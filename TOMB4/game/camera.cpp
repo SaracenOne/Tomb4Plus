@@ -71,7 +71,7 @@ void InitialiseCamera()
 	camera.pos.x = last_target.x;
 	camera.pos.z = last_target.z - 100;
 	camera.pos.room_number = lara_item->room_number;
-	camera.target_distance = mod_camera_info->chase_cam_distance;
+	camera.target_distance = mod_camera_info->chase_camera_distance;
 	camera.item = nullptr;
 	camera.number_frames = 1;
 	camera.type = CHASE_CAMERA;
@@ -580,8 +580,11 @@ void ChaseCamera(ITEM_INFO* item)
 	long distance, dx, dz, farthest, farthestnum, h, c, wx, wy, wz;
 	short angle, room_number;
 
+	MOD_LEVEL_CAMERA_INFO* mod_camera_info = get_game_mod_level_camera_info(gfCurrentLevel);
+
+
 	if (!camera.target_elevation)
-		camera.target_elevation = -1820;
+		camera.target_elevation = mod_camera_info->chase_camera_vertical_orientation;
 
 	camera.target_elevation += item->pos.x_rot;
 
@@ -795,7 +798,7 @@ void CombatCamera(ITEM_INFO* item)
 			if (!tomb4.combat_cam_tilt) {
 				camera.target_elevation = lara.head_x_rot + lara.torso_x_rot + item->pos.x_rot + mod_camera_info->chase_camera_vertical_orientation;
 			} else {
-				camera.target_elevation = lara.head_x_rot + lara.torso_x_rot + item->pos.x_rot + mod_camera_info->combat_cam_vertical_orientation;
+				camera.target_elevation = lara.head_x_rot + lara.torso_x_rot + item->pos.x_rot + mod_camera_info->combat_camera_vertical_orientation;
 			}
 			camera.target_elevation = lara.head_x_rot + lara.torso_x_rot + item->pos.x_rot - 2730;
 		}
@@ -804,7 +807,7 @@ void CombatCamera(ITEM_INFO* item)
 			if (!tomb4.combat_cam_tilt) {
 				camera.target_elevation = lara.torso_x_rot + item->pos.x_rot + lara.head_x_rot + mod_camera_info->chase_camera_vertical_orientation;
 			} else {
-				camera.target_elevation = lara.torso_x_rot + item->pos.x_rot + lara.head_x_rot + mod_camera_info->combat_cam_vertical_orientation;
+				camera.target_elevation = lara.torso_x_rot + item->pos.x_rot + lara.head_x_rot + mod_camera_info->combat_camera_vertical_orientation;
 			}
 		}
 	}
@@ -865,7 +868,7 @@ void CombatCamera(ITEM_INFO* item)
 	if (tr5_camera_behaviour) {
 		UpdateCameraElevation();
 	}
-	camera.target_distance = mod_camera_info->combat_cam_distance;
+	camera.target_distance = mod_camera_info->combat_camera_distance;
 	if (tr5_camera_behaviour) {\
 		distance = camera.target_distance * phd_cos(camera.actual_elevation) >> W2V_SHIFT;
 	} else {
@@ -1010,7 +1013,7 @@ void LookCamera(ITEM_INFO* item)
 	pos1.x = 0;
 	pos1.y = mod_camera_info->look_camera_height;
 	pos1.z = 64;
-	GetLaraJointPos(&pos1, 8);
+	GetLaraJointPos(&pos1, LMX_HEAD);
 	room_number = lara_item->room_number;
 	floor = GetFloor(pos1.x, pos1.y, pos1.z, &room_number);
 	h = GetHeight(floor, pos1.x, pos1.y, pos1.z);
@@ -1021,7 +1024,7 @@ void LookCamera(ITEM_INFO* item)
 		pos1.x = 0;
 		pos1.y = mod_camera_info->look_camera_height;
 		pos1.z = 0;
-		GetLaraJointPos(&pos1, 8);
+		GetLaraJointPos(&pos1, LMX_HEAD);
 
 		// T4Plus - swamp
 		room_number = lara_item->room_number;
@@ -1038,7 +1041,7 @@ void LookCamera(ITEM_INFO* item)
 			pos1.x = 0;
 			pos1.y = mod_camera_info->look_camera_height;
 			pos1.z = -64;
-			GetLaraJointPos(&pos1, 8);
+			GetLaraJointPos(&pos1, LMX_HEAD);
 
 			room_number = lara_item->room_number;
 			floor = GetFloor(pos1.x, pos1.y + 256, pos1.z, &room_number);
@@ -1055,7 +1058,7 @@ void LookCamera(ITEM_INFO* item)
 				pos1.x = 0;
 				pos1.y = mod_camera_info->look_camera_height;
 				pos1.z = -64;
-				GetLaraJointPos(&pos1, 8);
+				GetLaraJointPos(&pos1, LMX_HEAD);
 			}
 		}
 	}
@@ -1063,11 +1066,11 @@ void LookCamera(ITEM_INFO* item)
 	pos2.x = 0;
 	pos2.y = 0;
 	pos2.z = mod_camera_info->look_camera_distance;
-	GetLaraJointPos(&pos2, 8);
+	GetLaraJointPos(&pos2, LMX_HEAD);
 	pos3.x = 0;
 	pos3.y = 0;
 	pos3.z = 2048;
-	GetLaraJointPos(&pos3, 8);
+	GetLaraJointPos(&pos3, LMX_HEAD);
 	wy = pos1.y;
 	wx = pos1.x;
 	wz = pos1.z;
@@ -1660,7 +1663,7 @@ void CalculateCamera()
 					v.x = 0;
 					v.y = 0;
 					v.z = 0;
-					GetLaraJointPos(&v, LM_TORSO);
+					GetLaraJointPos(&v, LMX_TORSO);
 					camera.target.x = v.x;
 					camera.target.y = v.y;
 					camera.target.z = v.z;
@@ -1763,7 +1766,7 @@ void CalculateCamera()
 		camera.item = 0;
 		camera.target_elevation = 0;
 		camera.target_angle = 0;
-		camera.target_distance = mod_camera_info->chase_cam_distance;
+		camera.target_distance = mod_camera_info->chase_camera_distance;
 		camera.flags = 0;
 		camera.lara_node = -1;
 	}

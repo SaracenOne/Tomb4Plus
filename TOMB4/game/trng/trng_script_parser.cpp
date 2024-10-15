@@ -1393,7 +1393,7 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 							}
 						}
 						if (distance_chase_cam != -1) {
-							get_game_mod_level_camera_info(i)->chase_cam_distance = distance_chase_cam;
+							get_game_mod_level_camera_info(i)->chase_camera_distance = distance_chase_cam;
 						}
 						if (v_orient_chase_cam != -1) {
 							get_game_mod_level_camera_info(i)->chase_camera_vertical_orientation = v_orient_chase_cam;
@@ -1402,10 +1402,10 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: h_orient_chase_cam is not supported! (level %u)", current_level);
 						}
 						if (distance_combat_cam != -1) {
-							get_game_mod_level_camera_info(i)->combat_cam_distance = distance_combat_cam;
+							get_game_mod_level_camera_info(i)->combat_camera_distance = distance_combat_cam;
 						}
 						if (v_orient_combat_cam != -1) {
-							get_game_mod_level_camera_info(i)->combat_cam_vertical_orientation = v_orient_combat_cam;
+							get_game_mod_level_camera_info(i)->combat_camera_vertical_orientation = v_orient_combat_cam;
 						}
 						if (distance_look_cam != -1) {
 							get_game_mod_level_camera_info(i)->look_camera_distance = distance_look_cam;

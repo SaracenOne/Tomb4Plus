@@ -11,7 +11,8 @@
 
 #define MOD_LEVEL_COUNT 64
 
-#define ENGINE_MANIFEST_VERSION 0
+// 1 - Change object customization ID format.
+#define ENGINE_MANIFEST_VERSION 1
 
 #define DEFAULT_FOG_START_VALUE 12288
 #define DEFAULT_FOG_END_VALUE 20480
@@ -67,12 +68,12 @@ struct MOD_LEVEL_FONT_INFO {
 };
 
 struct MOD_LEVEL_CAMERA_INFO {
-	int chase_cam_distance = 1536;
+	int chase_camera_distance = 1536;
 	int chase_camera_vertical_orientation = -1820;
 	int chase_camera_horizontal_orientation = 0;
 
-	int combat_cam_distance = 1536;
-	int combat_cam_vertical_orientation = -2730;
+	int combat_camera_distance = 1536;
+	int combat_camera_vertical_orientation = -2730;
 
 	int look_camera_distance = -1024;
 	int look_camera_height = 16;
@@ -103,19 +104,59 @@ enum SLOT_HIT_TYPE {
 	HIT_SMOKE
 };
 
+#define MAX_BONE_CUSTOMIZATIONS 4
+
+struct MOD_LEVEL_OBJECT_BONE_CUSTOMIZATION {
+	unsigned char bone_id = -1;
+	unsigned char bone_data = 0;
+};
+
 struct MOD_LEVEL_OBJECT_CUSTOMIZATION {
+	const char *initialise_routine;
+	const char *collision_routine;
+	const char *control_routine;
+	const char *draw_routine;
+	const char *draw_routine_extra;
+	const char *ceiling_routine;
+	const char *floor_routine;
+
+	ushort is_amphibious : 1;
+
+	ushort is_agent : 1;
+	ushort is_undead : 1;
+
+	ushort save_position : 1;
+	ushort save_hitpoints : 1;
+	ushort save_flags : 1;
+	ushort save_anim : 1;
+	ushort save_mesh : 1;
+
+	ushort override_hit_points : 1;
+	ushort override_hit_type : 1;
+
+	ushort explode_immediately : 1;
+	ushort explode_after_death_animation : 1;
+	ushort explosive_death_only : 1;
+	ushort hit_type : 2;
+	
+	int pivot_length = 0;
+	int radius = 10;
+	int shadow_size = 0;
+
+	int explodable_meshbits = 0;
+
 	short hit_points = 0;
 	short damage_1 = 0;
 	short damage_2 = 0;
 	short damage_3 = 0;
 
-	bool override_hit_points : 1;
-	bool override_hit_type : 1;
+	ushort linked_object_1 = 0;
+	ushort linked_object_2 = 0;
+	ushort linked_object_3 = 0;
 
-	bool explode_immediately : 1;
-	bool explode_after_death_animation : 1;
-	SLOT_HIT_TYPE hit_type: 2;
-	bool explosive_death_only : 1;
+	int object_mip = 0;
+
+	MOD_LEVEL_OBJECT_BONE_CUSTOMIZATION bone_customization[MAX_BONE_CUSTOMIZATIONS];
 };
 
 struct MOD_LEVEL_OBJECTS_INFO {

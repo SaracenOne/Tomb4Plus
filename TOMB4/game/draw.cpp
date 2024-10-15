@@ -373,7 +373,7 @@ void CalculateObjectLightingLara()
 		}
 		else
 		{
-			GetLaraJointPos(&pos, 7);
+			GetLaraJointPos(&pos, LMX_TORSO);
 			room_no = lara_item->room_number;
 			GetFloor(pos.x, pos.y, pos.z, &room_no);
 		}

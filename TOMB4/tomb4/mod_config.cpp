@@ -477,12 +477,12 @@ void LoadGameModLevelFontInfo(const json_t* font, MOD_LEVEL_FONT_INFO* font_info
 }
 
 void LoadGameModLevelCameraInfo(const json_t* camera, MOD_LEVEL_CAMERA_INFO* camera_info) {
-    READ_JSON_SINT32(chase_cam_distance, camera, camera_info);
+    READ_JSON_SINT32(chase_camera_distance, camera, camera_info);
     READ_JSON_SINT32(chase_camera_vertical_orientation, camera, camera_info);
     READ_JSON_SINT32(chase_camera_horizontal_orientation, camera, camera_info);
 
-    READ_JSON_SINT32(combat_cam_distance, camera, camera_info);
-    READ_JSON_SINT32(combat_cam_vertical_orientation, camera, camera_info);
+    READ_JSON_SINT32(combat_camera_distance, camera, camera_info);
+    READ_JSON_SINT32(combat_camera_vertical_orientation, camera, camera_info);
 
     READ_JSON_SINT32(look_camera_distance, camera, camera_info);
     READ_JSON_SINT32(look_camera_height, camera, camera_info);
@@ -683,9 +683,14 @@ void LoadGameModLevelObjectsInfo(const json_t* objects, MOD_LEVEL_OBJECTS_INFO* 
     const json_t *object_customization = json_getProperty(objects, "object_customization");
     if (object_customization && JSON_ARRAY == json_getType(object_customization)) {
         json_t const* object_customization_json;
-        int object_customization_index = 0;
         for (object_customization_json = json_getChild(object_customization); object_customization_json != 0; object_customization_json = json_getSibling(object_customization_json)) {
-            if (object_customization_index >= NUMBER_OBJECTS)
+            int object_customization_index = -1;
+            const json_t* prop = json_getProperty(object_customization_json, "object_id");
+            if (prop && JSON_INTEGER == json_getType(prop)) {
+                object_customization_index = (signed int)json_getInteger(prop);
+            }
+            
+            if (object_customization_index >= NUMBER_OBJECTS || object_customization_index < 0)
                 break;
 
             LoadGameModObjectCustomizationInfo(object_customization_json, &objects_info->object_customization[object_customization_index]);
@@ -765,6 +770,11 @@ void LoadGameModLevel(const json_t *level, MOD_LEVEL_INFO *level_info) {
     const json_t* bars_info = json_getProperty(level, "bars_info");
     if (bars_info && JSON_OBJ == json_getType(bars_info)) {
         LoadGameModLevelBarsInfo(bars_info, &level_info->bars_info);
+    }
+
+    const json_t* camera_info = json_getProperty(level, "camera_info");
+    if (camera_info && JSON_OBJ == json_getType(camera_info)) {
+        LoadGameModLevelCameraInfo(camera_info, &level_info->camera_info);
     }
 
     const json_t* environment_info = json_getProperty(level, "environment_info");
