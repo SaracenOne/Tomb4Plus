@@ -1334,13 +1334,18 @@ void ControlRaisingBlock(short item_number)
 			item->item_flags[1] += 64;
 
 			// TRNG
-			if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour)
-			{
+			if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour) {
 				// TRNG
-				ITEM_INFO* pushable = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? (BLOCK_SIZE * 2) : BLOCK_SIZE);
-				if (pushable)
-				{
-					pushable->pos.y_pos -= item->object_number == RAISING_BLOCK2 ? 32 : 16;
+				ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? (BLOCK_SIZE * 2) : BLOCK_SIZE);
+				if (pushable_item) {
+					int32_t height_different = item->object_number == RAISING_BLOCK2 ? -32 : -16;
+					pushable_item->pos.y_pos += height_different;
+
+					int16_t pushable_room_number = pushable_item->room_number;
+					FLOOR_INFO* floor_info = GetFloor(pushable_item->pos.x_pos, pushable_item->pos.y_pos + height_different, pushable_item->pos.z_pos, &pushable_room_number);
+					if (pushable_item->room_number != pushable_room_number) {
+						ItemNewRoom(T4PlusGetIDForItemInfo(pushable_item), pushable_room_number);
+					}
 				}
 			}
 
@@ -1370,12 +1375,16 @@ void ControlRaisingBlock(short item_number)
 		item->item_flags[1] -= 64;
 		
 		// TRNG
-		if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour)
-		{
-			ITEM_INFO* pushable = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? 2048 : 1024);
-			if (pushable)
-			{
-				pushable->pos.y_pos += item->object_number == RAISING_BLOCK2 ? 32 : 16;
+		if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour) {
+			ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? 2048 : 1024);
+			if (pushable_item) {
+				int32_t height_different = item->object_number == RAISING_BLOCK2 ? 32 : 16;
+				pushable_item->pos.y_pos += height_different;
+				int16_t pushable_room_number = pushable_item->room_number;
+				FLOOR_INFO* floor_info = GetFloor(pushable_item->pos.x_pos, pushable_item->pos.y_pos + height_different, pushable_item->pos.z_pos, &pushable_room_number);
+				if (pushable_item->room_number != pushable_room_number){
+					ItemNewRoom(T4PlusGetIDForItemInfo(pushable_item), pushable_room_number);
+				}
 			}
 		}
 	}

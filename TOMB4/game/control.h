@@ -50,7 +50,7 @@ extern ANIM_STRUCT* anims;
 extern ROOM_INFO* room;
 extern short** meshes;
 extern long* bones;
-extern long level_items;
+extern int32_t level_items;
 extern short number_rooms;
 
 extern short* OutsideRoomOffsets;

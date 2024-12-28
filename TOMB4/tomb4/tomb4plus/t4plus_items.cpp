@@ -67,7 +67,8 @@ void T4PlusActivateItem(short item_id, bool anti) {
 }
 
 int32_t T4PlusGetIDForItemInfo(ITEM_INFO *item) {
-	return int32_t(items - item) / sizeof(ITEM_INFO);
+	int32_t id = int32_t(size_t(item) - size_t(items)) / sizeof(ITEM_INFO);
+	return id;
 }
 
 ITEM_INFO *T4PlusGetItemInfoForID(int32_t item_id) {

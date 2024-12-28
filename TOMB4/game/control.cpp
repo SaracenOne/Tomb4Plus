@@ -64,7 +64,7 @@ ANIM_STRUCT* anims;
 ROOM_INFO* room;
 short** meshes;
 long* bones;
-long level_items;
+int32_t level_items;
 short number_rooms;
 
 short* OutsideRoomOffsets;
