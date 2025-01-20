@@ -545,7 +545,7 @@ uint32_t NGWriteFrozenItems(uint32_t position) {
 	frozen_items_size += sizeof(uint16_t);
 	frozen_items_size += sizeof(uint16_t);
 
-	for (int i = 0; i < level_items; i++) {
+	for (int i = 0; i < frozen_item_count; i++) {
 		frozen_items_size += sizeof(uint16_t);
 		frozen_items_size += sizeof(uint16_t);
 	}
@@ -585,6 +585,9 @@ void NGWriteNGSavegameInfo() {
 	ng_savegame_buffer_size = NGWriteOCBItems(ng_savegame_buffer_size);
 	ng_savegame_buffer_size = NGWriteLocalVariables(ng_savegame_buffer_size);
 	ng_savegame_buffer_size = NGWriteFrozenItems(ng_savegame_buffer_size);
+
+	// End
+	NG_WRITE_32(ng_savegame_buffer, ng_savegame_buffer_size, 0);
 
 	NG_WRITE_32(ng_savegame_buffer, ng_savegame_buffer_size, NGLE_END_SIGNATURE);
 	NG_WRITE_32(ng_savegame_buffer, ng_savegame_buffer_size, ng_savegame_buffer_size + sizeof(uint32_t));
@@ -627,7 +630,7 @@ void NGReadNGSavegameInfo() {
 			uint16_t block_type = NG_READ_16(ng_savegame_buffer, offset);
 
 			if (block_type == 0) {
-				return;
+				break;
 			}
 
 			switch (block_type) {
