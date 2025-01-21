@@ -55,7 +55,7 @@ void DrawGameInfo(long timed)
 	if (camera_frozen)
 		return;
 
-	if (!GLOBAL_playing_cutseq && !bDisableLaraControl && gfGameMode != 1)
+	if (!GLOBAL_playing_cutseq && !bDisableLaraControl && gfGameMode != GF_GAME_MODE_TITLE)
 	{
 		flash_state = FlashIt();
 		DrawHealthBar(flash_state);

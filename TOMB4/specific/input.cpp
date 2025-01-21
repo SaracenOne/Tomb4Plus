@@ -1231,7 +1231,7 @@ long S_UpdateInput()
 	if (debounce)
 		dbinput = inputBusy;
 
-	if (!gfGameMode && Gameflow->LoadSaveEnabled)
+	if (gfGameMode == GF_GAME_MODE_LEVEL && Gameflow->LoadSaveEnabled)
 	{
 		if (IsKeyPressed(T4P_KEY_F5))
 			if (NGValidateInputSavegame())

@@ -143,11 +143,11 @@ void InitialiseSpotCam(short Sequence)
 	spline_to_camera = 0;
 	s = &SpotCam[current_spline_camera];
 
-	if (s->flags & 0x400 || gfGameMode == 1)
+	if (s->flags & 0x400 || gfGameMode == GF_GAME_MODE_TITLE)
 	{
 		bDisableLaraControl = 1;
 
-		if (gfGameMode != 1)
+		if (gfGameMode != GF_GAME_MODE_TITLE)
 			SetFadeClip(16, 1);
 	}
 
@@ -375,7 +375,7 @@ void CalculateSpotCams()
 	if (!(input & IN_LOOK))
 		bFirstLook = 0;
 
-	if (FirstCam->flags & 0x200 || !(input & IN_LOOK) || gfGameMode == 1)
+	if (FirstCam->flags & 0x200 || !(input & IN_LOOK) || gfGameMode == GF_GAME_MODE_TITLE)
 	{
 		camera.pos.x = cpx;
 		camera.pos.y = cpy;

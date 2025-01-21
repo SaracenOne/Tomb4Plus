@@ -1,6 +1,14 @@
 #pragma once
 #include "../global/types.h"
 
+enum GameFlowGameMode {
+	GF_GAME_MODE_LEVEL = 0,
+	GF_GAME_MODE_TITLE,
+	GF_GAME_MODE_DEMO,
+	GF_GAME_MODE_CUTSCENE,
+	GF_GAME_MODE_SAVEGAME
+};
+
 char *GetCustomStringForTextID(int id);
 char *GetFixedStringForTextID(int id);
 void DoGameflow();
@@ -30,7 +38,7 @@ extern long gfStatus;
 extern ushort gfLevelFlags;
 extern uchar gfCurrentLevel;
 extern uchar gfLevelComplete;
-extern uchar gfGameMode;
+extern GameFlowGameMode gfGameMode;
 extern uchar gfMirrorRoom;
 extern uchar gfNumMips;
 extern uchar gfRequiredStartPos;

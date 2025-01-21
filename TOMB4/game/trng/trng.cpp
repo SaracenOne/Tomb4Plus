@@ -538,7 +538,7 @@ void NGLevelSetup() {
 	NGSetupLevelExtraState();
 
 	// Loaded from a savegame
-	if (gfGameMode == 4) {
+	if (gfGameMode == GF_GAME_MODE_SAVEGAME) {
 		ng_loaded_savegame = true;
 	} else {
 		ng_loaded_savegame = false;

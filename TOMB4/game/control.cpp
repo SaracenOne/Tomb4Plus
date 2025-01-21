@@ -334,7 +334,7 @@ long ControlPhase(long nframes, long demo_mode)
 					return 2;
 			}
 
-			if (input & IN_PAUSE && gfGameMode == 0 && lara_item->hit_points > 0)
+			if (input & IN_PAUSE && gfGameMode == GF_GAME_MODE_LEVEL && lara_item->hit_points > 0)
 			{
 				if (S_PauseMenu() == 8)
 					return 1;
@@ -478,11 +478,12 @@ long ControlPhase(long nframes, long demo_mode)
 
 		InItemControlLoop = true;
 
-		if (!GLOBAL_playing_cutseq && !gfGameMode)
+		if (!GLOBAL_playing_cutseq && gfGameMode == GF_GAME_MODE_LEVEL) {
 			LaraControl(0);
-		else if (gfGameMode == 1 && global_info->show_lara_in_title)
+		} else if (gfGameMode == GF_GAME_MODE_TITLE && global_info->show_lara_in_title) {
 			// TRLE: Activate Lara if we have 'show_lara_in_title' flag set.
 			AnimateLara(lara_item);
+		}
 
 		InItemControlLoop = false;
 
@@ -581,7 +582,7 @@ long ControlPhase(long nframes, long demo_mode)
 		SoundEffects();
 		health_bar_timer--;
 		
-		if (!gfGameMode)
+		if (gfGameMode == GF_GAME_MODE_LEVEL)
 		{
 			GameTimer++;
 

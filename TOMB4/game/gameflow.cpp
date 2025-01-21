@@ -135,7 +135,7 @@ long gfStatus = 0;
 ushort gfLevelFlags;
 uchar gfCurrentLevel;
 uchar gfLevelComplete;
-uchar gfGameMode = 1;
+GameFlowGameMode gfGameMode = GF_GAME_MODE_TITLE;
 uchar gfMirrorRoom;
 uchar gfNumMips = 0;
 uchar gfRequiredStartPos;
@@ -264,7 +264,7 @@ void DoGameflow()
 				break;
 
 			case 2:
-				gfGameMode = 4;
+				gfGameMode = GF_GAME_MODE_SAVEGAME;
 				gfCurrentLevel = savegame.CurrentLevel & 0x7F;
 				break;
 
@@ -315,12 +315,12 @@ void DoGameflow()
 			switch (gfStatus)
 			{
 			case 2:
-				gfGameMode = 4;
+				gfGameMode = GF_GAME_MODE_SAVEGAME;
 				gfCurrentLevel = savegame.CurrentLevel & 0x7F;
 				break;
 
 			case 3:
-				gfGameMode = 0;
+				gfGameMode = GF_GAME_MODE_LEVEL;
 				gfCurrentLevel = gfLevelComplete;
 				gfInitialiseGame = 1;
 				break;
@@ -403,7 +403,7 @@ void DoGameflow()
 			gfLegend = gf[0];
 			gf++;
 
-			if (gfGameMode != 4)
+			if (gfGameMode != GF_GAME_MODE_SAVEGAME)
 				gfLegendTime = get_game_mod_level_misc_info(gfCurrentLevel)->legend_timer;
 
 			break;
@@ -489,7 +489,7 @@ void DoLevel(uchar Name, uchar Audio)
 	gamestatus = 0;
 	SetFade(255, 0);
 
-	if (gfGameMode != 4)
+	if (gfGameMode != GF_GAME_MODE_SAVEGAME)
 	{
 		savegame.Level.Timer = 0;
 		savegame.Level.Distance = 0;
@@ -511,19 +511,15 @@ void DoLevel(uchar Name, uchar Audio)
 	SOUND_Stop();
 	bDisableLaraControl = 0;
 
-	if (gfGameMode == 4)
-	{
+	if (gfGameMode == GF_GAME_MODE_SAVEGAME) {
 		sgRestoreGame();
 		gfRequiredStartPos = 0;
 		gfInitialiseGame = 0;
 		SetVolumetricFogColor(savegame.fog_colour.r, savegame.fog_colour.g, savegame.fog_colour.b);
-	}
-	else
-	{
+	} else {
 		T4PlusLevelReset();
 
-		if (gfInitialiseGame)
-		{
+		if (gfInitialiseGame) {
 			GameTimer = 0;
 			gfRequiredStartPos = 0;
 			gfInitialiseGame = 0;
@@ -532,9 +528,9 @@ void DoLevel(uchar Name, uchar Audio)
 
 			// T4Plus
 			T4PlusEnterLevel(gfCurrentLevel, true);
-		}
-		else
+		} else {
 			sgRestoreLevel();
+		}
 
 		if (gfLevelFlags & GF_REMOVEAMULET)
 			lara.questitems &= ~1;
@@ -550,7 +546,7 @@ void DoLevel(uchar Name, uchar Audio)
 
 	ClipRange = (float)environment_info->far_view;
 
-	if (CurrentAtmosphere != -1 && (gfGameMode == 0 || IsUsingOldCDTriggerMode())) {
+	if (CurrentAtmosphere != -1 && (gfGameMode == GF_GAME_MODE_LEVEL || IsUsingOldCDTriggerMode())) {
 		S_CDPlay(CurrentAtmosphere, 1);
 	}
 	IsAtmospherePlaying = true;
@@ -560,14 +556,11 @@ void DoLevel(uchar Name, uchar Audio)
 	dScreenFade = 255;
 	ScreenFade = 255;
 
-	if (!gfCutNumber || CheckCutPlayed(gfCutNumber))
-	{
+	if (!gfCutNumber || CheckCutPlayed(gfCutNumber)) {
 		cutseq_num = 0;
 		gfCutNumber = 0;
 		SetScreenFadeIn(16);
-	}
-	else
-	{
+	} else {
 		cutseq_num = gfCutNumber;
 		gfCutNumber = 0;
 		ScreenFadedOut = 1;
@@ -575,7 +568,7 @@ void DoLevel(uchar Name, uchar Audio)
 
 	InitialiseCamera();
 	bUseSpotCam = 0;
-	gfGameMode = 0;
+	gfGameMode = GF_GAME_MODE_LEVEL;
 	gfLevelComplete = 0;
 	nFrames = 2;
 	framecount = 0;
@@ -589,8 +582,7 @@ void DoLevel(uchar Name, uchar Audio)
 
 		S_InitialisePolyList();
 
-		if (gfLegendTime != 0 && !cutseq_num && ((!DestFadeScreenHeight && !FadeScreenHeight) || get_game_mod_level_misc_info(gfCurrentLevel)->draw_legend_on_flyby))
-		{
+		if (gfLegendTime != 0 && !cutseq_num && ((!DestFadeScreenHeight && !FadeScreenHeight) || get_game_mod_level_misc_info(gfCurrentLevel)->draw_legend_on_flyby)) {
 			PrintString(phd_winwidth >> 1, phd_winymax - font_height, 2, GetCustomStringForTextID(gfLegend), FF_CENTER);
 			if (gfLegendTime > 0) {
 				gfLegendTime--;
@@ -599,15 +591,12 @@ void DoLevel(uchar Name, uchar Audio)
 
 		nFrames = DrawPhaseGame();
 
-		if (!get_game_mod_global_info()->tr_level_editor)
-		{
+		if (!get_game_mod_global_info()->tr_level_editor) {
 			handle_cutseq_triggering(Name);
 
-			if (DEL_playingamefmv)
-			{
+			if (DEL_playingamefmv) {
 				DEL_playingamefmv = 0;
-				if (!get_game_mod_global_info()->tr_times_exclusive)
-				{
+				if (!get_game_mod_global_info()->tr_times_exclusive) {
 					S_CDStop();
 					PlayFmvNow(7);
 					DelsHandyTeleportLara(54179, -8192, 50899, -32703);
@@ -615,32 +604,29 @@ void DoLevel(uchar Name, uchar Audio)
 			}
 		}
 
-		if (gfLevelComplete)
-		{
+		if (gfLevelComplete) {
 			gfStatus = 3;
 			break;
 		}
 
 		gfStatus = ControlPhase(nFrames, 0);
 
-		if (gfStatus && !gamestatus)
-		{
-			if (lara_item->hit_points < 0)
-			{
+		if (gfStatus && !gamestatus) {
+			if (lara_item->hit_points < 0) {
 				gamestatus = gfStatus;
 				SetFade(0, 255);
 				gfStatus = 0;
-			}
-			else
+			} else {
 				break;
+			}
 		}
 
-		if (gamestatus)
-		{
+		if (gamestatus) {
 			gfStatus = 0;
 
-			if (DoFade == 2)
+			if (DoFade == 2) {
 				gfStatus = gamestatus;
+			}
 		}
 	}
 
@@ -988,7 +974,7 @@ void DoTitle(uchar Name, uchar Audio)
 	bUseSpotCam = 1;
 	if (!global_info->show_lara_in_title)
 		lara_item->mesh_bits = 0;
-	gfGameMode = 1;
+	gfGameMode = GF_GAME_MODE_TITLE;
 	gfLevelComplete = 0;
 	nFrames = 2;
 	gfStatus = ControlPhase(2, 0);
