@@ -264,7 +264,12 @@ uint32_t NGWriteVariableData(uint32_t position) {
 	NG_WRITE_16(ng_savegame_buffer, position, 0); // TODO: Damage intensity
 	NG_WRITE_16(ng_savegame_buffer, position, 0); // TODO: Damage flags
 	NG_WRITE_32(ng_savegame_buffer, position, ng_input_to_disable);
-	NG_WRITE_32(ng_savegame_buffer, position, 0); // TODO: Status NG
+
+	int32_t status_ng = 0;
+	if (NGLaraHasInfiniteAir()) {
+		status_ng |= 0x00000001;
+	}
+	NG_WRITE_32(ng_savegame_buffer, position, status_ng); // TODO: Status NG
 	NG_WRITE_16(ng_savegame_buffer, position, 0); // TODO: Disable feature flags
 	NG_WRITE_32(ng_savegame_buffer, position, 0); // TODO: Counter game
 	NG_WRITE_16(ng_savegame_buffer, position, 0); // TODO: Level now flags
@@ -744,6 +749,9 @@ void NGReadNGSavegameInfo() {
 					uint16_t damage_flags = NG_READ_16(ng_savegame_buffer, offset);
 					ng_input_to_disable = NG_READ_32(ng_savegame_buffer, offset);
 					uint32_t status_ng = NG_READ_32(ng_savegame_buffer, offset);
+
+					ng_lara_infinite_air = status_ng & 0x00000001;
+
 					uint16_t disable_features_flags = NG_READ_16(ng_savegame_buffer, offset);
 					uint32_t counter_game = NG_READ_32(ng_savegame_buffer, offset);
 					uint16_t level_now_flags = NG_READ_16(ng_savegame_buffer, offset);
