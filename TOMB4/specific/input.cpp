@@ -604,10 +604,9 @@ static void DoWeaponHotkey()	//adds extra checks and does ammo type swaps..
 	short state;
 	bool goin;
 
-	if (!lara_item)
+	if (!lara_item) {
 		goin = 0;
-	else
-	{
+	} else {
 		state = lara_item->current_anim_state;
 		goin = !(gfLevelFlags & GF_YOUNGLARA) && (lara.water_status == LW_ABOVE_WATER || lara.water_status == LW_WADE) && !bDisableLaraControl &&
 			(state != AS_ALL4S && state != AS_CRAWL && state != AS_ALL4TURNL && state != AS_ALL4TURNR && state != AS_CRAWLBACK &&
@@ -1088,7 +1087,7 @@ long S_UpdateInput()
 	if (IsActionPressed(INPUT_ACTION_UNSELECT))
 		linput |= IN_DESELECT;
 
-	linput = NGValidateInputAgainstLockTimers(linput);
+	linput = NGValidateAgainstBlockedInput(linput);
 	linput = NGApplySimulatedInput(linput);
 
 	if (linput & IN_FLARE) {
@@ -1233,13 +1232,25 @@ long S_UpdateInput()
 
 	if (gfGameMode == GF_GAME_MODE_LEVEL && Gameflow->LoadSaveEnabled)
 	{
-		if (IsKeyPressed(T4P_KEY_F5))
-			if (NGValidateInputSavegame())
+		if (IsKeyPressed(T4P_KEY_F5)) {
+			if (NGValidateInputSavegame()) {
 				linput |= IN_SAVE;
+			}
+		}
+		
+		if (NGIsSimulatingInputSavegame()) {
+			linput |= IN_SAVE;
+		}
 
-		if (IsKeyPressed(T4P_KEY_F6))
-			if (NGValidateInputLoadgame())
+		if (IsKeyPressed(T4P_KEY_F6)) {
+			if (NGValidateInputLoadgame()) {
 				linput |= IN_LOAD;
+			}
+		}
+		
+		if (NGIsSimulatingInputLoadgame()) {
+			linput |= IN_LOAD;
+		}
 	}
 
 
@@ -1262,6 +1273,8 @@ long S_UpdateInput()
 
 	if (debounce)
 		dbinput = inputBusy & (dbinput ^ inputBusy);
+
+	NGClearSimulatedSingleInputForFrame();
 
 	input = linput;
 	return 1;

@@ -22,6 +22,7 @@
 #include "trng_organizer.h"
 #include "trng_triggergroup.h"
 #include "trng_globaltrigger.h"
+#include "trng_progressive_action.h"
 #include "../../specific/file.h"
 #include "../../tomb4/tomb4plus/t4plus_environment.h"
 #include "../../tomb4/tomb4plus/t4plus_items.h"
@@ -151,43 +152,21 @@ char ng_string4[REGULAR_TEXT_BUFFER_SIZE];
 
 char ng_text_big[BIG_TEXT_BUFFER_SIZE];
 
+// Visual
+
+NG_DRAW_STATE ng_drawing_state = NG_DRAW_STATE_ACTIVE;
+
 // Inventory
 uint8_t ng_selected_inventory_item_memory = 0;
 int32_t ng_used_inventory_object_for_frame = NO_ITEM;
 bool ng_used_large_medipack = false;
 bool ng_used_small_medipack = false;
 
-enum TRNG_INPUT {
-	TRNG_INPUT_UP,
-	TRNG_INPUT_DOWN,
-	TRNG_INPUT_LEFT,
-	TRNG_INPUT_RIGHT,
-	TRNG_INPUT_DUCK,
-	TRNG_INPUT_DASH,
-	TRNG_INPUT_WALK,
-	TRNG_INPUT_JUMP,
-	TRNG_INPUT_ACTION,
-	TRNG_INPUT_DRAW_WEAPON,
-	TRNG_INPUT_USE_FLARE,
-	TRNG_INPUT_LOOK,
-	TRNG_INPUT_ROLL,
-	TRNG_INVENTORY_AND_DESELECT,
-	TRNG_STEP_LEFT,
-	TRNG_STEP_RIGHT,
-	TRNG_PAUSE,
-	TRNG_SAVE_GAME,
-	TRNG_LOAD_GAME,
-	TRNG_WEAPON_KEYS,
-	TRNG_INPUT_COUNT
-};
-
 int32_t ng_looped_sound_state[NumSamples];
 
-#define NG_INPUT_TIMER_COUNT TRNG_INPUT_COUNT
-
-int32_t ng_input_simulate_oneshot = -1;
-int32_t ng_input_lock_timers[NG_INPUT_TIMER_COUNT];
-int32_t ng_input_simulate_timers[NG_INPUT_TIMER_COUNT];
+int32_t ng_input_to_simulate = 0;
+int32_t ng_input_to_disable = 0;
+int32_t ng_single_input_to_simulate = 0;
 
 int32_t NGGetPluginIDForFloorData(uint32_t floor_index, bool test_condition) {
 	if (test_condition) {
@@ -205,208 +184,162 @@ int32_t NGGetPluginIDForFloorData(uint32_t floor_index, bool test_condition) {
 	return 0;
 }
 
-int32_t NGValidateInputAgainstLockTimers(int32_t input) {
-	for (int32_t i = 0; i < TRNG_SAVE_GAME; i++) {
-		if (ng_input_lock_timers[i] != 0) {
-			switch (i) {
-				case TRNG_INPUT_UP:
-					input &= ~IN_FORWARD;
-					break;
-				case TRNG_INPUT_DOWN:
-					input &= ~IN_BACK;
-					break;
-				case TRNG_INPUT_LEFT:
-					input &= ~IN_LEFT;
-					break;
-				case TRNG_INPUT_RIGHT:
-					input &= ~IN_RIGHT;
-					break;
-				case TRNG_INPUT_DUCK:
-					input &= ~IN_DUCK;
-					break;
-				case TRNG_INPUT_DASH:
-					input &= ~IN_SPRINT;
-					break;
-				case TRNG_INPUT_WALK:
-					input &= ~(IN_WALK | IN_LSTEP | IN_RSTEP); // TRNG bug?
-					break;
-				case TRNG_INPUT_JUMP:
-					input &= ~IN_JUMP;
-					break;
-				case TRNG_INPUT_ACTION:
-					input &= ~(IN_ACTION | IN_SELECT);
-					break;
-				case TRNG_INPUT_DRAW_WEAPON:
-					input &= ~IN_DRAW;
-					break;
-				case TRNG_INPUT_USE_FLARE:
-					input &= ~IN_FLARE;
-					break;
-				case TRNG_INPUT_LOOK:
-					input &= ~IN_LOOK;
-					break;
-				case TRNG_INPUT_ROLL:
-					input &= ~IN_ROLL;
-					break;
-				case TRNG_INVENTORY_AND_DESELECT:
-					input &= ~(IN_OPTION | IN_DESELECT);
-					break;
-				case TRNG_STEP_LEFT:
-					input &= ~(IN_WALK | IN_LSTEP | IN_RSTEP); // TRNG bug?
-					break;
-				case TRNG_STEP_RIGHT:
-					input &= ~(IN_WALK | IN_LSTEP | IN_RSTEP); // TRNG bug?
-					break;
-				case TRNG_PAUSE:
-					input &= ~IN_PAUSE;
-					break;
-				default:
-					NGLog(NG_LOG_TYPE_ERROR, "Invalid input type %u!", i);
-					break;
-			}
+NG_DRAW_STATE NGGetDrawState() {
+	return ng_drawing_state;
+}
+
+int32_t NGValidateAgainstBlockedInput(int32_t input) {
+	if (ng_input_to_disable) {
+		int32_t modified_blocked_input = ng_input_to_disable;
+		if (modified_blocked_input == IN_ALL) {
+			input = 0;
+		} else {
+			input &= ~modified_blocked_input;
 		}
 	}
 
 	return input;
 }
 
-void NGApplyNGInputEnumToMask(uint32_t ng_input_type, int32_t *input_mask) {
-	switch (ng_input_type) {
-		case TRNG_INPUT_UP:
-			*input_mask |= IN_FORWARD;
-			break;
-		case TRNG_INPUT_DOWN:
-			*input_mask |= IN_BACK;
-			break;
-		case TRNG_INPUT_LEFT:
-			*input_mask |= IN_LEFT;
-			break;
-		case TRNG_INPUT_RIGHT:
-			*input_mask |= IN_RIGHT;
-			break;
-		case TRNG_INPUT_DUCK:
-			*input_mask |= IN_DUCK;
-			break;
-		case TRNG_INPUT_DASH:
-			*input_mask |= IN_SPRINT;
-			break;
-		case TRNG_INPUT_WALK:
-			*input_mask |= IN_WALK;
-			break;
-		case TRNG_INPUT_JUMP:
-			*input_mask |= IN_JUMP;
-			break;
-		case TRNG_INPUT_ACTION:
-			*input_mask |= IN_ACTION;
-			break;
-		case TRNG_INPUT_DRAW_WEAPON:
-			*input_mask |= IN_DRAW;
-			break;
-		case TRNG_INPUT_USE_FLARE:
-			*input_mask |= IN_FLARE;
-			break;
-		case TRNG_INPUT_LOOK:
-			*input_mask |= IN_LOOK;
-			break;
-		case TRNG_INPUT_ROLL:
-			*input_mask |= IN_ROLL;
-			break;
-		case TRNG_INVENTORY_AND_DESELECT:
-			*input_mask |= (IN_OPTION | IN_DESELECT);
-			break;
-		case TRNG_STEP_LEFT:
-			*input_mask |= IN_LSTEP;
-			break;
-		case TRNG_STEP_RIGHT:
-			*input_mask |= IN_LSTEP;
-			break;
-		case TRNG_PAUSE:
-			*input_mask |= IN_PAUSE;
-			break;
-		default:
-			NGLog(NG_LOG_TYPE_ERROR, "Invalid NG input type %u!", ng_input_type);
-			break;
-	}
-}
-
 int32_t NGApplySimulatedInput(int32_t input) {
-	for (int32_t i = 0; i < TRNG_SAVE_GAME; i++) {
-		if (ng_input_simulate_timers[i] != 0) {
-			NGApplyNGInputEnumToMask(i, &input);
-		}
-	}
+	input |= ng_single_input_to_simulate;
 
-	if (ng_input_simulate_oneshot >= 0) {
-		NGApplyNGInputEnumToMask(ng_input_simulate_oneshot, &input);
-		ng_input_simulate_oneshot = -1;
+	if (ng_input_to_simulate) {
+		int32_t modified_simulated_input = ng_input_to_simulate;
+		if (modified_simulated_input != IN_ALL) {
+			if (modified_simulated_input & IN_SAVE) { // SAVE_GAME
+				//
+			}
+
+			if (modified_simulated_input & IN_LOAD) { // LOAD_GAME
+
+			}
+
+			if (modified_simulated_input & 0x10000000) { // WEAPON_KEYS
+				for (int32_t i = 0; i < 6; i++) {
+					
+				}
+
+				modified_simulated_input &= ~0x10000000;
+			}
+		}
+
+		input |= modified_simulated_input;
 	}
 
 	return input;
 }
 
 bool NGValidateInputSavegame() {
-	return ng_input_lock_timers[TRNG_SAVE_GAME] == 0;
+	if (ng_input_to_disable) {
+		int32_t modified_blocked_input = ng_input_to_disable;
+		if (modified_blocked_input == IN_ALL) {
+			return false;
+		}
+		else {
+			if (modified_blocked_input & IN_SAVE) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 bool NGValidateInputLoadgame() {
-	return ng_input_lock_timers[TRNG_LOAD_GAME] == 0;
+	if (ng_input_to_disable) {
+		int32_t modified_blocked_input = ng_input_to_disable;
+		if (modified_blocked_input == IN_ALL) {
+			return false;
+		}
+		else {
+			if (modified_blocked_input & IN_LOAD) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+bool NGIsSimulatingInputSavegame() {
+	if (ng_input_to_simulate & IN_SAVE) {
+		return true;
+	}
+	return false;
+}
+
+bool NGIsSimulatingInputLoadgame() {
+	if (ng_input_to_simulate & IN_LOAD) {
+		return true;
+	}
+	return false;
 }
 
 bool NGValidateInputWeaponHotkeys() {
-	return ng_input_lock_timers[TRNG_WEAPON_KEYS] == 0;
-}
-
-void NGDisableInputForTime(uint8_t input, int32_t ticks) {
-	if (input > NG_INPUT_TIMER_COUNT) {
-		NGLog(NG_LOG_TYPE_ERROR, "NGDisableInputForTime: Invalid input type %u!", input);
-		return;
-	}
-
-	int32_t final_ticks = -1;
-	if (ticks > 0) {
-		final_ticks = ticks;
-	}
-
-	if (input == 0) {
-		for (int32_t i = 0; i < NG_INPUT_TIMER_COUNT; i++) {
-			ng_input_lock_timers[i] = final_ticks;
-		}
-	} else {
-		ng_input_lock_timers[input - 1] = final_ticks;
-	}
-}
-
-void NGSimulateInputForTime(uint8_t input, int32_t ticks) {
-	if (input > NG_INPUT_TIMER_COUNT) {
-		NGLog(NG_LOG_TYPE_ERROR, "NGSimulateInputForTime: Invalid input type %u!", input);
-		return;
-	}
-
-	if (ticks > 0) {
-		if (input == 0) {
-			for (int32_t i = 0; i < NG_INPUT_TIMER_COUNT; i++) {
-				if (ng_input_simulate_timers[i] < ticks) {
-					ng_input_simulate_timers[i] = ticks / 30;
-				}
-			}
+	if (ng_input_to_disable) {
+		int32_t modified_blocked_input = ng_input_to_disable;
+		if (modified_blocked_input == IN_ALL) {
+			return false;
 		} else {
-			if (ng_input_simulate_timers[input - 1] < ticks) {
-				ng_input_simulate_timers[input - 1] = ticks / 30;
+			if (modified_blocked_input & 0x10000000) {
+				return false;
 			}
 		}
-	} else {
-		ng_input_simulate_oneshot = input;
+	}
+	return true;
+}
+
+void NGDisableInputForTime(uint32_t mask, int32_t ticks) {
+	ng_input_to_disable |= mask;
+
+	if (ticks == 0) {
+		return;
+	}
+
+	NGProgressiveAction *prog_action = nullptr;
+	for (int32_t i = 0; i < progressive_action_count; i++) {
+		if (progressive_actions[i].type == AZ_RESET_DISABLED_INPUT && progressive_actions[i].argument2_i32[0] == mask) {
+			prog_action = &progressive_actions[i];
+		}
+	}
+
+	if (!prog_action) {
+		prog_action = NGCreateProgressiveAction();
+	}
+
+	if (prog_action) {
+		prog_action->type = AZ_RESET_DISABLED_INPUT;
+		prog_action->argument2_i32[0] = mask;
+		prog_action->duration = ticks;
 	}
 }
 
-void NGEnableInput(uint8_t input) {
-	if (input == 0) {
-		for (int32_t i = 0; i < NG_INPUT_TIMER_COUNT; i++) {
-			ng_input_lock_timers[i] = 0;
-		}
+void NGEnableInput(uint32_t mask) {
+	if (mask == -1) {
+		ng_input_to_disable = 0;
 	} else {
-		ng_input_lock_timers[input - 1] = 0;
+		ng_input_to_disable &= (mask ^ -1);
 	}
+}
+
+void NGSimulateInputForTime(uint32_t mask, int32_t ticks) {
+	ng_input_to_simulate |= mask;
+
+	if (ticks == 0) {
+		ng_single_input_to_simulate = mask;
+		return;
+	}
+
+	NGProgressiveAction* prog_action = prog_action = NGCreateProgressiveAction();
+
+	if (prog_action) {
+		prog_action->type = AZ_RESET_SIMULATED_INPUT;
+		prog_action->argument2_i32[0] = mask;
+		prog_action->duration = ticks;
+	}
+}
+
+void NGClearSimulatedSingleInputForFrame() {
+	ng_single_input_to_simulate = 0;
 }
 
 void NGHandleItemMovement(uint32_t item_num) {
@@ -453,7 +386,7 @@ void NGHandleItemMovement(uint32_t item_num) {
 					TestTriggersAtXYZ(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, item->room_number, true, 0);
 				}
 			}
-			UpdateItemRoom(item_num, -128);
+			UpdateItemRoom(item_num, -HALF_CLICK_SIZE);
 		}
 	}
 
@@ -501,7 +434,7 @@ void NGHandleItemMovement(uint32_t item_num) {
 					TestTriggersAtXYZ(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, item->room_number, true, 0);
 				}
 			}
-			UpdateItemRoom(item_num, -128);
+			UpdateItemRoom(item_num, -HALF_CLICK_SIZE);
 		}
 	}
 }
@@ -919,17 +852,6 @@ void NGFrameStartExtraState() {
 		}
 	}
 
-	// Input Locks and Input Simulators
-	ng_input_simulate_oneshot = -1;
-	for (int32_t i = 0; i < NG_INPUT_TIMER_COUNT; i++) {
-		if (ng_input_lock_timers[i] > 0) {
-			ng_input_lock_timers[i] -= 1;
-		}
-		if (ng_input_simulate_timers[i] > 0) {
-			ng_input_simulate_timers[i] -= 1;
-		}
-	}
-
 	// Looping sounds
 	for (int32_t i = 0; i < NumSamples; i++) {
 		if (ng_looped_sound_state[i] > 0) {
@@ -1064,14 +986,18 @@ void NGDrawPhase() {
 						sprintf(format_buffer, "%d", time_tracker_item->timer);
 						break;
 				}
-				PrintString(phd_centerx, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
+				if (NGGetDrawState() != NG_DRAW_STATE_BLANK) {
+					PrintString(phd_centerx, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
+				}
 			}
 		}
 	}
 
 	// Timers
-	NGDrawTimer(ng_local_timer, ng_local_timer_position, ng_local_timer_time_until_hide);
-	NGDrawTimer(ng_global_timer, ng_global_timer_position, ng_global_timer_time_until_hide);
+	if (NGGetDrawState() != NG_DRAW_STATE_BLANK) {
+		NGDrawTimer(ng_local_timer, ng_local_timer_position, ng_local_timer_time_until_hide);
+		NGDrawTimer(ng_global_timer, ng_global_timer_position, ng_global_timer_time_until_hide);
+	}
 }
 
 bool NGIsItemFrozen(uint32_t item_num) {
@@ -1438,6 +1364,9 @@ void NGSetupLevelExtraState() {
 
 	memset(ng_text_big, 0x00, BIG_TEXT_BUFFER_SIZE);
 
+	// Visual
+	ng_drawing_state = NG_DRAW_STATE_ACTIVE;
+
 	// Inventory
 	ng_selected_inventory_item_memory = 0;
 	ng_used_inventory_object_for_frame = NO_ITEM;
@@ -1521,8 +1450,9 @@ void NGSetupLevelExtraState() {
 
 
 	// Input lock and simulator
-	memset(ng_input_lock_timers, 0x00, sizeof(ng_input_lock_timers));
-	memset(ng_input_simulate_timers, 0x00, sizeof(ng_input_simulate_timers));
+	ng_input_to_simulate = 0;
+	ng_input_to_disable = 0;
+	ng_single_input_to_simulate = 0;
 
 	// Looped samples
 	memset(ng_looped_sound_state, 0x00, NumSamples * sizeof(int32_t));

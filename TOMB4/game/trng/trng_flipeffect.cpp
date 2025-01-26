@@ -35,6 +35,7 @@
 
 #include "../../specific/function_table.h"
 #include "../../specific/3dmath.h"
+#include "trng_progressive_action.h"
 
 uint32_t scanned_flipeffect_count = 0;
 NGScannedFlipEffect scanned_flipeffects[NG_MAX_SCANNED_FLIPEFFECTS];
@@ -177,50 +178,65 @@ bool inventory_set_inventory_items(uint8_t inventory_id, uint8_t count) {
 
 // NGLE - 51
 bool disable_input_for_time(uint8_t input, uint8_t timer) {
-	NGDisableInputForTime(input, (int32_t)timer * NG_TICKS_PER_SECOND);
+	if (input < (sizeof(NG_INPUT_CODES) / sizeof(int32_t))) {
+		NGDisableInputForTime(NG_INPUT_CODES[input], (int32_t)timer * NG_TICKS_PER_SECOND);
+	} else {
+		NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
+	}
 	
 	return true;
 }
 
 // NGLE - 52
 bool keyboard_enable_input(uint8_t input, uint8_t _unused) {
-	NGEnableInput(input);
+	if (input < (sizeof(NG_INPUT_CODES) / sizeof(int32_t))) {
+		NGEnableInput(NG_INPUT_CODES[input]);
+	} else {
+		NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
+	}
 	
 	return true;
 }
 
 // NGLE - 53
 bool keyboard_simulate_receivement_of_keyboard_command(uint8_t input, uint8_t timer) {
-	const int32_t SIMULATION_TIMES[] = {
-		0,
-		100,
-		200,
-		300,
-		400,
-		500,
-		700,
-		1000,
-		2000,
-		3000,
-		4000,
-		5000,
-		6000,
-		7000,
-		8000,
-		9000,
-		10000,
-		15000,
-		20000,
-		25000,
-		30000,
-		35000
-	};
-
-	if (timer < (sizeof(SIMULATION_TIMES) / sizeof(int32_t))) {
-		NGSimulateInputForTime(input, SIMULATION_TIMES[timer]);
+	if (timer < (sizeof(NG_SIMULATION_TIMES) / sizeof(int32_t))) {
+		if (input < (sizeof(NG_INPUT_CODES) / sizeof(int32_t))) {
+			NGSimulateInputForTime(NG_INPUT_CODES[input], NG_SIMULATION_TIMES[timer] / NG_TICKS_PER_SECOND);
+		}
+		else {
+			NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
+		}
 	} else {
 		NGLog(NG_LOG_TYPE_ERROR, "Invalid simulation time for simulated keyboard command!");
 	}
+
+	return true;
+}
+
+// NGLE - 54
+bool hide_screen_for_time(int32_t seconds, bool black_screen) {
+	ng_drawing_state = NG_DRAW_STATE_FROZEN;
+
+	if (black_screen) {
+		ng_drawing_state = NG_DRAW_STATE_BLANK;
+	}
+
+	if (seconds > 0) {
+		NGProgressiveAction *prog_action = prog_action = NGCreateProgressiveAction();
+
+		if (prog_action) {
+			prog_action->type = AZ_HIDE_SCREEN;
+			prog_action->duration = seconds * NG_TICKS_PER_SECOND;
+		}
+	}
+
+	return true;
+}
+
+// NGLE - 55
+bool show_screen() {
+	ng_drawing_state = NG_DRAW_STATE_ACTIVE;
 
 	return true;
 }
@@ -1678,11 +1694,11 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			break;
 		}
 		case SCREEN_HIDE_SCREEN_FOR_X_TIME_IN_WAY: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SCREEN_HIDE_SCREEN_FOR_X_TIME_IN_WAY unimplemented!");
+			hide_screen_for_time(timer, extra_timer == 0);
 			break;
 		}
 		case SCREEN_SHOW_SCREEN: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SCREEN_SHOW_SCREEN unimplemented!");
+			show_screen();
 			break;
 		}
 		case ANIMATED_TEXTURES_STOP_ANIMATION_RANGE: {

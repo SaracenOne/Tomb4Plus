@@ -37,7 +37,7 @@ long SoundQuality = 1;
 long MusicVolume = 40;
 long SFXVolume = 80;
 long ControlMethod;
-char MonoScreenOn;
+bool MonoScreenOn;
 
 static MONOSCREEN_STRUCT MonoScreen;
 static LEGACY_SAVEFILE_INFO SaveGames[MAX_SAVEGAMES] = {};
@@ -841,7 +841,7 @@ void S_DisplayMonoScreen()
 
 void CreateMonoScreen()
 {
-	MonoScreenOn = 1;
+	MonoScreenOn = true;
 
 #ifndef USE_BGFX
 	if (App.dx.Flags & DXF_WINDOWED)
@@ -871,7 +871,7 @@ void FreeMonoScreen()
 		Log(1, "%s Attempt To Release NULL Ptr", "Mono Screen Texture");
 
 #endif
-	MonoScreenOn = 0;
+	MonoScreenOn = false;
 }
 
 void RGBM_Mono(uchar * r, uchar * g, uchar * b)

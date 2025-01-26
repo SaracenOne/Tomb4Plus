@@ -26,6 +26,10 @@ enum NGTimerTrackerType {
 #define MAX_NG_MULTI_ENV_CONDITIONS 9999
 #define MAX_NG_TEST_POSITIONS 9999
 
+extern int32_t ng_input_to_simulate;
+extern int32_t ng_input_to_disable;
+extern int32_t ng_single_input_to_simulate;
+
 extern int32_t resumed_trigger_group_count;
 extern uint16_t resumed_trigger_groups[MAX_NG_TRIGGER_GROUPS];
 extern int32_t last_performed_trigger_group;
@@ -113,6 +117,16 @@ extern char ng_string4[REGULAR_TEXT_BUFFER_SIZE];
 #define BIG_TEXT_BUFFER_SIZE 320
 extern char ng_text_big[BIG_TEXT_BUFFER_SIZE];
 
+// Visual
+
+enum NG_DRAW_STATE {
+	NG_DRAW_STATE_ACTIVE,
+	NG_DRAW_STATE_FROZEN,
+	NG_DRAW_STATE_BLANK
+};
+
+extern NG_DRAW_STATE ng_drawing_state;
+
 // Inventory
 extern uint8_t ng_selected_inventory_item_memory;
 extern int32_t ng_used_inventory_object_for_frame;
@@ -124,15 +138,21 @@ extern void NGSetupLevelExtraState();
 extern void NGFrameStartExtraState();
 extern void NGFrameFinishExtraState();
 
-extern int32_t NGValidateInputAgainstLockTimers(int32_t input);
+extern NG_DRAW_STATE NGGetDrawState();
+
+extern int32_t NGValidateAgainstBlockedInput(int32_t input);
 extern int32_t NGApplySimulatedInput(int32_t input);
 extern bool NGValidateInputSavegame();
 extern bool NGValidateInputLoadgame();
 extern bool NGValidateInputWeaponHotkeys();
 
-extern void NGDisableInputForTime(uint8_t input, int32_t ticks);
-extern void NGSimulateInputForTime(uint8_t input, int32_t ticks);
-extern void NGEnableInput(uint8_t input);
+extern bool NGIsSimulatingInputSavegame();
+extern bool NGIsSimulatingInputLoadgame();
+
+extern void NGDisableInputForTime(uint32_t mask, int32_t ticks);
+extern void NGSimulateInputForTime(uint32_t mask, int32_t ticks);
+extern void NGEnableInput(uint32_t mask);
+extern void NGClearSimulatedSingleInputForFrame();
 
 extern bool NGIsItemFrozen(uint32_t item_num);
 extern void NGSetItemFreezeTimer(uint32_t item_num, uint32_t ticks);

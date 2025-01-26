@@ -7,6 +7,7 @@
 #include "../../specific/file.h"
 #include "../../tomb4/mod_config.h"
 #include "../../tomb4/tomb4plus/t4plus_items.h"
+#include "trng_extra_state.h"
 
 NGProgressiveAction progressive_actions[NG_MAX_PROGRESSIVE_ACTIONS];
 int32_t progressive_action_count = 0;
@@ -70,6 +71,32 @@ void NGExecuteProgressiveAction(NGProgressiveAction* progressive_action) {
 				progressive_action->type = AZ_NONE;
 			}
 
+			break;
+		}
+		case AZ_RESET_DISABLED_INPUT: {
+			progressive_action->duration--;
+			if (progressive_action->duration == 0) {
+				int32_t mask = progressive_action->argument2_i32[0] ^ -1;
+				ng_input_to_disable &= mask;
+				progressive_action->type = AZ_NONE;
+			}
+			break;
+		}
+		case AZ_RESET_SIMULATED_INPUT: {
+			progressive_action->duration--;
+			if (progressive_action->duration == 0) {
+				int32_t mask = progressive_action->argument2_i32[0] ^ -1;
+				ng_input_to_simulate &= mask;
+				progressive_action->type = AZ_NONE;
+			}
+			break;
+		}
+		case AZ_HIDE_SCREEN: {
+			progressive_action->duration--;
+			if (progressive_action->duration == 0) {
+				ng_drawing_state = NG_DRAW_STATE_ACTIVE;
+				progressive_action->type = AZ_NONE;
+			}
 			break;
 		}
 	}

@@ -12,6 +12,7 @@
 #include "../tomb4/mod_config.h"
 #include "3dmath.h"
 #include "file.h"
+#include "../game/trng/trng_extra_state.h"
 
 #ifdef USE_BGFX
 
@@ -238,39 +239,41 @@ void SetupBGFXOutputPolyList() {
 }
 
 void RenderBGFXDrawLists() {
-    size_t current_bucket_idx = 0;
-    size_t current_sort_idx = 0;
-
-    MOD_LEVEL_ENVIRONMENT_INFO* environment_info = get_game_mod_level_environment_info(gfCurrentLevel);
-    if (gfLevelFlags & GF_TRAIN || environment_info->force_train_fog)
-    {
-        bgfx_fog_parameters[BGFX_FOG_START_PARAMETER] = float(DEFAULT_FOG_START_BLOCKS);
-        bgfx_fog_parameters[BGFX_FOG_END_PARAMETER] = float(DEFAULT_FOG_END_BLOCKS);
-    } else {
-        bgfx_fog_parameters[BGFX_FOG_START_PARAMETER] = LevelFogStart / float(BLOCK_SIZE);
-        bgfx_fog_parameters[BGFX_FOG_END_PARAMETER] = LevelFogEnd / float(BLOCK_SIZE);
-    };
-
-    for (size_t i = 0; i < MAX_SORT_BUFFERS; i++) {
-        bgfx::update(sort_buffer_vertex_handle[i], 0, sort_buffer_vertex_buffers_ref[i]);
-    }
-    
     // Hack to prevent pickup display flickering.
     bool multipass_frame = false;
 
-    for (size_t i = 0; i < current_draw_commands; i++) {
-        if (draw_commands[i].clear_depth_buffer) {
-            bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, bgfx_clear_col, 1.0f, 0);
-            bgfx::frame();
-            multipass_frame = true;
+    if (NGGetDrawState() != NG_DRAW_STATE_FROZEN) {
+        size_t current_bucket_idx = 0;
+        size_t current_sort_idx = 0;
+
+        MOD_LEVEL_ENVIRONMENT_INFO* environment_info = get_game_mod_level_environment_info(gfCurrentLevel);
+        if (gfLevelFlags & GF_TRAIN || environment_info->force_train_fog)
+        {
+            bgfx_fog_parameters[BGFX_FOG_START_PARAMETER] = float(DEFAULT_FOG_START_BLOCKS);
+            bgfx_fog_parameters[BGFX_FOG_END_PARAMETER] = float(DEFAULT_FOG_END_BLOCKS);
+        }
+        else {
+            bgfx_fog_parameters[BGFX_FOG_START_PARAMETER] = LevelFogStart / float(BLOCK_SIZE);
+            bgfx_fog_parameters[BGFX_FOG_END_PARAMETER] = LevelFogEnd / float(BLOCK_SIZE);
+        };
+
+        for (size_t i = 0; i < MAX_SORT_BUFFERS; i++) {
+            bgfx::update(sort_buffer_vertex_handle[i], 0, sort_buffer_vertex_buffers_ref[i]);
         }
 
-        if (draw_commands[i].is_sorted_command) {
-            for (; current_sort_idx < draw_commands[i].last_idx; current_sort_idx++) {
-                uint64_t state = UINT64_C(0);
-                bool is_blended = false;
+        for (size_t i = 0; i < current_draw_commands; i++) {
+            if (draw_commands[i].clear_depth_buffer) {
+                bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, bgfx_clear_col, 1.0f, 0);
+                bgfx::frame();
+                multipass_frame = true;
+            }
 
-                switch (sort_draw_commands[current_sort_idx].draw_type) {
+            if (draw_commands[i].is_sorted_command) {
+                for (; current_sort_idx < draw_commands[i].last_idx; current_sort_idx++) {
+                    uint64_t state = UINT64_C(0);
+                    bool is_blended = false;
+
+                    switch (sort_draw_commands[current_sort_idx].draw_type) {
                     case 0: {
                         is_blended = false;
                         state = 0
@@ -351,61 +354,67 @@ void RenderBGFXDrawLists() {
                             | UINT64_C(0);
                         break;
                     }
+                    }
+
+                    bgfx::setState(state);
+                    bgfx::setVertexBuffer(
+                        0,
+                        sort_buffer_vertex_handle[sort_draw_commands[current_sort_idx].buffer_id],
+                        sort_draw_commands[current_sort_idx].buffer_offset,
+                        sort_draw_commands[current_sort_idx].count);
+
+                    if (sort_draw_commands[current_sort_idx].texture.idx != 0xffff) {
+                        bgfx::setTexture(0, s_texColor, sort_draw_commands[current_sort_idx].texture);
+                        bgfx::setUniform(u_fogColor, bgfx_fog_color);
+                        bgfx::setUniform(u_volumetricFogColor, bgfx_volumetric_fog_color);
+                        bgfx::setUniform(u_fogParameters, bgfx_fog_parameters);
+                        if (is_blended) {
+                            bgfx::submit(0, m_outputVTLTexAlphaBlendedProgram);
+                        }
+                        else {
+                            bgfx::submit(0, m_outputVTLTexAlphaClippedProgram);
+                        }
+                    } else {
+                        bgfx::submit(0, m_outputVTLAlphaProgram);
+                    }
                 }
+            }  else {
+                for (; current_bucket_idx < draw_commands[i].last_idx; current_bucket_idx++) {
+                    TEXTUREBUCKET* bucket = &Bucket[current_bucket_idx];
 
-                bgfx::setState(state);
-                bgfx::setVertexBuffer(
-                    0,
-                    sort_buffer_vertex_handle[sort_draw_commands[current_sort_idx].buffer_id],
-                    sort_draw_commands[current_sort_idx].buffer_offset,
-                    sort_draw_commands[current_sort_idx].count);
+                    if (bucket->tpage == 1)
+                        bucket->tpage = 1;
 
-                if (sort_draw_commands[current_sort_idx].texture.idx != 0xffff) {
-                    bgfx::setTexture(0, s_texColor, sort_draw_commands[current_sort_idx].texture);
+                    if (!bucket->nVtx)
+                        continue;
+
+                    uint64_t state = 0
+                        | BGFX_STATE_WRITE_RGB
+                        | BGFX_STATE_WRITE_Z
+                        | BGFX_STATE_DEPTH_TEST_LESS
+                        | UINT64_C(0);
+
+                    bgfx::update(bucket->handle, 0, bgfx::makeRef(bucket->vtx, BUCKET_VERT_COUNT * sizeof(GFXTLBUMPVERTEX)));
+
+                    bgfx::setVertexBuffer(0, bucket->handle, 0, bucket->nVtx);
+                    bgfx::setTexture(0, s_texColor, Textures[bucket->tpage].tex);
+                    bgfx::setState(state);
                     bgfx::setUniform(u_fogColor, bgfx_fog_color);
                     bgfx::setUniform(u_volumetricFogColor, bgfx_volumetric_fog_color);
                     bgfx::setUniform(u_fogParameters, bgfx_fog_parameters);
-                    if (is_blended) {
-                        bgfx::submit(0, m_outputVTLTexAlphaBlendedProgram);
-                    } else {
-                        bgfx::submit(0, m_outputVTLTexAlphaClippedProgram);
-                    }
-                } else {
-                    bgfx::submit(0, m_outputVTLAlphaProgram);
+
+                    bgfx::submit(0, m_outputVTLTexProgram);
+
+                    bucket->nVtx = 0;
+                    bucket->tpage = -1;
+                    DrawPrimitiveCnt++;
                 }
             }
-        } else {
-            for (; current_bucket_idx < draw_commands[i].last_idx; current_bucket_idx++) {
-                TEXTUREBUCKET *bucket = &Bucket[current_bucket_idx];
-
-                if (bucket->tpage == 1)
-                    bucket->tpage = 1;
-
-                if (!bucket->nVtx)
-                    continue;
-
-                uint64_t state = 0
-                    | BGFX_STATE_WRITE_RGB
-                    | BGFX_STATE_WRITE_Z
-                    | BGFX_STATE_DEPTH_TEST_LESS
-                    | UINT64_C(0);
-
-                bgfx::update(bucket->handle, 0, bgfx::makeRef(bucket->vtx, BUCKET_VERT_COUNT * sizeof(GFXTLBUMPVERTEX)));
-
-                bgfx::setVertexBuffer(0, bucket->handle, 0, bucket->nVtx);
-                bgfx::setTexture(0, s_texColor, Textures[bucket->tpage].tex);
-                bgfx::setState(state);
-                bgfx::setUniform(u_fogColor, bgfx_fog_color);
-                bgfx::setUniform(u_volumetricFogColor, bgfx_volumetric_fog_color);
-                bgfx::setUniform(u_fogParameters, bgfx_fog_parameters);
-
-                bgfx::submit(0, m_outputVTLTexProgram);
-
-                bucket->nVtx = 0;
-                bucket->tpage = -1;
-                DrawPrimitiveCnt++;
-            }
         }
+    } else {
+        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, bgfx_clear_col, 1.0f, 0);
+        bgfx::frame();
+        multipass_frame = true;
     }
 
     if (multipass_frame) {

@@ -583,7 +583,9 @@ void DoLevel(uchar Name, uchar Audio)
 		S_InitialisePolyList();
 
 		if (gfLegendTime != 0 && !cutseq_num && ((!DestFadeScreenHeight && !FadeScreenHeight) || get_game_mod_level_misc_info(gfCurrentLevel)->draw_legend_on_flyby)) {
-			PrintString(phd_winwidth >> 1, phd_winymax - font_height, 2, GetCustomStringForTextID(gfLegend), FF_CENTER);
+			if (NGGetDrawState() != NG_DRAW_STATE_BLANK) {
+				PrintString(phd_winwidth >> 1, phd_winymax - font_height, 2, GetCustomStringForTextID(gfLegend), FF_CENTER);
+			}
 			if (gfLegendTime > 0) {
 				gfLegendTime--;
 			}

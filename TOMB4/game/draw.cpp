@@ -977,8 +977,7 @@ void RenderIt(short CurrentRoom)
 		PrintObjects(draw_rooms[i]);
 }
 
-long DrawPhaseGame()
-{
+long DrawPhaseGame() {
 	CalcLaraMatrices(0);
 	phd_PushUnitMatrix();
 	CalcLaraMatrices(1);
@@ -988,8 +987,12 @@ long DrawPhaseGame()
 		fix_lara_for_cutseq();
 
 	SetLaraUnderwaterNodes();
-	DrawRooms(camera.pos.room_number);
-	DrawGameInfo(1);
+	if (NGGetDrawState() != NG_DRAW_STATE_BLANK) {
+		DrawRooms(camera.pos.room_number);
+		DrawGameInfo(1);
+	} else {
+		DrawPsxTile(0, phd_winwidth | (phd_winheight << 16), RGBA(0x00, 0x00, 0x00, 0xff), 2, 0);
+	}
 
 	NGDrawPhase(); // TRNG
 

@@ -25,4 +25,4 @@ extern long SoundQuality;
 extern long MusicVolume;
 extern long SFXVolume;
 extern long ControlMethod;
-extern char MonoScreenOn;
+extern bool MonoScreenOn;
