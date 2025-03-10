@@ -26,6 +26,7 @@
 #include "../../specific/file.h"
 #include "../../tomb4/tomb4plus/t4plus_environment.h"
 #include "../../tomb4/tomb4plus/t4plus_items.h"
+#include "../../tomb4/tomb4plus/t4plus_objects.h"
 
 int32_t resumed_trigger_group_count;
 uint16_t resumed_trigger_groups[MAX_NG_TRIGGER_GROUPS];
@@ -143,14 +144,14 @@ int32_t ng_last_input_number = 0;
 
 int32_t ng_store_variables[STORE_VARIABLE_COUNT];
 
-char ng_last_text_input[REGULAR_TEXT_BUFFER_SIZE];
+int8_t ng_last_text_input[REGULAR_TEXT_BUFFER_SIZE];
 
-char ng_string1[REGULAR_TEXT_BUFFER_SIZE];
-char ng_string2[REGULAR_TEXT_BUFFER_SIZE];
-char ng_string3[REGULAR_TEXT_BUFFER_SIZE];
-char ng_string4[REGULAR_TEXT_BUFFER_SIZE];
+int8_t ng_string1[REGULAR_TEXT_BUFFER_SIZE];
+int8_t ng_string2[REGULAR_TEXT_BUFFER_SIZE];
+int8_t ng_string3[REGULAR_TEXT_BUFFER_SIZE];
+int8_t ng_string4[REGULAR_TEXT_BUFFER_SIZE];
 
-char ng_text_big[BIG_TEXT_BUFFER_SIZE];
+int8_t ng_text_big[BIG_TEXT_BUFFER_SIZE];
 
 // Visual
 
@@ -168,7 +169,7 @@ int32_t ng_input_to_simulate = 0;
 int32_t ng_input_to_disable = 0;
 int32_t ng_single_input_to_simulate = 0;
 
-int32_t NGGetPluginIDForFloorData(uint32_t floor_index, bool test_condition) {
+int32_t NGGetPluginIDForFloorData(size_t floor_index, bool test_condition) {
 	if (test_condition) {
 		floor_index++;
 	}
@@ -217,7 +218,7 @@ int32_t NGApplySimulatedInput(int32_t input) {
 
 			if (modified_simulated_input & 0x10000000) { // WEAPON_KEYS
 				for (int32_t i = 0; i < 6; i++) {
-					
+
 				}
 
 				modified_simulated_input &= ~0x10000000;
@@ -235,8 +236,7 @@ bool NGValidateInputSavegame() {
 		int32_t modified_blocked_input = ng_input_to_disable;
 		if (modified_blocked_input == IN_ALL) {
 			return false;
-		}
-		else {
+		} else {
 			if (modified_blocked_input & IN_SAVE) {
 				return false;
 			}
@@ -250,8 +250,7 @@ bool NGValidateInputLoadgame() {
 		int32_t modified_blocked_input = ng_input_to_disable;
 		if (modified_blocked_input == IN_ALL) {
 			return false;
-		}
-		else {
+		} else {
 			if (modified_blocked_input & IN_LOAD) {
 				return false;
 			}
@@ -349,8 +348,8 @@ void NGHandleItemMovement(uint32_t item_num) {
 			int32_t move_by_amount = NGGetItemHorizontalMovementSpeed(item_num);
 			int32_t remaining_movement_units = NGGetItemHorizontalMovementRemainingUnits(item_num);
 			if (
-				(remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
-				(remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
+			    (remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
+			    (remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
 				move_by_amount = remaining_movement_units;
 			}
 
@@ -396,8 +395,8 @@ void NGHandleItemMovement(uint32_t item_num) {
 			int32_t move_by_amount = NGGetItemVerticalMovementSpeed(item_num);
 			int32_t remaining_movement_units = NGGetItemVerticalMovementRemainingUnits(item_num);
 			if (
-				(remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
-				(remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
+			    (remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
+			    (remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
 				move_by_amount = remaining_movement_units;
 			}
 
@@ -448,8 +447,8 @@ void NGHandleStaticMovement(uint32_t static_num) {
 		int32_t move_by_amount = NGGetStaticHorizontalMovementSpeed(static_num);
 		int32_t remaining_movement_units = NGGetStaticHorizontalMovementRemainingUnits(static_num);
 		if (
-			(remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
-			(remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
+		    (remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
+		    (remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
 			move_by_amount = remaining_movement_units;
 		}
 
@@ -476,8 +475,7 @@ void NGHandleStaticMovement(uint32_t static_num) {
 			} else {
 				NGSetStaticHorizontalMovementSpeed(static_num, 0);
 			}
-		}
-		else {
+		} else {
 			if (NGGetStaticMovementInProgressSound(static_num) != -1) {
 				PHD_3DPOS pos;
 				pos.x_pos = game_vector.x;
@@ -502,8 +500,8 @@ void NGHandleStaticMovement(uint32_t static_num) {
 		int32_t move_by_amount = NGGetStaticVerticalMovementSpeed(static_num);
 		int32_t remaining_movement_units = NGGetStaticVerticalMovementRemainingUnits(static_num);
 		if (
-			(remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
-			(remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
+		    (remaining_movement_units >= 0 && move_by_amount > remaining_movement_units) ||
+		    (remaining_movement_units < 0 && move_by_amount < remaining_movement_units)) {
 			move_by_amount = remaining_movement_units;
 		}
 
@@ -531,8 +529,7 @@ void NGHandleStaticMovement(uint32_t static_num) {
 			} else {
 				NGSetStaticVerticalMovementSpeed(static_num, 0);
 			}
-		}
-		else {
+		} else {
 			if (NGGetStaticMovementInProgressSound(static_num) != -1) {
 				PHD_3DPOS pos;
 				pos.x_pos = game_vector.x;
@@ -582,7 +579,7 @@ int32_t ng_lara_static_collision_size = 0;
 void NGAddLaraItemCollision(ITEM_INFO *item_info, int32_t flags) {
 	if (ng_lara_moveable_collision_size >= MAX_LARA_COLLISONS-1)
 		return;
-	
+
 	for (int32_t i = 0; i < ng_lara_moveable_collision_size; i++) {
 		if (ng_lara_moveable_collisions[i].item_info == item_info) {
 			ng_lara_moveable_collisions[i].flags |= flags;
@@ -655,19 +652,18 @@ ITEM_INFO *NGIsLaraCollidingWithMoveableSlot(int32_t slot_number, int32_t mask) 
 
 bool NGIsObjectMortalType(int32_t object_id) {
 	if (object_id == BADDY_1 ||
-		object_id == BADDY_2 ||
-		(object_id >= CROCODILE && object_id <= SCORPION) ||
-		object_id == TROOPS ||
-		object_id == BABOON_NORMAL ||
-		object_id == WILD_BOAR ||
-		object_id == HARPY ||
-		object_id == BIG_BEETLE ||
-		object_id == BAT ||
-		object_id == DOG ||
-		object_id == SAS ||
-		object_id == SAS_CAPTAIN ||
-		object_id == SMALL_SCORPION)
-	{
+	        object_id == BADDY_2 ||
+	        (object_id >= CROCODILE && object_id <= SCORPION) ||
+	        object_id == TROOPS ||
+	        object_id == BABOON_NORMAL ||
+	        object_id == WILD_BOAR ||
+	        object_id == HARPY ||
+	        object_id == BIG_BEETLE ||
+	        object_id == BAT ||
+	        object_id == DOG ||
+	        object_id == SAS ||
+	        object_id == SAS_CAPTAIN ||
+	        object_id == SMALL_SCORPION) {
 		return true;
 	} else {
 		return false;
@@ -676,22 +672,20 @@ bool NGIsObjectMortalType(int32_t object_id) {
 
 bool NGIsObjectImmortalType(int32_t object_id) {
 	if (object_id == SKELETON ||
-		object_id == SETHA ||
-		object_id == MUMMY ||
-		object_id == SPHINX ||
-		object_id == KNIGHTS_TEMPLAR ||
-		object_id == MUTANT ||
-		object_id == BIG_BEETLE ||
-		object_id == HORSE ||
-		(object_id >= DEMIGOD1 && object_id <= LITTLE_BEETLE) ||
-		(object_id >= WRAITH1 && object_id <= WRAITH4) ||
-		object_id == HAMMERHEAD ||
-		object_id == AHMET ||
-		object_id == FISH)
-	{
+	        object_id == SETHA ||
+	        object_id == MUMMY ||
+	        object_id == SPHINX ||
+	        object_id == KNIGHTS_TEMPLAR ||
+	        object_id == MUTANT ||
+	        object_id == BIG_BEETLE ||
+	        object_id == HORSE ||
+	        (object_id >= DEMIGOD1 && object_id <= LITTLE_BEETLE) ||
+	        (object_id >= WRAITH1 && object_id <= WRAITH4) ||
+	        object_id == HAMMERHEAD ||
+	        object_id == AHMET ||
+	        object_id == FISH) {
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
@@ -783,6 +777,94 @@ int32_t NGIsLaraCollidingWithStaticSlot(int32_t slot) {
 	return -1;
 }
 
+bool NGIsLaraHolding(int32_t hold_type) {
+	switch (hold_type) {
+		case 1: {
+			return (lara.gun_type == WEAPON_PISTOLS && lara.gun_status == LG_READY);
+			break;
+		}
+		case 2: {
+			return (lara.gun_type == WEAPON_REVOLVER && lara.gun_status == LG_READY);
+			break;
+		}
+		case 3: {
+			return (lara.gun_type == WEAPON_UZI && lara.gun_status == LG_READY);
+			break;
+		}
+		case 4: {
+			return (lara.gun_type == WEAPON_SHOTGUN && lara.gun_status == LG_READY);
+			break;
+		}
+		case 5: {
+			return (lara.gun_type == WEAPON_GRENADE && lara.gun_status == LG_READY);
+			break;
+		}
+		case 6: {
+			return (lara.gun_type == WEAPON_CROSSBOW && lara.gun_status == LG_READY);
+			break;
+		}
+		case 7: {
+			return (lara.gun_type == WEAPON_FLARE);
+			break;
+		}
+		case 8: {
+			return (lara.gun_type == WEAPON_TORCH && !lara.LitTorch);
+			break;
+		}
+		case 9: {
+			return (lara.gun_type == WEAPON_TORCH && lara.LitTorch);
+			break;
+		}
+		case 10: {
+			if (lara.vehicle != NO_ITEM)
+				return (T4PlusGetItemInfoForID(lara.vehicle)->object_number == T4PlusGetJeepSlotID());
+			break;
+		}
+		case 11: {
+			if (lara.vehicle != NO_ITEM)
+				return (T4PlusGetItemInfoForID(lara.vehicle)->object_number == T4PlusGetMotorbikeSlotID());
+			break;
+		}
+		case 12: {
+			if (lara.vehicle != NO_ITEM)
+				return (T4PlusGetItemInfoForID(lara.vehicle)->object_number == T4PlusGetRubberBoatSlotID());
+			break;
+		}
+		case 13: {
+			if (lara.vehicle != NO_ITEM)
+				return (T4PlusGetItemInfoForID(lara.vehicle)->object_number == T4PlusGetMotorBoatSlotID());
+			break;
+		}
+		case 14: {
+			return (lara.RopePtr != -1);
+			break;
+		}
+		case 15: {
+			return (lara_item->current_anim_state == AS_POLESTAT ||
+			        lara_item->current_anim_state == AS_POLEUP ||
+			        lara_item->current_anim_state == AS_POLEDOWN ||
+			        lara_item->current_anim_state == AS_POLELEFT ||
+			        lara_item->current_anim_state == AS_POLERIGHT);
+			break;
+		}
+		case 16: {
+			return (lara.gun_type == WEAPON_TORCH);
+			break;
+		}
+		case 17: {
+			if (lara.vehicle != NO_ITEM)
+				return (T4PlusGetItemInfoForID(lara.vehicle)->object_number == KAYAK);
+			break;
+		}
+		default: {
+			NGLog(NG_LOG_TYPE_ERROR, "Invalid HOLD_ id %u.", hold_type);
+			return false;
+		}
+	}
+
+	return false;
+}
+
 bool NGProcessGlobalTriggers(int32_t selected_inventory_object_id) {
 	bool management_replaced = false;
 	if (ng_levels[gfCurrentLevel].records) {
@@ -821,25 +903,32 @@ void NGFrameStartExtraState() {
 			case -1: { // Fullscreen
 				SetFadeClipImmediate(150);
 				break;
-			} case 0: {
+			}
+			case 0: {
 				SetFadeClipImmediate(10);
 				break;
-			} case 1: { // Tiny
+			}
+			case 1: { // Tiny
 				SetFadeClipImmediate(20);
 				break;
-			} case 2: { // Middle
+			}
+			case 2: { // Middle
 				SetFadeClipImmediate(30);
 				break;
-			} case 3: { // Big
+			}
+			case 3: { // Big
 				SetFadeClipImmediate(40);
 				break;
-			} case 4: { // Huge
+			}
+			case 4: { // Huge
 				SetFadeClipImmediate(60);
 				break;
-			} case 5: { // Fissure
+			}
+			case 5: { // Fissure
 				SetFadeClipImmediate(90);
 				break;
-			} default: {
+			}
+			default: {
 				SetFadeClipImmediate(10);
 				break;
 			}
@@ -907,39 +996,39 @@ void NGDrawTimer(int32_t timer, NGTimerPosition timer_position, int32_t timer_ti
 
 			// TODO: the scaling of the text is not correct at all
 			switch (timer_position) {
-			case NG_TIMER_POSITION_BOTTOM_CENTER:
-				PrintString(phd_centerx, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
-				break;
-			case NG_TIMER_POSITION_TOP_CENTER:
-				PrintString(phd_centerx, font_height, 0, format_buffer, FF_CENTER);
-				break;
-			case NG_TIMER_POSITION_CENTER_CENTER:
-				PrintString(phd_centerx, long(phd_centery - font_height * 0.5), 0, format_buffer, FF_CENTER);
-				break;
-			case NG_TIMER_POSITION_TOP_LEFT:
-				PrintString(0, font_height, 0, format_buffer, 0);
-				break;
-			case NG_TIMER_POSITION_TOP_RIGHT:
-				PrintString(phd_winxmax, font_height, 0, format_buffer, FF_RJUSTIFY);
-				break;
-			case NG_TIMER_POSITION_BOTTOM_LEFT:
-				PrintString(0, long(phd_winymax - font_height * 0.25), 0, format_buffer, 0);
-				break;
-			case NG_TIMER_POSITION_BOTTOM_RIGHT:
-				PrintString(phd_winxmax, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_RJUSTIFY);
-				break;
-			case NG_TIMER_POSITION_DOWN_DAMAGE_BAR:
-			case NG_TIMER_POSITION_DOWN_COLD_BAR:
-				PrintString(phd_centerx, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
-				break;
-			case NG_TIMER_POSITION_DOWN_LEFT_BARS:
-				PrintString(0, font_height, 0, format_buffer, 0);
-				break;
-			case NG_TIMER_POSITION_DOWN_RIGHT_BARS:
-				PrintString(phd_winxmax, font_height, 0, format_buffer, FF_RJUSTIFY);
-				break;
-			default:
-				break;
+				case NG_TIMER_POSITION_BOTTOM_CENTER:
+					PrintString(phd_centerx, int32_t(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
+					break;
+				case NG_TIMER_POSITION_TOP_CENTER:
+					PrintString(phd_centerx, font_height, 0, format_buffer, FF_CENTER);
+					break;
+				case NG_TIMER_POSITION_CENTER_CENTER:
+					PrintString(phd_centerx, int32_t(phd_centery - font_height * 0.5), 0, format_buffer, FF_CENTER);
+					break;
+				case NG_TIMER_POSITION_TOP_LEFT:
+					PrintString(0, font_height, 0, format_buffer, 0);
+					break;
+				case NG_TIMER_POSITION_TOP_RIGHT:
+					PrintString(phd_winxmax, font_height, 0, format_buffer, FF_RJUSTIFY);
+					break;
+				case NG_TIMER_POSITION_BOTTOM_LEFT:
+					PrintString(0, int32_t(phd_winymax - font_height * 0.25), 0, format_buffer, 0);
+					break;
+				case NG_TIMER_POSITION_BOTTOM_RIGHT:
+					PrintString(phd_winxmax, int32_t(phd_winymax - font_height * 0.25), 0, format_buffer, FF_RJUSTIFY);
+					break;
+				case NG_TIMER_POSITION_DOWN_DAMAGE_BAR:
+				case NG_TIMER_POSITION_DOWN_COLD_BAR:
+					PrintString(phd_centerx, int32_t(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
+					break;
+				case NG_TIMER_POSITION_DOWN_LEFT_BARS:
+					PrintString(0, font_height, 0, format_buffer, 0);
+					break;
+				case NG_TIMER_POSITION_DOWN_RIGHT_BARS:
+					PrintString(phd_winxmax, font_height, 0, format_buffer, FF_RJUSTIFY);
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -987,7 +1076,7 @@ void NGDrawPhase() {
 						break;
 				}
 				if (NGGetDrawState() != NG_DRAW_STATE_BLANK) {
-					PrintString(phd_centerx, long(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
+					PrintString(phd_centerx, int32_t(phd_winymax - font_height * 0.25), 0, format_buffer, FF_CENTER);
 				}
 			}
 		}
@@ -1233,7 +1322,7 @@ void NGToggleItemMeshVisibilityMaskBit(uint32_t item_num, uint32_t mask_bit, boo
 	if (!item) {
 		return;
 	}
-	
+
 	if (enabled)
 		item->mesh_bits |= (1 << mask_bit);
 	else
@@ -1356,7 +1445,7 @@ void NGSetupLevelExtraState() {
 	}
 
 	memset(ng_last_text_input, 0x00, REGULAR_TEXT_BUFFER_SIZE);
-	
+
 	memset(ng_string1, 0x00, REGULAR_TEXT_BUFFER_SIZE);
 	memset(ng_string2, 0x00, REGULAR_TEXT_BUFFER_SIZE);
 	memset(ng_string3, 0x00, REGULAR_TEXT_BUFFER_SIZE);

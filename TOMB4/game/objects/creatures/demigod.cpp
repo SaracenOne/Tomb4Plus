@@ -17,15 +17,13 @@
 #include "../../gameflow.h"
 #include "../../../tomb4/tomb4plus/t4plus_objects.h"
 
-void TriggerDemigodMissile(PHD_3DPOS* pos, short room_number, short type)
-{
+void TriggerDemigodMissile(PHD_3DPOS* pos, int16_t room_number, int16_t type) {
 	FX_INFO* fx;
-	short fx_number;
+	int16_t fx_number;
 
 	fx_number = CreateEffect(room_number);
 
-	if (fx_number != NO_ITEM)
-	{
+	if (fx_number != NO_ITEM) {
 		fx = &effects[fx_number];
 		fx->pos.x_pos = pos->x_pos;
 		fx->pos.y_pos = pos->y_pos - (GetRandomControl() & 0x3F) - (QUARTER_CLICK_SIZE / 2);
@@ -40,7 +38,7 @@ void TriggerDemigodMissile(PHD_3DPOS* pos, short room_number, short type)
 		fx->pos.z_rot = 0;
 
 		fx->room_number = room_number;
-		fx->counter = short(2 * GetRandomControl() + 0x8000);
+		fx->counter = int16_t(2 * GetRandomControl() + 0x8000);
 		fx->flag1 = type;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
 		fx->object_number = T4PlusGetBubblesSlotID();
@@ -52,11 +50,10 @@ void TriggerDemigodMissile(PHD_3DPOS* pos, short room_number, short type)
 	}
 }
 
-void TriggerDemigodMissileFlame(short fx_number, long xv, long yv, long zv)
-{
+void TriggerDemigodMissileFlame(int16_t fx_number, int32_t xv, int32_t yv, int32_t zv) {
 	FX_INFO* fx;
 	SPARKS* sptr;
-	long dx, dz;
+	int32_t dx, dz;
 
 	fx = &effects[fx_number];
 	dx = lara_item->pos.x_pos - fx->pos.x_pos;
@@ -68,17 +65,14 @@ void TriggerDemigodMissileFlame(short fx_number, long xv, long yv, long zv)
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
 
-	if (fx->flag1 == 3 || fx->flag1 == 4)
-	{
+	if (fx->flag1 == 3 || fx->flag1 == 4) {
 		sptr->sR = 0;
 		sptr->sB = (GetRandomControl() & 0x7F) + 32;
 		sptr->sG = sptr->sB + 64;
 		sptr->dR = 0;
 		sptr->dG = (GetRandomControl() & 0x7F) + 32;
 		sptr->dB = sptr->dG + 64;
-	}
-	else
-	{
+	} else {
 		sptr->sR = (GetRandomControl() & 0x7F) + 32;
 		sptr->sG = sptr->sR - (GetRandomControl() & 0x1F);
 		sptr->sB = 0;
@@ -95,9 +89,9 @@ void TriggerDemigodMissileFlame(short fx_number, long xv, long yv, long zv)
 	sptr->x = (GetRandomControl() & 0xF) - 8;
 	sptr->y = 0;
 	sptr->z = (GetRandomControl() & 0xF) - 8;
-	sptr->Xvel = (short)xv;
-	sptr->Yvel = (short)yv;
-	sptr->Zvel = (short)zv;
+	sptr->Xvel = (int16_t)xv;
+	sptr->Yvel = (int16_t)yv;
+	sptr->Zvel = (int16_t)zv;
 	sptr->Friction = 68;
 	sptr->Flags = SF_UNUSED2 | SF_FX | SF_ROTATE | SF_DEF | SF_SCALE;
 	sptr->RotAng = GetRandomControl() & 0xFFF;
@@ -109,23 +103,21 @@ void TriggerDemigodMissileFlame(short fx_number, long xv, long yv, long zv)
 
 	sptr->Gravity = 0;
 	sptr->MaxYvel = 0;
-	sptr->FxObj = (uchar)fx_number;
+	sptr->FxObj = (uint8_t)fx_number;
 	sptr->Scalar = 2;
 	sptr->Size = (GetRandomControl() & 7) + 64;
 	sptr->sSize = sptr->Size;
 	sptr->dSize = sptr->Size >> 5;
 }
 
-void TriggerHammerSmoke(long x, long y, long z, long num)
-{
+void TriggerHammerSmoke(int32_t x, int32_t y, int32_t z, int32_t num) {
 	SMOKE_SPARKS* sptr;
-	long angle, step, off;
+	int32_t angle, step, off;
 
 	angle = GetRandomControl() << 1;
 	step = 0x10000 / num;
 
-	for (; num > 0; num--)
-	{
+	for (; num > 0; num--) {
 		sptr = &smoke_spark[GetFreeSmokeSpark()];
 		sptr->On = 1;
 		sptr->sShade = 0;
@@ -139,13 +131,12 @@ void TriggerHammerSmoke(long x, long y, long z, long num)
 		sptr->y = (GetRandomControl() & 0x1F) + y - 16;
 		sptr->z = (GetRandomControl() & 0x1F) + z - 16;
 		off = (GetRandomControl() & 0xFF) + (CLICK_SIZE - 1);
-		sptr->Xvel = short((off * phd_sin(angle)) >> W2V_SHIFT);
+		sptr->Xvel = int16_t((off * phd_sin(angle)) >> W2V_SHIFT);
 		sptr->Yvel = -32 - (GetRandomControl() & 0x3F);
-		sptr->Zvel = short((off * phd_cos(angle)) >> W2V_SHIFT);
+		sptr->Zvel = int16_t((off * phd_cos(angle)) >> W2V_SHIFT);
 		sptr->Friction = 9;
 
-		if (GetRandomControl() & 1)
-		{
+		if (GetRandomControl() & 1) {
 			sptr->Flags = SF_ROTATE;
 			sptr->RotAng = GetRandomControl() & 0xFFF;
 
@@ -153,8 +144,7 @@ void TriggerHammerSmoke(long x, long y, long z, long num)
 				sptr->RotAdd = -64 - (GetRandomControl() & 0x3F);
 			else
 				sptr->RotAdd = (GetRandomControl() & 0x3F) + 64;
-		}
-		else if (room[lara_item->room_number].flags & ROOM_NOT_INSIDE)
+		} else if (room[lara_item->room_number].flags & ROOM_NOT_INSIDE)
 			sptr->Flags = SF_OUTSIDE;
 		else
 			sptr->Flags = SF_NONE;
@@ -168,22 +158,19 @@ void TriggerHammerSmoke(long x, long y, long z, long num)
 	}
 }
 
-void DoDemigodEffects(short item_number)
-{
+void DoDemigodEffects(int16_t item_number) {
 	ITEM_INFO* item;
 	PHD_3DPOS pos;
 	PHD_VECTOR pos1;
 	PHD_VECTOR pos2;
-	short angles[2];
-	short anim, frame;
+	int16_t angles[2];
+	int16_t anim, frame;
 
 	item = &items[item_number];
 	anim = item->anim_number - objects[item->object_number].anim_index;
 
-	if (anim == 8 || anim == 19)
-	{
-		if (item->frame_number == anims[item->anim_number].frame_base)
-		{
+	if (anim == 8 || anim == 19) {
+		if (item->frame_number == anims[item->anim_number].frame_base) {
 			pos1.x = -544;
 			pos1.y = 96;
 			pos1.z = 0;
@@ -204,13 +191,10 @@ void DoDemigodEffects(short item_number)
 			else
 				TriggerDemigodMissile(&pos, item->room_number, 5);
 		}
-	}
-	else if (anim == 16)
-	{
+	} else if (anim == 16) {
 		frame = item->frame_number - anims[item->anim_number].frame_base;
 
-		if (frame >= 8 && frame <= 64)
-		{
+		if (frame >= 8 && frame <= 64) {
 			pos1.x = 0;
 			pos1.y = 0;
 			pos1.z = (HALF_CLICK_SIZE + QUARTER_CLICK_SIZE);
@@ -230,8 +214,7 @@ void DoDemigodEffects(short item_number)
 	}
 }
 
-void InitialiseDemigod(short item_number)
-{
+void InitialiseDemigod(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
 
@@ -242,8 +225,7 @@ void InitialiseDemigod(short item_number)
 	item->current_anim_state = 0;
 	item->goal_anim_state = 0;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item2 = &items[i];
 
 		if (item != item2 && item2->object_number == DEMIGOD3 && !item2->item_flags[0])
@@ -251,8 +233,7 @@ void InitialiseDemigod(short item_number)
 	}
 }
 
-void DemigodControl(short item_number)
-{
+void DemigodControl(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
 	CREATURE_INFO* god;
@@ -260,19 +241,17 @@ void DemigodControl(short item_number)
 	FLOOR_INFO* floor;
 	AI_INFO info;
 	PHD_VECTOR pos;
-	short* zone;
-	long dx, dz, h;
-	short objnum, angle, torso_x, torso_y, torso_z, head, iAngle, iAhead, room_number;
+	int16_t* zone;
+	int32_t dx, dz, h;
+	int16_t objnum, angle, torso_x, torso_y, torso_z, head, iAngle, iAhead, room_number;
 
 	item = &items[item_number];
 	objnum = item->item_flags[0];
 
-	if (objnum)
-	{
+	if (objnum) {
 		item2 = &items[objnum];
 
-		if (item2->status == ITEM_ACTIVE && item2->active)
-		{
+		if (item2->status == ITEM_ACTIVE && item2->active) {
 			item->hit_points = objects[item->object_number].hit_points;
 			return;
 		}
@@ -289,70 +268,56 @@ void DemigodControl(short item_number)
 	torso_y = 0;
 	torso_z = 0;
 
-	if (gfCurrentLevel == 24)	//Chambers of Tulun
-	{
+	if (gfCurrentLevel == 24) {	//Chambers of Tulun
 		r = &room[lara_item->room_number];
 		zone = ground_zone[god->LOT.zone][flip_status];
 		lara_item->box_number = r->floor[((lara_item->pos.z_pos - r->z) >> 10) + r->x_size * ((lara_item->pos.x_pos - r->x) >> 10)].box;
 
-		if (zone[item->box_number] == zone[lara_item->box_number])
-		{
+		if (zone[item->box_number] == zone[lara_item->box_number]) {
 			item->ai_bits = 0;
 			god->enemy = lara_item;
-		}
-		else
-		{
+		} else {
 			item->ai_bits = FOLLOW;
 			item->item_flags[3] = lara.location;
 			god->enemy = 0;
 		}
 	}
 
-	if (item->hit_points <= 0)
-	{
+	if (item->hit_points <= 0) {
 		item->hit_points = 0;
 
-		if (item->current_anim_state != 8 && item->current_anim_state != 15)
-		{
-			if (item->current_anim_state == 1 || item->current_anim_state == 2)
-			{
+		if (item->current_anim_state != 8 && item->current_anim_state != 15) {
+			if (item->current_anim_state == 1 || item->current_anim_state == 2) {
 				item->anim_number = objects[objnum].anim_index + 27;
 				item->frame_number = anims[item->anim_number].frame_base;
 				item->current_anim_state = 15;
-			}
-			else
-			{
+			} else {
 				item->anim_number = objects[objnum].anim_index + 12;
 				item->frame_number = anims[item->anim_number].frame_base;
 				item->current_anim_state = 8;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		if (item->ai_bits)
 			GetAITarget(god);
 
 		CreatureAIInfo(item, &info);
 
-		if (god->enemy == lara_item)
-		{
-			iAngle = (short)info.angle;
-			iAhead = (short)info.ahead;
-		}
-		else
-		{
+		if (god->enemy == lara_item) {
+			iAngle = (int16_t)info.angle;
+			iAhead = (int16_t)info.ahead;
+		} else {
 			dx = lara_item->pos.x_pos - item->pos.x_pos;
 			dz = lara_item->pos.z_pos - item->pos.z_pos;
-			iAngle = (short)phd_atan(dz, dx) - item->pos.y_rot;
+			iAngle = (int16_t)phd_atan(dz, dx) - item->pos.y_rot;
 			iAhead = abs(iAngle) < 0x4000;
 			dx = abs(dx);
 			dz = abs(dz);
 
 			if (dx > dz)
-				info.x_angle = (short)phd_atan(dx + (dz >> 1), item->pos.y_pos - lara_item->pos.y_pos);
+				info.x_angle = (int16_t)phd_atan(dx + (dz >> 1), item->pos.y_pos - lara_item->pos.y_pos);
 			else
-				info.x_angle = (short)phd_atan(dz + (dx >> 1), item->pos.y_pos - lara_item->pos.y_pos);
+				info.x_angle = (int16_t)phd_atan(dz + (dx >> 1), item->pos.y_pos - lara_item->pos.y_pos);
 		}
 
 		GetCreatureMood(item, &info, true);
@@ -360,283 +325,254 @@ void DemigodControl(short item_number)
 		angle = CreatureTurn(item, god->maximum_turn);
 		torso_x = -info.x_angle;
 
-		if (iAhead)
-		{
+		if (iAhead) {
 			torso_y = iAngle >> 1;
 			torso_z = iAngle >> 1;
 			head = iAngle >> 1;
-		}
-		else if (info.ahead)
-		{
+		} else if (info.ahead) {
 			torso_y = info.angle >> 1;
 			torso_z = info.angle >> 1;
 			head = info.angle >> 1;
 		}
 
-		switch (item->current_anim_state)
-		{
-		case 0:
-			god->maximum_turn = 0;
+		switch (item->current_anim_state) {
+			case 0:
+				god->maximum_turn = 0;
 
-			if (info.ahead)
-				torso_x = -info.x_angle;
+				if (info.ahead)
+					torso_x = -info.x_angle;
 
-			if (objnum == DEMIGOD1)
-			{
-				if (info.distance < 0x900000)
-				{
-					if (info.bite ||
-					((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
-						lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114))
-					{
-						item->goal_anim_state = 13;
-						break;
-					}
-				}
-			}
-			else
-			{
-				if (Targetable(item, &info))
-				{
-					god->flags = 1;
-
-					if (objnum == DEMIGOD2)
-						item->goal_anim_state = 3;
-					else
-						item->goal_anim_state = 11;
-
-					break;
-				}
-
-				if (objnum == DEMIGOD3)
-				{
-					if (info.distance > 0x400000 && info.distance < 0x1900000)
-					{
-						if (!(GetRandomControl() & 3))
-						{
-							item->goal_anim_state = 9;
+				if (objnum == DEMIGOD1) {
+					if (info.distance < 0x900000) {
+						if (info.bite ||
+						        ((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
+						          lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114)) {
+							item->goal_anim_state = 13;
 							break;
 						}
 					}
+				} else {
+					if (Targetable(item, &info)) {
+						god->flags = 1;
+
+						if (objnum == DEMIGOD2)
+							item->goal_anim_state = 3;
+						else
+							item->goal_anim_state = 11;
+
+						break;
+					}
+
+					if (objnum == DEMIGOD3) {
+						if (info.distance > 0x400000 && info.distance < 0x1900000) {
+							if (!(GetRandomControl() & 3)) {
+								item->goal_anim_state = 9;
+								break;
+							}
+						}
+					}
 				}
-			}
 
-			if (info.distance > 0x900000 && objnum == DEMIGOD2)
-				item->goal_anim_state = 5;
-			else
-				item->goal_anim_state = 1;
-
-			break;
-
-		case 1:
-			god->maximum_turn = DEGREES_TO_ROTATION(7);
-
-			if (info.distance < 0x400000)
-			{
-				item->goal_anim_state = 0;
-				break;
-			}
-
-			if (objnum == DEMIGOD1)
-			{
-				if (info.distance < 0x900000)
-				{
-					item->goal_anim_state = 0;
-					break;
-				}
-			}
-			else if (Targetable(item, &info))
-			{
-				item->goal_anim_state = 0;
-				break;
-			}
-
-			if (info.distance > 0x900000)
-			{
-				if (objnum == DEMIGOD2)
+				if (info.distance > 0x900000 && objnum == DEMIGOD2)
 					item->goal_anim_state = 5;
 				else
-					item->goal_anim_state = 2;
-			}
-
-			break;
-
-		case 2:
-			god->maximum_turn = DEGREES_TO_ROTATION(7);
-
-			if (info.distance < 0x400000)
-			{
-				item->goal_anim_state = 0;
-				break;
-			}
-
-			if (objnum == DEMIGOD1)
-			{
-				if (info.distance < 0x900000)
-				{
-					item->goal_anim_state = 0;
-					break;
-				}
-			}
-			else
-			{
-				if (Targetable(item, &info) || objnum == DEMIGOD3 && info.distance > 0x400000)
-				{
-					item->goal_anim_state = 0;
-					break;
-				}
-
-				if (info.distance < 0x900000)
 					item->goal_anim_state = 1;
-			}
 
-			break;
+				break;
 
-		case 3:
+			case 1:
+				god->maximum_turn = DEGREES_TO_ROTATION(7);
 
-			if (info.ahead)
-				torso_x = -info.x_angle;
-
-			god->maximum_turn = 0;
-
-			if (item->anim_number == objects[objnum].anim_index + 6)
-			{
-				if (abs(info.angle) < DEGREES_TO_ROTATION(7))
-					item->pos.y_rot += info.angle;
-				else if (info.angle < 0)
-					item->pos.y_rot -= DEGREES_TO_ROTATION(7);
-				else
-					item->pos.y_rot += DEGREES_TO_ROTATION(7);
-			}
-
-			if (Targetable(item, &info) || god->flags)
-				item->goal_anim_state = 4;
-			else
-				item->goal_anim_state = 0;
-
-			god->flags = 0;
-
-			break;
-
-		case 4:
-		case 12:
-			DoDemigodEffects(item_number);
-			break;
-
-		case 6:
-			god->maximum_turn = DEGREES_TO_ROTATION(7);
-
-			if (Targetable(item, &info))
-				item->goal_anim_state = 7;
-
-			break;
-
-		case 9:
-			god->maximum_turn = DEGREES_TO_ROTATION(7);
-
-			if (!Targetable(item, &info) && info.distance < 0x1900000)
-				item->goal_anim_state = 10;
-
-			break;
-
-		case 10:
-			god->maximum_turn = DEGREES_TO_ROTATION(7);
-			DoDemigodEffects(item_number);
-
-			if (!Targetable(item, &info) || info.distance < 0x1900000 || !(GetRandomControl() & 0xFF))
-				item->goal_anim_state = 0;
-
-			break;
-
-		case 11:
-			torso_y = iAngle;
-			torso_z = 0;
-
-			if (info.ahead)
-				torso_x = -info.x_angle;
-
-			god->maximum_turn = 0;
-
-			if (item->anim_number == objects[objnum].anim_index + 6)
-			{
-				if (abs(info.angle) < DEGREES_TO_ROTATION(7))
-					item->pos.y_rot += info.angle;
-				else if (info.angle < 0)
-					item->pos.y_rot -= DEGREES_TO_ROTATION(7);
-				else
-					item->pos.y_rot += DEGREES_TO_ROTATION(7);
-			}
-
-			if (Targetable(item, &info) || god->flags)
-				item->goal_anim_state = 12;
-			else
-				item->goal_anim_state = 0;
-
-			god->flags = 0;
-			break;
-
-		case 13:
-			god->maximum_turn = 0;
-			torso_y = iAngle;
-			torso_z = 0;
-
-			if (abs(info.angle) < DEGREES_TO_ROTATION(7))
-				item->pos.y_rot += info.angle;
-			else if (info.angle < 0)
-				item->pos.y_rot -= DEGREES_TO_ROTATION(7);
-			else
-				item->pos.y_rot += DEGREES_TO_ROTATION(7);
-
-			if (info.distance < 0x900000 && info.bite ||
-			((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
-				lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114))
-				item->goal_anim_state = 14;
-			else
-				item->goal_anim_state = 0;
-
-			break;
-
-		case 14:
-
-			if (item->frame_number - anims[item->anim_number].frame_base == 26)
-			{
-				pos.x = 80;
-				pos.y = -8;
-				pos.z = -40;
-				GetJointAbsPosition(item, &pos, 17);
-				room_number = item->room_number;
-				floor = GetFloor(pos.x, pos.y, pos.z, &room_number);
-				h = GetHeight(floor, pos.x, pos.y, pos.z);
-
-				if (h == NO_HEIGHT)
-					pos.y -= 128;
-				else
-					pos.y = h - 128;
-
-				TriggerShockwave(&pos, 0x580018, 256, 0x20808080, 0x20000);
-				TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
-				camera.bounce = -128;
-
-				if ((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
-					lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114)
-				{
-					lara.torso_x_rot = 0;
-					lara.torso_y_rot = 0;
-					lara.head_x_rot = 0;
-					lara.head_y_rot = 0;
-					lara_item->anim_number = ANIM_FALLDOWN;
-					lara_item->frame_number = anims[ANIM_FALLDOWN].frame_base;
-					lara_item->current_anim_state = AS_FORWARDJUMP;
-					lara_item->goal_anim_state = AS_FORWARDJUMP;
-					lara_item->pos.x_pos += -50 * phd_sin(lara_item->pos.y_rot) >> W2V_SHIFT;
-					lara_item->gravity_status = 1;
-					lara_item->speed = 2;
-					lara_item->fallspeed = 1;
-					lara.gun_status = LG_NO_ARMS;
+				if (info.distance < 0x400000) {
+					item->goal_anim_state = 0;
+					break;
 				}
-			}
 
-			break;
+				if (objnum == DEMIGOD1) {
+					if (info.distance < 0x900000) {
+						item->goal_anim_state = 0;
+						break;
+					}
+				} else if (Targetable(item, &info)) {
+					item->goal_anim_state = 0;
+					break;
+				}
+
+				if (info.distance > 0x900000) {
+					if (objnum == DEMIGOD2)
+						item->goal_anim_state = 5;
+					else
+						item->goal_anim_state = 2;
+				}
+
+				break;
+
+			case 2:
+				god->maximum_turn = DEGREES_TO_ROTATION(7);
+
+				if (info.distance < 0x400000) {
+					item->goal_anim_state = 0;
+					break;
+				}
+
+				if (objnum == DEMIGOD1) {
+					if (info.distance < 0x900000) {
+						item->goal_anim_state = 0;
+						break;
+					}
+				} else {
+					if (Targetable(item, &info) || objnum == DEMIGOD3 && info.distance > 0x400000) {
+						item->goal_anim_state = 0;
+						break;
+					}
+
+					if (info.distance < 0x900000)
+						item->goal_anim_state = 1;
+				}
+
+				break;
+
+			case 3:
+
+				if (info.ahead)
+					torso_x = -info.x_angle;
+
+				god->maximum_turn = 0;
+
+				if (item->anim_number == objects[objnum].anim_index + 6) {
+					if (abs(info.angle) < DEGREES_TO_ROTATION(7))
+						item->pos.y_rot += info.angle;
+					else if (info.angle < 0)
+						item->pos.y_rot -= DEGREES_TO_ROTATION(7);
+					else
+						item->pos.y_rot += DEGREES_TO_ROTATION(7);
+				}
+
+				if (Targetable(item, &info) || god->flags)
+					item->goal_anim_state = 4;
+				else
+					item->goal_anim_state = 0;
+
+				god->flags = 0;
+
+				break;
+
+			case 4:
+			case 12:
+				DoDemigodEffects(item_number);
+				break;
+
+			case 6:
+				god->maximum_turn = DEGREES_TO_ROTATION(7);
+
+				if (Targetable(item, &info))
+					item->goal_anim_state = 7;
+
+				break;
+
+			case 9:
+				god->maximum_turn = DEGREES_TO_ROTATION(7);
+
+				if (!Targetable(item, &info) && info.distance < 0x1900000)
+					item->goal_anim_state = 10;
+
+				break;
+
+			case 10:
+				god->maximum_turn = DEGREES_TO_ROTATION(7);
+				DoDemigodEffects(item_number);
+
+				if (!Targetable(item, &info) || info.distance < 0x1900000 || !(GetRandomControl() & 0xFF))
+					item->goal_anim_state = 0;
+
+				break;
+
+			case 11:
+				torso_y = iAngle;
+				torso_z = 0;
+
+				if (info.ahead)
+					torso_x = -info.x_angle;
+
+				god->maximum_turn = 0;
+
+				if (item->anim_number == objects[objnum].anim_index + 6) {
+					if (abs(info.angle) < DEGREES_TO_ROTATION(7))
+						item->pos.y_rot += info.angle;
+					else if (info.angle < 0)
+						item->pos.y_rot -= DEGREES_TO_ROTATION(7);
+					else
+						item->pos.y_rot += DEGREES_TO_ROTATION(7);
+				}
+
+				if (Targetable(item, &info) || god->flags)
+					item->goal_anim_state = 12;
+				else
+					item->goal_anim_state = 0;
+
+				god->flags = 0;
+				break;
+
+			case 13:
+				god->maximum_turn = 0;
+				torso_y = iAngle;
+				torso_z = 0;
+
+				if (abs(info.angle) < DEGREES_TO_ROTATION(7))
+					item->pos.y_rot += info.angle;
+				else if (info.angle < 0)
+					item->pos.y_rot -= DEGREES_TO_ROTATION(7);
+				else
+					item->pos.y_rot += DEGREES_TO_ROTATION(7);
+
+				if (info.distance < 0x900000 && info.bite ||
+				        ((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
+				          lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114))
+					item->goal_anim_state = 14;
+				else
+					item->goal_anim_state = 0;
+
+				break;
+
+			case 14:
+
+				if (item->frame_number - anims[item->anim_number].frame_base == 26) {
+					pos.x = 80;
+					pos.y = -8;
+					pos.z = -40;
+					GetJointAbsPosition(item, &pos, 17);
+					room_number = item->room_number;
+					floor = GetFloor(pos.x, pos.y, pos.z, &room_number);
+					h = GetHeight(floor, pos.x, pos.y, pos.z);
+
+					if (h == NO_HEIGHT)
+						pos.y -= 128;
+					else
+						pos.y = h - 128;
+
+					TriggerShockwave(&pos, 0x580018, 256, 0x20808080, 0x20000);
+					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
+					camera.bounce = -128;
+
+					if ((lara_item->current_anim_state >= AS_CLIMBSTNC && lara_item->current_anim_state <= AS_CLIMBDOWN ||
+					        lara_item->current_anim_state == AS_HANG) && !lara.location && lara_item->room_number > 114) {
+						lara.torso_x_rot = 0;
+						lara.torso_y_rot = 0;
+						lara.head_x_rot = 0;
+						lara.head_y_rot = 0;
+						lara_item->anim_number = ANIM_FALLDOWN;
+						lara_item->frame_number = anims[ANIM_FALLDOWN].frame_base;
+						lara_item->current_anim_state = AS_FORWARDJUMP;
+						lara_item->goal_anim_state = AS_FORWARDJUMP;
+						lara_item->pos.x_pos += -50 * phd_sin(lara_item->pos.y_rot) >> W2V_SHIFT;
+						lara_item->gravity_status = 1;
+						lara_item->speed = 2;
+						lara_item->fallspeed = 1;
+						lara.gun_status = LG_NO_ARMS;
+					}
+				}
+
+				break;
 		}
 	}
 

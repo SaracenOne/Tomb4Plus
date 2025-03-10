@@ -17,8 +17,8 @@ enum T4PWeatherType {
 extern T4PWeatherType t4p_rain_type; // TRLE
 extern T4PWeatherType t4p_snow_type; // TRLE
 
-extern long rain_outside; // TRLE
-extern long snow_outside; // TRLE
+extern int32_t rain_outside; // TRLE
+extern int32_t snow_outside; // TRLE
 
 // TRLE - Weather effects
 extern void InitWeatherFX();

@@ -24,8 +24,7 @@ void NGExecuteOrganizer(int32_t organizer_id) {
 				// FO_LOOP
 				if (organizer->flags & 0x02) {
 					ng_organizer_states[record_id].current_tick = -1;
-				}
-				else {
+				} else {
 					ng_organizer_states[record_id].is_enabled = false;
 				}
 			}

@@ -32,54 +32,46 @@
 #include "file.h"
 #include "platform.h"
 
-long sfx_frequencies[3] = { 11025, 22050, 44100 };
-long SoundQuality = 1;
-long MusicVolume = 40;
-long SFXVolume = 80;
-long ControlMethod;
+int32_t sfx_frequencies[3] = { 11025, 22050, 44100 };
+int32_t SoundQuality = 1;
+int32_t MusicVolume = 40;
+int32_t SFXVolume = 80;
+int32_t ControlMethod;
 bool MonoScreenOn;
 
 static MONOSCREEN_STRUCT MonoScreen;
 static LEGACY_SAVEFILE_INFO SaveGames[MAX_SAVEGAMES] = {};
 
-void DoOptions()
-{
+void DoOptions() {
 	char** keyboard_buttons;
 	char* txt;
-	static long menu;
-	static ulong sel = 1;	//selection
-	static ulong sel2;		//selection for when mapping keys
-	static long mSliderCol = 0xFF3F3F3F;
-	static long sSliderCol = 0xFF3F3F3F;
-	static long sfx_bak;
-	static long sfx_quality_bak;
-	static long sfx_breath_db = -1;
-	ulong nMask;
-	long f, y, i, lp;
-#ifndef USE_SDL
-	long jread, jx, jy;
-#endif
-	static char sfx_backup_flag;	//have we backed sfx stuff up?
+	static int32_t menu;
+	static uint32_t sel = 1;	//selection
+	static uint32_t sel2;		//selection for when mapping keys
+	static int32_t mSliderCol = 0xFF3F3F3F;
+	static int32_t sSliderCol = 0xFF3F3F3F;
+	static int32_t sfx_bak;
+	static int32_t sfx_quality_bak;
+	static int32_t sfx_breath_db = -1;
+	uint32_t nMask;
+	int32_t f, y, i, lp;
+	static int8_t sfx_backup_flag;	//have we backed sfx stuff up?
 	static bool waiting_for_key = 0;
 
-	if (!(sfx_backup_flag & 1))
-	{
+	if (!(sfx_backup_flag & 1)) {
 		sfx_backup_flag |= 1;
 		sfx_bak = SFXVolume;
 	}
 
-	if (!(sfx_backup_flag & 2))
-	{
+	if (!(sfx_backup_flag & 2)) {
 		sfx_backup_flag |= 2;
 		sfx_quality_bak = SoundQuality;
 	}
 
 	f = font_height - 4;
 
-	if (menu)	//controls menu
-	{
-		if (menu == 200)
-		{
+	if (menu) { //controls menu
+		if (menu == 200) {
 			TroyeMenu(f, menu, sel);
 			return;
 		}
@@ -123,8 +115,7 @@ void DoOptions()
 		y = 1;
 		i = 1;
 
-		for (lp = 0; lp < 16; lp++)
-		{
+		for (lp = 0; lp < 16; lp++) {
 			int dik = keyboard_layout[1][lp];
 
 			txt = (waiting_for_key && sel2 & (1 << i)) ? GetFixedStringForTextID(TXT_Waiting) : keyboard_buttons[dik];
@@ -136,31 +127,22 @@ void DoOptions()
 
 		small_font = 0;
 
-		if (ControlMethod < 2 && !waiting_for_key)
-		{
-			if (dbinput & IN_FORWARD)
-			{
+		if (ControlMethod < 2 && !waiting_for_key) {
+			if (dbinput & IN_FORWARD) {
 				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 				sel >>= 1;
 			}
 
-			if (dbinput & IN_BACK)
-			{
+			if (dbinput & IN_BACK) {
 				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 				sel <<= 1;
 			}
 		}
 
-		if (waiting_for_key)
-		{
+		if (waiting_for_key) {
 			i = 0;
 
-#ifdef USE_SDL
-			if (keymap[SDL_SCANCODE_ESCAPE])
-#else
-			if (keymap[DIK_ESCAPE])
-#endif
-			{
+			if (keymap[SDL_SCANCODE_ESCAPE]) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 				sel2 = 0;
 				dbinput = 0;
@@ -168,20 +150,15 @@ void DoOptions()
 				return;
 			}
 
-#ifdef USE_SDL
-			for (lp = 0; lp < keymap_count; lp++)
-			{
-				short tomb4_scancode = (short)convert_sdl_scancode_to_tomb_keycode(lp);
-				if (keymap[lp] && keyboard_buttons[tomb4_scancode])
-				{
-					if (tomb4_scancode != T4P_KEY_RETURN && tomb4_scancode != T4P_KEY_LEFT && tomb4_scancode != T4P_KEY_RIGHT && tomb4_scancode != T4P_KEY_UP && tomb4_scancode != T4P_KEY_DOWN)
-					{
+			for (lp = 0; lp < keymap_count; lp++) {
+				int16_t tomb4_scancode = (int16_t)convert_sdl_scancode_to_tomb_keycode(lp);
+				if (keymap[lp] && keyboard_buttons[tomb4_scancode]) {
+					if (tomb4_scancode != T4P_KEY_RETURN && tomb4_scancode != T4P_KEY_LEFT && tomb4_scancode != T4P_KEY_RIGHT && tomb4_scancode != T4P_KEY_UP && tomb4_scancode != T4P_KEY_DOWN) {
 						waiting_for_key = 0;
 
 						sel2 >>= 2;
 
-						while (sel2)
-						{
+						while (sel2) {
 							i++;
 							sel2 >>= 1;
 						}
@@ -192,91 +169,32 @@ void DoOptions()
 					}
 				}
 			}
-#else
-			for (lp = 0; lp < 255; lp++)
-			{
-				if (keymap[lp] && keyboard_buttons[lp])
-				{
-					if (lp != DIK_RETURN && lp != DIK_LEFT && lp != DIK_RIGHT && lp != DIK_UP && lp != DIK_DOWN)
-					{
-						waiting_for_key = 0;
-
-						sel2 >>= 2;
-
-						while (sel2)
-						{
-							i++;
-							sel2 >>= 1;
-						}
-
-						sel2 = 0;
-						layout[1][i] = (short)convert_sdl_scancode_to_tomb_keycode(lp);
-					}
-				}
-			}
-#endif
-			if (ControlMethod == 1)
-			{
-#ifndef USE_SDL
-				jread = ReadJoystick(jx, jy);
-
-				if (jread)
-				{
-					i = 0;
-					sel2 >>= 2;
-
-					while (sel2)
-					{
-						i++;
-						sel2 >>= 1;
-					}
-
-					sel2 = 0;
-					lp = 0;
-
-					while (jread)
-					{
-						jread >>= 1;
-						lp++;
-					}
-
-					layout[1][i] = short(lp + 255);
-					waiting_for_key = 0;
-				}
-#endif
+			if (ControlMethod == 1) {
 			}
 
 			CheckKeyConflicts();
 			dbinput = 0;
 		}
 
-		if (dbinput & IN_SELECT && sel > 1 && ControlMethod < 2)
-		{
+		if (dbinput & IN_SELECT && sel > 1 && ControlMethod < 2) {
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			sel2 = sel;
 			waiting_for_key = 1;
-#ifndef USE_SDL
-			memset(keymap, 0, sizeof(keymap));
-#endif
 		}
 
-		if (dbinput & IN_SELECT && ControlMethod == 2)
-		{
+		if (dbinput & IN_SELECT && ControlMethod == 2) {
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			ControlMethod = 0;
 			memcpy(keyboard_layout[1], keyboard_layout, 72);
 		}
 
-		if (sel & 1)
-		{
-			if (dbinput & IN_LEFT)
-			{
+		if (sel & 1) {
+			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 				ControlMethod--;
 			}
 
-			if (dbinput & IN_RIGHT)
-			{
+			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 				ControlMethod++;
 			}
@@ -287,13 +205,11 @@ void DoOptions()
 			if (ControlMethod < 0)
 				ControlMethod = 0;
 
-			if (ControlMethod == 1)
-			{
+			if (ControlMethod == 1) {
 #if 0
 				joy.dwSize = sizeof(JOYINFOEX);
 
-				if (joyGetPosEx(0, &joy) == JOYERR_UNPLUGGED)
-				{
+				if (joyGetPosEx(0, &joy) == JOYERR_UNPLUGGED) {
 					if (dbinput & IN_LEFT)
 						ControlMethod = 0;
 
@@ -307,11 +223,10 @@ void DoOptions()
 		if (!sel)
 			sel = 1;
 
-		if (sel > ulong(1 << (nMask - 1)))
+		if (sel > uint32_t(1 << (nMask - 1)))
 			sel = 1 << (nMask - 1);
 
-		if (dbinput & IN_DESELECT)
-		{
+		if (dbinput & IN_DESELECT) {
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 
 			if (ControlMethod < 2)
@@ -320,9 +235,7 @@ void DoOptions()
 			dbinput = 0;
 			sel = 1;
 		}
-	}
-	else	//'main' menu
-	{
+	} else { //'main' menu
 		nMask = 6;
 		f = 3 * font_height;
 		PrintString(phd_centerx, f, 6, GetFixedStringForTextID(TXT_Options), FF_CENTER);
@@ -348,26 +261,22 @@ void DoOptions()
 
 		PrintString(phd_centerx, (font_height >> 1) + f + 7 * font_height, sel & 0x20 ? 1 : 2, "tomb4 options", FF_CENTER);
 
-		if (dbinput & IN_FORWARD)
-		{
+		if (dbinput & IN_FORWARD) {
 			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 			sel >>= 1;
 		}
 
-		if (dbinput & IN_BACK)
-		{
+		if (dbinput & IN_BACK) {
 			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 			sel <<= 1;
 		}
 
-		if (dbinput & IN_SELECT && sel & 1)
-		{
+		if (dbinput & IN_SELECT && sel & 1) {
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			menu = 1;
 		}
 
-		if (dbinput & IN_SELECT && sel & 0x20)
-		{
+		if (dbinput & IN_SELECT && sel & 0x20) {
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			sel = 1;
 			menu = 200;
@@ -376,14 +285,13 @@ void DoOptions()
 		if (!sel)
 			sel = 1;
 
-		if (sel > ulong(1 << (nMask - 1)))
+		if (sel > uint32_t(1 << (nMask - 1)))
 			sel = 1 << (nMask - 1);
 
 		mSliderCol = 0xFF3F3F3F;
 		sSliderCol = 0xFF3F3F3F;
 
-		if (sel & 2)
-		{
+		if (sel & 2) {
 			sfx_bak = SFXVolume;
 
 			if (linput & IN_LEFT)
@@ -400,9 +308,7 @@ void DoOptions()
 			sSliderCol = 0xFF3F3F3F;
 			mSliderCol = 0xFF7F7F7F;
 			ACMSetVolume();
-		}
-		else if (sel & 4)
-		{
+		} else if (sel & 4) {
 			if (linput & IN_LEFT)
 				SFXVolume--;
 
@@ -414,24 +320,19 @@ void DoOptions()
 			else if (SFXVolume < 0)
 				SFXVolume = 0;
 
-			if (SFXVolume != sfx_bak)
-			{
-				if (sfx_breath_db == -1 || !DSIsChannelPlaying(0))
-				{
+			if (SFXVolume != sfx_bak) {
+				if (sfx_breath_db == -1 || !DSIsChannelPlaying(0)) {
 					S_SoundStopAllSamples();
 					sfx_bak = SFXVolume;
 					sfx_breath_db = SoundEffect(SFX_LARA_BREATH, 0, SFX_ALWAYS);
 					DSChangeVolume(0, -100 * ((100 - SFXVolume) >> 1));
-				}
-				else if (sfx_breath_db != -1 && DSIsChannelPlaying(0))
+				} else if (sfx_breath_db != -1 && DSIsChannelPlaying(0))
 					DSChangeVolume(0, -100 * ((100 - SFXVolume) >> 1));
 			}
 
 			mSliderCol = 0xFF3F3F3F;
 			sSliderCol = 0xFF7F7F7F;
-		}
-		else if (sel & 8)
-		{
+		} else if (sel & 8) {
 			sfx_bak = SFXVolume;
 
 			if (dbinput & IN_LEFT)
@@ -445,26 +346,21 @@ void DoOptions()
 			else if (SoundQuality < 0)
 				SoundQuality = 0;
 
-			if (SoundQuality != sfx_quality_bak)
-			{
+			if (SoundQuality != sfx_quality_bak) {
 				S_SoundStopAllSamples();
 				DXChangeOutputFormat(sfx_frequencies[SoundQuality], 0);
 				sfx_quality_bak = SoundQuality;
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			}
-		}
-		else if (sel & 16)
-		{
-			if (dbinput & IN_LEFT)
-			{
+		} else if (sel & 16) {
+			if (dbinput & IN_LEFT) {
 				if (App.AutoTarget)
 					App.AutoTarget = 0;
 
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 			}
 
-			if (dbinput & IN_RIGHT)
-			{
+			if (dbinput & IN_RIGHT) {
 				if (!App.AutoTarget)
 					App.AutoTarget = 1;
 
@@ -476,9 +372,8 @@ void DoOptions()
 	}
 }
 
-void DisplayGameStats()
-{
-	long sec, days, hours, min, y;
+void DisplayGameStats() {
+	int32_t sec, days, hours, min, y;
 	char buf[40];
 
 	y = phd_centery - (font_height << 2);
@@ -513,57 +408,44 @@ void DisplayGameStats()
 	PrintString(phd_centerx + (phd_centerx >> 2), y + 7 * font_height, 6, buf, 0);
 }
 
-long S_DisplayPauseMenu(long reset_selection, long reset_menu)
-{
-	static long menu, selection = 1;
-	long y;
+int32_t S_DisplayPauseMenu(int32_t reset_selection, int32_t reset_menu) {
+	static int32_t menu, selection = 1;
+	int32_t y;
 
-	if (!menu)
-	{
-		if (reset_selection)
-		{
+	if (!menu) {
+		if (reset_selection) {
 			selection = reset_selection;
 			menu = 0;
 			if (reset_menu >= 0) {
 				menu = reset_menu;
 			}
-		}
-		else
-		{
+		} else {
 			y = phd_centery - font_height;
 			PrintString(phd_centerx, y - ((3 * font_height) >> 1), 6, GetFixedStringForTextID(TXT_Paused), FF_CENTER);
 			PrintString(phd_centerx, y, selection & 1 ? 1 : 2, GetFixedStringForTextID(TXT_Statistics), FF_CENTER);
 			PrintString(phd_centerx, y + font_height, selection & 2 ? 1 : 2, GetFixedStringForTextID(TXT_Options), FF_CENTER);
 			PrintString(phd_centerx, y + 2 * font_height, selection & 4 ? 1 : 2, GetFixedStringForTextID(TXT_Exit_to_Title), FF_CENTER);
 
-			if (dbinput & IN_FORWARD)
-			{
+			if (dbinput & IN_FORWARD) {
 				if (selection > 1)
 					selection >>= 1;
 
 				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 			}
 
-			if (dbinput & IN_BACK)
-			{
+			if (dbinput & IN_BACK) {
 				if (selection < 4)
 					selection <<= 1;
 
 				SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 			}
 
-			if (dbinput & IN_DESELECT)
-			{
+			if (dbinput & IN_DESELECT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 				return 1;
 			}
 
-#ifdef USE_SDL
-			if (dbinput & IN_SELECT && !keymap[SDL_SCANCODE_LALT])
-#else
-			if (dbinput & IN_SELECT && !keymap[DIK_LALT])
-#endif
-			{
+			if (dbinput & IN_SELECT && !keymap[SDL_SCANCODE_LALT]) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 
 				if (selection & 1)
@@ -574,23 +456,17 @@ long S_DisplayPauseMenu(long reset_selection, long reset_menu)
 					return 8;
 			}
 		}
-	}
-	else if (menu == 1)
-	{
+	} else if (menu == 1) {
 		DoOptions();
 
-		if (dbinput & IN_DESELECT)
-		{
+		if (dbinput & IN_DESELECT) {
 			menu = 0;
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 		}
-	}
-	else if (menu == 2)
-	{
+	} else if (menu == 2) {
 		DisplayGameStats();
 
-		if (dbinput & IN_DESELECT)
-		{
+		if (dbinput & IN_DESELECT) {
 			menu = 0;
 			SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 
@@ -602,15 +478,14 @@ long S_DisplayPauseMenu(long reset_selection, long reset_menu)
 	return 0;
 }
 
-long DoLoadSave(long LoadSave)
-{
+int32_t DoLoadSave(int32_t LoadSave) {
 	// Tomb4Plus: handling for increased savegame count.
 
 	LEGACY_SAVEFILE_INFO* pSave;
-	static long selection;
-	long txt;
+	static int32_t selection;
+	int32_t txt;
 	size_t l;
-	uchar color;
+	uint8_t color;
 	char string[80];
 	char name[41];
 
@@ -620,12 +495,11 @@ long DoLoadSave(long LoadSave)
 		txt = TXT_Load_Game;
 
 	float font_scale = 15.0f / (float)MAX_SAVEGAMES * 1.06f;
-	long scaled_font_height = (long)(savegame_font_height * font_scale);
+	int32_t scaled_font_height = (int32_t)(savegame_font_height * font_scale);
 
 	PrintString(phd_centerx, savegame_font_height, 6, GetFixedStringForTextID(txt), FF_CENTER);
 
-	for (int i = 0; i < MAX_SAVEGAMES; i++)
-	{
+	for (int i = 0; i < MAX_SAVEGAMES; i++) {
 		pSave = &SaveGames[i];
 		color = 2;
 
@@ -642,16 +516,13 @@ long DoLoadSave(long LoadSave)
 		name[40] = 0;
 		small_font = 1;
 
-		if (pSave->valid)
-		{
+		if (pSave->valid) {
 			sprintf(string, "%03d", pSave->num);
-			PrintStringScaled(phd_centerx - long((float)phd_winwidth / 640.0F * 310.0), savegame_font_height + scaled_font_height * (i + 2), color, string, 0, 1.0F, font_scale);
-			PrintStringScaled(phd_centerx - long((float)phd_winwidth / 640.0F * 270.0), savegame_font_height + scaled_font_height * (i + 2), color, name, 0, 1.0F, font_scale);
+			PrintStringScaled(phd_centerx - int32_t((float)phd_winwidth / 640.0F * 310.0), savegame_font_height + scaled_font_height * (i + 2), color, string, 0, 1.0F, font_scale);
+			PrintStringScaled(phd_centerx - int32_t((float)phd_winwidth / 640.0F * 270.0), savegame_font_height + scaled_font_height * (i + 2), color, name, 0, 1.0F, font_scale);
 			sprintf(string, "%d %s %02d:%02d:%02d", pSave->days, GetFixedStringForTextID(TXT_days), pSave->hours, pSave->minutes, pSave->seconds);
-			PrintStringScaled(phd_centerx - long((float)phd_winwidth / 640.0F * -135.0), savegame_font_height + scaled_font_height * (i + 2), color, string, 0, 1.0F, font_scale);
-		}
-		else
-		{
+			PrintStringScaled(phd_centerx - int32_t((float)phd_winwidth / 640.0F * -135.0), savegame_font_height + scaled_font_height * (i + 2), color, string, 0, 1.0F, font_scale);
+		} else {
 			sprintf(string, "%s", pSave->name);
 			PrintStringScaled(phd_centerx, savegame_font_height + scaled_font_height * (i + 2), color, string, FF_CENTER, 1.0F, font_scale);
 		}
@@ -659,14 +530,12 @@ long DoLoadSave(long LoadSave)
 		small_font = 0;
 	}
 
-	if (dbinput & IN_FORWARD)
-	{
+	if (dbinput & IN_FORWARD) {
 		selection--;
 		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
-	if (dbinput & IN_BACK)
-	{
+	if (dbinput & IN_BACK) {
 		selection++;
 		SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
@@ -676,8 +545,7 @@ long DoLoadSave(long LoadSave)
 	else if (selection >= MAX_SAVEGAMES)
 		selection = MAX_SAVEGAMES - 1;
 
-	if (dbinput & IN_SELECT)
-	{
+	if (dbinput & IN_SELECT) {
 		if (SaveGames[selection].valid || LoadSave == IN_SAVE)
 			return selection;
 
@@ -687,9 +555,8 @@ long DoLoadSave(long LoadSave)
 	return -1;
 }
 
-long S_LoadSave(long load_or_save, long mono, long inv_active)
-{
-	long fade, ret;
+int32_t S_LoadSave(int32_t load_or_save, int32_t mono, int32_t inv_active) {
+	int32_t fade, ret;
 
 	fade = 0;
 
@@ -701,8 +568,7 @@ long S_LoadSave(long load_or_save, long mono, long inv_active)
 	if (!inv_active)
 		InventoryActive = 1;
 
-	while (1)
-	{
+	while (1) {
 		S_InitialisePolyList();
 
 		if (fade)
@@ -717,10 +583,8 @@ long S_LoadSave(long load_or_save, long mono, long inv_active)
 		S_OutputPolyList();
 		S_DumpScreen();
 
-		if (ret >= 0)
-		{
-			if (load_or_save & IN_SAVE)
-			{
+		if (ret >= 0) {
+			if (load_or_save & IN_SAVE) {
 				sgSaveGame();
 				S_SaveGame(ret);
 				GetSaveLoadFiles();
@@ -736,14 +600,12 @@ long S_LoadSave(long load_or_save, long mono, long inv_active)
 			ret = -1;
 		}
 
-		if (fade && DoFade == 2)
-		{
+		if (fade && DoFade == 2) {
 			ret = fade - 1;
 			break;
 		}
 
-		if (input & IN_OPTION)
-		{
+		if (input & IN_OPTION) {
 			ret = -1;
 			break;
 		}
@@ -763,123 +625,21 @@ long S_LoadSave(long load_or_save, long mono, long inv_active)
 	return ret;
 }
 
-#ifndef USE_BGFX
-static void S_DrawTile(long x, long y, long w, long h, LPDIRECT3DTEXTUREX t, long c0, long c1, long c2, long c3)
-{
-	GFXTLBUMPVERTEX v[4] = {};
-	float u1, v1, u2, v2;
-
-	u1 = 0;
-	v1 = 0;
-	u2 = 1.0F;
-	v2 = 1.0F;
-
-	v[0].sx = (float)x;
-	v[0].sy = (float)y;
-	v[0].sz = 0.995F;
-	v[0].tu = u1;
-	v[0].tv = v1;
-	v[0].rhw = 1;
-	v[0].color = c0;
-	v[0].specular = 0xFF000000;
-
-	v[1].sx = float(w + x);
-	v[1].sy = (float)y;
-	v[1].sz = 0.995F;
-	v[1].tu = u2;
-	v[1].tv = v1;
-	v[1].rhw = 1;
-	v[1].color = c1;
-	v[1].specular = 0xFF000000;
-
-	v[2].sx = float(w + x);
-	v[2].sy = float(h + y);
-	v[2].sz = 0.995F;
-	v[2].tu = u2;
-	v[2].tv = v2;
-	v[2].rhw = 1;
-	v[2].color = c3;
-	v[2].specular = 0xFF000000;
-
-	v[3].sx = (float)x;
-	v[3].sy = float(h + y);
-	v[3].sz = 0.995F;
-	v[3].tu = u1;
-	v[3].tv = v2;
-	v[3].rhw = 1;
-	v[3].color = c2;
-	v[3].specular = 0xFF000000;
-
-	App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-	App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_POINT);
-	App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0);
-	DXAttempt(App.dx.lpD3DDevice->SetTexture(0, t));
-	App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, FVF, v, 4, D3DDP_DONOTCLIP | D3DDP_DONOTUPDATEEXTENTS);
-	App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1);
-
-	if (App.Filtering)
-	{
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
-	}
-}
-#endif
-
-void S_DisplayMonoScreen()
-{
-#ifndef USE_BGFX
-	ulong col;
-
-	if (tomb4.inv_bg_mode == INV_BG_MODE_ORIGINAL || tomb4.inv_bg_mode == INV_BG_MODE_CLEAR)
-		col = 0xFFFFFFFF;
-	else
-		col = 0xFFFFFF80;
-
-	S_DrawTile(0, 0, phd_winwidth, phd_winheight, MonoScreen.tex, col, col, col, col);
-#endif
+void S_DisplayMonoScreen() {
 }
 
-void CreateMonoScreen()
-{
+void CreateMonoScreen() {
 	MonoScreenOn = true;
-
-#ifndef USE_BGFX
-	if (App.dx.Flags & DXF_WINDOWED)
-		ConvertSurfaceToTextures(App.dx.lpBackBuffer);
-	else
-		ConvertSurfaceToTextures(App.dx.lpPrimaryBuffer);
-#endif
 }
 
-void FreeMonoScreen()
-{
-#ifndef USE_BGFX
-	if (MonoScreen.surface)
-	{
-		Log(4, "Released %s @ %x - RefCnt = %d", "Mono Screen Surface", MonoScreen.surface, MonoScreen.surface->Release());
-		MonoScreen.surface = 0;
-	}
-	else
-		Log(1, "%s Attempt To Release NULL Ptr", "Mono Screen Surface");
-
-	if (MonoScreen.tex)
-	{
-		Log(4, "Released %s @ %x - RefCnt = %d", "Mono Screen Texture", MonoScreen.tex, MonoScreen.tex->Release());
-		MonoScreen.tex = 0;
-	}
-	else
-		Log(1, "%s Attempt To Release NULL Ptr", "Mono Screen Texture");
-
-#endif
+void FreeMonoScreen() {
 	MonoScreenOn = false;
 }
 
-void RGBM_Mono(uchar * r, uchar * g, uchar * b)
-{
-	uchar c;
+void RGBM_Mono(uint8_t * r, uint8_t * g, uint8_t * b) {
+	uint8_t c;
 
-	if (tomb4.inv_bg_mode != INV_BG_MODE_CLEAR)
-	{
+	if (tomb4.inv_bg_mode != INV_BG_MODE_CLEAR) {
 		c = (*r + *b) >> 1;
 		*r = c;
 		*g = c;
@@ -887,12 +647,10 @@ void RGBM_Mono(uchar * r, uchar * g, uchar * b)
 	}
 }
 
-static void BitMaskGetNumberOfBits(ulong bitMask, ulong& bitDepth, ulong& bitOffset)
-{
-	long i;
+static void BitMaskGetNumberOfBits(uint32_t bitMask, uint32_t& bitDepth, uint32_t& bitOffset) {
+	int32_t i;
 
-	if (!bitMask) 
-	{
+	if (!bitMask) {
 		bitOffset = 0;
 		bitDepth = 0;
 		return;
@@ -909,141 +667,15 @@ static void BitMaskGetNumberOfBits(ulong bitMask, ulong& bitDepth, ulong& bitOff
 	bitDepth = i;
 }
 
-#ifndef USE_BGFX
-static void WinVidGetColorBitMasks(COLOR_BIT_MASKS* bm, LPDDPIXELFORMAT pixelFormat)
-{
-	bm->dwRBitMask = pixelFormat->dwRBitMask;
-	bm->dwGBitMask = pixelFormat->dwGBitMask;
-	bm->dwBBitMask = pixelFormat->dwBBitMask;
-	bm->dwRGBAlphaBitMask = pixelFormat->dwRGBAlphaBitMask;
+void CheckKeyConflicts() {
+	int16_t key;
 
-	BitMaskGetNumberOfBits(bm->dwRBitMask, bm->dwRBitDepth, bm->dwRBitOffset);
-	BitMaskGetNumberOfBits(bm->dwGBitMask, bm->dwGBitDepth, bm->dwGBitOffset);
-	BitMaskGetNumberOfBits(bm->dwBBitMask, bm->dwBBitDepth, bm->dwBBitOffset);
-	BitMaskGetNumberOfBits(bm->dwRGBAlphaBitMask, bm->dwRGBAlphaBitDepth, bm->dwRGBAlphaBitOffset);
-}
-
-static void CustomBlt(LPDDSURFACEDESCX dst, ulong dstX, ulong dstY, LPDDSURFACEDESCX src, LPRECT srcRect)
-{
-	COLOR_BIT_MASKS srcMask, dstMask;
-	uchar* srcLine;
-	uchar* dstLine;
-	uchar* srcPtr;
-	uchar* dstPtr;
-	ulong srcX, srcY, width, height, srcBpp, dstBpp, color, high, low, r, g, b;
-
-	srcX = srcRect->left;
-	srcY = srcRect->top;
-	width = srcRect->right - srcRect->left;
-	height = srcRect->bottom - srcRect->top;
-	srcBpp = src->ddpfPixelFormat.dwRGBBitCount / 8;
-	dstBpp = dst->ddpfPixelFormat.dwRGBBitCount / 8;
-	WinVidGetColorBitMasks(&srcMask, &src->ddpfPixelFormat);
-	WinVidGetColorBitMasks(&dstMask, &dst->ddpfPixelFormat);
-	srcLine = (uchar*)src->lpSurface + srcY * src->lPitch + srcX * srcBpp;
-	dstLine = (uchar*)dst->lpSurface + dstY * dst->lPitch + dstX * dstBpp;
-
-	for (ulong j = 0; j < height; j++) 
-	{
-		srcPtr = srcLine;
-		dstPtr = dstLine;
-
-		for (ulong i = 0; i < width; i++)
-		{
-			color = 0;
-			memcpy(&color, srcPtr, srcBpp);
-			r = (color & srcMask.dwRBitMask) >> srcMask.dwRBitOffset;
-			g = (color & srcMask.dwGBitMask) >> srcMask.dwGBitOffset;
-			b = (color & srcMask.dwBBitMask) >> srcMask.dwBBitOffset;
-
-			if (srcMask.dwRBitDepth < dstMask.dwRBitDepth) 
-			{
-				high = dstMask.dwRBitDepth - srcMask.dwRBitDepth;
-				low = (srcMask.dwRBitDepth > high) ? srcMask.dwRBitDepth - high : 0;
-				r = (r << high) | (r >> low);
-			}
-			else if (srcMask.dwRBitDepth > dstMask.dwRBitDepth)
-				r >>= srcMask.dwRBitDepth - dstMask.dwRBitDepth;
-
-			if (srcMask.dwGBitDepth < dstMask.dwGBitDepth)
-			{
-				high = dstMask.dwGBitDepth - srcMask.dwGBitDepth;
-				low = (srcMask.dwGBitDepth > high) ? srcMask.dwGBitDepth - high : 0;
-				g = (g << high) | (g >> low);
-			}
-			else if (srcMask.dwGBitDepth > dstMask.dwGBitDepth)
-				g >>= srcMask.dwGBitDepth - dstMask.dwGBitDepth;
-
-			if (srcMask.dwBBitDepth < dstMask.dwBBitDepth) 
-			{
-				high = dstMask.dwBBitDepth - srcMask.dwBBitDepth;
-				low = (srcMask.dwBBitDepth > high) ? srcMask.dwBBitDepth - high : 0;
-				b = (b << high) | (b >> low);
-			}
-			else if (srcMask.dwBBitDepth > dstMask.dwBBitDepth)
-				b >>= srcMask.dwBBitDepth - dstMask.dwBBitDepth;
-
-			RGBM_Mono((uchar*)&r, (uchar*)&g, (uchar*)&b);
-			color = dst->ddpfPixelFormat.dwRGBAlphaBitMask; // destination is opaque
-			color |= r << dstMask.dwRBitOffset;
-			color |= g << dstMask.dwGBitOffset;
-			color |= b << dstMask.dwBBitOffset;
-			memcpy(dstPtr, &color, dstBpp);
-			srcPtr += srcBpp;
-			dstPtr += dstBpp;
-		}
-
-		srcLine += src->lPitch;
-		dstLine += dst->lPitch;
-	}
-}
-#endif
-
-#ifndef USE_BGFX
-void ConvertSurfaceToTextures(LPDIRECTDRAWSURFACEX surface)
-{
-	DDSURFACEDESCX tSurf;
-	DDSURFACEDESCX uSurf;
-	RECT r = {};
-	ushort* pTexture;
-	ushort* pSrc;
-
-	memset(&tSurf, 0, sizeof(tSurf));
-	tSurf.dwSize = sizeof(DDSURFACEDESCX);
-	surface->Lock(0, &tSurf, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0);
-	pSrc = (ushort*)tSurf.lpSurface;
-	MonoScreen.surface = CreateTexturePage(tSurf.dwWidth, tSurf.dwHeight, 0, 0, RGBM_Mono, -1);
-
-	memset(&uSurf, 0, sizeof(uSurf));
-	uSurf.dwSize = sizeof(DDSURFACEDESCX);
-	MonoScreen.surface->Lock(0, &uSurf, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0);
-	pTexture = (ushort*)uSurf.lpSurface;
-
-	r.left = 0;
-	r.top = 0;
-	r.right = tSurf.dwWidth;
-	r.bottom = tSurf.dwHeight;
-	CustomBlt(&uSurf, 0, 0, &tSurf, &r);
-
-	MonoScreen.surface->Unlock(0);
-	DXAttempt(MonoScreen.surface->QueryInterface(TEXGUID, (void**)&MonoScreen.tex));
-	surface->Unlock(0);
-}
-#endif
-
-void CheckKeyConflicts()
-{
-	short key;
-
-	for (int i = 0; i < 18; i++)
-	{
+	for (int i = 0; i < 18; i++) {
 		key = keyboard_layout[0][i];
 		conflict[i] = 0;
 
-		for (int j = 0; j < 18; j++)
-		{
-			if (key == keyboard_layout[1][j])
-			{
+		for (int j = 0; j < 18; j++) {
+			if (key == keyboard_layout[1][j]) {
 				conflict[i] = 1;
 				break;
 			}
@@ -1051,9 +683,8 @@ void CheckKeyConflicts()
 	}
 }
 
-long S_PauseMenu(long force_menu)
-{
-	long fade, ret;
+int32_t S_PauseMenu(int32_t force_menu) {
+	int32_t fade, ret;
 
 	fade = 0;
 	CreateMonoScreen();
@@ -1061,8 +692,7 @@ long S_PauseMenu(long force_menu)
 	InventoryActive = 1;
 	S_SetReverbType(1);
 
-	do
-	{
+	do {
 		S_InitialisePolyList();
 
 		if (fade)
@@ -1080,15 +710,13 @@ long S_PauseMenu(long force_menu)
 		if (ret == 1)
 			break;
 
-		if (ret == 8)
-		{
+		if (ret == 8) {
 			fade = 8;
 			ret = 0;
 			SetFade(0, 255);
 		}
 
-		if (fade && DoFade == 2)
-		{
+		if (fade && DoFade == 2) {
 			ret = fade;
 			break;
 		}
@@ -1101,18 +729,16 @@ long S_PauseMenu(long force_menu)
 	return ret;
 }
 
-long GetSaveLoadFiles()
-{
+int32_t GetSaveLoadFiles() {
 	FILE* file;
 	LEGACY_SAVEFILE_INFO *pSave;
 	LEGACY_SAVEGAME_INFO save_info;
-	static long nSaves;
+	static int32_t nSaves;
 	char name[75];
 
 	SaveCounter = 0;
 
-	for (int i = 0; i < MAX_SAVEGAMES; i++)
-	{
+	for (int i = 0; i < MAX_SAVEGAMES; i++) {
 		pSave = &SaveGames[i];
 		sprintf(name, "savegame.%d", i);
 
@@ -1120,23 +746,21 @@ long GetSaveLoadFiles()
 
 		file = platform_fopen(full_path.c_str(), "rb");
 
-		if (!file)
-		{
+		if (!file) {
 			pSave->valid = 0;
 			strcpy(pSave->name, GetFixedStringForTextID(TXT_Empty_Slot));
 			continue;
 		}
 
 		fread(&pSave->name, sizeof(char), 75, file);
-		fread(&pSave->num, sizeof(long), 1, file);
-		fread(&pSave->days, sizeof(short), 1, file);
-		fread(&pSave->hours, sizeof(short), 1, file);
-		fread(&pSave->minutes, sizeof(short), 1, file);
-		fread(&pSave->seconds, sizeof(short), 1, file);
+		fread(&pSave->num, sizeof(int32_t), 1, file);
+		fread(&pSave->days, sizeof(int16_t), 1, file);
+		fread(&pSave->hours, sizeof(int16_t), 1, file);
+		fread(&pSave->minutes, sizeof(int16_t), 1, file);
+		fread(&pSave->seconds, sizeof(int16_t), 1, file);
 		fread(&save_info, 1, sizeof(LEGACY_SAVEGAME_INFO), file);
 
-		if (!CheckSumValid((char*)&save_info))
-		{
+		if (!CheckSumValid((char*)&save_info)) {
 			pSave->valid = 0;
 			strcpy(pSave->name, GetFixedStringForTextID(TXT_Empty_Slot));
 			continue;

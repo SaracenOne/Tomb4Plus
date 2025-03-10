@@ -87,7 +87,7 @@
 #define	T4P_KEY_OEM_102						0x56
 #define	T4P_KEY_F11							0x57
 #define	T4P_KEY_F12							0x58
-#define	T4P_KEY_F13							0x64	
+#define	T4P_KEY_F13							0x64
 #define	T4P_KEY_F14							0x65
 #define	T4P_KEY_F15							0x66
 #define	T4P_KEY_KANA						0x70
@@ -181,8 +181,8 @@ enum InputAction {
 
 bool IsActionPressed(InputAction action);
 
-long S_UpdateInput();
-long ReadJoystick(long& x, long& y);
+int32_t S_UpdateInput();
+int32_t ReadJoystick(int32_t& x, int32_t& y);
 
 #define INPUT_LAYOUT_COUNT 2
 
@@ -190,12 +190,12 @@ extern const char* KeyboardButtons[272];
 extern const char* GermanKeyboard[272];
 
 extern bool use_gamepad;
-extern short keyboard_layout[INPUT_LAYOUT_COUNT][INPUT_ACTION_COUNT];
+extern int16_t keyboard_layout[INPUT_LAYOUT_COUNT][INPUT_ACTION_COUNT];
 
-extern long conflict[INPUT_ACTION_COUNT];
-extern long input;
-extern long linput;
-extern long dbinput;
-extern long inputBusy;
-extern short ammo_change_timer;
+extern int32_t conflict[INPUT_ACTION_COUNT];
+extern int32_t input;
+extern int32_t linput;
+extern int32_t dbinput;
+extern int32_t inputBusy;
+extern int16_t ammo_change_timer;
 extern char ammo_change_buf[12];

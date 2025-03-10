@@ -1,5 +1,5 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseBat(short item_number);
-void BatControl(short item_number);
+void InitialiseBat(int16_t item_number);
+void BatControl(int16_t item_number);

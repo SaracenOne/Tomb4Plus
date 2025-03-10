@@ -9,24 +9,21 @@
 #include "gameflow.h"
 #include "../tomb4/tomb4plus/t4plus_mirror.h"
 
-void Draw_Mirror_Lara(int mirror_id)
-{
+void Draw_Mirror_Lara(int mirror_id) {
 	HAIR_STRUCT* hair;
 	GUNSHELL_STRUCT* gunshell;
 
 	hair = &hairs[0][0];
 
-	for (int i = 0; i < 6; i++)
-	{
+	for (int i = 0; i < 6; i++) {
 		hair->pos = T4PMirrorRotated3DPosOnPlane(&t4p_mirror_info[mirror_id], hair->pos);
 		hair++;
 	}
 
-	for (int i = 0; i < MAX_GUNSHELLS; i++)
-	{
+	for (int i = 0; i < MAX_GUNSHELLS; i++) {
 		gunshell = &Gunshells[i];
 
-		if (gunshell->counter) 
+		if (gunshell->counter)
 			gunshell->pos = T4PMirrorUnrotated3DPosOnPlane(&t4p_mirror_info[mirror_id], gunshell->pos);
 	}
 
@@ -39,8 +36,7 @@ void Draw_Mirror_Lara(int mirror_id)
 	lara_item->pos = T4PMirrorInverted3DPosOnPlane(&t4p_mirror_info[mirror_id], lara_item->pos);
 	phd_PushMatrix();
 
-	if (lara.right_arm.flash_gun)
-	{
+	if (lara.right_arm.flash_gun) {
 		mMXPtr[M00] = lara_matrices[11 * indices_count + M00];
 		mMXPtr[M01] = lara_matrices[11 * indices_count + M01];
 		mMXPtr[M02] = lara_matrices[11 * indices_count + M02];
@@ -56,8 +52,7 @@ void Draw_Mirror_Lara(int mirror_id)
 		SetGunFlash(lara.gun_type);
 	}
 
-	if (lara.left_arm.flash_gun)
-	{
+	if (lara.left_arm.flash_gun) {
 		mMXPtr[M00] = lara_matrices[14 * indices_count + M00];
 		mMXPtr[M01] = lara_matrices[14 * indices_count + M01];
 		mMXPtr[M02] = lara_matrices[14 * indices_count + M02];
@@ -75,8 +70,7 @@ void Draw_Mirror_Lara(int mirror_id)
 
 	phd_PopMatrix();
 
-	for (int i = 0; i < MAX_GUNSHELLS; i++)
-	{
+	for (int i = 0; i < MAX_GUNSHELLS; i++) {
 		gunshell = &Gunshells[i];
 
 		if (gunshell->counter)
@@ -85,8 +79,7 @@ void Draw_Mirror_Lara(int mirror_id)
 
 	hair = &hairs[0][0];
 
-	for (int i = 0; i < 6; i++)
-	{
+	for (int i = 0; i < 6; i++) {
 		hair->pos = T4PMirrorRotated3DPosOnPlane(&t4p_mirror_info[mirror_id], hair->pos);
 		hair++;
 	}

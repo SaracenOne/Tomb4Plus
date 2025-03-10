@@ -21,15 +21,13 @@
 
 #include "../effects/locusts.h"
 
-void TriggerCrocgodMissile(PHD_3DPOS* pos, short room_number, short num)
-{
+void TriggerCrocgodMissile(PHD_3DPOS* pos, int16_t room_number, int16_t num) {
 	FX_INFO* fx;
-	short fx_number;
+	int16_t fx_number;
 
 	fx_number = CreateEffect(room_number);
 
-	if (fx_number != NO_ITEM)
-	{
+	if (fx_number != NO_ITEM) {
 		fx = &effects[fx_number];
 		fx->pos.x_pos = pos->x_pos;
 		fx->pos.y_pos = pos->y_pos - (GetRandomControl() & 0x3F) - 32;
@@ -46,11 +44,10 @@ void TriggerCrocgodMissile(PHD_3DPOS* pos, short room_number, short num)
 	}
 }
 
-void TriggerCrocgodMissileFlame(short fx_number, long xv, long yv, long zv)
-{
+void TriggerCrocgodMissileFlame(int16_t fx_number, int32_t xv, int32_t yv, int32_t zv) {
 	FX_INFO* fx;
 	SPARKS* sptr;
-	long dx, dz;
+	int32_t dx, dz;
 
 	fx = &effects[fx_number];
 	dx = lara_item->pos.x_pos - fx->pos.x_pos;
@@ -76,9 +73,9 @@ void TriggerCrocgodMissileFlame(short fx_number, long xv, long yv, long zv)
 	sptr->x = fx->pos.x_pos + (GetRandomControl() & 0xF) - 8;
 	sptr->y = fx->pos.y_pos;
 	sptr->z = fx->pos.z_pos + (GetRandomControl() & 0xF) - 8;
-	sptr->Xvel = (short)xv;
-	sptr->Yvel = (short)yv;
-	sptr->Zvel = (short)zv;
+	sptr->Xvel = (int16_t)xv;
+	sptr->Yvel = (int16_t)yv;
+	sptr->Zvel = (int16_t)zv;
 	sptr->Friction = 34;
 	sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 	sptr->RotAng = GetRandomControl() & 0xFFF;
@@ -90,15 +87,14 @@ void TriggerCrocgodMissileFlame(short fx_number, long xv, long yv, long zv)
 
 	sptr->Gravity = 0;
 	sptr->MaxYvel = 0;
-	sptr->FxObj = (uchar)fx_number;
+	sptr->FxObj = (uint8_t)fx_number;
 	sptr->Scalar = 2;
 	sptr->Size = (GetRandomControl() & 0xF) + 128;
 	sptr->sSize = sptr->Size;
 	sptr->dSize = sptr->Size >> 2;
 }
 
-void InitialiseCrocgod(short item_number)
-{
+void InitialiseCrocgod(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -109,16 +105,15 @@ void InitialiseCrocgod(short item_number)
 	item->goal_anim_state = 1;
 }
 
-void CrocgodControl(short item_number)
-{
+void CrocgodControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* crocgod;
 	AI_INFO info;
 	PHD_3DPOS mPos;
 	PHD_VECTOR pos;
 	PHD_VECTOR pos2;
-	short angles[2];
-	short angle, torso, neck, frame;
+	int16_t angles[2];
+	int16_t angle, torso, neck, frame;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -131,8 +126,7 @@ void CrocgodControl(short item_number)
 
 	if (item->hit_points <= 0)
 		item->hit_points = 0;
-	else
-	{
+	else {
 		if (item->ai_bits)
 			GetAITarget(crocgod);
 		else if (crocgod->hurt_by_lara)
@@ -150,112 +144,103 @@ void CrocgodControl(short item_number)
 		crocgod->maximum_turn = 0;
 		angle = CreatureTurn(item, 0);
 
-		if (item->item_flags[2] == 999)
-		{
+		if (item->item_flags[2] == 999) {
 			torso = info.angle;
 			neck = info.x_angle;
 		}
 
-		switch (item->current_anim_state)
-		{
-		case 2:
+		switch (item->current_anim_state) {
+			case 2:
 
-			if (item->item_flags[2] < 600)
-			{
-				item->goal_anim_state = 4;
-				item->item_flags[2]++;
-			}
-			else
-			{
-				item->item_flags[2] = 999;
-
-				if (info.distance < 0x1900000)
-					item->goal_anim_state = 5;
-				else if (info.distance < 0x3840000)
-					item->goal_anim_state = 3;
-				else if (info.distance < 0x7900000)
+				if (item->item_flags[2] < 600) {
 					item->goal_anim_state = 4;
-			}
+					item->item_flags[2]++;
+				} else {
+					item->item_flags[2] = 999;
 
-			break;
-
-		case 3:
-			frame = item->frame_number - anims[item->anim_number].frame_base;
-
-			if (frame >= 94 && frame <= 96)
-			{
-				pos.x = 0;
-				pos.y = -96;
-				pos.z = 144;
-				GetJointAbsPosition(item, &pos, 9);
-				pos2.x = 0;
-				pos2.y = -128;
-				pos2.z = 288;
-				GetJointAbsPosition(item, &pos2, 9);
-				mPos.z_pos = pos2.z;
-				mPos.y_pos = pos2.y;
-				mPos.x_pos = pos2.x;
-				phd_GetVectorAngles(pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, angles);
-				mPos.y_rot = angles[0];
-				mPos.x_rot = angles[1];
-
-				if (frame == 94)
-					TriggerCrocgodMissile(&mPos, item->room_number, 0);
-				else
-				{
-					if (frame == 95)
-						mPos.y_rot = angles[0] - (BLOCK_SIZE * 2);
-					else
-						mPos.y_rot = angles[0] + (BLOCK_SIZE * 2);
-
-					TriggerCrocgodMissile(&mPos, item->room_number, 1);
+					if (info.distance < 0x1900000)
+						item->goal_anim_state = 5;
+					else if (info.distance < 0x3840000)
+						item->goal_anim_state = 3;
+					else if (info.distance < 0x7900000)
+						item->goal_anim_state = 4;
 				}
-			}
 
-			break;
+				break;
 
-		case 4:
-
-			if (item->item_flags[2] < 600)
-				item->item_flags[2]++;
-
-			if (item->item_flags[2] == 999)
-			{
+			case 3:
 				frame = item->frame_number - anims[item->anim_number].frame_base;
 
-				if (frame >= 60 && frame <= 120)
-					TriggerLocust(item);
-			}
+				if (frame >= 94 && frame <= 96) {
+					pos.x = 0;
+					pos.y = -96;
+					pos.z = 144;
+					GetJointAbsPosition(item, &pos, 9);
+					pos2.x = 0;
+					pos2.y = -128;
+					pos2.z = 288;
+					GetJointAbsPosition(item, &pos2, 9);
+					mPos.z_pos = pos2.z;
+					mPos.y_pos = pos2.y;
+					mPos.x_pos = pos2.x;
+					phd_GetVectorAngles(pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, angles);
+					mPos.y_rot = angles[0];
+					mPos.x_rot = angles[1];
 
-			break;
+					if (frame == 94)
+						TriggerCrocgodMissile(&mPos, item->room_number, 0);
+					else {
+						if (frame == 95)
+							mPos.y_rot = angles[0] - (BLOCK_SIZE * 2);
+						else
+							mPos.y_rot = angles[0] + (BLOCK_SIZE * 2);
 
-		case 5:
-			frame = item->frame_number - anims[item->anim_number].frame_base;
+						TriggerCrocgodMissile(&mPos, item->room_number, 1);
+					}
+				}
 
-			if (frame == 45 || frame == 60 || frame == 75)
-			{
-				pos.x = 0;
-				pos.y = -96;
-				pos.z = 144;
-				GetJointAbsPosition(item, &pos, 9);
-				pos2.x = 0;
-				pos2.y = -128;
-				pos2.z = 288;
-				GetJointAbsPosition(item, &pos2, 9);
-				mPos.z_pos = pos2.z;
-				mPos.y_pos = pos2.y;
-				mPos.x_pos = pos2.x;
-				phd_GetVectorAngles(pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, angles);
-				mPos.y_rot = angles[0];
-				mPos.x_rot = angles[1];
+				break;
 
-				if (frame == 60)
-					TriggerCrocgodMissile(&mPos, item->room_number, 0);
-				else
-					TriggerCrocgodMissile(&mPos, item->room_number, 1);
-			}
+			case 4:
 
-			break;
+				if (item->item_flags[2] < 600)
+					item->item_flags[2]++;
+
+				if (item->item_flags[2] == 999) {
+					frame = item->frame_number - anims[item->anim_number].frame_base;
+
+					if (frame >= 60 && frame <= 120)
+						TriggerLocust(item);
+				}
+
+				break;
+
+			case 5:
+				frame = item->frame_number - anims[item->anim_number].frame_base;
+
+				if (frame == 45 || frame == 60 || frame == 75) {
+					pos.x = 0;
+					pos.y = -96;
+					pos.z = 144;
+					GetJointAbsPosition(item, &pos, 9);
+					pos2.x = 0;
+					pos2.y = -128;
+					pos2.z = 288;
+					GetJointAbsPosition(item, &pos2, 9);
+					mPos.z_pos = pos2.z;
+					mPos.y_pos = pos2.y;
+					mPos.x_pos = pos2.x;
+					phd_GetVectorAngles(pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, angles);
+					mPos.y_rot = angles[0];
+					mPos.x_rot = angles[1];
+
+					if (frame == 60)
+						TriggerCrocgodMissile(&mPos, item->room_number, 0);
+					else
+						TriggerCrocgodMissile(&mPos, item->room_number, 1);
+				}
+
+				break;
 		}
 	}
 

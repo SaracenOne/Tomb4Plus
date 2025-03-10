@@ -56,4 +56,4 @@ extern int16_t T4PlusGetEnemyJeepSlotID();
 
 extern void T4PlusSetupDefaultObjectCustomization();
 
-bool T4ObjectControlRoutine(short object_number, short item_num);
+bool T4ObjectControlRoutine(int16_t object_number, int16_t item_num);

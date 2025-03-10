@@ -10,28 +10,25 @@
 #define MAX_DEBRIS 256
 
 DEBRIS_STRUCT debris[MAX_DEBRIS];
-long next_debris;
-short DebrisFlags;
+int32_t next_debris;
+int16_t DebrisFlags;
 
 static MESH_DATA* DebrisMesh;
-static long DebrisMeshC1;
-static long DebrisMeshC2;
-static long DebrisMeshC3;
-static long DebrisMeshAmbient;
-static long DebrisMeshFlags;
+static int32_t DebrisMeshC1;
+static int32_t DebrisMeshC2;
+static int32_t DebrisMeshC3;
+static int32_t DebrisMeshAmbient;
+static int32_t DebrisMeshFlags;
 
-void UpdateDebris()
-{
+void UpdateDebris() {
 	DEBRIS_STRUCT* dptr;
 	FLOOR_INFO* floor;
-	long height, ceiling;
+	int32_t height, ceiling;
 
-	for (int i = 0; i < MAX_DEBRIS; i++)
-	{
+	for (int i = 0; i < MAX_DEBRIS; i++) {
 		dptr = &debris[i];
 
-		if (dptr->On)
-		{
+		if (dptr->On) {
 			dptr->Yvel += dptr->Gravity;
 
 			if (dptr->Yvel > 4096)
@@ -47,8 +44,7 @@ void UpdateDebris()
 
 			if (dptr->y >= height || dptr->y < ceiling)
 				dptr->On = 0;
-			else if (get_game_mod_global_info()->spinning_debris)
-			{
+			else if (get_game_mod_global_info()->spinning_debris) {
 				dptr->XRot += dptr->Yvel >> 6;
 
 				if (dptr->Yvel)
@@ -61,16 +57,13 @@ void UpdateDebris()
 	}
 }
 
-void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels, short rgb)
-{
+void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, int16_t* Offsets, int32_t* Vels, int16_t rgb) {
 	DEBRIS_STRUCT* dptr;
 
-	if (GetRandomControl() & 3)
-	{
+	if (GetRandomControl() & 3) {
 		if (rgb < 0)
 			rgb = -rgb;
-	}
-	else if (rgb >= 0)
+	} else if (rgb >= 0)
 		TriggerShatterSmoke(pos->x, pos->y, pos->z);
 
 	dptr = &debris[GetFreeDebris()];
@@ -79,14 +72,11 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 	dptr->y = pos->y;
 	dptr->z = pos->z;
 
-	if (DebrisFlags & 1)
-	{
-		dptr->Dir = short(GetRandomControl() << 1);
+	if (DebrisFlags & 1) {
+		dptr->Dir = int16_t(GetRandomControl() << 1);
 		dptr->Speed = (GetRandomControl() & 0xF) + 16;
-	}
-	else
-	{
-		dptr->Dir = (short)phd_atan(Vels[2], Vels[0]);
+	} else {
+		dptr->Dir = (int16_t)phd_atan(Vels[2], Vels[0]);
 
 		if (Vels[0] < 0)
 			Vels[0] = -Vels[0];
@@ -94,11 +84,10 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 		if (Vels[2] < 0)
 			Vels[2] = -Vels[2];
 
-		dptr->Speed = short((Vels[0] + Vels[2]) >> 2);
+		dptr->Speed = int16_t((Vels[0] + Vels[2]) >> 2);
 	}
 
-	if (Vels[1])
-	{
+	if (Vels[1]) {
 		dptr->Yvel = -512 - (GetRandomControl() & 0x1FF);
 		dptr->Gravity = (GetRandomControl() & 0x3F) + 64;
 
@@ -106,9 +95,7 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 			dptr->Yvel <<= 1;
 		else if (Vels[1] == -2)
 			dptr->Yvel >>= 1;
-	}
-	else
-	{
+	} else {
 		dptr->Yvel = 0;
 		dptr->Gravity = (GetRandomControl() & 0x1F) + 32;
 	}
@@ -124,13 +111,10 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 	dptr->XYZOffsets3[1] = Offsets[7];
 	dptr->XYZOffsets3[2] = Offsets[8];
 
-	if (DebrisFlags & 1 && get_game_mod_global_info()->spinning_debris)
-	{
-		dptr->YRot = uchar(GetRandomControl() << 1);
+	if (DebrisFlags & 1 && get_game_mod_global_info()->spinning_debris) {
+		dptr->YRot = uint8_t(GetRandomControl() << 1);
 		dptr->XRot = dptr->YRot;
-	}
-	else
-	{
+	} else {
 		dptr->YRot = 0;
 		dptr->XRot = 0;
 	}
@@ -140,15 +124,12 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 	dptr->g = (rgb >> 5) << 3;
 	dptr->b = (rgb >> 10) << 3;
 
-	if (DebrisMesh->prelight)
-	{
+	if (DebrisMesh->prelight) {
 		dptr->color1 = DebrisMesh->prelight[DebrisMeshC1];
 		dptr->color2 = DebrisMesh->prelight[DebrisMeshC2];
 		dptr->color3 = DebrisMesh->prelight[DebrisMeshC3];
 		dptr->ambient = 0;
-	}
-	else
-	{
+	} else {
 		dptr->color1 = 0;
 		dptr->color2 = 0;
 		dptr->color3 = 0;
@@ -158,37 +139,30 @@ void TriggerDebris(GAME_VECTOR* pos, void* TextInfo, short* Offsets, long* Vels,
 	dptr->flags = DebrisMeshFlags;
 }
 
-long GetFreeDebris()
-{
+int32_t GetFreeDebris() {
 	DEBRIS_STRUCT* dptr;
-	long eldestage, eldestfree, free;
+	int32_t eldestage, eldestfree, free;
 
 	free = next_debris;
 	eldestfree = 0;
 	eldestage = -0x4000;
 	dptr = &debris[next_debris];
 
-	for (int i = 0; i < MAX_DEBRIS; i++)
-	{
-		if (!dptr->On)
-		{
+	for (int i = 0; i < MAX_DEBRIS; i++) {
+		if (!dptr->On) {
 			next_debris = (free + 1) & 0xFF;
 			return free;
 		}
 
-		if (dptr->Yvel > eldestage)
-		{
+		if (dptr->Yvel > eldestage) {
 			eldestfree = free;
 			eldestage = dptr->Yvel;
 		}
 
-		if (free == 255)
-		{
+		if (free == 255) {
 			dptr = debris;
 			free = 0;
-		}
-		else
-		{
+		} else {
 			free++;
 			dptr++;
 		}
@@ -198,8 +172,7 @@ long GetFreeDebris()
 	return eldestfree;
 }
 
-void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num, short RoomNumber, long NoXZVel)
-{
+void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, int16_t Num, int16_t RoomNumber, int32_t NoXZVel) {
 	MESH_DATA* mesh;
 	TEXTURESTRUCT* tex;
 	PHD_VECTOR TPos;
@@ -207,37 +180,33 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 	PHD_VECTOR pos;
 	GAME_VECTOR vec;
 	float* vtx;
-	long* Vels;
-	ushort* face_data;
-	short* meshp;
-	short* offsets;
-	short* RotVerts;
-	long lp, nVtx, nTris, nQuads, x, y, z;
-	ushort v1, v2, v3, c;
-	short rnd, RotY, rgb;
+	int32_t* Vels;
+	uint16_t* face_data;
+	int16_t* meshp;
+	int16_t* offsets;
+	int16_t* RotVerts;
+	int32_t lp, nVtx, nTris, nQuads, x, y, z;
+	uint16_t v1, v2, v3, c;
+	int16_t rnd, RotY, rgb;
 
 	rnd = 0;
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
 
-	if (Num < 0)
-	{
+	if (Num < 0) {
 		Num = -Num;
 		rnd = 1;
 	}
 
-	if (shatter_item)
-	{
+	if (shatter_item) {
 		meshp = shatter_item->meshp;
 		TPos.x = shatter_item->Sphere.x;
 		TPos.y = shatter_item->Sphere.y;
 		TPos.z = shatter_item->Sphere.z;
 		RotY = shatter_item->YRot;
 		rgb = 0;
-	}
-	else
-	{
+	} else {
 		meshp = meshes[static_objects[StaticMesh->static_number].mesh_number];
 		TPos.x = StaticMesh->x;
 		TPos.y = StaticMesh->y;
@@ -248,11 +217,7 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 
 	mesh = (MESH_DATA*)meshp;
 	DebrisMesh = mesh;
-#ifdef USE_BGFX
 	vtx = (float*)mesh->Buffer;
-#else
-	mesh->SourceVB->Lock(DDLOCK_READONLY, (LPVOID*)&vtx, 0);
-#endif
 	nVtx = mesh->nVerts;
 	nTris = mesh->ngt3;
 	nQuads = mesh->ngt4;
@@ -263,18 +228,17 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 	phd_PushUnitMatrix();
 	phd_RotY(RotY);
 
-	offsets = (short*)&tsv_buffer[0];
+	offsets = (int16_t*)&tsv_buffer[0];
 
-	for (lp = 0; lp < nVtx; lp++)
-	{
-		x = (long)*vtx++;
-		y = (long)*vtx++;
-		z = (long)*vtx++;
+	for (lp = 0; lp < nVtx; lp++) {
+		x = (int32_t)*vtx++;
+		y = (int32_t)*vtx++;
+		z = (int32_t)*vtx++;
 		vtx += 5;
 
-		offsets[0] = short(mMXPtr[M00] * x + mMXPtr[M01] * y + mMXPtr[M02] * z + mMXPtr[M03]);
-		offsets[1] = short(mMXPtr[M10] * x + mMXPtr[M11] * y + mMXPtr[M12] * z + mMXPtr[M13]);
-		offsets[2] = short(mMXPtr[M20] * x + mMXPtr[M21] * y + mMXPtr[M22] * z + mMXPtr[M23]);
+		offsets[0] = int16_t(mMXPtr[M00] * x + mMXPtr[M01] * y + mMXPtr[M02] * z + mMXPtr[M03]);
+		offsets[1] = int16_t(mMXPtr[M10] * x + mMXPtr[M11] * y + mMXPtr[M12] * z + mMXPtr[M13]);
+		offsets[2] = int16_t(mMXPtr[M20] * x + mMXPtr[M21] * y + mMXPtr[M22] * z + mMXPtr[M23]);
 
 		pos.x += offsets[0];
 		pos.y += offsets[1];
@@ -283,24 +247,20 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 		offsets += 3;
 	}
 
-#ifndef USE_BGFX
-	mesh->SourceVB->Unlock();
-#endif
 	VPos.x = pos.x / lp;
 	VPos.y = pos.y / lp;
 	VPos.z = pos.z / lp;
 	phd_PopMatrix();
 
-	RotVerts = (short*)&tsv_buffer[0];
-	Vels = (long*)&tsv_buffer[1536];
-	offsets = (short*)&tsv_buffer[1548];
+	RotVerts = (int16_t*)&tsv_buffer[0];
+	Vels = (int32_t*)&tsv_buffer[1536];
+	offsets = (int16_t*)&tsv_buffer[1548];
 	vec.room_number = RoomNumber;
 	DebrisMeshAmbient = room[RoomNumber].ambient;
 
-	face_data = (ushort*)mesh->gt3;
+	face_data = (uint16_t*)mesh->gt3;
 
-	while (nTris && Num)
-	{
+	while (nTris && Num) {
 		v1 = *face_data++;
 		v2 = *face_data++;
 		v3 = *face_data++;
@@ -313,8 +273,7 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 		tex = (TEXTURESTRUCT*)*face_data++;
 		DebrisMeshFlags = *face_data++;
 
-		if (v1 < 0x300 && v2 < 0x300 && v3 < 0x300 && (!rnd || rnd == 1 && GetRandomControl() & 1))
-		{
+		if (v1 < 0x300 && v2 < 0x300 && v3 < 0x300 && (!rnd || rnd == 1 && GetRandomControl() & 1)) {
 			offsets[0] = RotVerts[v1];
 			offsets[1] = RotVerts[v1 + 1];
 			offsets[2] = RotVerts[v1 + 2];
@@ -331,26 +290,23 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 			vec.y = (offsets[1] + offsets[4] + offsets[7]) / 3;
 			vec.z = (offsets[2] + offsets[5] + offsets[8]) / 3;
 
-			offsets[0] -= (short)vec.x;
-			offsets[1] -= (short)vec.y;
-			offsets[2] -= (short)vec.z;
+			offsets[0] -= (int16_t)vec.x;
+			offsets[1] -= (int16_t)vec.y;
+			offsets[2] -= (int16_t)vec.z;
 
-			offsets[3] -= (short)vec.x;
-			offsets[4] -= (short)vec.y;
-			offsets[5] -= (short)vec.z;
+			offsets[3] -= (int16_t)vec.x;
+			offsets[4] -= (int16_t)vec.y;
+			offsets[5] -= (int16_t)vec.z;
 
-			offsets[6] -= (short)vec.x;
-			offsets[7] -= (short)vec.y;
-			offsets[8] -= (short)vec.z;
+			offsets[6] -= (int16_t)vec.x;
+			offsets[7] -= (int16_t)vec.y;
+			offsets[8] -= (int16_t)vec.z;
 
-			if (NoXZVel > 0)
-			{
+			if (NoXZVel > 0) {
 				Vels[0] = 0;
 				Vels[1] = 0;
 				Vels[2] = 0;
-			}
-			else
-			{
+			} else {
 				Vels[0] = vec.x - VPos.x;
 				Vels[1] = vec.y - VPos.y;
 				Vels[2] = vec.z - VPos.z;
@@ -374,10 +330,9 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 		nTris--;
 	}
 
-	face_data = (ushort*)mesh->gt4;
+	face_data = (uint16_t*)mesh->gt4;
 
-	while (nQuads && Num)
-	{
+	while (nQuads && Num) {
 		v1 = *face_data++;
 		v2 = *face_data++;
 		face_data++;
@@ -391,8 +346,7 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 		tex = (TEXTURESTRUCT*)*face_data++;
 		DebrisMeshFlags = *face_data++;
 
-		if (v1 < 0x300 && v2 < 0x300 && v3 < 0x300 && (!rnd || rnd == 1 && GetRandomControl() & 1))
-		{
+		if (v1 < 0x300 && v2 < 0x300 && v3 < 0x300 && (!rnd || rnd == 1 && GetRandomControl() & 1)) {
 			offsets[0] = RotVerts[v1];
 			offsets[1] = RotVerts[v1 + 1];
 			offsets[2] = RotVerts[v1 + 2];
@@ -409,26 +363,23 @@ void ShatterObject(SHATTER_ITEM* shatter_item, MESH_INFO* StaticMesh, short Num,
 			vec.y = (offsets[1] + offsets[4] + offsets[7]) / 3;
 			vec.z = (offsets[2] + offsets[5] + offsets[8]) / 3;
 
-			offsets[0] -= (short)vec.x;
-			offsets[1] -= (short)vec.y;
-			offsets[2] -= (short)vec.z;
+			offsets[0] -= (int16_t)vec.x;
+			offsets[1] -= (int16_t)vec.y;
+			offsets[2] -= (int16_t)vec.z;
 
-			offsets[3] -= (short)vec.x;
-			offsets[4] -= (short)vec.y;
-			offsets[5] -= (short)vec.z;
+			offsets[3] -= (int16_t)vec.x;
+			offsets[4] -= (int16_t)vec.y;
+			offsets[5] -= (int16_t)vec.z;
 
-			offsets[6] -= (short)vec.x;
-			offsets[7] -= (short)vec.y;
-			offsets[8] -= (short)vec.z;
+			offsets[6] -= (int16_t)vec.x;
+			offsets[7] -= (int16_t)vec.y;
+			offsets[8] -= (int16_t)vec.z;
 
-			if (NoXZVel > 0)
-			{
+			if (NoXZVel > 0) {
 				Vels[0] = 0;
 				Vels[1] = 0;
 				Vels[2] = 0;
-			}
-			else
-			{
+			} else {
 				Vels[0] = vec.x - VPos.x;
 				Vels[1] = vec.y - VPos.y;
 				Vels[2] = vec.z - VPos.z;

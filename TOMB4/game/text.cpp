@@ -10,18 +10,17 @@
 #include "../tomb4/mod_config.h"
 #include "gameflow.h"
 
-long stash_font_height;
-long smol_font_height;
-long savegame_font_height;
-long small_font;
-long font_height;
-long GnFrameCounter;
+int32_t stash_font_height;
+int32_t smol_font_height;
+int32_t savegame_font_height;
+int32_t small_font;
+int32_t font_height;
+int32_t GnFrameCounter;
 
 static CVECTOR FontShades[10][32];
-static uchar ScaleFlag;
+static uint8_t ScaleFlag;
 
-char AccentTable[46][2] =
-{
+int8_t AccentTable[46][2] = {
 	{'{', ' '},
 	{'u', '^'},
 	{'e', '\\'},
@@ -76,25 +75,23 @@ int custom_glyph_scale_height = 240;
 #pragma warning(push)
 #pragma warning(disable : 4838)
 #pragma warning(disable : 4309)
-static CVECTOR ShadeFromTo[10][2] =
-{
-	{ {128, 128, 128, 0}, {128, 128, 128, 0} },
-	{ {128, 128, 128, 0}, {128, 128, 128, 0} },
-	{ {128, 128, 128, 0}, {128, 128, 128, 0} },
-	{ {128, 0, 0, 0}, {64, 0, 0, 0} },
-	{ {0, 0, 160, 0}, {0, 0, 80, 0} },
-	{ {128, 128, 128, 0}, {16, 16, 16, 0} },
-	{ {192, 128, 64, 0}, {64, 16, 0, 0} },
-	{ {16, 16, 16, 0}, {128, 128, 128, 0} },
-	{ {224, 192, 0, 0}, {64, 32, 0, 0} },
-	{ {128, 0, 0, 0}, {64, 0, 0, 0} },
+static CVECTOR ShadeFromTo[10][2] = {
+	{ {(int8_t)128, (int8_t)128, (int8_t)128, 0}, {(int8_t)128, (int8_t)128, (int8_t)128, 0} },
+	{ {(int8_t)128, (int8_t)128, (int8_t)128, 0}, {(int8_t)128, (int8_t)128, (int8_t)128, 0} },
+	{ {(int8_t)128, (int8_t)128, (int8_t)128, 0}, {(int8_t)128, (int8_t)128, (int8_t)128, 0} },
+	{ {(int8_t)128, 0, 0, 0}, {64, 0, 0, 0} },
+	{ {0, 0, (int8_t)160, 0}, {0, 0, 80, 0} },
+	{ {(int8_t)128, (int8_t)128, (int8_t)128, 0}, {16, 16, 16, 0} },
+	{ {(int8_t)192, (int8_t)128, 64, 0}, {64, 16, 0, 0} },
+	{ {16, 16, 16, 0}, {(int8_t)128, (int8_t)128, (int8_t)128, 0} },
+	{ {(int8_t)224, (int8_t)192, 0, 0}, {64, 32, 0, 0} },
+	{ {(int8_t)128, 0, 0, 0}, {64, 0, 0, 0} },
 };
 #pragma warning(pop)
 
 static CHARDEF CharDef[CHAR_TABLE_COUNT];
 
-void InitFont()
-{
+void InitFont() {
 	MOD_LEVEL_FONT_INFO *font_info = get_game_mod_level_font_info(gfCurrentLevel);
 
 	custom_glyph_scale_width = font_info->custom_glyph_scale_width;
@@ -136,13 +133,12 @@ void InitFont()
 
 	GFXTLVERTEX v;
 	static CHARDEF copy[106];
-	static long init = 1;
-	ushort r, g, b;
-	short h, w, yoff;
-	uchar fr, fg, fb, tr, tg, tb;
+	static int32_t init = 1;
+	uint16_t r, g, b;
+	int16_t h, w, yoff;
+	uint8_t fr, fg, fb, tr, tg, tb;
 
-	for (int i = 0; i < 10; i++)
-	{
+	for (int i = 0; i < 10; i++) {
 		fr = ShadeFromTo[i][0].r;
 		fg = ShadeFromTo[i][0].g;
 		fb = ShadeFromTo[i][0].b;
@@ -150,8 +146,7 @@ void InitFont()
 		tg = ShadeFromTo[i][1].g;
 		tb = ShadeFromTo[i][1].b;
 
-		for (int j = 0; j < 16; j++)
-		{
+		for (int j = 0; j < 16; j++) {
 			r = ((tr * j) >> 4) + ((fr * (16 - j)) >> 4);
 			g = ((tg * j) >> 4) + ((fg * (16 - j)) >> 4);
 			b = ((tb * j) >> 4) + ((fb * (16 - j)) >> 4);
@@ -170,25 +165,23 @@ void InitFont()
 			r = CLRR(v.color);
 			g = CLRG(v.color);
 			b = CLRB(v.color);
-			FontShades[i][j << 1].r = (uchar)r;
-			FontShades[i][j << 1].g = (uchar)g;
-			FontShades[i][j << 1].b = (uchar)b;
-			FontShades[i][j << 1].a = (uchar)0xFF;
+			FontShades[i][j << 1].r = (uint8_t)r;
+			FontShades[i][j << 1].g = (uint8_t)g;
+			FontShades[i][j << 1].b = (uint8_t)b;
+			FontShades[i][j << 1].a = (uint8_t)0xFF;
 
 			r = CLRR(v.specular);
 			g = CLRG(v.specular);
 			b = CLRB(v.specular);
-			FontShades[i][(j << 1) + 1].r = (uchar)r;
-			FontShades[i][(j << 1) + 1].g = (uchar)g;
-			FontShades[i][(j << 1) + 1].b = (uchar)b;
-			FontShades[i][(j << 1) + 1].a = (uchar)0xFF;
+			FontShades[i][(j << 1) + 1].r = (uint8_t)r;
+			FontShades[i][(j << 1) + 1].g = (uint8_t)g;
+			FontShades[i][(j << 1) + 1].b = (uint8_t)b;
+			FontShades[i][(j << 1) + 1].a = (uint8_t)0xFF;
 		}
 	}
 
-	if (init)
-	{
-		for (int i = 0; i < 106; i++)
-		{
+	if (init) {
+		for (int i = 0; i < 106; i++) {
 			copy[i].h = CharDef[i].h;
 			copy[i].w = CharDef[i].w;
 			copy[i].y_offset = CharDef[i].y_offset;
@@ -197,27 +190,25 @@ void InitFont()
 		init = 0;
 	}
 
-	for (int i = 0; i < 106; i++)
-	{
-		h = short((float)copy[i].h * float(phd_winymax / 240.0F));
-		w = short((float)copy[i].w * float(phd_winxmax / 512.0F));
-		yoff = short((float)copy[i].y_offset * float(phd_winymax / 240.0F));
+	for (int i = 0; i < 106; i++) {
+		h = int16_t((float)copy[i].h * float(phd_winymax / 240.0F));
+		w = int16_t((float)copy[i].w * float(phd_winxmax / 512.0F));
+		yoff = int16_t((float)copy[i].y_offset * float(phd_winymax / 240.0F));
 		CharDef[i].h = h;
 		CharDef[i].w = w;
 		CharDef[i].y_offset = yoff;
 	}
 
-	font_height = long(float(phd_winymax * font_info->custom_vertical_spacing));
+	font_height = int32_t(float(phd_winymax * font_info->custom_vertical_spacing));
 	stash_font_height = font_height;
-	savegame_font_height = long(float(3.0F * phd_winymax / 40.0F));
-	smol_font_height = long(float(7.0F * phd_winymax / 120.0F));
+	savegame_font_height = int32_t(float(3.0F * phd_winymax / 40.0F));
+	smol_font_height = int32_t(float(7.0F * phd_winymax / 120.0F));
 }
 
-void UpdatePulseColour()
-{
+void UpdatePulseColour() {
 	GFXTLVERTEX v;
-	static uchar PulseCnt = 0;
-	uchar c, r, g, b;
+	static uint8_t PulseCnt = 0;
+	uint8_t c, r, g, b;
 
 	PulseCnt = (PulseCnt + 1) & 0x1F;
 
@@ -229,8 +220,7 @@ void UpdatePulseColour()
 	c <<= 3;
 	CalcColorSplit(RGBONLY(c, c, c), &v.color);
 
-	for (int i = 0; i < 16; i++)
-	{
+	for (int i = 0; i < 16; i++) {
 		r = CLRR(v.color);
 		g = CLRG(v.color);
 		b = CLRB(v.color);
@@ -247,10 +237,9 @@ void UpdatePulseColour()
 	}
 }
 
-long GetStringLengthScaled(const char* string, long* top, long* bottom, float glyph_scale_width, float glyph_scale_height)
-{
+int32_t GetStringLengthScaled(const char* string, int32_t* top, int32_t* bottom, float glyph_scale_width, float glyph_scale_height) {
 	CHARDEF* def;
-	long s, accent, length, lowest, highest;
+	int32_t s, accent, length, lowest, highest;
 
 	s = *string++;
 	length = 0;
@@ -258,37 +247,29 @@ long GetStringLengthScaled(const char* string, long* top, long* bottom, float gl
 	lowest = -BLOCK_SIZE;
 	highest = BLOCK_SIZE;
 
-	while (s)
-	{
+	while (s) {
 		if (s == '\n')
 			break;
 
 		if (s == ' ')
-			length += long((float(phd_winxmax + 1) / 640.0F) * 8.0F);
-		else if (s == '\t')
-		{
+			length += int32_t((float(phd_winxmax + 1) / 640.0F) * 8.0F);
+		else if (s == '\t') {
 			length += 40;
 
-			if (top)
-			{
+			if (top) {
 				if (highest > -12)
 					highest = -12;
 			}
 
-			if (bottom)
-			{
+			if (bottom) {
 				if (lowest < 2)
 					lowest = 2;
 			}
-		}
-		else if (s >= 20)
-		{
+		} else if (s >= 20) {
 			if (s < ' ')
 				def = &CharDef[s + 74];
-			else
-			{
-				if (s >= 128 && s <= 173)
-				{
+			else {
+				if (s >= 128 && s <= 173) {
 					accent = 1;
 					s = AccentTable[s - 128][0];
 				}
@@ -300,30 +281,27 @@ long GetStringLengthScaled(const char* string, long* top, long* bottom, float gl
 			float scaled_glypth_height = def->h * glyph_scale_height;
 
 			if (ScaleFlag)
-				length += long(scaled_glypth_width - scaled_glypth_width / 4);
+				length += int32_t(scaled_glypth_width - scaled_glypth_width / 4);
 			else
-				length += long(scaled_glypth_width);
+				length += int32_t(scaled_glypth_width);
 
-			long scaled_y_offset = long(def->y_offset * glyph_scale_height);
+			int32_t scaled_y_offset = int32_t(def->y_offset * glyph_scale_height);
 
-			if (top)
-			{
+			if (top) {
 				if (scaled_y_offset < highest)
-					highest = long(scaled_y_offset);
+					highest = int32_t(scaled_y_offset);
 			}
 
-			if (bottom)
-			{
-				if (long(scaled_glypth_height) + scaled_y_offset > lowest)
-					lowest = long(scaled_glypth_height) + scaled_y_offset;
+			if (bottom) {
+				if (int32_t(scaled_glypth_height) + scaled_y_offset > lowest)
+					lowest = int32_t(scaled_glypth_height) + scaled_y_offset;
 			}
 		}
 
 		s = *string++;
 	}
 
-	if (top)
-	{
+	if (top) {
 		if (accent)
 			highest -= 4;
 
@@ -336,45 +314,42 @@ long GetStringLengthScaled(const char* string, long* top, long* bottom, float gl
 	return length;
 }
 
-long GetStringLength(const char* string, long* top, long* bottom)
-{
+int32_t GetStringLength(const char* string, int32_t* top, int32_t* bottom) {
 	float glyph_scale_width = (float)DEFAULT_GLYPH_SCALE_WIDTH / (float)custom_glyph_scale_width;
 	float glyph_scale_height = (float)DEFAULT_GLYPH_SCALE_HEIGHT / (float)custom_glyph_scale_height;
 
 	return GetStringLengthScaled(string, top, bottom, glyph_scale_width, glyph_scale_height);
 }
 
-void DrawCharScaled(long x, long y, ushort col, CHARDEF* def, float glyph_scale_width, float glyph_scale_height)
-{
+void DrawCharScaled(int32_t x, int32_t y, uint16_t col, CHARDEF* def, float glyph_scale_width, float glyph_scale_height) {
 	GFXTLVERTEX* v;
 	TEXTURESTRUCT tex;
 	float u1, v1, u2, v2;
-	long x1, y1, x2, y2, top, bottom;
+	int32_t x1, y1, x2, y2, top, bottom;
 
 	v = MyVertexBuffer;
 
-	y1 = y + phd_winymin + long(def->y_offset * glyph_scale_height);
-	y2 = y + phd_winymin + long((def->h * glyph_scale_height) + (def->y_offset * glyph_scale_height));
+	y1 = y + phd_winymin + int32_t(def->y_offset * glyph_scale_height);
+	y2 = y + phd_winymin + int32_t((def->h * glyph_scale_height) + (def->y_offset * glyph_scale_height));
 
-	if (small_font)
-	{
-		y1 = long((float)y1 * 0.75F);
-		y2 = long((float)y2 * 0.75F);
+	if (small_font) {
+		y1 = int32_t((float)y1 * 0.75F);
+		y2 = int32_t((float)y2 * 0.75F);
 	}
 
 	x1 = x + phd_winxmin;
-	x2 = x1 + long(def->w * glyph_scale_width);
-	setXY4(v, x1, y1, x2, y1, x2, y2, x1, y2, (long)f_mznear, clipflags);
+	x2 = x1 + int32_t(def->w * glyph_scale_width);
+	setXY4(v, x1, y1, x2, y1, x2, y2, x1, y2, (int32_t)f_mznear, clipflags);
 
-	top = *(long*)&FontShades[col][2 * def->top_shade];
-	bottom = *(long*)&FontShades[col][2 * def->bottom_shade];
+	top = *(int32_t*)&FontShades[col][2 * def->top_shade];
+	bottom = *(int32_t*)&FontShades[col][2 * def->bottom_shade];
 	v[0].color = top;
 	v[1].color = top;
 	v[2].color = bottom;
 	v[3].color = bottom;
 
-	top = *(long*)&FontShades[col][(2 * def->top_shade) + 1];
-	bottom = *(long*)&FontShades[col][(2 * def->bottom_shade) + 1];
+	top = *(int32_t*)&FontShades[col][(2 * def->top_shade) + 1];
+	bottom = *(int32_t*)&FontShades[col][(2 * def->bottom_shade) + 1];
 	v[0].specular = top;
 	v[1].specular = top;
 	v[2].specular = bottom;
@@ -394,26 +369,24 @@ void DrawCharScaled(long x, long y, ushort col, CHARDEF* def, float glyph_scale_
 	tex.v4 = v2;
 
 	tex.drawtype = 1;
-	tex.tpage = ushort(nTextures - 2);
+	tex.tpage = uint16_t(nTextures - 2);
 	tex.flag = 0;
 	nPolyType = 4;
 	AddQuadClippedSorted(v, 0, 1, 2, 3, &tex, 0);
 }
 
-void DrawChar(long x, long y, ushort col, CHARDEF* def)
-{
+void DrawChar(int32_t x, int32_t y, uint16_t col, CHARDEF* def) {
 	float glyph_scale_width = (float)DEFAULT_GLYPH_SCALE_WIDTH / (float)custom_glyph_scale_width;
 	float glyph_scale_height = (float)DEFAULT_GLYPH_SCALE_HEIGHT / (float)custom_glyph_scale_height;
 
 	DrawCharScaled(x, y, col, def, glyph_scale_width, glyph_scale_height);
 }
 
-void PrintStringScaled(long x, long y, uchar col, const char* string, ushort flags, float glyph_scale_width, float glyph_scale_height)
-{
+void PrintStringScaled(int32_t x, int32_t y, uint8_t col, const char* string, uint16_t flags, float glyph_scale_width, float glyph_scale_height) {
 	CHARDEF* def;
 	CHARDEF* accent;
-	long x2, bottom, l, top, bottom2;
-	uchar s;
+	int32_t x2, bottom, l, top, bottom2;
+	uint8_t s;
 
 	if (flags & FF_BLINK && GnFrameCounter & 0x10)
 		return;
@@ -430,17 +403,12 @@ void PrintStringScaled(long x, long y, uchar col, const char* string, ushort fla
 
 	s = *string++;
 
-	while (s)
-	{
-		if (s == '\n')
-		{
-			if (*string == '\n')
-			{
+	while (s) {
+		if (s == '\n') {
+			if (*string == '\n') {
 				bottom = 0;
 				y += 16;
-			}
-			else
-			{
+			} else {
 				l = GetStringLengthScaled(string, &top, &bottom2, glyph_scale_width, glyph_scale_height);
 
 				if (flags & FF_CENTER)
@@ -458,42 +426,36 @@ void PrintStringScaled(long x, long y, uchar col, const char* string, ushort fla
 			continue;
 		}
 
-		if (s == ' ')
-		{
+		if (s == ' ') {
 			if (ScaleFlag)
 				x2 += 6;
 			else
-				x2 += long(float(phd_winxmax + 1) / 640.0F * 8.0F);
+				x2 += int32_t(float(phd_winxmax + 1) / 640.0F * 8.0F);
 
 			s = *string++;
 			continue;
 		}
 
-		if (s == '\t')
-		{
+		if (s == '\t') {
 			x2 += 40;
 			s = *string++;
 			continue;
 		}
 
-		if (s < 20)
-		{
+		if (s < 20) {
 			col = s - 1;
 			s = *string++;
 			continue;
 		}
 
-		if (s >= 128 && s <= 173)
-		{
+		if (s >= 128 && s <= 173) {
 			def = &CharDef[AccentTable[s - 128][0] - '!'];
 			accent = &CharDef[AccentTable[s - 128][1] - '!'];
 			DrawCharScaled(x2, y, col, def, glyph_scale_width, glyph_scale_height);
 
 			if (AccentTable[s - 128][1] != ' ')
 				DrawCharScaled(def->w / 2 + x2 - 3, y + def->y_offset, col, accent, glyph_scale_width, glyph_scale_height);
-		}
-		else
-		{
+		} else {
 			if (s < ' ')
 				def = &CharDef[s + 74];
 			else
@@ -505,9 +467,9 @@ void PrintStringScaled(long x, long y, uchar col, const char* string, ushort fla
 		float scaled_glypth_width = def->w * glyph_scale_width;
 
 		if (ScaleFlag)
-			x2 += long(scaled_glypth_width - scaled_glypth_width / 4);
+			x2 += int32_t(scaled_glypth_width - scaled_glypth_width / 4);
 		else
-			x2 += long(scaled_glypth_width);
+			x2 += int32_t(scaled_glypth_width);
 
 		s = *string++;
 	}
@@ -515,8 +477,7 @@ void PrintStringScaled(long x, long y, uchar col, const char* string, ushort fla
 	ScaleFlag = 0;
 }
 
-void PrintString(long x, long y, uchar col, const char* string, ushort flags)
-{
+void PrintString(int32_t x, int32_t y, uint8_t col, const char* string, uint16_t flags) {
 	const float glyph_scale_width = (float)DEFAULT_GLYPH_SCALE_WIDTH / (float)custom_glyph_scale_width;
 	const float glyph_scale_height = (float)DEFAULT_GLYPH_SCALE_HEIGHT / (float)custom_glyph_scale_height;
 

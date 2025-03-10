@@ -13,8 +13,7 @@
 #include "platform.h"
 #include "cmdline.h"
 
-const char *LastRevelationTrackFileNames[] = 
-{
+const char *LastRevelationTrackFileNames[] = {
 	"044_attack_part_i.wav",
 	"008_voncroy9a.wav",
 	"100_attack_part_ii.wav",
@@ -130,8 +129,7 @@ const char *LastRevelationTrackFileNames[] =
 };
 
 // TRLE: track count increased
-const char* LevelEditorTrackFileNames[] =
-{
+const char* LevelEditorTrackFileNames[] = {
 #ifdef MA_AUDIO_ENGINE
 	"000",
 	"001",
@@ -654,10 +652,9 @@ const char* LevelEditorTrackFileNames[] =
 #pragma warning(push)
 #pragma warning(disable : 4838)
 #pragma warning(disable : 4309)
-static char source_wav_format[50] =
-{
-	2, 0, 2, 0, 68, 172, 0, 0, 71, 173, 0, 0, 0, 8, 4, 0, 32, 0, 244, 7, 7, 0, 0, 1, 0, 0, 0,
-	2, 0, 255, 0, 0, 0, 0, 192, 0, 64, 0, 240, 0, 0, 0, 204, 1, 48, 255, 136, 1, 24, 255
+static int8_t source_wav_format[50] = {
+	2, 0, 2, 0, 68, (int8_t)172, 0, 0, 71, (int8_t)173, 0, 0, 0, 8, 4, 0, 32, 0, (int8_t)244, 7, 7, 0, 0, 1, 0, 0, 0,
+	2, 0, (int8_t)255, 0, 0, 0, 0, (int8_t)192, 0, 64, 0, (int8_t)240, 0, 0, 0, (int8_t)204, 1, 48, (int8_t)255, (int8_t)136, 1, 24, (int8_t)255
 };
 #pragma warning(pop)
 
@@ -665,20 +662,20 @@ static char source_wav_format[50] =
 HACMDRIVER hACMDriver;
 #endif
 
-uchar* wav_file_buffer = 0;
-uchar* ADPCMBuffer = 0;
+uint8_t* wav_file_buffer = 0;
+uint8_t* ADPCMBuffer = 0;
 bool acm_ready = 0;
 
-long LegacyTrack = -1;
-long LegacyTrackFlag = 7;
+int32_t LegacyTrack = -1;
+int32_t LegacyTrackFlag = 7;
 
 #ifndef MA_AUDIO_ENGINE
 #error "MA_AUDIO_ENGINE is required."
 #else
 #define STB_VORBIS_HEADER_ONLY // <-- Exclude stb_vorbis' implementation
-#include "../tomb4/libs/miniaudio/extras/stb_vorbis.c"
+#include "extras/stb_vorbis.c"
 
-#include "../tomb4/libs/miniaudio/miniaudio.h"
+#include "miniaudio.h"
 #include "../tomb4/mod_config.h"
 
 bool new_audio_system = false;
@@ -878,8 +875,7 @@ bool play_track_on_stream_channel(int32_t channel_id, int32_t track, StreamMode 
 
 void track_complete_callback(int32_t channel_id) {
 	if (channels[channel_id].current_stream_mode == STREAM_ONESHOT_AND_RESTORE_ATMOSPHERE) {
-		if (CurrentAtmosphere && !IsAtmospherePlaying)
-		{
+		if (CurrentAtmosphere && !IsAtmospherePlaying) {
 			if (channels[channel_id].current_stream_active) {
 				S_CDStop();
 				S_CDPlay(CurrentAtmosphere, 1);
@@ -970,8 +966,7 @@ void S_CDPlayExt(uint8_t track_id, uint8_t channel_id, bool looping, bool restor
 				if (IsAtmospherePlaying)
 					S_CDPlay(track_id, true);
 			}
-		}
-		else {
+		} else {
 			S_CDPlay(track_id, false);
 		}
 	}
@@ -988,8 +983,7 @@ int32_t S_CDGetTrackID(uint8_t channel_id) {
 bool S_CDGetChannelIsActive(uint8_t channel_id) {
 	if (IsUsingNewAudioSystem()) {
 		return channels[channel_id].current_stream_active;
-	}
-	else {
+	} else {
 		return 0;
 	}
 }
@@ -997,8 +991,7 @@ bool S_CDGetChannelIsActive(uint8_t channel_id) {
 bool S_CDGetChannelIsLooping(uint8_t channel_id) {
 	if (IsUsingNewAudioSystem()) {
 		return channels[channel_id].current_stream_loops;
-	}
-	else {
+	} else {
 		return 0;
 	}
 }
@@ -1006,8 +999,7 @@ bool S_CDGetChannelIsLooping(uint8_t channel_id) {
 uint64_t S_CDGetChannelPosition(uint8_t channel_id) {
 	if (IsUsingNewAudioSystem()) {
 		return channels[channel_id].position;
-	}
-	else {
+	} else {
 		return -1;
 	}
 }
@@ -1022,8 +1014,7 @@ void S_CDStop() {
 void S_CDStopExt(uint8_t channel_id) {
 	if (IsUsingNewAudioSystem()) {
 		stop_track_on_stream_channel(channel_id);
-	}
-	else {
+	} else {
 		S_CDStop();
 	}
 }
@@ -1126,8 +1117,7 @@ bool IsUsingOldCDTriggerMode() {
 	return old_cd_trigger_mode;
 }
 
-void FillADPCMBuffer(char* p, long track)
-{
+void FillADPCMBuffer(char* p, int32_t track) {
 	// Dummied out, kept around for now for frontend compatibility.
 }
 

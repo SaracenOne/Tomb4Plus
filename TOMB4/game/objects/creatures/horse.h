@@ -1,7 +1,7 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseHorseman(short item_number);
-void HorsemanControl(short item_number);
-void TriggerHorsemanRicochets(PHD_VECTOR* pos, long yrot, long num);
-void InitialiseHorse(short item_number);
+void InitialiseHorseman(int16_t item_number);
+void HorsemanControl(int16_t item_number);
+void TriggerHorsemanRicochets(PHD_VECTOR* pos, int32_t yrot, int32_t num);
+void InitialiseHorse(int16_t item_number);

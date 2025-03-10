@@ -1,7 +1,6 @@
 #pragma once
 
-enum lara_anim_state
-{
+enum lara_anim_state {
 	AS_WALK = 0,
 	AS_RUN = 1,
 	AS_STOP = 2,
@@ -148,8 +147,7 @@ enum lara_anim_state
 };
 
 
-enum lara_anim
-{
+enum lara_anim {
 	ANIM_RUN = 0,
 	ANIM_WALK_STOP_LEFT = 2,
 	ANIM_WALK_STOP_RIGHT = 3,

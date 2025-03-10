@@ -6,8 +6,7 @@
 #include "control.h"
 #include "../tomb4/tomb4plus/t4plus_objects.h"
 
-static uchar SkinJoints[14][4] =
-{
+static uint8_t SkinJoints[14][4] = {
 	{ 0, 1, 1, 3 },
 	{ 1, 2, 4, 5 },
 	{ 2, 3, 6, 7 },
@@ -24,8 +23,7 @@ static uchar SkinJoints[14][4] =
 	{ 14, 7, 27, 16 }
 };
 
-static char HairSkinVertNums[6][12] =
-{
+static int8_t HairSkinVertNums[6][12] = {
 	{ 37, 38, 39, 40, -1, 0, 0, 0, 0, 0, 0, 0 },
 	{ 79, 77, 78, 76, -1, 0, 0, 0, 0, 0, 0, 0 },
 	{ 68, 71, 69, 70, -1, 0, 0, 0, 0, 0, 0, 0 },
@@ -34,8 +32,7 @@ static char HairSkinVertNums[6][12] =
 	{ 0, 3, 1, 2, -1, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-static char HairScratchVertNums[3][12] =
-{
+static int8_t HairScratchVertNums[3][12] = {
 	{ 0, 3, 1, 2, -1, 0, 0, 0, 0, 0, 0, 0 },
 	{ 4, 5, 6, 7, -1, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 1, 2, 3, -1, 0, 0, 0, 0, 0, 0, 0 }
@@ -46,10 +43,9 @@ static PHD_VECTOR BelowMeshXYZ;
 static PHD_VECTOR JointMeshXYZ;
 static PHD_VECTOR AboveMeshXYZ;
 static PHD_VECTOR XYZList[32];
-static uchar PointsToCalc[26][12];
+static uint8_t PointsToCalc[26][12];
 
-void PushXYZ()
-{
+void PushXYZ() {
 	PHD_VECTOR* ptr;
 
 	ptr = SkinXYZPtr++;
@@ -58,28 +54,25 @@ void PushXYZ()
 	SkinXYZPtr->z = ptr->z;
 }
 
-void PopXYZ()
-{
+void PopXYZ() {
 	SkinXYZPtr--;
 }
 
-void CreateSkinningData()
-{
+void CreateSkinningData() {
 	MESH_DATA* aboveMesh;
 	MESH_DATA* belowMesh;
 	MESH_DATA* jointMesh;
 	MESH_DATA* hairMesh;
 	OBJECT_INFO* obj;
-	short** meshpp;
-	long* bone;
-	short* joint;
-	short* LaraMesh;
-	long vertCount, aboveVerts, belowVerts, jointVerts, laraVerts, laraX, laraY, laraZ, jointX, jointY, jointZ, calcPointsCounter;
-	short aboveMeshNum, belowMeshNum, jointMeshNum;
-	uchar vertBuf[128];
+	int16_t** meshpp;
+	int32_t* bone;
+	int16_t* joint;
+	int16_t* LaraMesh;
+	int32_t vertCount, aboveVerts, belowVerts, jointVerts, laraVerts, laraX, laraY, laraZ, jointX, jointY, jointZ, calcPointsCounter;
+	int16_t aboveMeshNum, belowMeshNum, jointMeshNum;
+	uint8_t vertBuf[128];
 
-	for (int i = 0; i < 14; i++)
-	{
+	for (int i = 0; i < 14; i++) {
 		SkinXYZPtr = XYZList;
 		SkinXYZPtr->x = 0;
 		SkinXYZPtr->y = 0;
@@ -93,12 +86,10 @@ void CreateSkinningData()
 		belowMesh = (MESH_DATA*)*meshpp;
 		jointMesh = (MESH_DATA*)*meshpp;
 
-		if (aboveMeshNum)
-		{
+		if (aboveMeshNum) {
 			meshpp++;
 
-			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++)
-			{
+			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 				if (bone[0] & POP_BONE_FLAG)
 					PopXYZ();
 
@@ -109,8 +100,7 @@ void CreateSkinningData()
 				SkinXYZPtr->y += bone[2];
 				SkinXYZPtr->z += bone[3];
 
-				if (aboveMeshNum == j)
-				{
+				if (aboveMeshNum == j) {
 					aboveMesh = (MESH_DATA*)*meshpp;
 					AboveMeshXYZ.x = SkinXYZPtr->x;
 					AboveMeshXYZ.y = SkinXYZPtr->y;
@@ -118,9 +108,7 @@ void CreateSkinningData()
 					break;
 				}
 			}
-		}
-		else
-		{
+		} else {
 			aboveMesh = (MESH_DATA*)*meshpp;
 			AboveMeshXYZ.x = 0;
 			AboveMeshXYZ.y = 0;
@@ -134,12 +122,10 @@ void CreateSkinningData()
 		meshpp = &meshes[obj->mesh_index];
 		bone = &bones[obj->bone_index];
 
-		if (belowMeshNum)
-		{
+		if (belowMeshNum) {
 			meshpp++;
 
-			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++)
-			{
+			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 				if (bone[0] & POP_BONE_FLAG)
 					PopXYZ();
 
@@ -150,8 +136,7 @@ void CreateSkinningData()
 				SkinXYZPtr->y += bone[2];
 				SkinXYZPtr->z += bone[3];
 
-				if (belowMeshNum == j)
-				{
+				if (belowMeshNum == j) {
 					belowMesh = (MESH_DATA*)*meshpp;
 					BelowMeshXYZ.x = SkinXYZPtr->x;
 					BelowMeshXYZ.y = SkinXYZPtr->y;
@@ -159,9 +144,7 @@ void CreateSkinningData()
 					break;
 				}
 			}
-		}
-		else
-		{
+		} else {
 			belowMesh = (MESH_DATA*)*meshpp;
 			BelowMeshXYZ.x = 0;
 			BelowMeshXYZ.y = 0;
@@ -177,8 +160,7 @@ void CreateSkinningData()
 		bone = &bones[obj->bone_index];
 		jointMeshNum = i + 1;
 
-		for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++)
-		{
+		for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 			if (*bone & POP_BONE_FLAG)
 				PopXYZ();
 
@@ -189,8 +171,7 @@ void CreateSkinningData()
 			SkinXYZPtr->y += bone[2];
 			SkinXYZPtr->z += bone[3];
 
-			if (jointMeshNum == j)
-			{
+			if (jointMeshNum == j) {
 				jointMesh = (MESH_DATA*)*meshpp;
 				JointMeshXYZ.x = SkinXYZPtr->x;
 				JointMeshXYZ.y = SkinXYZPtr->y;
@@ -209,23 +190,20 @@ void CreateSkinningData()
 
 		joint = &jointMesh->nNorms;
 
-		for (int j = 0; j < jointVerts; j++)
-		{
+		for (int j = 0; j < jointVerts; j++) {
 			jointX = JointMeshXYZ.x + joint[0];
 			jointY = JointMeshXYZ.y + joint[1];
 			jointZ = JointMeshXYZ.z + joint[2];
 			joint += 3;
 			LaraMesh = &aboveMesh->nNorms;
 
-			for (int ii = 0; ii < laraVerts; ii++)
-			{
+			for (int ii = 0; ii < laraVerts; ii++) {
 				laraX = AboveMeshXYZ.x + LaraMesh[0];
 				laraY = AboveMeshXYZ.y + LaraMesh[1];
 				laraZ = AboveMeshXYZ.z + LaraMesh[2];
 				LaraMesh += 3;
 
-				if (abs(laraX - jointX) <= 1 && abs(laraY - jointY) <= 1 && abs(laraZ - jointZ) <= 1)
-				{
+				if (abs(laraX - jointX) <= 1 && abs(laraY - jointY) <= 1 && abs(laraZ - jointZ) <= 1) {
 					vertCount++;
 					vertBuf[j] = 1;
 					SkinVertNums[SkinJoints[i][2]][aboveVerts] = ii;
@@ -241,23 +219,20 @@ void CreateSkinningData()
 		laraVerts = belowMesh->nVerts & 0xFF;
 		joint = &jointMesh->nNorms;
 
-		for (int j = 0; j < jointVerts; j++)
-		{
+		for (int j = 0; j < jointVerts; j++) {
 			jointX = JointMeshXYZ.x + joint[0];
 			jointY = JointMeshXYZ.y + joint[1];
 			jointZ = JointMeshXYZ.z + joint[2];
 			joint += 3;
 			LaraMesh = &belowMesh->nNorms;
 
-			for (int ii = 0; ii < laraVerts; ii++)
-			{
+			for (int ii = 0; ii < laraVerts; ii++) {
 				laraY = BelowMeshXYZ.y + LaraMesh[1];
 				laraX = BelowMeshXYZ.x + LaraMesh[0];
 				laraZ = BelowMeshXYZ.z + LaraMesh[2];
 				LaraMesh += 3;
 
-				if (abs(laraX - jointX) <= 1 && abs(laraY - jointY) <= 1 && abs(laraZ - jointZ) <= 1)
-				{
+				if (abs(laraX - jointX) <= 1 && abs(laraY - jointY) <= 1 && abs(laraZ - jointZ) <= 1) {
 					vertCount++;
 					vertBuf[j] = 1;
 					SkinVertNums[SkinJoints[i][3]][belowVerts] = ii;
@@ -273,12 +248,9 @@ void CreateSkinningData()
 
 		if (vertCount == jointVerts)
 			jointMesh->nVerts <<= 8;
-		else
-		{
-			for (int j = 0; j < jointVerts; j++)
-			{
-				if (!vertBuf[j])
-				{
+		else {
+			for (int j = 0; j < jointVerts; j++) {
+				if (!vertBuf[j]) {
 					PointsToCalc[jointMeshNum - 1][calcPointsCounter] = j;
 					calcPointsCounter++;
 				}
@@ -288,15 +260,11 @@ void CreateSkinningData()
 		PointsToCalc[jointMeshNum - 1][calcPointsCounter] = 0xFF;
 	}
 
-	for (int i = 0; ; i++)
-	{
-		if (gfLevelFlags & GF_YOUNGLARA)
-		{
+	for (int i = 0; ; i++) {
+		if (gfLevelFlags & GF_YOUNGLARA) {
 			SkinVertNums[28][i] = HairSkinVertNums[1][i];
 			SkinVertNums[34][i] = HairSkinVertNums[2][i];
-		}
-		else
-		{
+		} else {
 			SkinVertNums[28][i] = HairSkinVertNums[0][i];
 			SkinVertNums[34][i] = HairSkinVertNums[0][i];
 		}
@@ -312,10 +280,8 @@ void CreateSkinningData()
 			break;
 	}
 
-	for (int i = 0; i < 4; i += 2)
-	{
-		for (int j = 0; ; j++)
-		{
+	for (int i = 0; i < 4; i += 2) {
+		for (int j = 0; ; j++) {
 			SkinVertNums[i + 30][j] = HairSkinVertNums[4][j];
 			SkinVertNums[i + 31][j] = HairSkinVertNums[3][j];
 			ScratchVertNums[i + 30][j] = HairScratchVertNums[2][j];
@@ -333,8 +299,7 @@ void CreateSkinningData()
 	obj = &objects[T4PlusGetLaraHairSlotID()];
 	meshpp = &meshes[obj->mesh_index];
 
-	for (int i = 0; i < 3; i++, meshpp += 2)
-	{
+	for (int i = 0; i < 3; i++, meshpp += 2) {
 		hairMesh = (MESH_DATA*)*meshpp;
 		hairMesh->nVerts <<= 8;
 	}
@@ -342,61 +307,55 @@ void CreateSkinningData()
 	OptomiseSkinningData();
 }
 
-void OptomiseSkinningData()
-{
+void OptomiseSkinningData() {
 	OBJECT_INFO* object;
-	short** meshpp;
-	short* JointMesh, * MeshJ, * MeshNormals, * Src, * Dest;
-	short VertTable[128];
-	short NormalTable[128];
-	long c, lp, lp1, numvertsj, numvertstocalc, padval, numtris, numquads;
-	uchar RemapTable[32];
+	int16_t** meshpp;
+	int16_t* JointMesh, * MeshJ, * MeshNormals, * Src, * Dest;
+	int16_t VertTable[128];
+	int16_t NormalTable[128];
+	int32_t c, lp, lp1, numvertsj, numvertstocalc, padval, numtris, numquads;
+	uint8_t RemapTable[32];
 
 
 	object = &objects[T4PlusGetLaraSkinJointsSlotID()];
 	meshpp = &meshes[object->mesh_index + 1];
 
-	for (c = 0; c < 14; ++c)
-	{
+	for (c = 0; c < 14; ++c) {
 		JointMesh = *meshpp;
 		meshpp++;
 		numvertsj = JointMesh[5] & 0xFF;
 		numvertstocalc = JointMesh[5] & 0xFF;
 
 		if (!numvertstocalc)
-			numvertstocalc = (ushort)JointMesh[5] >> 8;
+			numvertstocalc = (uint16_t)JointMesh[5] >> 8;
 
 		lp = 0;
 
 		while (PointsToCalc[c][lp] != 255)
 			lp++;
 
-		if (numvertsj)
-		{
+		if (numvertsj) {
 			for (lp1 = 0; lp1 < lp; lp1++)
-				RemapTable[PointsToCalc[c][lp1]] = (uchar)lp1;
+				RemapTable[PointsToCalc[c][lp1]] = (uint8_t)lp1;
 
 			padval = lp;
 
-			for (lp1 = 0; ScratchVertNums[SkinJoints[c][2]][lp1] != -1; lp1++)
-			{
-				RemapTable[ScratchVertNums[SkinJoints[c][2]][lp1]] = (uchar)padval;
-				ScratchVertNums[SkinJoints[c][2]][lp1] = (char)padval;
+			for (lp1 = 0; ScratchVertNums[SkinJoints[c][2]][lp1] != -1; lp1++) {
+				RemapTable[ScratchVertNums[SkinJoints[c][2]][lp1]] = (uint8_t)padval;
+				ScratchVertNums[SkinJoints[c][2]][lp1] = (int8_t)padval;
 				padval++;
 			}
 
-			for (lp1 = 0; ScratchVertNums[SkinJoints[c][3]][lp1] != -1; lp1++)
-			{
-				RemapTable[ScratchVertNums[SkinJoints[c][3]][lp1]] = (uchar)padval;
-				ScratchVertNums[SkinJoints[c][3]][lp1] = (char)padval;
+			for (lp1 = 0; ScratchVertNums[SkinJoints[c][3]][lp1] != -1; lp1++) {
+				RemapTable[ScratchVertNums[SkinJoints[c][3]][lp1]] = (uint8_t)padval;
+				ScratchVertNums[SkinJoints[c][3]][lp1] = (int8_t)padval;
 				padval++;
 			}
 
 			MeshJ = &JointMesh[6];
 			MeshNormals = &JointMesh[3 * numvertstocalc + 7];
 
-			for (lp1 = 0; lp1 < numvertsj; lp1++)
-			{
+			for (lp1 = 0; lp1 < numvertsj; lp1++) {
 				VertTable[4 * lp1] = MeshJ[0];
 				VertTable[4 * lp1 + 1] = MeshJ[1];
 				VertTable[4 * lp1 + 2] = MeshJ[2];
@@ -409,8 +368,7 @@ void OptomiseSkinningData()
 				MeshNormals += 3;
 			}
 
-			for (lp1 = 0; lp1 < lp; lp1++)
-			{
+			for (lp1 = 0; lp1 < lp; lp1++) {
 				Src = &VertTable[4 * PointsToCalc[c][lp1]];
 				Dest = &JointMesh[3 * (RemapTable[PointsToCalc[c][lp1]] + 2)];
 				Dest[0] = Src[0];
@@ -427,8 +385,7 @@ void OptomiseSkinningData()
 			numquads = *Dest;
 			Dest++;
 
-			for (lp1 = 0; lp1 < numquads; lp1++)
-			{
+			for (lp1 = 0; lp1 < numquads; lp1++) {
 				Dest[0] = RemapTable[Dest[0]];
 				Dest[1] = RemapTable[Dest[1]];
 				Dest[2] = RemapTable[Dest[2]];
@@ -439,22 +396,20 @@ void OptomiseSkinningData()
 			numtris = *Dest;
 			Dest++;
 
-			for (lp1 = 0; lp1 < numtris; lp1++)
-			{
+			for (lp1 = 0; lp1 < numtris; lp1++) {
 				Dest[0] = RemapTable[Dest[0]];
 				Dest[1] = RemapTable[Dest[1]];
 				Dest[2] = RemapTable[Dest[2]];
 				Dest += 5;
 			}
 
-			JointMesh[5] = (short)lp;
+			JointMesh[5] = (int16_t)lp;
 			JointMesh[3 * (lp + 2)] = 0;
 			Src = &JointMesh[6 * numvertstocalc + 7];
 			Dest = &JointMesh[6 * lp + 7];
 			numquads = 6 * *Src + 1;
 
-			for (lp1 = 0; lp1 < numquads; lp1++)
-			{
+			for (lp1 = 0; lp1 < numquads; lp1++) {
 				*Dest = *Src;
 				Src++;
 				Dest++;
@@ -464,8 +419,7 @@ void OptomiseSkinningData()
 			Dest = &JointMesh[6 * lp + numquads + 7];
 			numtris = 5 * *Src + 1;
 
-			for (lp1 = 0; lp1 < numtris; lp1++)
-			{
+			for (lp1 = 0; lp1 < numtris; lp1++) {
 				*Dest = *Src;
 				Src++;
 				Dest++;

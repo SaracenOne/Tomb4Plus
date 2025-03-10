@@ -1,18 +1,14 @@
 #pragma once
 #include "../global/types.h"
 
-#ifdef USE_SDL
 int LoadLevel(void* name);
-#else
-unsigned int __stdcall LoadLevel(void* name);
-#endif
-long S_LoadLevelFile(long num);
+int32_t S_LoadLevelFile(int32_t num);
 void FreeLevel();
-FILE* FileOpen(const char* name);
+FILE* T4PFileOpen(const char* name);
 void FileClose(FILE* file);
-long FileSize(FILE* file);
-size_t LoadFile(const char* name, char** dest);
-bool LoadTextures(long RTPages, long OTPages, long BTPages);
+int32_t FileSize(FILE* file);
+size_t T4PLoadFileAtRelativePath(const char* name, char** dest);
+bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages);
 bool LoadRooms();
 bool LoadObjects();
 bool LoadSprites();
@@ -26,15 +22,15 @@ bool LoadCinematic();
 bool LoadAIInfo();
 bool LoadSamples();
 void S_GetUVRotateTextures();
-void AdjustUV(long num);
-bool Decompress(char* pDest, char* pCompressed, long compressedSize, long size);
+void AdjustUV(int32_t num);
+bool Decompress(char* pDest, char* pCompressed, int32_t compressedSize, int32_t size);
 
 extern TEXTURESTRUCT* textinfo;
 extern SPRITESTRUCT* spriteinfo;
 extern THREAD LevelLoadingThread;
 
 extern TEXTURESTRUCT* AnimatingWaterfalls[3];
-extern long AnimatingWaterfallsV[3];
+extern int32_t AnimatingWaterfallsV[3];
 
 extern int32_t num_meshes;
 extern int32_t num_anims;
@@ -42,14 +38,14 @@ extern int32_t num_anims;
 extern CHANGE_STRUCT* changes;
 extern RANGE_STRUCT* ranges;
 extern AIOBJECT* AIObjects;
-extern short* aranges;
-extern short* frames;
-extern short* commands;
-extern short* floor_data;
-extern short* mesh_base;
-extern long nAnimUVRanges;
-extern long number_cameras;
-extern short nAIObjects;
+extern int16_t* aranges;
+extern int16_t* frames;
+extern int16_t* commands;
+extern int16_t* floor_data;
+extern int16_t* mesh_base;
+extern int32_t nAnimUVRanges;
+extern int32_t number_cameras;
+extern int16_t nAIObjects;
 
 // T4Plus: Helper table for mapping mesh_ptrs between 64-bit and 32-bit offsets
 extern size_t mesh_mapping_table_count;

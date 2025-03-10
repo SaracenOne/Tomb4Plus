@@ -51,8 +51,8 @@ dst_offset += buffer_size
 #define NG_DEGREE(i) (DEGREES_TO_ROTATION(i))
 
 #define SCANF_HEAVY				0x100
-#define SCANF_TEMP_ONE_SHOT		0x200 
-#define SCANF_BUTTON_ONE_SHOT	0x400 
+#define SCANF_TEMP_ONE_SHOT		0x200
+#define SCANF_BUTTON_ONE_SHOT	0x400
 #define SCANF_YET_TO_PERFORM    0x800
 #define SCANF_SCRIPT_TRIGGER	0x1000
 #define SCANF_DIRECT_CALL		0x2000
@@ -61,7 +61,7 @@ dst_offset += buffer_size
 
 struct NGOldTrigger {
 	uint16_t flags;
-	uint32_t offset_floor_data;
+	size_t offset_floor_data;
 };
 
 enum NG_DIRECTIONS {
@@ -83,7 +83,7 @@ struct NGLevelInfo {
 extern NGLevelInfo ng_level_info[MOD_LEVEL_COUNT];
 
 extern int32_t ng_floor_id_size;
-extern int8_t *ng_floor_id_table;
+extern char *ng_floor_id_table;
 
 #define NG_MAX_FLIP_ROOMS 512
 
@@ -128,7 +128,7 @@ extern NGStaticTableEntry ng_static_id_table[NG_STATIC_ID_TABLE_SIZE];
 extern void NGPreloadAllLevelInfo(uint32_t valid_level_count);
 extern void NGLoadLevelInfo(FILE* level_fp);
 
-extern int32_t NGGetPluginIDForFloorData(uint32_t floor_index, bool test_condition);
+extern int32_t NGGetPluginIDForFloorData(size_t floor_index, bool test_condition);
 
 
 // Move the item in a direction by the number of units

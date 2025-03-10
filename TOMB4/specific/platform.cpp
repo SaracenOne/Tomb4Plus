@@ -5,7 +5,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#elif defined(_POSIX_VERSION)
+#elif defined(__linux__) || defined(__unix__) || defined(__APPLE__) || defined(_POSIX_VERSION)
 #include <dirent.h>
 #else
 #error "Platform not supported"
@@ -31,17 +31,16 @@ size_t count_matching_characters(const char* s1, const char* s2) {
 			count++;
 			s1 += len;
 			s2 += len;
-		}
-		else {
+		} else {
 			break;
 		}
 	}
 	return count;
 }
 
-int platform_strcicmp(char const* a, char const* b) {
+int platform_strcicmp(const char* a, const char* b) {
 	for (;; a++, b++) {
-		int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
+		int d = tolower((uint8_t)*a) - tolower((uint8_t)*b);
 		if (d != 0 || !*a)
 			return d;
 	}
@@ -114,8 +113,7 @@ void platform_find_file_with_substring(const char* dir_path, const char* substri
 				strcpy(found_filename, cFileName);
 				found_filename[filename_length] = '\0';
 				break;
-			}
-			else {
+			} else {
 				Log(1, "Filename %s too long!", cFileName);
 				return;
 			}
@@ -177,14 +175,10 @@ void platform_fatal_error(const char* s, ...) {
 
 	Log(0, "Fatal Error: %s", buf);
 
-#ifdef USE_SDL
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-		"Tomb4Main",
-		buf,
-		NULL);
-#elif _WIN32
-	MessageBox(0, buf, "Tomb4Main", 0);
-#endif
+	                         "Tomb4Main",
+	                         buf,
+	                         NULL);
 
 	exit(-1);
 }
@@ -198,14 +192,10 @@ void platform_message_box(const char* s, ...) {
 	strcat(buf, "\n");
 	va_end(list);
 
-#ifdef USE_SDL
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-		"Tomb4Main",
-		buf,
-		NULL);
-#elif _WIN32
-	MessageBox(0, buf, "Tomb4Main", 0);
-#endif
+	                         "Tomb4Main",
+	                         buf,
+	                         NULL);
 }
 
 bool platform_create_directory(const char* path) {
@@ -259,6 +249,7 @@ bool platform_create_directory(const char* path) {
 	for (p = tmp + 1; *p; p++) {
 		if (*p == *PATH_SEPARATOR) {
 			*p = 0;
+#ifdef _WIN32
 			DWORD attr = GetFileAttributesA(tmp);
 			if (attr == INVALID_FILE_ATTRIBUTES) {
 				int res = _mkdir(tmp);
@@ -277,6 +268,18 @@ bool platform_create_directory(const char* path) {
 					return false;
 				}
 			}
+#else
+			struct stat st;
+			if (stat(tmp, &st) != 0) {
+				if (mkdir(tmp, S_IRWXU) != 0 && errno != EEXIST) {
+					return false;
+				}
+			} else if (!S_ISDIR(st.st_mode)) {
+				if (mkdir(tmp, S_IRWXU) != 0 && errno != EEXIST) {
+					return false;
+				}
+			}
+#endif
 			*p = *PATH_SEPARATOR;
 		}
 	}

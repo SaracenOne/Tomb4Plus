@@ -24,14 +24,12 @@
 
 // Based on Troye's Tomb3 project.
 
-enum BOAT_TYPE
-{
+enum BOAT_TYPE {
 	BOAT_TYPE_RUBBER,
 	BOAT_TYPE_MOTOR
 };
 
-enum BOAT_STATES
-{
+enum BOAT_STATES {
 	BOAT_GETON,
 	BOAT_STILL,
 	BOAT_MOVING,
@@ -44,14 +42,13 @@ enum BOAT_STATES
 	BOAT_TURNL
 };
 
-void TriggerBoatBeam(ITEM_INFO* item)
-{
+void TriggerBoatBeam(ITEM_INFO* item) {
 	// Ad-hoc implementation. Not correct.
 
 	BOAT_INFO* boat;
 	PHD_VECTOR s;
 	PHD_VECTOR d;
-	long intensity;
+	int32_t intensity;
 
 	boat = (BOAT_INFO*)item->data;
 	s.x = 0;
@@ -70,11 +67,10 @@ void TriggerBoatBeam(ITEM_INFO* item)
 		bLaraTorch = 0;
 }
 
-static long TestWaterHeight(ITEM_INFO* item, long z, long x, PHD_VECTOR* pos)
-{
+static int32_t TestWaterHeight(ITEM_INFO* item, int32_t z, int32_t x, PHD_VECTOR* pos) {
 	FLOOR_INFO* floor;
-	long s, c, h;
-	short room_number;
+	int32_t s, c, h;
+	int16_t room_number;
 
 	s = phd_sin(item->pos.y_rot);
 	c = phd_cos(item->pos.y_rot);
@@ -86,8 +82,7 @@ static long TestWaterHeight(ITEM_INFO* item, long z, long x, PHD_VECTOR* pos)
 	GetFloor(pos->x, pos->y, pos->z, &room_number);
 	h = GetWaterHeight(pos->x, pos->y, pos->z, room_number);
 
-	if (h == NO_HEIGHT)
-	{
+	if (h == NO_HEIGHT) {
 		floor = GetFloor(pos->x, pos->y, pos->z, &room_number);
 		h = GetHeight(floor, pos->x, pos->y, pos->z);
 
@@ -98,23 +93,18 @@ static long TestWaterHeight(ITEM_INFO* item, long z, long x, PHD_VECTOR* pos)
 	return h - 5;
 }
 
-static long DoBoatDynamics(long height, long fallspeed, long* ypos)
-{
-	if (height <= *ypos)
-	{
+static int32_t DoBoatDynamics(int32_t height, int32_t fallspeed, int32_t* ypos) {
+	if (height <= *ypos) {
 		fallspeed += (height - fallspeed - *ypos) >> 3;
 
 		if (*ypos > height)
 			*ypos = height;
-	}
-	else
-	{
+	} else {
 		*ypos += fallspeed;
 
 		if (*ypos <= height)
 			fallspeed += 6;
-		else
-		{
+		else {
 			*ypos = height;
 			fallspeed = 0;
 		}
@@ -123,18 +113,15 @@ static long DoBoatDynamics(long height, long fallspeed, long* ypos)
 	return fallspeed;
 }
 
-static long BoatUserControl(ITEM_INFO* item)
-{
+static int32_t BoatUserControl(ITEM_INFO* item) {
 	BOAT_INFO* boat;
-	long no_turn, max_speed;
+	int32_t no_turn, max_speed;
 
 	boat = (BOAT_INFO*)item->data;
 	no_turn = 1;
 
-	if (item->trigger_flags & BOAT_OCB_HEADLIGHT)
-	{
-		if (boat->light_intensity < 127)
-		{
+	if (item->trigger_flags & BOAT_OCB_HEADLIGHT) {
+		if (boat->light_intensity < 127) {
 			boat->light_intensity += (GetRandomControl() & 7) + 3;
 
 			if (boat->light_intensity > 127)
@@ -145,8 +132,7 @@ static long BoatUserControl(ITEM_INFO* item)
 	if (item->pos.y_pos < boat->water - 128 || boat->water == NO_HEIGHT)
 		return 1;
 
-	if ((input & IN_ROLL || input & IN_LOOK) && !item->speed)
-	{
+	if ((input & IN_ROLL || input & IN_LOOK) && !item->speed) {
 		if (!(input & (IN_RSTEP | IN_RIGHT | IN_LSTEP | IN_LEFT)))
 			item->speed = 0;
 		else if (!(input & IN_ROLL))
@@ -154,15 +140,11 @@ static long BoatUserControl(ITEM_INFO* item)
 
 		if (input & IN_LOOK && !item->speed)
 			LookUpDown();
-	}
-	else
-	{
-		if ((input & (IN_LSTEP | IN_LEFT)) && !(input & IN_JUMP) || (input & (IN_RSTEP | IN_RIGHT)) && input & IN_JUMP)
-		{
+	} else {
+		if ((input & (IN_LSTEP | IN_LEFT)) && !(input & IN_JUMP) || (input & (IN_RSTEP | IN_RIGHT)) && input & IN_JUMP) {
 			if (boat->boat_turn > 0)
 				boat->boat_turn -= 45;
-			else
-			{
+			else {
 				boat->boat_turn -= 22;
 
 				if (boat->boat_turn < -DEGREES_TO_ROTATION(4))
@@ -170,13 +152,10 @@ static long BoatUserControl(ITEM_INFO* item)
 			}
 
 			no_turn = 0;
-		}
-		else if ((input & (IN_RSTEP | IN_RIGHT)) && !(input & IN_JUMP) || (input & (IN_LSTEP | IN_LEFT)) && input & IN_JUMP)
-		{
+		} else if ((input & (IN_RSTEP | IN_RIGHT)) && !(input & IN_JUMP) || (input & (IN_LSTEP | IN_LEFT)) && input & IN_JUMP) {
 			if (boat->boat_turn < 0)
 				boat->boat_turn += 45;
-			else
-			{
+			else {
 				boat->boat_turn += 22;
 
 				if (boat->boat_turn > DEGREES_TO_ROTATION(4))
@@ -186,15 +165,12 @@ static long BoatUserControl(ITEM_INFO* item)
 			no_turn = 0;
 		}
 
-		if (input & IN_JUMP)
-		{
+		if (input & IN_JUMP) {
 			if (item->speed > 0)
 				item->speed -= 5;
 			else if (item->speed > -20)
 				item->speed -= 2;
-		}
-		else if (input & IN_ACTION)
-		{
+		} else if (input & IN_ACTION) {
 			if (input & IN_SPRINT)
 				max_speed = RUBBER_BOAT_FAST_SPEED;
 			else if (input & IN_WALK)
@@ -203,16 +179,13 @@ static long BoatUserControl(ITEM_INFO* item)
 				max_speed = RUBBER_BOAT_TOP_SPEED;
 
 			if (item->speed < max_speed)
-				item->speed = short(5 * item->speed / (2 * max_speed) + item->speed + 2);
+				item->speed = int16_t(5 * item->speed / (2 * max_speed) + item->speed + 2);
 			else if (item->speed > max_speed + 1)
 				item->speed--;
-		}
-		else if (item->speed >= 0 && item->speed < 20 && (input & (IN_RSTEP | IN_RIGHT | IN_LSTEP | IN_LEFT)))
-		{
+		} else if (item->speed >= 0 && item->speed < 20 && (input & (IN_RSTEP | IN_RIGHT | IN_LSTEP | IN_LEFT))) {
 			if (!item->speed && !(input & IN_ROLL))
 				item->speed = 20;
-		}
-		else if (item->speed > 1)
+		} else if (item->speed > 1)
 			item->speed--;
 		else
 			item->speed = 0;
@@ -221,12 +194,11 @@ static long BoatUserControl(ITEM_INFO* item)
 	return no_turn;
 }
 
-static long CanGetOff(long lr)
-{
+static int32_t CanGetOff(int32_t lr) {
 	ITEM_INFO* item;
 	FLOOR_INFO* floor;
-	long x, y, z, h, c;
-	short angle, room_number;
+	int32_t x, y, z, h, c;
+	int16_t angle, room_number;
 
 	item = &items[lara.vehicle];
 
@@ -250,7 +222,7 @@ static long CanGetOff(long lr)
 	return 0;
 }
 
-static void BoatAnimation(ITEM_INFO* item, long collide) {
+static void BoatAnimation(ITEM_INFO* item, int32_t collide) {
 	BOAT_INFO* boat;
 
 	boat = (BOAT_INFO*)item->data;
@@ -267,43 +239,31 @@ static void BoatAnimation(ITEM_INFO* item, long collide) {
 
 	boat_slot_id = item->object_number;
 
-	if (lara_item->hit_points <= 0)
-	{
-		if (lara_item->current_anim_state != BOAT_DEATH)
-		{
+	if (lara_item->hit_points <= 0) {
+		if (lara_item->current_anim_state != BOAT_DEATH) {
 			lara_item->anim_number = objects[boat_extra_slot_id].anim_index + 18;
 			lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 			lara_item->current_anim_state = BOAT_DEATH;
 			lara_item->goal_anim_state = BOAT_DEATH;
 		}
-	}
-	else if (item->pos.y_pos < boat->water - 128 && item->fallspeed > 0)
-	{
-		if (lara_item->current_anim_state != BOAT_FALL)
-		{
+	} else if (item->pos.y_pos < boat->water - 128 && item->fallspeed > 0) {
+		if (lara_item->current_anim_state != BOAT_FALL) {
 			lara_item->anim_number = objects[boat_extra_slot_id].anim_index + 15;
 			lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 			lara_item->current_anim_state = BOAT_FALL;
 			lara_item->goal_anim_state = BOAT_FALL;
 		}
-	}
-	else if (collide)
-	{
-		if (lara_item->current_anim_state != BOAT_HIT)
-		{
-			lara_item->anim_number = short(objects[boat_extra_slot_id].anim_index + collide);
+	} else if (collide) {
+		if (lara_item->current_anim_state != BOAT_HIT) {
+			lara_item->anim_number = int16_t(objects[boat_extra_slot_id].anim_index + collide);
 			lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 			lara_item->current_anim_state = BOAT_HIT;
 			lara_item->goal_anim_state = BOAT_HIT;
 		}
-	}
-	else
-	{
-		switch (lara_item->current_anim_state)
-		{
+	} else {
+		switch (lara_item->current_anim_state) {
 			case BOAT_STILL:
-				if (input & IN_ROLL && !item->speed)
-				{
+				if (input & IN_ROLL && !item->speed) {
 					if (input & (IN_RSTEP | IN_RIGHT) && CanGetOff(item->pos.y_rot + 0x4000))
 						lara_item->goal_anim_state = BOAT_JUMPR;
 					else if (input & (IN_LSTEP | IN_LEFT) && CanGetOff(item->pos.y_rot - 0x4000))
@@ -348,27 +308,23 @@ static void BoatAnimation(ITEM_INFO* item, long collide) {
 	}
 }
 
-static void DoBoatShift(long item_number)
-{
+static void DoBoatShift(int32_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* boat;
-	long item_num, x, z, dist;
+	int32_t item_num, x, z, dist;
 
 	item = &items[item_number];
 
-	for (item_num = room[item->room_number].item_number; item_num != NO_ITEM; item_num = boat->next_item)
-	{
+	for (item_num = room[item->room_number].item_number; item_num != NO_ITEM; item_num = boat->next_item) {
 		boat = &items[item_num];
 
 		if ((boat->object_number == T4PlusGetMotorBoatSlotID() || boat->object_number == T4PlusGetRubberBoatSlotID())
-			&& item_num != item_number && lara.vehicle != item_num)
-		{
+		        && item_num != item_number && lara.vehicle != item_num) {
 			x = boat->pos.z_pos - item->pos.z_pos;
 			z = boat->pos.x_pos - item->pos.x_pos;
 			dist = SQUARE(x) + SQUARE(z);
 
-			if (dist < 1000000)
-			{
+			if (dist < 1000000) {
 				item->pos.x_pos = boat->pos.x_pos - 1000000 * z / dist;
 				item->pos.z_pos = boat->pos.z_pos - 1000000 * x / dist;
 			}
@@ -378,16 +334,15 @@ static void DoBoatShift(long item_number)
 	}
 }
 
-static long BoatDynamics(short item_number)
-{
+static int32_t BoatDynamics(int16_t item_number) {
 	ITEM_INFO* item;
 	BOAT_INFO* boat;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos, newPos;
 	PHD_VECTOR flPos, frPos, blPos, brPos, fmPos, flPos2, frPos2, blPos2, brPos2, fmPos2;
-	long front_left, front_right, back_left, back_right, front_mid, front_left2, front_right2, back_left2, back_right2, front_mid2;
-	long slip, shift, h, anim, dx, dz, speed;
-	short room_number;
+	int32_t front_left, front_right, back_left, back_right, front_mid, front_left2, front_right2, back_left2, back_right2, front_mid2;
+	int32_t slip, shift, h, anim, dx, dz, speed;
+	int16_t room_number;
 
 	item = &items[item_number];
 	boat = (BOAT_INFO*)item->data;
@@ -417,8 +372,8 @@ static long BoatDynamics(short item_number)
 	if (fmPos.y > front_mid)
 		fmPos.y = front_mid;
 
-	item->pos.y_rot += short(boat->extra_rotation + boat->boat_turn);
-	boat->tilt_angle = short(6 * boat->boat_turn);
+	item->pos.y_rot += int16_t(boat->extra_rotation + boat->boat_turn);
+	boat->tilt_angle = int16_t(6 * boat->boat_turn);
 
 	item->pos.x_pos += (item->speed * phd_sin(item->pos.y_rot)) >> W2V_SHIFT;
 	item->pos.z_pos += (item->speed * phd_cos(item->pos.y_rot)) >> W2V_SHIFT;
@@ -469,8 +424,7 @@ static long BoatDynamics(short item_number)
 	if (front_right2 < frPos.y - 128)
 		shift += DoShift(item, &frPos2, &frPos);
 
-	if (!slip)
-	{
+	if (!slip) {
 		front_mid2 = TestWaterHeight(item, 1000, 0, &fmPos2);
 
 		if (front_mid2 < fmPos.y - 128)
@@ -487,17 +441,15 @@ static long BoatDynamics(short item_number)
 	if (h < item->pos.y_pos - 128)
 		DoShift(item, (PHD_VECTOR*)&item->pos, &pos);
 
-	boat->extra_rotation = (short)shift;
+	boat->extra_rotation = (int16_t)shift;
 	anim = GetCollisionAnim(item, &newPos, nullptr);
 
-	if (slip || anim)
-	{
+	if (slip || anim) {
 		dx = item->pos.x_pos - pos.x;
 		dz = item->pos.z_pos - pos.z;
 		speed = (dx * phd_sin(item->pos.y_rot) + dz * phd_cos(item->pos.y_rot)) >> W2V_SHIFT;
 
-		if (lara.vehicle == item_number && item->speed > RUBBER_BOAT_TOP_SPEED + 5 && speed < item->speed - 10)
-		{
+		if (lara.vehicle == item_number && item->speed > RUBBER_BOAT_TOP_SPEED + 5 && speed < item->speed - 10) {
 			lara_item->hit_points -= item->speed;
 			lara_item->hit_status = 1;
 			SoundEffect(SFX_LARA_INJURY, &lara_item->pos, SFX_DEFAULT);
@@ -505,15 +457,13 @@ static long BoatDynamics(short item_number)
 			item->speed >>= 1;
 		}
 
-		if (slip)
-		{
+		if (slip) {
 			if (item->speed <= RUBBER_BOAT_TOP_SPEED + 10)
-				item->speed = (short)speed;
-		}
-		else if (item->speed > 0 && speed < item->speed)
-			item->speed = (short)speed;
+				item->speed = (int16_t)speed;
+		} else if (item->speed > 0 && speed < item->speed)
+			item->speed = (int16_t)speed;
 		else if (item->speed < 0 && speed > item->speed)
-			item->speed = (short)speed;
+			item->speed = (int16_t)speed;
 
 		if (item->speed < -20)
 			item->speed = -20;
@@ -521,11 +471,10 @@ static long BoatDynamics(short item_number)
 	return anim;
 }
 
-static long BoatCheckGeton(short item_num, COLL_INFO *coll)
-{
+static int32_t BoatCheckGeton(int16_t item_num, COLL_INFO *coll) {
 	ITEM_INFO* item;
-	long dx, dz, pass;
-	short ang;
+	int32_t dx, dz, pass;
+	int16_t ang;
 
 	if (lara.gun_status != LG_NO_ARMS)
 		return 0;
@@ -548,20 +497,15 @@ static long BoatCheckGeton(short item_num, COLL_INFO *coll)
 			pass = 1;
 		else if (ang > -0x6000 && ang < -0x2000)
 			pass = 2;
-	}
-	else if (lara.water_status == LW_ABOVE_WATER)
-	{
+	} else if (lara.water_status == LW_ABOVE_WATER) {
 		if (lara_item->fallspeed > 0) {
 			if (lara_item->pos.y_pos + HALF_BLOCK_SIZE > item->pos.y_pos)
 				pass = 3;
-		}
-		else if (!lara_item->fallspeed)
-		{
-			if (ang > -0x6000 && ang < 0x6000)
-			{
+		} else if (!lara_item->fallspeed) {
+			if (ang > -0x6000 && ang < 0x6000) {
 				if (lara_item->pos.x_pos == item->pos.x_pos &&
-					lara_item->pos.y_pos == item->pos.y_pos &&
-					lara_item->pos.z_pos == item->pos.z_pos)
+				        lara_item->pos.y_pos == item->pos.y_pos &&
+				        lara_item->pos.z_pos == item->pos.z_pos)
 					pass = 4;
 				else
 					pass = 3;
@@ -569,8 +513,7 @@ static long BoatCheckGeton(short item_num, COLL_INFO *coll)
 		}
 	}
 
-	if (pass)
-	{
+	if (pass) {
 		if (!TestBoundsCollide(item, lara_item, coll->radius))
 			return 0;
 
@@ -581,8 +524,7 @@ static long BoatCheckGeton(short item_num, COLL_INFO *coll)
 	return pass;
 }
 
-void InitialiseBoat(short item_num)
-{
+void InitialiseBoat(int16_t item_num) {
 	ITEM_INFO* item;
 	BOAT_INFO* boat;
 
@@ -599,24 +541,21 @@ void InitialiseBoat(short item_num)
 	boat->light_intensity = 0;
 }
 
-void BoatCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll)
-{
+void BoatCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 	ITEM_INFO* item;
-	long geton;
+	int32_t geton;
 
 	if (l->hit_points < 0 || lara.vehicle != NO_ITEM)
 		return;
 
 	BOAT_INFO *boat = (BOAT_INFO*)items[item_num].data;
-	if (boat->light_intensity)
-	{
+	if (boat->light_intensity) {
 		boat->light_intensity = boat->light_intensity - (boat->light_intensity >> 3) - 1;
 	}
 
 	geton = BoatCheckGeton(item_num, coll);
 
-	if (!geton)
-	{
+	if (!geton) {
 		coll->enable_baddie_push = true;
 		ObjectCollision(item_num, l, coll);
 		return;
@@ -631,8 +570,7 @@ void BoatCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll)
 	else if (items[item_num].object_number == T4PlusGetRubberBoatSlotID())
 		extra_animation_slot = T4PlusGetRubberBoatExtraSlotID();
 
-	if (extra_animation_slot != NO_ITEM)
-	{
+	if (extra_animation_slot != NO_ITEM) {
 		if (geton == 1)
 			l->anim_number = objects[extra_animation_slot].anim_index + 8;
 		else if (geton == 2)
@@ -674,15 +612,14 @@ void BoatCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void BoatControl(short item_num, BOAT_TYPE boat_type)
-{
+void BoatControl(int16_t item_num, BOAT_TYPE boat_type) {
 	ITEM_INFO* item;
 	BOAT_INFO* boat;
 	FLOOR_INFO* floor;
 	PHD_3DPOS bubble;
 	PHD_VECTOR flPos, frPos, pos;
-	long hitWall, driving, no_turn, front_left, front_right, h, wh, x, y, z, leaving, ceiling, pitch;
-	short room_number, fallspeed, x_rot, z_rot, ang;
+	int32_t hitWall, driving, no_turn, front_left, front_right, h, wh, x, y, z, leaving, ceiling, pitch;
+	int16_t room_number, fallspeed, x_rot, z_rot, ang;
 
 	item = &items[item_num];
 	boat = (BOAT_INFO*)item->data;
@@ -694,18 +631,13 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 
 	int16_t boat_slot_id = NO_ITEM;
 	int16_t boat_extra_slot_id = NO_ITEM;
-	if (boat_type == BOAT_TYPE_RUBBER)
-	{
+	if (boat_type == BOAT_TYPE_RUBBER) {
 		boat_slot_id = T4PlusGetRubberBoatSlotID();
 		boat_extra_slot_id = T4PlusGetRubberBoatExtraSlotID();
-	}
-	else if (boat_type == BOAT_TYPE_MOTOR)
-	{
+	} else if (boat_type == BOAT_TYPE_MOTOR) {
 		boat_slot_id = T4PlusGetMotorBoatSlotID();
 		boat_extra_slot_id = T4PlusGetMotorBoatExtraSlotID();
-	}
-	else
-	{
+	} else {
 		return;
 	}
 
@@ -716,8 +648,7 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	h = GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 	ceiling = GetCeiling(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 
-	if (lara.vehicle == item_num)
-	{
+	if (lara.vehicle == item_num) {
 		if (!(item->trigger_flags & BOAT_OCB_SKIP_REGULAR_TRIGGERS))
 			TestTriggers(trigger_index, false, 0);
 		if (!(item->trigger_flags & BOAT_OCB_SKIP_HEAVY_TRIGGERS))
@@ -727,21 +658,17 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	boat->water = GetWaterHeight(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, room_number);
 	wh = boat->water;
 
-	if (lara.vehicle == item_num && lara_item->hit_points > 0)
-	{
-		if (lara_item->current_anim_state && (lara_item->current_anim_state <= BOAT_MOVING || lara_item->current_anim_state > BOAT_JUMPL))
-		{
+	if (lara.vehicle == item_num && lara_item->hit_points > 0) {
+		if (lara_item->current_anim_state && (lara_item->current_anim_state <= BOAT_MOVING || lara_item->current_anim_state > BOAT_JUMPL)) {
 			driving = 1;
 			no_turn = BoatUserControl(item);
 		}
-	}
-	else if (item->speed > 1)
+	} else if (item->speed > 1)
 		item->speed--;
 	else
 		item->speed = 0;
 
-	if (no_turn)
-	{
+	if (no_turn) {
 		if (boat->boat_turn < -45)
 			boat->boat_turn += 45;
 		else if (boat->boat_turn > 45)
@@ -761,7 +688,7 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	boat->right_fallspeed = DoBoatDynamics(front_right, boat->right_fallspeed, &frPos.y);
 
 	fallspeed = item->fallspeed;
-	item->fallspeed = (short)DoBoatDynamics(boat->water, item->fallspeed, &item->pos.y_pos);
+	item->fallspeed = (int16_t)DoBoatDynamics(boat->water, item->fallspeed, &item->pos.y_pos);
 
 	//if (fallspeed - item->fallspeed > 32 && !item->fallspeed && wh != NO_HEIGHT)
 	//	BoatSplash(item, fallspeed - item->fallspeed, wh);
@@ -773,8 +700,8 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	else
 		h = -abs(h) >> 1;
 
-	x_rot = (short)phd_atan(750, item->pos.y_pos - h);
-	z_rot = (short)phd_atan(300, h - flPos.y);
+	x_rot = (int16_t)phd_atan(750, item->pos.y_pos - h);
+	z_rot = (int16_t)phd_atan(300, h - flPos.y);
 
 	item->pos.x_rot += (x_rot - item->pos.x_rot) >> 1;
 	item->pos.z_rot += (z_rot - item->pos.z_rot) >> 1;
@@ -785,14 +712,12 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	if (!z_rot && abs(item->pos.z_rot) < 4)
 		item->pos.z_rot = 0;
 
-	if (lara.vehicle == item_num)
-	{
+	if (lara.vehicle == item_num) {
 		BoatAnimation(item, hitWall);
 
 		TriggerBoatBeam(item);
 
-		if (room_number != item->room_number)
-		{
+		if (room_number != item->room_number) {
 			ItemNewRoom(item_num, room_number);
 			ItemNewRoom(lara.item_number, room_number);
 		}
@@ -807,17 +732,14 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 
 		AnimateItem(lara_item);
 
-		if (lara_item->hit_points > 0)
-		{
+		if (lara_item->hit_points > 0) {
 			item->anim_number = objects[boat_slot_id].anim_index + lara_item->anim_number - objects[boat_extra_slot_id].anim_index;
 			item->frame_number = lara_item->frame_number + anims[item->anim_number].frame_base - anims[lara_item->anim_number].frame_base;
 		}
 
 		camera.target_elevation = -DEGREES_TO_ROTATION(20);
 		camera.target_distance = (BLOCK_SIZE * 2);
-	}
-	else
-	{
+	} else {
 		if (room_number != item->room_number)
 			ItemNewRoom(item_num, room_number);
 
@@ -834,32 +756,23 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 
 	boat->pitch += (pitch - boat->pitch) >> 2;
 
-	if (boat_type == BOAT_TYPE_MOTOR)
-	{
-		if (item->speed > 20)
-		{
-			short sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->motorboat_moving_sfx_id;
+	if (boat_type == BOAT_TYPE_MOTOR) {
+		if (item->speed > 20) {
+			int16_t sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->motorboat_moving_sfx_id;
+			if (sound_effect_id >= 0)
+				SoundEffect(sound_effect_id, nullptr, SFX_SETPITCH + ((0x10000 - (RUBBER_BOAT_TOP_SPEED - boat->pitch) * 100) << 8));
+		} else if (driving) {
+			int16_t sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->motorboat_idle_sfx_id;
 			if (sound_effect_id >= 0)
 				SoundEffect(sound_effect_id, nullptr, SFX_SETPITCH + ((0x10000 - (RUBBER_BOAT_TOP_SPEED - boat->pitch) * 100) << 8));
 		}
-		else if (driving)
-		{
-			short sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->motorboat_idle_sfx_id;
+	} else if (boat_type == BOAT_TYPE_RUBBER) {
+		if (item->speed > 20) {
+			int16_t sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->rubber_boat_moving_sfx_id;
 			if (sound_effect_id >= 0)
 				SoundEffect(sound_effect_id, nullptr, SFX_SETPITCH + ((0x10000 - (RUBBER_BOAT_TOP_SPEED - boat->pitch) * 100) << 8));
-		}
-	}
-	else if (boat_type == BOAT_TYPE_RUBBER)
-	{
-		if (item->speed > 20)
-		{
-			short sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->rubber_boat_moving_sfx_id;
-			if (sound_effect_id >= 0)
-				SoundEffect(sound_effect_id, nullptr, SFX_SETPITCH + ((0x10000 - (RUBBER_BOAT_TOP_SPEED - boat->pitch) * 100) << 8));
-		}
-		else if (driving)
-		{
-			short sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->rubber_boat_idle_sfx_id;
+		} else if (driving) {
+			int16_t sound_effect_id = get_game_mod_level_audio_info(gfCurrentLevel)->rubber_boat_idle_sfx_id;
 			if (sound_effect_id >= 0)
 				SoundEffect(sound_effect_id, nullptr, SFX_SETPITCH + ((0x10000 - (RUBBER_BOAT_TOP_SPEED - boat->pitch) * 100) << 8));
 		}
@@ -869,8 +782,7 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 		return;
 
 	if ((lara_item->current_anim_state == BOAT_JUMPR || lara_item->current_anim_state == BOAT_JUMPL) &&
-		lara_item->frame_number == anims[lara_item->anim_number].frame_end)
-	{
+	        lara_item->frame_number == anims[lara_item->anim_number].frame_end) {
 		if (lara_item->current_anim_state == BOAT_JUMPL)
 			lara_item->pos.y_rot -= 0x4000;
 		else
@@ -893,8 +805,7 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 		z = lara_item->pos.z_pos + ((360 * phd_cos(lara_item->pos.y_rot)) >> W2V_SHIFT);
 		floor = GetFloor(x, y, z, &room_number);
 
-		if (GetHeight(floor, x, y, z) >= y - 256)
-		{
+		if (GetHeight(floor, x, y, z) >= y - 256) {
 			lara_item->pos.x_pos = x;
 			lara_item->pos.z_pos = z;
 
@@ -937,25 +848,19 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 	floor = GetFloor(pos.x, pos.y, pos.z, &room_number);
 	wh = GetWaterHeight(pos.x, pos.y, pos.z, room_number);
 
-	if (!item->speed || wh >= pos.y || wh == NO_HEIGHT)
-	{
+	if (!item->speed || wh >= pos.y || wh == NO_HEIGHT) {
 		h = GetHeight(floor, pos.x, pos.y, pos.z);
 
-		if (pos.y > h && !(room[room_number].flags & ROOM_UNDERWATER))
-		{
-			for (int i = (GetRandomControl() & 3) + 3; i > 0; i--)
-			{
-				ang = short(item->pos.y_rot + GetRandomControl() + 0x4000);
+		if (pos.y > h && !(room[room_number].flags & ROOM_UNDERWATER)) {
+			for (int i = (GetRandomControl() & 3) + 3; i > 0; i--) {
+				ang = int16_t(item->pos.y_rot + GetRandomControl() + 0x4000);
 				//TriggerBoatMist(pos.x, pos.y, pos.z, ((GetRandomControl() & 0xF) + 96) << 4, ang, 1);
 			}
 		}
-	}
-	else
-	{
+	} else {
 		//TriggerBoatMist(pos.x, pos.y, pos.z, abs(item->speed), item->pos.y_rot + 0x8000, 0);
 
-		if (!(GetRandomControl() & 1))
-		{
+		if (!(GetRandomControl() & 1)) {
 			bubble.x_pos = (GetRandomControl() & 0x3F) + pos.x - 32;
 			bubble.y_pos = pos.y + (GetRandomControl() & 0xF);
 			bubble.z_pos = (GetRandomControl() & 0x3F) + pos.z - 32;
@@ -969,18 +874,15 @@ void BoatControl(short item_num, BOAT_TYPE boat_type)
 }
 
 
-void RubberBoatControl(short item_num)
-{
+void RubberBoatControl(int16_t item_num) {
 	BoatControl(item_num, BOAT_TYPE_RUBBER);
 }
 
-void MotorBoatControl(short item_num)
-{
+void MotorBoatControl(int16_t item_num) {
 	BoatControl(item_num, BOAT_TYPE_MOTOR);
 }
 
-void DrawBoat(ITEM_INFO *item)
-{
+void DrawBoat(ITEM_INFO *item) {
 	BOAT_INFO* boat;
 
 	boat = (BOAT_INFO*)item->data;

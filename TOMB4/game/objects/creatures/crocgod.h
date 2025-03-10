@@ -1,7 +1,7 @@
 #pragma once
 #include "../../../global/types.h"
 
-void TriggerCrocgodMissile(PHD_3DPOS* pos, short room_number, short num);
-void TriggerCrocgodMissileFlame(short fx_number, long xv, long yv, long zv);
-void InitialiseCrocgod(short item_number);
-void CrocgodControl(short item_number);
+void TriggerCrocgodMissile(PHD_3DPOS* pos, int16_t room_number, int16_t num);
+void TriggerCrocgodMissileFlame(int16_t fx_number, int32_t xv, int32_t yv, int32_t zv);
+void InitialiseCrocgod(int16_t item_number);
+void CrocgodControl(int16_t item_number);

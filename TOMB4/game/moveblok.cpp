@@ -24,7 +24,7 @@
 #include "../tomb4/mod_config.h"
 #include "../specific/file.h"
 
-static short MovingBlockBounds[] = {
+static int16_t MovingBlockBounds[] = {
 	0,
 	0,
 	-CLICK_SIZE,
@@ -41,9 +41,9 @@ static short MovingBlockBounds[] = {
 
 static PHD_VECTOR MovingBlockPos = { 0, 0, 0 };
 
-static void ClearMovableBlockSplitters(long x, long y, long z, short room_number) {
+static void ClearMovableBlockSplitters(int32_t x, int32_t y, int32_t z, int16_t room_number) {
 	FLOOR_INFO* floor;
-	short room_num, height;
+	int16_t room_num, height;
 
 	floor = GetFloor(x, y, z, &room_number);
 	boxes[floor->box].overlap_index = ~0x4000;
@@ -81,7 +81,7 @@ static void ClearMovableBlockSplitters(long x, long y, long z, short room_number
 	}
 }
 
-void InitialiseMovingBlock(short item_number) {
+void InitialiseMovingBlock(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -93,7 +93,7 @@ void InitialiseMovingBlock(short item_number) {
 	int climbable_block_height = 0;
 	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
 		climbable_block_height = item->trigger_flags & 0xf;
-	// TREP
+		// TREP
 	} else if (misc_info->enable_standing_pushables) {
 		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
 	}
@@ -105,13 +105,13 @@ void InitialiseMovingBlock(short item_number) {
 	}
 }
 
-static long TestBlockPush(ITEM_INFO* item, long height, ushort quadrant, bool can_push_over_ledges) {
+static int32_t TestBlockPush(ITEM_INFO* item, int32_t height, uint16_t quadrant, bool can_push_over_ledges) {
 	ITEM_INFO** itemlist;
 	ITEM_INFO* collided;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
-	long x, y, z, rx, rz;
-	short room_number;
+	int32_t x, y, z, rx, rz;
+	int16_t room_number;
 
 	// TRNG
 	MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
@@ -138,21 +138,21 @@ static long TestBlockPush(ITEM_INFO* item, long height, ushort quadrant, bool ca
 	itemlist = (ITEM_INFO**)&tsv_buffer[0];
 
 	switch (quadrant) {
-	case NORTH:
-		z += BLOCK_SIZE;
-		break;
+		case NORTH:
+			z += BLOCK_SIZE;
+			break;
 
-	case EAST:
-		x += BLOCK_SIZE;
-		break;
+		case EAST:
+			x += BLOCK_SIZE;
+			break;
 
-	case SOUTH:
-		z -= BLOCK_SIZE;
-		break;
+		case SOUTH:
+			z -= BLOCK_SIZE;
+			break;
 
-	case WEST:
-		x -= BLOCK_SIZE;
-		break;
+		case WEST:
+			x -= BLOCK_SIZE;
+			break;
 	}
 
 	room_number = item->room_number;
@@ -205,14 +205,13 @@ static long TestBlockPush(ITEM_INFO* item, long height, ushort quadrant, bool ca
 	return 1;
 }
 
-static long TestBlockPull(ITEM_INFO* item, long height, ushort quadrant)
-{
+static int32_t TestBlockPull(ITEM_INFO* item, int32_t height, uint16_t quadrant) {
 	ITEM_INFO** itemlist;
 	ITEM_INFO* collided;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
-	long x, y, z, destx, destz, rx, rz, ignore;
-	short room_number;
+	int32_t x, y, z, destx, destz, rx, rz, ignore;
+	int16_t room_number;
 
 	// TRNG
 	MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
@@ -238,21 +237,21 @@ static long TestBlockPull(ITEM_INFO* item, long height, ushort quadrant)
 	destz = 0;
 
 	switch (quadrant) {
-	case NORTH:
-		destz = -BLOCK_SIZE;
-		break;
+		case NORTH:
+			destz = -BLOCK_SIZE;
+			break;
 
-	case EAST:
-		destx = -BLOCK_SIZE;
-		break;
+		case EAST:
+			destx = -BLOCK_SIZE;
+			break;
 
-	case SOUTH:
-		destz = BLOCK_SIZE;
-		break;
+		case SOUTH:
+			destz = BLOCK_SIZE;
+			break;
 
-	case WEST:
-		destx = BLOCK_SIZE;
-		break;
+		case WEST:
+			destx = BLOCK_SIZE;
+			break;
 	}
 
 	x = item->pos.x_pos + destx;
@@ -346,13 +345,13 @@ static long TestBlockPull(ITEM_INFO* item, long height, ushort quadrant)
 	return 1;
 }
 
-void MovableBlock(short item_number) {
+void MovableBlock(int16_t item_number) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
-	long offset;
-	ushort quadrant;
-	short frame, base;
-	static char sfx = 0;
+	int32_t offset;
+	uint16_t quadrant;
+	int16_t frame, base;
+	static int8_t sfx = 0;
 
 	item = &items[item_number];
 
@@ -362,14 +361,14 @@ void MovableBlock(short item_number) {
 	int climbable_block_height = 0;
 	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
 		climbable_block_height = item->trigger_flags & 0xf;
-	// TREP
+		// TREP
 	} else if (misc_info->enable_standing_pushables) {
 		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
 	}
 
 	// TRNG
 	if (global_info->trng_pushables_have_gravity) {
-		short room_number = item->room_number;
+		int16_t room_number = item->room_number;
 		FLOOR_INFO *floor_info = GetFloor(item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos, &room_number);
 		int height = GetHeight(floor_info, item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos);
 
@@ -408,185 +407,183 @@ void MovableBlock(short item_number) {
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	quadrant = ushort(lara_item->pos.y_rot + 0x2000) / 0x4000;
+	quadrant = uint16_t(lara_item->pos.y_rot + 0x2000) / 0x4000;
 
 	switch (lara_item->anim_number) {
-	case ANIM_PUSH:
-		frame = lara_item->frame_number;
-		base = anims[ANIM_PUSH].frame_base;
+		case ANIM_PUSH:
+			frame = lara_item->frame_number;
+			base = anims[ANIM_PUSH].frame_base;
 
-		if ((frame < base + 30 || frame > base + 67) && (frame < base + 78 || frame > base + 125) && (frame < base + 140 || frame > base + 160)) {
-			if (sfx) {
-				SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, SFX_ALWAYS);
-				sfx = 0;
+			if ((frame < base + 30 || frame > base + 67) && (frame < base + 78 || frame > base + 125) && (frame < base + 140 || frame > base + 160)) {
+				if (sfx) {
+					SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, SFX_ALWAYS);
+					sfx = 0;
+				}
+			} else {
+				SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, SFX_ALWAYS);
+				sfx = 1;
 			}
-		} else {
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, SFX_ALWAYS);
-			sfx = 1;
-		}
 
-		GetLaraJointPos(&pos, LMX_HAND_L);
+			GetLaraJointPos(&pos, LMX_HAND_L);
 
-		switch (quadrant) {
-			case NORTH:
-				offset = pos.z + *(long*)&item->item_flags[2] - *(long*)&lara_item->item_flags[2];
+			switch (quadrant) {
+				case NORTH:
+					offset = pos.z + *(int32_t*)&item->item_flags[2] - *(int32_t*)&lara_item->item_flags[2];
 
-				if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos < offset)
-					item->pos.z_pos = offset;
+					if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos < offset)
+						item->pos.z_pos = offset;
 
-				break;
+					break;
 
-			case EAST:
-				offset = pos.x + *(long*)item->item_flags - *(long*)lara_item->item_flags;
+				case EAST:
+					offset = pos.x + *(int32_t*)item->item_flags - *(int32_t*)lara_item->item_flags;
 
-				if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos < offset)
-					item->pos.x_pos = offset;
+					if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos < offset)
+						item->pos.x_pos = offset;
 
-				break;
+					break;
 
-			case SOUTH:
-				offset = pos.z + *(long*)&item->item_flags[2] - *(long*)&lara_item->item_flags[2];
+				case SOUTH:
+					offset = pos.z + *(int32_t*)&item->item_flags[2] - *(int32_t*)&lara_item->item_flags[2];
 
-				if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos > offset)
-					item->pos.z_pos = offset;
+					if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos > offset)
+						item->pos.z_pos = offset;
 
-				break;
+					break;
 
-			case WEST:
-				offset = pos.x + *(long*)item->item_flags - *(long*)lara_item->item_flags;
+				case WEST:
+					offset = pos.x + *(int32_t*)item->item_flags - *(int32_t*)lara_item->item_flags;
 
-				if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos > offset)
-					item->pos.x_pos = offset;
+					if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos > offset)
+						item->pos.x_pos = offset;
 
-				break;
-		}
+					break;
+			}
 
 
-		if (lara_item->frame_number == anims[lara_item->anim_number].frame_end - 1) {
-			// T4Plus: Update Room
-			UpdateItemRoom(item_number, -CLICK_SIZE);
+			if (lara_item->frame_number == anims[lara_item->anim_number].frame_end - 1) {
+				// T4Plus: Update Room
+				UpdateItemRoom(item_number, -CLICK_SIZE);
 
-			if (input & IN_ACTION) {
-				// TRNG
-				MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
-				bool can_push_over_ledges = false;
-				if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
-					if (!(item->trigger_flags & 0x100)) { // TRNG: Pushing disabled
-						can_push_over_ledges = item->trigger_flags & 0x20;
+				if (input & IN_ACTION) {
+					// TRNG
+					MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
+					bool can_push_over_ledges = false;
+					if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
+						if (!(item->trigger_flags & 0x100)) { // TRNG: Pushing disabled
+							can_push_over_ledges = item->trigger_flags & 0x20;
+						}
+					}
+
+					if (!TestBlockPush(item, BLOCK_SIZE, quadrant, can_push_over_ledges))
+						lara_item->goal_anim_state = 2;
+				} else {
+					lara_item->goal_anim_state = 2;
+				}
+			}
+
+			break;
+
+		case ANIM_PULL:
+			frame = lara_item->frame_number;
+			base = anims[ANIM_PULL].frame_base;
+
+			if ((frame < base + 40 || frame > base + 122) && (frame < base + 130 || frame > base + 170)) {
+				if (sfx) {
+					SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, SFX_ALWAYS);
+					sfx = 0;
+				}
+			} else {
+				SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, SFX_ALWAYS);
+				sfx = 1;
+			}
+
+			GetLaraJointPos(&pos, LMX_HAND_L);
+
+			switch (quadrant) {
+				case NORTH:
+					offset = pos.z + *(int32_t*)&item->item_flags[2] - *(int32_t*)&lara_item->item_flags[2];
+
+					if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos > offset)
+						item->pos.z_pos = offset;
+
+					break;
+
+				case EAST:
+					offset = pos.x + *(int32_t*)item->item_flags - *(int32_t*)lara_item->item_flags;
+
+					if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos > offset)
+						item->pos.x_pos = offset;
+
+					break;
+
+				case SOUTH:
+					offset = pos.z + *(int32_t*)&item->item_flags[2] - *(int32_t*)&lara_item->item_flags[2];
+
+					if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos < offset)
+						item->pos.z_pos = offset;
+
+					break;
+
+				case WEST:
+					offset = pos.x + *(int32_t*)item->item_flags - *(int32_t*)lara_item->item_flags;
+
+					if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos < offset)
+						item->pos.x_pos = offset;
+
+					break;
+			}
+
+			if (lara_item->frame_number == anims[lara_item->anim_number].frame_end - 1) {
+				// T4Plus: Update Room
+				UpdateItemRoom(item_number, -CLICK_SIZE);
+
+				if (input & IN_ACTION) {
+					if (!TestBlockPull(item, BLOCK_SIZE, quadrant))
+						lara_item->goal_anim_state = 2;
+				} else {
+					lara_item->goal_anim_state = 2;
+				}
+			}
+
+			break;
+
+		case 417:
+		case 418:
+			frame = lara_item->frame_number;
+
+			if (frame == anims[417].frame_base || frame == anims[418].frame_base) {
+				item->pos.x_pos = (item->pos.x_pos & -HALF_BLOCK_SIZE) | HALF_BLOCK_SIZE;
+				item->pos.z_pos = (item->pos.z_pos & -HALF_BLOCK_SIZE) | HALF_BLOCK_SIZE;
+			}
+
+			if (frame == anims[lara_item->anim_number].frame_end) {
+				if (item->gravity_status == 0 || !global_info->trng_pushables_have_gravity) {
+					int16_t room_number = item->room_number;
+					GetHeight(GetFloor(item->pos.x_pos, item->pos.y_pos - CLICK_SIZE, item->pos.z_pos, &room_number),
+					          item->pos.x_pos, item->pos.y_pos - 256, item->pos.z_pos);
+					if (item->room_number != room_number)
+						ItemNewRoom(item_number, room_number);
+
+					TestTriggers(trigger_index, true, item->flags & IFL_CODEBITS);
+					RemoveActiveItem(item_number);
+					item->status = ITEM_INACTIVE;
+
+					if (climbable_block_height > 0) {
+						AlterFloorHeight(item, -climbable_block_height * CLICK_SIZE);
 					}
 				}
-
-				if (!TestBlockPush(item, BLOCK_SIZE, quadrant, can_push_over_ledges))
-					lara_item->goal_anim_state = 2;
-			} else {
-				lara_item->goal_anim_state = 2;
 			}
-		}
-
-		break;
-
-	case ANIM_PULL:
-		frame = lara_item->frame_number;
-		base = anims[ANIM_PULL].frame_base;
-
-		if ((frame < base + 40 || frame > base + 122) && (frame < base + 130 || frame > base + 170)) {
-			if (sfx) {
-				SoundEffect(SFX_PUSH_BLOCK_END, &item->pos, SFX_ALWAYS);
-				sfx = 0;
-			}
-		} else {
-			SoundEffect(SFX_PUSHABLE_SOUND, &item->pos, SFX_ALWAYS);
-			sfx = 1;
-		}
-
-		GetLaraJointPos(&pos, LMX_HAND_L);
-
-		switch (quadrant)
-		{
-		case NORTH:
-			offset = pos.z + *(long*)&item->item_flags[2] - *(long*)&lara_item->item_flags[2];
-
-			if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos > offset)
-				item->pos.z_pos = offset;
 
 			break;
-
-		case EAST:
-			offset = pos.x + *(long*)item->item_flags - *(long*)lara_item->item_flags;
-
-			if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos > offset)
-				item->pos.x_pos = offset;
-
-			break;
-
-		case SOUTH:
-			offset = pos.z + *(long*)&item->item_flags[2] - *(long*)&lara_item->item_flags[2];
-
-			if (abs(item->pos.z_pos - offset) < HALF_BLOCK_SIZE && item->pos.z_pos < offset)
-				item->pos.z_pos = offset;
-
-			break;
-
-		case WEST:
-			offset = pos.x + *(long*)item->item_flags - *(long*)lara_item->item_flags;
-
-			if (abs(item->pos.x_pos - offset) < HALF_BLOCK_SIZE && item->pos.x_pos < offset)
-				item->pos.x_pos = offset;
-
-			break;
-		}
-
-		if (lara_item->frame_number == anims[lara_item->anim_number].frame_end - 1) {
-			// T4Plus: Update Room
-			UpdateItemRoom(item_number, -CLICK_SIZE);
-
-			if (input & IN_ACTION) {
-				if (!TestBlockPull(item, BLOCK_SIZE, quadrant))
-					lara_item->goal_anim_state = 2;
-			} else {
-				lara_item->goal_anim_state = 2;
-			}
-		}
-
-		break;
-
-	case 417:
-	case 418:
-		frame = lara_item->frame_number;
-
-		if (frame == anims[417].frame_base || frame == anims[418].frame_base) {
-			item->pos.x_pos = (item->pos.x_pos & -HALF_BLOCK_SIZE) | HALF_BLOCK_SIZE;
-			item->pos.z_pos = (item->pos.z_pos & -HALF_BLOCK_SIZE) | HALF_BLOCK_SIZE;
-		}
-
-		if (frame == anims[lara_item->anim_number].frame_end) {
-			if (item->gravity_status == 0 || !global_info->trng_pushables_have_gravity) {
-				int16_t room_number = item->room_number;
-				GetHeight(GetFloor(item->pos.x_pos, item->pos.y_pos - CLICK_SIZE, item->pos.z_pos, &room_number),
-					item->pos.x_pos, item->pos.y_pos - 256, item->pos.z_pos);
-				if (item->room_number != room_number)
-					ItemNewRoom(item_number, room_number);
-
-				TestTriggers(trigger_index, true, item->flags & IFL_CODEBITS);
-				RemoveActiveItem(item_number);
-				item->status = ITEM_INACTIVE;
-
-				if (climbable_block_height > 0) {
-					AlterFloorHeight(item, -climbable_block_height * CLICK_SIZE);
-				}
-			}
-		}
-
-		break;
 	}
 }
 
-void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll)
-{
+void MovableBlockCollision(int16_t item_number, ITEM_INFO* laraitem, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
-	short* bounds;
-	short room_number, yrot, quadrant;
+	int16_t* bounds;
+	int16_t room_number, yrot, quadrant;
 
 	item = &items[item_number];
 
@@ -597,7 +594,7 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 	int climbable_block_height = 0;
 	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
 		climbable_block_height = item->trigger_flags & 0xf;
-	// TREP
+		// TREP
 	} else if (misc_info->enable_standing_pushables) {
 		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
 	}
@@ -608,7 +605,7 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 	if (climbable_block_height == 0) {
 		if (!get_game_mod_global_info()->trng_advanced_block_raising_behaviour) {
 			item->pos.y_pos = GetHeight(GetFloor(item->pos.x_pos, item->pos.y_pos - CLICK_SIZE, item->pos.z_pos, &room_number),
-				item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
+			                            item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 		}
 	}
 
@@ -616,14 +613,14 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 		ItemNewRoom(item_number, room_number);
 
 	if (input & IN_ACTION && laraitem->current_anim_state == AS_STOP && laraitem->anim_number == ANIM_BREATH && !laraitem->gravity_status &&
-		lara.gun_status == LG_NO_ARMS && item->status == ITEM_INACTIVE && item->trigger_flags >= 0 || (lara.IsMoving && lara.GeneralPtr == item_number)) {
+	        lara.gun_status == LG_NO_ARMS && item->status == ITEM_INACTIVE && item->trigger_flags >= 0 || (lara.IsMoving && lara.GeneralPtr == item_number)) {
 		room_number = laraitem->room_number;
 		GetFloor(item->pos.x_pos, item->pos.y_pos - CLICK_SIZE, item->pos.z_pos, &room_number);
 
 		if (room_number == item->room_number) {
 			// TRNG - disable movement in certain directions
 			if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
-				quadrant = (ushort)(laraitem->pos.y_rot + (BLOCK_SIZE * 8)) >> W2V_SHIFT;
+				quadrant = (uint16_t)(laraitem->pos.y_rot + (BLOCK_SIZE * 8)) >> W2V_SHIFT;
 				if (quadrant == EAST || quadrant == WEST) {
 					if (item->trigger_flags & 0x400) { // TRNG: East and West direction disabled
 						return;
@@ -651,16 +648,15 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 					item->status = ITEM_ACTIVE;
 				}
 
-				if ((ushort(yrot + 0x2000) / 0x4000) + ((ushort)item->pos.y_rot / 0x4000) & 1)
+				if ((uint16_t(yrot + 0x2000) / 0x4000) + ((uint16_t)item->pos.y_rot / 0x4000) & 1)
 					if (climbable_block_height == 0)
 						MovingBlockPos.z = bounds[0] - 35;
 					else
 						MovingBlockPos.z = bounds[0] - 105;
+				else if (climbable_block_height == 0)
+					MovingBlockPos.z = bounds[4] - 35;
 				else
-					if (climbable_block_height == 0)
-						MovingBlockPos.z = bounds[4] - 35;
-					else
-						MovingBlockPos.z = bounds[0] - 105;
+					MovingBlockPos.z = bounds[0] - 105;
 
 				if (MoveLaraPosition(&MovingBlockPos, item, laraitem)) {
 					laraitem->anim_number = ANIM_PPREADY;
@@ -687,13 +683,12 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 
 			item->pos.y_rot = yrot;
 		}
-	}
-	else if (laraitem->current_anim_state == AS_PPREADY && laraitem->frame_number == anims[ANIM_PPREADY].frame_base + 19 && lara.CornerX == item) {
+	} else if (laraitem->current_anim_state == AS_PPREADY && laraitem->frame_number == anims[ANIM_PPREADY].frame_base + 19 && lara.CornerX == item) {
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;
-		quadrant = (ushort)(laraitem->pos.y_rot + (BLOCK_SIZE * 8)) >> W2V_SHIFT;
-		 
+		quadrant = (uint16_t)(laraitem->pos.y_rot + (BLOCK_SIZE * 8)) >> W2V_SHIFT;
+
 		if (input & IN_FORWARD) {
 			// TRNG
 			MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
@@ -734,10 +729,10 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 		lara.torso_x_rot = 0;
 		lara.torso_y_rot = 0;
 		GetLaraJointPos(&pos, LMX_HAND_L);
-		*(long*)&laraitem->item_flags[0] = pos.x;
-		*(long*)&laraitem->item_flags[2] = pos.z;
-		*(long*)&item->item_flags[0] = item->pos.x_pos;
-		*(long*)&item->item_flags[2] = item->pos.z_pos;
+		*(int32_t*)&laraitem->item_flags[0] = pos.x;
+		*(int32_t*)&laraitem->item_flags[2] = pos.z;
+		*(int32_t*)&item->item_flags[0] = item->pos.x_pos;
+		*(int32_t*)&item->item_flags[2] = item->pos.z_pos;
 	} else {
 		if (climbable_block_height == 0) {
 			ObjectCollision(item_number, laraitem, coll);
@@ -745,12 +740,11 @@ void MovableBlockCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* co
 	}
 }
 
-void InitialisePlanetEffect(short item_number)
-{
+void InitialisePlanetEffect(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
 	char* pifl;
-	uchar others[4];
+	uint8_t others[4];
 
 	item = &items[item_number];
 	item->mesh_bits = 0;
@@ -787,14 +781,13 @@ void InitialisePlanetEffect(short item_number)
 	}
 }
 
-void ControlPlanetEffect(short item_number)
-{
+void ControlPlanetEffect(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
 	PHD_VECTOR pos;
 	PHD_VECTOR pos2;
 	char* pifl;
-	long b, g;
+	int32_t b, g;
 
 	item = &items[item_number];
 
@@ -810,11 +803,10 @@ void ControlPlanetEffect(short item_number)
 	AnimateItem(item);
 
 	if (item->trigger_flags == 1) {
-		if ((items[LOBYTE(item->item_flags[2])].flags & IFL_CODEBITS) == IFL_CODEBITS &&
-			(items[HIBYTE(item->item_flags[2])].flags & IFL_CODEBITS) == IFL_CODEBITS &&
-			(items[LOBYTE(item->item_flags[3])].flags & IFL_CODEBITS) == IFL_CODEBITS &&
-			(items[HIBYTE(item->item_flags[3])].flags & IFL_CODEBITS) == IFL_CODEBITS)
-		{
+		if ((items[(item->item_flags[2]) & 0xff].flags & IFL_CODEBITS) == IFL_CODEBITS &&
+		        (items[(item->item_flags[2] >> 8) & 0xff].flags & IFL_CODEBITS) == IFL_CODEBITS &&
+		        (items[(item->item_flags[3]) & 0xff].flags & IFL_CODEBITS) == IFL_CODEBITS &&
+		        (items[(item->item_flags[3] >> 8) & 0xff].flags & IFL_CODEBITS) == IFL_CODEBITS) {
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0;
@@ -857,11 +849,11 @@ void ControlPlanetEffect(short item_number)
 
 void DrawPlanetEffect(ITEM_INFO* item) {
 	OBJECT_INFO* obj;
-	short** meshpp;
-	long* bone;
-	short* frm[2];
-	short* rot;
-	long poppush;
+	int16_t** meshpp;
+	int32_t* bone;
+	int16_t* frm[2];
+	int16_t* rot;
+	int32_t poppush;
 
 	// T4Plus: Animation safety check
 	if (item->anim_number < 0 || item->anim_number >= num_anims) {

@@ -33,15 +33,13 @@
 #include "../../../tomb4/mod_config.h"
 #include "../../../tomb4/tomb4plus/t4plus_objects.h"
 
-void JeepFireGrenade(ITEM_INFO* item)
-{
+void JeepFireGrenade(ITEM_INFO* item) {
 	ITEM_INFO* grenade;
-	short item_number;
+	int16_t item_number;
 
 	item_number = CreateItem();
 
-	if (item_number != NO_ITEM)
-	{
+	if (item_number != NO_ITEM) {
 		grenade = &items[item_number];
 		grenade->shade = -0x3DF0;
 		grenade->object_number = GRENADE;
@@ -74,8 +72,7 @@ void JeepFireGrenade(ITEM_INFO* item)
 	}
 }
 
-void InitialiseEnemyJeep(short item_number)
-{
+void InitialiseEnemyJeep(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -88,16 +85,15 @@ void InitialiseEnemyJeep(short item_number)
 	item->status -= ITEM_INVISIBLE;
 }
 
-void EnemyJeepControl(short item_number)
-{
+void EnemyJeepControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* jeep;
 	FLOOR_INFO* floor;
 	AIOBJECT* aiobj;
 	AI_INFO info;
 	PHD_VECTOR pos;
-	long Xoffset, Zoffset, x, y, z, h1, h2, _h1, _h2, iAngle, iDist;
-	short room_number, xrot, zrot;
+	int32_t Xoffset, Zoffset, x, y, z, h1, h2, _h1, _h2, iAngle, iDist;
+	int16_t room_number, xrot, zrot;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -112,9 +108,8 @@ void EnemyJeepControl(short item_number)
 	room_number = item->room_number;
 	floor = GetFloor(x, y, z, &room_number);
 	h1 = GetHeight(floor, x, y, z);
-	
-	if (abs(y - h1) > (HALF_BLOCK_SIZE + CLICK_SIZE))
-	{
+
+	if (abs(y - h1) > (HALF_BLOCK_SIZE + CLICK_SIZE)) {
 		item->pos.x_pos += Zoffset >> 6;
 		item->pos.z_pos -= Xoffset >> 6;
 		item->pos.y_rot += DEGREES_TO_ROTATION(2);
@@ -127,15 +122,14 @@ void EnemyJeepControl(short item_number)
 	floor = GetFloor(x, y, z, &room_number);
 	h2 = GetHeight(floor, x, y, z);
 
-	if (abs(y - h2) > (HALF_BLOCK_SIZE + CLICK_SIZE))
-	{
+	if (abs(y - h2) > (HALF_BLOCK_SIZE + CLICK_SIZE)) {
 		item->pos.x_pos -= Zoffset >> 6;
 		item->pos.z_pos += Xoffset >> 6;
 		item->pos.y_rot -= DEGREES_TO_ROTATION(2);
 		h2 = y;
 	}
 
-	zrot = (short)phd_atan(1364, h2 - h1);
+	zrot = (int16_t)phd_atan(1364, h2 - h1);
 
 	x = item->pos.x_pos + Xoffset;
 	z = item->pos.z_pos + Zoffset;
@@ -157,17 +151,14 @@ void EnemyJeepControl(short item_number)
 	if (abs(y - h2) > (HALF_BLOCK_SIZE + CLICK_SIZE))
 		h2 = y;
 
-	xrot = (short)phd_atan(1364, h2 - h1);
+	xrot = (int16_t)phd_atan(1364, h2 - h1);
 	CreatureAIInfo(item, &info);
 	jeep->enemy = &jeep->ai_target;
 
-	if (jeep->enemy == lara_item)
-	{
+	if (jeep->enemy == lara_item) {
 		iAngle = info.angle;
 		iDist = info.distance;
-	}
-	else
-	{
+	} else {
 		x = lara_item->pos.x_pos - item->pos.x_pos;
 		z = lara_item->pos.z_pos - item->pos.z_pos;
 
@@ -179,68 +170,65 @@ void EnemyJeepControl(short item_number)
 			iDist = SQUARE(x) + SQUARE(z);
 	}
 
-	switch (item->current_anim_state)
-	{
-	case 0:
-	case 2:
-		item->item_flags[0] -= 128;
-		item->mesh_bits = 0xFFFE7FFF;
+	switch (item->current_anim_state) {
+		case 0:
+		case 2:
+			item->item_flags[0] -= 128;
+			item->mesh_bits = 0xFFFE7FFF;
 
-		if (item->item_flags[0] < 0)
-			item->item_flags[0] = 0;
+			if (item->item_flags[0] < 0)
+				item->item_flags[0] = 0;
 
-		pos.x = 0;
-		pos.y = -(HALF_CLICK_SIZE + (QUARTER_CLICK_SIZE / 4));
-		pos.z = -BLOCK_SIZE;
-		GetJointAbsPosition(item, &pos, 11);
-		TriggerDynamic(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+			pos.x = 0;
+			pos.y = -(HALF_CLICK_SIZE + (QUARTER_CLICK_SIZE / 4));
+			pos.z = -BLOCK_SIZE;
+			GetJointAbsPosition(item, &pos, 11);
+			TriggerDynamic(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
-		if (item->required_anim_state)
-			item->goal_anim_state = item->required_anim_state;
-		else if (info.distance > 0x100000 || lara.location >= item->item_flags[3])
+			if (item->required_anim_state)
+				item->goal_anim_state = item->required_anim_state;
+			else if (info.distance > 0x100000 || lara.location >= item->item_flags[3])
+				item->goal_anim_state = 1;
+
+			break;
+
+		case 1:
+			jeep->maximum_turn = item->item_flags[0] >> 4;
+			item->item_flags[0] += 37;		//34 in debug exe
+			item->mesh_bits = 0xFFFDBFFF;
+
+			if (item->item_flags[0] > 0x2200)
+				item->item_flags[0] = 0x2200;
+
+			if (info.angle > 0x100)
+				item->goal_anim_state = 4;
+			else if (info.angle < -0x100)
+				item->goal_anim_state = 3;
+
+			break;
+
+		case 3:
+		case 4:
+			item->item_flags[0] += 18;		//17 in debug exe
+
+			if (item->item_flags[0] > 0x2200)
+				item->item_flags[0] = 0x2200;
+
 			item->goal_anim_state = 1;
+			break;
 
-		break;
-		
-	case 1:
-		jeep->maximum_turn = item->item_flags[0] >> 4;
-		item->item_flags[0] += 37;		//34 in debug exe
-		item->mesh_bits = 0xFFFDBFFF;
+		case 5:
 
-		if (item->item_flags[0] > 0x2200)
-			item->item_flags[0] = 0x2200;
+			if (item->item_flags[0] < 0x4A0)
+				item->item_flags[0] = 0x4A0;
 
-		if (info.angle > 0x100)
-			item->goal_anim_state = 4;
-		else if (info.angle < -0x100)
-			item->goal_anim_state = 3;
-
-		break;
-
-	case 3:
-	case 4:
-		item->item_flags[0] += 18;		//17 in debug exe
-
-		if (item->item_flags[0] > 0x2200)
-			item->item_flags[0] = 0x2200;
-
-		item->goal_anim_state = 1;
-		break;
-
-	case 5:
-
-		if (item->item_flags[0] < 0x4A0)
-			item->item_flags[0] = 0x4A0;
-
-		break;
+			break;
 	}
 
-	if (_h1 > item->floor + HALF_BLOCK_SIZE)
-	{
+	if (_h1 > item->floor + HALF_BLOCK_SIZE) {
 		jeep->LOT.is_jumping = 1;
 
-		if (item->item_flags[1] > 0)
-		{
+		if (item->item_flags[1] > 0) {
 			xrot = item->item_flags[1];
 			item->item_flags[1] -= 8;
 
@@ -248,21 +236,16 @@ void EnemyJeepControl(short item_number)
 				jeep->LOT.is_jumping = 0;
 
 			item->pos.y_pos += item->item_flags[1] >> 6;
-		}
-		else
-		{
+		} else {
 			item->item_flags[1] = xrot << 1;
 			jeep->LOT.is_jumping = 1;
 		}
 
-		if (jeep->LOT.is_jumping)
-		{
+		if (jeep->LOT.is_jumping) {
 			jeep->maximum_turn = 0;
 			item->goal_anim_state = 1;
 		}
-	}
-	else if (_h2 > item->floor + HALF_BLOCK_SIZE && item->current_anim_state != 5)
-	{
+	} else if (_h2 > item->floor + HALF_BLOCK_SIZE && item->current_anim_state != 5) {
 		item->item_flags[1] = 0;
 		item->anim_number = objects[item->object_number].anim_index + 8;
 		item->frame_number = anims[item->anim_number].frame_base;
@@ -273,19 +256,16 @@ void EnemyJeepControl(short item_number)
 	if (info.distance < 0x240000 || item->item_flags[3] == -2)
 		jeep->reached_goal = 1;
 
-	if (jeep->reached_goal)
-	{
+	if (jeep->reached_goal) {
 		TestTriggersAtXYZ(jeep->enemy->pos.x_pos, jeep->enemy->pos.y_pos, jeep->enemy->pos.z_pos, jeep->enemy->room_number, 1, 0);
 
-		if (lara.location < item->item_flags[3] && item->current_anim_state != 2 && item->goal_anim_state != 2)
-		{
+		if (lara.location < item->item_flags[3] && item->current_anim_state != 2 && item->goal_anim_state != 2) {
 			item->anim_number = objects[item->object_number].anim_index + 1;
 			item->frame_number = anims[item->anim_number].frame_base;
 			item->current_anim_state = 2;
 			item->goal_anim_state = 2;
 
-			if (jeep->enemy->flags & 4)
-			{
+			if (jeep->enemy->flags & 4) {
 				item->pos.x_pos = jeep->enemy->pos.x_pos;
 				item->pos.y_pos = jeep->enemy->pos.y_pos;
 				item->pos.z_pos = jeep->enemy->pos.z_pos;
@@ -298,31 +278,26 @@ void EnemyJeepControl(short item_number)
 			}
 		}
 
-		if (iDist > 0x400000 && iDist < 0x6400000 && !item->item_flags[2] && (iAngle < -20480 || iAngle > 20480))
-		{
+		if (iDist > 0x400000 && iDist < 0x6400000 && !item->item_flags[2] && (iAngle < -20480 || iAngle > 20480)) {
 			JeepFireGrenade(item);
 			item->item_flags[2] = 150;
 		}
 
-		if (jeep->enemy->flags == 62)
-		{
+		if (jeep->enemy->flags == 62) {
 			item->status = ITEM_INVISIBLE;
 			RemoveActiveItem(item_number);
 			DisableBaddieAI(item_number);
 		}
 
-		if (lara.location >= item->item_flags[3] || !(jeep->enemy->flags & 4))
-		{
+		if (lara.location >= item->item_flags[3] || !(jeep->enemy->flags & 4)) {
 			jeep->reached_goal = 0;
 			item->item_flags[3]++;
 			jeep->enemy = 0;
 
-			for (int i = 0; i < nAIObjects; i++)
-			{
+			for (int i = 0; i < nAIObjects; i++) {
 				aiobj = &AIObjects[i];
 
-				if (aiobj->trigger_flags == item->item_flags[3] && aiobj->room_number != 255)
-				{
+				if (aiobj->trigger_flags == item->item_flags[3] && aiobj->room_number != 255) {
 					jeep->enemy = &jeep->ai_target;
 					jeep->enemy->object_number = aiobj->object_number;
 					jeep->enemy->room_number = aiobj->room_number;
@@ -334,8 +309,7 @@ void EnemyJeepControl(short item_number)
 					jeep->enemy->trigger_flags = aiobj->trigger_flags;
 					jeep->enemy->box_number = aiobj->box_number;
 
-					if (!(jeep->enemy->flags & 0x20))
-					{
+					if (!(jeep->enemy->flags & 0x20)) {
 						jeep->enemy->pos.x_pos += CLICK_SIZE * phd_sin(jeep->enemy->pos.y_rot) >> W2V_SHIFT;
 						jeep->enemy->pos.z_pos += CLICK_SIZE * phd_cos(jeep->enemy->pos.y_rot) >> W2V_SHIFT;
 					}
@@ -393,8 +367,7 @@ void EnemyJeepControl(short item_number)
 
 	if (item->pos.y_pos < item->floor)
 		item->gravity_status = 1;
-	else
-	{
+	else {
 		item->fallspeed = 0;
 		item->pos.y_pos = item->floor;
 		item->gravity_status = 0;

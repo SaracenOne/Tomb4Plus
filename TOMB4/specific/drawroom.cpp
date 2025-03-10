@@ -24,7 +24,7 @@
 #include "output.h"
 
 static ROOM_DYNAMIC RoomDynamics[MAX_DYNAMICS];
-static long nRoomDynamics;
+static int32_t nRoomDynamics;
 
 MESH_DATA** mesh_vtxbuf;
 TEXTUREBUCKET Bucket[MAX_BUCKETS]; // TRLE: Increased bucket count (x8)
@@ -32,26 +32,24 @@ float clip_left;
 float clip_top;
 float clip_right;
 float clip_bottom;
-long bWaterEffect;
-long num_level_meshes;
+int32_t bWaterEffect;
+int32_t num_level_meshes;
 
-long water_color_R = 128;
-long water_color_G = 224;
-long water_color_B = 255;
+int32_t water_color_R = 128;
+int32_t water_color_G = 224;
+int32_t water_color_B = 255;
 
-void ProcessRoomDynamics(ROOM_INFO* r)
-{
+void ProcessRoomDynamics(ROOM_INFO* r) {
 	//Collect dynamic lights for room lighting
 
 	ROOM_DYNAMIC* l;
 	DYNAMIC* d;
 	float falloff;
-	
+
 	nRoomDynamics = 0;
 	l = RoomDynamics;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++)
-	{
+	for (int i = 0; i < MAX_DYNAMICS; i++) {
 		d = &dynamics[i];
 
 		if (!d->on)
@@ -72,8 +70,7 @@ void ProcessRoomDynamics(ROOM_INFO* r)
 	}
 }
 
-void ProcessRoomVertices(ROOM_INFO* r)
-{
+void ProcessRoomVertices(ROOM_INFO* r) {
 	//Transform, project, and light vertices, and store them in MyVertexBuffer.
 
 	ROOM_DYNAMIC* l;
@@ -81,22 +78,21 @@ void ProcessRoomVertices(ROOM_INFO* r)
 	FVECTOR vPos;
 	FVECTOR vtx;
 	FVECTOR n;
-	short* clip;
+	int16_t* clip;
 	static float DistanceFogStart;
 	static float DistanceFogEnd;
 	static float DistanceClipRange;
 	float zv, fR, fG, fB, val, val2;
-	long cR, cG, cB, sA, sR, sG, sB, rndoff, col;
-	short clipFlag;
-	uchar rnd, abs;
-	char shimmer;
+	int32_t cR, cG, cB, sA, sR, sG, sB, rndoff, col;
+	int16_t clipFlag;
+	uint8_t rnd, abs;
+	int8_t shimmer;
 
 	clip = clipflags;
 
 	MOD_LEVEL_ENVIRONMENT_INFO *environment_info = get_game_mod_level_environment_info(gfCurrentLevel);
 
-	if (gfLevelFlags & GF_TRAIN || environment_info->force_train_fog)
-	{
+	if (gfLevelFlags & GF_TRAIN || environment_info->force_train_fog) {
 		DistanceFogStart = float(DEFAULT_FOG_START_BLOCKS) * float(BLOCK_SIZE);
 		DistanceFogEnd = float(DEFAULT_FOG_END_BLOCKS) * float(BLOCK_SIZE);
 		DistanceClipRange = float(DEFAULT_CLIP_RANGE_BLOCKS) * float(BLOCK_SIZE);
@@ -114,8 +110,7 @@ void ProcessRoomVertices(ROOM_INFO* r)
 		}
 	};
 
-	for (int i = 0; i < r->nVerts; i++)
-	{
+	for (int i = 0; i < r->nVerts; i++) {
 		vtx.x = r->x + r->verts[i].x;
 		vtx.y = r->y + r->verts[i].y;
 		vtx.z = r->z + r->verts[i].z;
@@ -123,10 +118,9 @@ void ProcessRoomVertices(ROOM_INFO* r)
 		n.y = r->vnormals[i].y;
 		n.z = r->vnormals[i].z;
 
-		rndoff = long((vtx.x / 64.0F) + (vtx.y / 64.0F) + (vtx.z / 128.0F)) & 0xFC;
+		rndoff = int32_t((vtx.x / 64.0F) + (vtx.y / 64.0F) + (vtx.z / 128.0F)) & 0xFC;
 
-		if (i < r->nWaterVerts)
-		{
+		if (i < r->nWaterVerts) {
 			rnd = WaterTable[r->MeshEffect][rndoff & 0x3F].random;
 			vtx.y += WaterTable[r->MeshEffect][((wibble >> 2) + rnd) & 0x3F].choppy;
 		}
@@ -142,14 +136,11 @@ void ProcessRoomVertices(ROOM_INFO* r)
 
 		if (vPos.z < f_mznear)
 			clipFlag = -128;
-		else
-		{
+		else {
 			zv = f_mpersp / vPos.z;
 
-			if (DistanceClipRange >= 0.0f)
-			{
-				if (vPos.z > DistanceClipRange)
-				{
+			if (DistanceClipRange >= 0.0f) {
+				if (vPos.z > DistanceClipRange) {
 					clipFlag = 16;
 					vPos.z = f_zfar;
 				}
@@ -158,10 +149,9 @@ void ProcessRoomVertices(ROOM_INFO* r)
 			vPos.x = vPos.x * zv + f_centerx;
 			vPos.y = vPos.y * zv + f_centery;
 
-			if (i >= r->nWaterVerts && camera.underwater)
-			{
-				vPos.x += vert_wibble_table[((wibble + (long)vPos.y) >> 3) & 0x1F];
-				vPos.y += vert_wibble_table[((wibble + (long)vPos.x) >> 3) & 0x1F];
+			if (i >= r->nWaterVerts && camera.underwater) {
+				vPos.x += vert_wibble_table[((wibble + (int32_t)vPos.y) >> 3) & 0x1F];
+				vPos.y += vert_wibble_table[((wibble + (int32_t)vPos.x) >> 3) & 0x1F];
 			}
 
 			MyVertexBuffer[i].rhw = zv * f_moneopersp;
@@ -182,14 +172,11 @@ void ProcessRoomVertices(ROOM_INFO* r)
 		MyVertexBuffer[i].sy = vPos.y;
 		MyVertexBuffer[i].sz = vPos.z;
 
-		if (i >= r->nShoreVerts && camera.underwater)
-		{
+		if (i >= r->nShoreVerts && camera.underwater) {
 			cR = CLRR(r->prelightwater[i]);
 			cG = CLRG(r->prelightwater[i]);
 			cB = CLRB(r->prelightwater[i]);
-		}
-		else
-		{
+		} else {
 			cR = CLRR(r->prelight[i]);
 			cG = CLRG(r->prelight[i]);
 			cB = CLRB(r->prelight[i]);
@@ -203,8 +190,7 @@ void ProcessRoomVertices(ROOM_INFO* r)
 		fG = 0;
 		fB = 0;
 
-		for (int j = 0; j < nRoomDynamics; j++)
-		{
+		for (int j = 0; j < nRoomDynamics; j++) {
 			l = &RoomDynamics[j];
 
 			lPos.x = vtx.x - r->posx - l->x;
@@ -212,8 +198,7 @@ void ProcessRoomVertices(ROOM_INFO* r)
 			lPos.z = vtx.z - r->posz - l->z;
 			val = SQUARE(lPos.x) + SQUARE(lPos.y) + SQUARE(lPos.z);
 
-			if (val < l->sqr_falloff)
-			{
+			if (val < l->sqr_falloff) {
 				val = sqrt(val);
 				val2 = l->inv_falloff * (l->falloff - val);
 				lPos.x = (n.x * D3DMView._11 + n.y * D3DMView._21 + n.z * D3DMView._31) * (1.0F / val * lPos.x);
@@ -226,13 +211,12 @@ void ProcessRoomVertices(ROOM_INFO* r)
 			}
 		}
 
-		cR += long(fR * 128.0F);
-		cG += long(fG * 128.0F);
-		cB += long(fB * 128.0F);
+		cR += int32_t(fR * 128.0F);
+		cG += int32_t(fG * 128.0F);
+		cB += int32_t(fB * 128.0F);
 
-		if (i < r->nWaterVerts + r->nShoreVerts)
-		{
-			rndoff = long((vtx.x / 64.0F) + (vtx.y / 64.0F) + (vtx.z / 128.0F)) & 0xFC;
+		if (i < r->nWaterVerts + r->nShoreVerts) {
+			rndoff = int32_t((vtx.x / 64.0F) + (vtx.y / 64.0F) + (vtx.z / 128.0F)) & 0xFC;
 
 			rnd = WaterTable[r->MeshEffect][rndoff & 0x3C].random;
 			shimmer = WaterTable[r->MeshEffect][((wibble >> 2) + rnd) & 0x3F].shimmer;
@@ -245,45 +229,42 @@ void ProcessRoomVertices(ROOM_INFO* r)
 
 		CalculateVertexSpecular(vPos, DistanceFogStart, DistanceFogEnd, &cR, &cG, &cB, &sR, &sG, &sB, &sA);
 
-		if (sR > 255) sR = 255; else if (sR < 0) sR = 0;
-		if (sG > 255) sG = 255; else if (sG < 0) sG = 0;
-		if (sB > 255) sB = 255; else if (sB < 0) sB = 0;
-		if (cR > 255) cR = 255; else if (cR < 0) cR = 0;
-		if (cG > 255) cG = 255; else if (cG < 0) cG = 0;
-		if (cB > 255) cB = 255; else if (cB < 0) cB = 0;
+		if (sR > 255) sR = 255;
+		else if (sR < 0) sR = 0;
+		if (sG > 255) sG = 255;
+		else if (sG < 0) sG = 0;
+		if (sB > 255) sB = 255;
+		else if (sB < 0) sB = 0;
+		if (cR > 255) cR = 255;
+		else if (cR < 0) cR = 0;
+		if (cG > 255) cG = 255;
+		else if (cG < 0) cG = 0;
+		if (cB > 255) cB = 255;
+		else if (cB < 0) cB = 0;
 
 		MyVertexBuffer[i].color = RGBA(cR, cG, cB, 0xFF);
 		MyVertexBuffer[i].specular = RGBA(sR, sG, sB, sA);
 	}
 }
 
-void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
-{
+void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	GFXVERTEX* vptr;
-#ifndef USE_BGFX
-	D3DVERTEXBUFFERDESC vb;
-#endif
 	LIGHTINFO* light;
 	PCLIGHT_INFO* pclight;
 	FOGBULB_STRUCT* bulb;
-	short* data_ptr;
-	short* faces;
-	short* prelight;
+	int16_t* data_ptr;
+	int16_t* faces;
+	int16_t* prelight;
 	float intensity;
-	long nWaterVerts, nShoreVerts, nRestOfVerts, nLights, nBulbs;
-	ushort cR, cG, cB;
+	int32_t nWaterVerts, nShoreVerts, nRestOfVerts, nLights, nBulbs;
+	uint16_t cR, cG, cB;
 
 	data_ptr = r->data;
 	r->nVerts = *data_ptr++;
 
-	if (!r->nVerts)
-	{
+	if (!r->nVerts) {
 		r->num_lights = 0;
-#ifdef USE_BGFX
 		r->Buffer = nullptr;
-#else
-		r->SourceVB = 0;
-#endif
 		return;
 	}
 
@@ -293,20 +274,18 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 	data_ptr += r->gt4cnt * 5;
 	r->gt3cnt = *data_ptr;
 	r->verts = (GFXVECTOR*)game_malloc(sizeof(GFXVECTOR) * r->nVerts);
-	faces = (short*)SYSTEM_MALLOC(2 * r->nVerts);
-	prelight = (short*)SYSTEM_MALLOC(2 * r->nVerts);
+	faces = (int16_t*)SYSTEM_MALLOC(2 * r->nVerts);
+	prelight = (int16_t*)SYSTEM_MALLOC(2 * r->nVerts);
 	data_ptr = r->data + 1;	//go to vert data
 	nWaterVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++)	//get water verts
-	{
-		if (data_ptr[4] & 0x2000)
-		{
+	for (int i = 0; i < r->nVerts; i++) {	//get water verts
+		if (data_ptr[4] & 0x2000) {
 			r->verts[nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nWaterVerts].y = (float)data_ptr[1];
 			r->verts[nWaterVerts].z = (float)data_ptr[2];
 			prelight[nWaterVerts] = data_ptr[5];
-			faces[i] = short(nWaterVerts | 0x8000);
+			faces[i] = int16_t(nWaterVerts | 0x8000);
 			nWaterVerts++;
 		}
 
@@ -316,16 +295,14 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 	data_ptr = r->data + 1;
 	nShoreVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++)	//again for shore verts
-	{
-		if (data_ptr[4] & 0x4000 && !(data_ptr[4] & 0x2000))
-		{
+	for (int i = 0; i < r->nVerts; i++) {	//again for shore verts
+		if (data_ptr[4] & 0x4000 && !(data_ptr[4] & 0x2000)) {
 			r->verts[nShoreVerts + nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nShoreVerts + nWaterVerts].y = (float)data_ptr[1];
 			r->verts[nShoreVerts + nWaterVerts].z = (float)data_ptr[2];
 			prelight[nShoreVerts + nWaterVerts] = data_ptr[5];
 
-			faces[i] = short(nShoreVerts + nWaterVerts);
+			faces[i] = int16_t(nShoreVerts + nWaterVerts);
 			nShoreVerts++;
 		}
 
@@ -335,15 +312,13 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 	data_ptr = r->data + 1;
 	nRestOfVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++)	//one more for everything else
-	{
-		if (!(data_ptr[4] & 0x4000) && !(data_ptr[4] & 0x2000))
-		{
+	for (int i = 0; i < r->nVerts; i++) {	//one more for everything else
+		if (!(data_ptr[4] & 0x4000) && !(data_ptr[4] & 0x2000)) {
 			r->verts[nRestOfVerts + nShoreVerts + nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nRestOfVerts + nShoreVerts + nWaterVerts].y = (float)data_ptr[1];
 			r->verts[nRestOfVerts + nShoreVerts + nWaterVerts].z = (float)data_ptr[2];
 			prelight[nRestOfVerts + nShoreVerts + nWaterVerts] = data_ptr[5];
-			faces[i] = short(nRestOfVerts + nShoreVerts + nWaterVerts);
+			faces[i] = int16_t(nRestOfVerts + nShoreVerts + nWaterVerts);
 			nRestOfVerts++;
 		}
 
@@ -354,8 +329,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 	r->nWaterVerts = nWaterVerts;
 	r->nShoreVerts = nShoreVerts;
 
-	for (int i = 0; i < r->gt4cnt; i++)	//get quad data
-	{
+	for (int i = 0; i < r->gt4cnt; i++) {	//get quad data
 		if (faces[data_ptr[0]] & 0x8000 || faces[data_ptr[1]] & 0x8000 || faces[data_ptr[2]] & 0x8000 || faces[data_ptr[3]] & 0x8000)
 			data_ptr[4] |= 0x4000;
 
@@ -366,9 +340,9 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 
 		// TRNG: texture fix
 		if (data_ptr[0] < nWaterVerts + nShoreVerts ||
-			data_ptr[1] < nWaterVerts + nShoreVerts ||
-			data_ptr[2] < nWaterVerts + nShoreVerts ||
-			data_ptr[3] < nWaterVerts + nShoreVerts) {
+		        data_ptr[1] < nWaterVerts + nShoreVerts ||
+		        data_ptr[2] < nWaterVerts + nShoreVerts ||
+		        data_ptr[3] < nWaterVerts + nShoreVerts) {
 			data_ptr[4] = data_ptr[4] & 0xBFFF;
 		}
 
@@ -377,16 +351,15 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 
 	data_ptr++;//skip over tri count
 
-	for (int i = 0; i < r->gt3cnt; i++)	//tris
-	{
+	for (int i = 0; i < r->gt3cnt; i++) {	//tris
 		data_ptr[0] = faces[data_ptr[0]] & 0x7FFF;
 		data_ptr[1] = faces[data_ptr[1]] & 0x7FFF;
 		data_ptr[2] = faces[data_ptr[2]] & 0x7FFF;
 
 		// TRNG: texture fix
 		if (data_ptr[0] < nWaterVerts + nShoreVerts ||
-			data_ptr[1] < nWaterVerts + nShoreVerts ||
-			data_ptr[2] < nWaterVerts + nShoreVerts) {
+		        data_ptr[1] < nWaterVerts + nShoreVerts ||
+		        data_ptr[2] < nWaterVerts + nShoreVerts) {
 			data_ptr[3] = data_ptr[3] & 0xBFFF;
 		}
 
@@ -395,28 +368,18 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 
 	SYSTEM_FREE(faces);
 	CreateVertexNormals(r);
-	r->prelight = (long*)game_malloc(sizeof(long *) * r->nVerts);
-	r->prelightwater = (long*)game_malloc(sizeof(long *) * r->nVerts);
+	r->prelight = (int32_t*)game_malloc(sizeof(int32_t *) * r->nVerts);
+	r->prelightwater = (int32_t*)game_malloc(sizeof(int32_t *) * r->nVerts);
 	r->watercalc = 0;
-#ifdef USE_BGFX
 	uint32_t numVertices = r->nVerts;
 	r->Buffer = (GFXVERTEX *)SYSTEM_MALLOC(sizeof(GFXVERTEX) * numVertices);
 	vptr = r->Buffer;
-#else
-	vb.dwNumVertices = r->nVerts;
-	vb.dwSize = sizeof(D3DVERTEXBUFFERDESC);
-	vb.dwCaps = 0;
-	vb.dwFVF = D3DFVF_VERTEX;
-	DXAttempt(App.dx.lpD3D->CreateVertexBuffer(&vb, &r->SourceVB, D3DDP_DONOTCLIP, 0));
-	r->SourceVB->Lock(DDLOCK_WRITEONLY, (void**)&vptr, 0);
-#endif
 	r->posx = (float)r->x;
 	r->posy = (float)r->y;
 	r->posz = (float)r->z;
 	data_ptr = r->data + 1;
 
-	for (int i = 0; i < r->nVerts; i++)
-	{
+	for (int i = 0; i < r->nVerts; i++) {
 		vptr->x = r->verts[i].x + (float)r->x;
 		vptr->y = r->verts[i].y + (float)r->y;
 		vptr->z = r->verts[i].z + (float)r->z;
@@ -428,36 +391,28 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 		cG = ((prelight[i] & 0x3E0) >> 5) << 3;
 		cB = (prelight[i] & 0x1F) << 3;
 		r->prelight[i] = RGBA(cR, cG, cB, 0xFF);
-		cR = ushort((cR * water_color_R) >> 8);
-		cG = ushort((cG * water_color_G) >> 8);
-		cB = ushort((cB * water_color_B) >> 8);
+		cR = uint16_t((cR * water_color_R) >> 8);
+		cG = uint16_t((cG * water_color_G) >> 8);
+		cB = uint16_t((cB * water_color_B) >> 8);
 		r->prelightwater[i] = RGBA(cR, cG, cB, 0xFF);
 		vptr++;
 		data_ptr += 6;
 	}
 
-#ifndef USE_BGFX
-	r->SourceVB->Unlock();
-#endif
-
 	SYSTEM_FREE(prelight);
 
 	r->pclight = 0;
 
-	if (r->num_lights)
-	{
+	if (r->num_lights) {
 		r->pclight = (PCLIGHT_INFO*)game_malloc(sizeof(PCLIGHT_INFO) * r->num_lights);
 		nLights = 0;
 		nBulbs = NumLevelFogBulbs;
 
-		for (int i = 0; i < r->num_lights; i++)
-		{
+		for (int i = 0; i < r->num_lights; i++) {
 			light = &r->light[i];
 
-			if (light->Type == LIGHT_FOG)
-			{
-				if (NumLevelFogBulbs >= MAXIMUM_LEVEL_FOGBULBS)
-				{
+			if (light->Type == LIGHT_FOG) {
+				if (NumLevelFogBulbs >= MAXIMUM_LEVEL_FOGBULBS) {
 					Log(1, "Fog Bulb Discarded - More Than %d", MAXIMUM_LEVEL_FOGBULBS);
 					continue;
 				}
@@ -467,29 +422,24 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 				if (multi_colour_fog)
 					bulb->density = light->Intensity;
 				else
-					bulb->density = (long)light->r;
+					bulb->density = (int32_t)light->r;
 
 				bulb->WorldPos.x = (float)light->x;
 				bulb->WorldPos.y = (float)light->y;
 				bulb->WorldPos.z = (float)light->z;
-				if (multi_colour_fog)
-				{
-					bulb->r = (long)light->r;
-					bulb->g = (long)light->g;
-					bulb->b = (long)light->b;
+				if (multi_colour_fog) {
+					bulb->r = (int32_t)light->r;
+					bulb->g = (int32_t)light->g;
+					bulb->b = (int32_t)light->b;
 					bulb->rad = light->Outer * 1.25f;
-				}
-				else
-				{
+				} else {
 					bulb->rad = light->Outer;
 				}
 				bulb->sqrad = SQUARE(bulb->rad);
 				bulb->inv_sqrad = 1 / bulb->sqrad;
 				nBulbs++;
 				NumLevelFogBulbs = nBulbs;
-			}
-			else
-			{
+			} else {
 				if (!light->r && !light->g && !light->b && light->Type == LIGHT_SPOT)
 					continue;
 
@@ -508,7 +458,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 				pclight->b *= intensity;
 
 				if (r->light[nLights].Type)
-					pclight->shadow = long(intensity * 255);
+					pclight->shadow = int32_t(intensity * 255);
 
 				pclight->x = (float)light->x;
 				pclight->y = (float)light->y;
@@ -519,16 +469,15 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 				pclight->nx = -light->nx;
 				pclight->ny = -light->ny;
 				pclight->nz = -light->nz;
-				pclight->inx = long(light->nx * -16384.0F);
-				pclight->iny = long(light->ny * -16384.0F);
-				pclight->inz = long(light->nz * -16384.0F);
+				pclight->inx = int32_t(light->nx * -16384.0F);
+				pclight->iny = int32_t(light->ny * -16384.0F);
+				pclight->inz = int32_t(light->nz * -16384.0F);
 				pclight->Inner = light->Inner;
 				pclight->Outer = light->Outer;
 				pclight->InnerAngle = 2 * acos(light->Inner);
 				pclight->OuterAngle = 2 * acos(light->Outer);
 
-				if (r->light[nLights].Type == LIGHT_SPOT && pclight->OuterAngle > 3.1415927F)
-				{
+				if (r->light[nLights].Type == LIGHT_SPOT && pclight->OuterAngle > 3.1415927F) {
 					Log(1, "SpotLight Corrected");
 					pclight->OuterAngle = 3.1415927F;
 				}
@@ -539,16 +488,12 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog)
 			}
 		}
 	}
-#ifndef USE_BGFX
-	r->SourceVB->Optimize(App.dx._lpD3DDevice, 0);
-#endif
 }
 
-void InsertRoom(ROOM_INFO* r)
-{
-	TEXTURESTRUCT* pTex; 
-	short* data;
-	short numQuads, numTris;
+void InsertRoom(ROOM_INFO* r) {
+	TEXTURESTRUCT* pTex;
+	int16_t* data;
+	int16_t numQuads, numTris;
 	bool doublesided;
 
 	clip_left = r->left;
@@ -556,16 +501,14 @@ void InsertRoom(ROOM_INFO* r)
 	clip_bottom = r->bottom;
 	clip_top = r->top;
 
-	if (r->nVerts)
-	{
+	if (r->nVerts) {
 		ProcessRoomDynamics(r);
 		ProcessRoomVertices(r);
 
 		data = r->FaceData;
 		numQuads = *data++;
 
-		for (int i = 0; i < numQuads; i++, data += 5)
-		{
+		for (int i = 0; i < numQuads; i++, data += 5) {
 			// TRNG: use full textinfo mask range.
 			pTex = &textinfo[data[4] & 0x7FFF];
 			doublesided = (data[4] >> 15) & 1;
@@ -578,8 +521,7 @@ void InsertRoom(ROOM_INFO* r)
 
 		numTris = *data++;
 
-		for (int i = 0; i < numTris; i++, data += 4)
-		{
+		for (int i = 0; i < numTris; i++, data += 4) {
 			// TRNG: use full textinfo mask range.
 			pTex = &textinfo[data[3] & 0x7FFF];
 			doublesided = (data[3] >> 15) & 1;
@@ -592,8 +534,7 @@ void InsertRoom(ROOM_INFO* r)
 	}
 }
 
-void CalcTriFaceNormal(GFXVECTOR* p1, GFXVECTOR* p2, GFXVECTOR* p3, GFXVECTOR* N)
-{
+void CalcTriFaceNormal(GFXVECTOR* p1, GFXVECTOR* p2, GFXVECTOR* p3, GFXVECTOR* N) {
 	FVECTOR u, v;
 
 	u.x = p1->x - p2->x;
@@ -609,22 +550,18 @@ void CalcTriFaceNormal(GFXVECTOR* p1, GFXVECTOR* p2, GFXVECTOR* p3, GFXVECTOR* N
 
 #define ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(ptr, size) ptr += ((size + 3) & -4);
 
-void ProcessMeshData(long num_meshes)
-{
+void ProcessMeshData(int32_t num_meshes) {
 	MESH_DATA* mesh;
 	GFXVERTEX* vtx;
-#ifndef USE_BGFX
-	D3DVERTEXBUFFERDESC buf;
-#endif
-	short* mesh_ptr;
-	short* last_mesh_ptr;
-	long lp;
-	short c;
+	int16_t* mesh_ptr;
+	int16_t* last_mesh_ptr;
+	int32_t lp;
+	int16_t c;
 
 	Log(2, "ProcessMeshData %d", num_meshes);
 	num_level_meshes = num_meshes;
 	mesh_vtxbuf = (MESH_DATA**)game_malloc(sizeof(MESH_DATA *) * num_meshes);
-	mesh_base = (short*)malloc_ptr;
+	mesh_base = (int16_t*)malloc_ptr;
 	last_mesh_ptr = 0;
 	mesh = (MESH_DATA*)(size_t)num_meshes;
 
@@ -636,20 +573,16 @@ void ProcessMeshData(long num_meshes)
 	mesh_mapping_table_count = num_meshes;
 	mesh_mapping_table = (MESH_MAP_TABLE_ENTRY *)SYSTEM_REALLOC(mesh_mapping_table, num_meshes * sizeof(MESH_MAP_TABLE_ENTRY));
 
-	for (int i = 0; i < num_meshes; i++)
-	{
+	for (int i = 0; i < num_meshes; i++) {
 		mesh_ptr = meshes[i];
 
 		mesh_mapping_table[i].mesh_x32_ptr = original_mesh_table_ptr_32x;
 		mesh_mapping_table[i].mesh_native_ptr = original_mesh_table_ptr_native;
 
-		if (mesh_ptr == last_mesh_ptr)
-		{
-			meshes[i] = (short*)mesh;
+		if (mesh_ptr == last_mesh_ptr) {
+			meshes[i] = (int16_t*)mesh;
 			mesh_vtxbuf[i] = mesh;
-		}
-		else
-		{
+		} else {
 			last_mesh_ptr = mesh_ptr;
 			mesh = (MESH_DATA*)game_malloc(sizeof(MESH_DATA));
 
@@ -657,7 +590,7 @@ void ProcessMeshData(long num_meshes)
 			ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, INTERNAL_SAVEGAME_MESH_SIZE);
 
 			memset(mesh, 0, sizeof(MESH_DATA));
-			meshes[i] = (short*)mesh;
+			meshes[i] = (int16_t*)mesh;
 			mesh_vtxbuf[i] = mesh;
 			mesh->x = mesh_ptr[0];
 			mesh->y = mesh_ptr[1];
@@ -680,23 +613,11 @@ void ProcessMeshData(long num_meshes)
 
 			mesh_ptr += 6;
 
-			if (mesh->nVerts)
-			{
-#ifdef USE_BGFX
+			if (mesh->nVerts) {
 				uint32_t numVertices = mesh->nVerts;
 				mesh->Buffer = (GFXVERTEX*)SYSTEM_MALLOC(sizeof(GFXVERTEX) * numVertices);
 				vtx = mesh->Buffer;
-#else
-				buf.dwNumVertices = mesh->nVerts;
-				buf.dwSize = sizeof(D3DVERTEXBUFFERDESC);
-				buf.dwCaps = 0;
-				buf.dwFVF = D3DFVF_TEX1 | D3DFVF_NORMAL | D3DFVF_XYZ;
-
-				DXAttempt(App.dx.lpD3D->CreateVertexBuffer(&buf, &mesh->SourceVB, 0, 0));
-				mesh->SourceVB->Lock(DDLOCK_WRITEONLY, (LPVOID*)&vtx, 0);
-#endif
-				for (int j = 0; j < mesh->nVerts; j++)
-				{
+				for (int j = 0; j < mesh->nVerts; j++) {
 					vtx[j].x = mesh_ptr[0];
 					vtx[j].y = mesh_ptr[1];
 					vtx[j].z = mesh_ptr[2];
@@ -709,14 +630,12 @@ void ProcessMeshData(long num_meshes)
 				if (!mesh->nNorms)
 					mesh->nNorms = mesh->nVerts;
 
-				if (mesh->nNorms > 0)
-				{
+				if (mesh->nNorms > 0) {
 					mesh->Normals = (GFXVECTOR*)game_malloc(mesh->nNorms * sizeof(GFXVECTOR));
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, mesh->nNorms * sizeof(GFXVECTOR));
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, mesh->nNorms * sizeof(GFXVECTOR));
 
-					for (int j = 0; j < mesh->nVerts; j++)
-					{
+					for (int j = 0; j < mesh->nVerts; j++) {
 						vtx[j].nx = mesh_ptr[0];
 						vtx[j].ny = mesh_ptr[1];
 						vtx[j].nz = mesh_ptr[2];
@@ -728,35 +647,28 @@ void ProcessMeshData(long num_meshes)
 					}
 
 					mesh->prelight = 0;
-				}
-				else
-				{
+				} else {
 					mesh->Normals = 0;
-					mesh->prelight = (long*)game_malloc(sizeof(long *) * mesh->nVerts);
+					mesh->prelight = (int32_t*)game_malloc(sizeof(int32_t *) * mesh->nVerts);
 
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, mesh->nVerts * sizeof(X32_POINTER));
-					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, mesh->nVerts * sizeof(long*));
+					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, mesh->nVerts * sizeof(int32_t*));
 
-					for (int j = 0; j < mesh->nVerts; j++)
-					{
+					for (int j = 0; j < mesh->nVerts; j++) {
 						c = 255 - (mesh_ptr[0] >> 5);
 						mesh->prelight[j] = RGBONLY(c, c, c);
 						mesh_ptr++;
 					}
 				}
-#ifndef USE_BGFX
-				mesh->SourceVB->Unlock();
-#endif
-			}
-			else
+			} else {
 				mesh_ptr += 6 * lp + 1;
+			}
 
 			mesh->ngt4 = mesh_ptr[0];
 			mesh_ptr++;
 
-			if (mesh->ngt4)
-			{
-				mesh->gt4 = (short*)game_malloc(12 * mesh->ngt4);
+			if (mesh->ngt4) {
+				mesh->gt4 = (int16_t*)game_malloc(12 * mesh->ngt4);
 
 				ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, 12 * mesh->ngt4);
 				ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, 12 * mesh->ngt4);
@@ -772,9 +684,8 @@ void ProcessMeshData(long num_meshes)
 			mesh->ngt3 = mesh_ptr[0];
 			mesh_ptr++;
 
-			if (mesh->ngt3)
-			{
-				mesh->gt3 = (short*)game_malloc(10 * mesh->ngt3);
+			if (mesh->ngt3) {
+				mesh->gt3 = (int16_t*)game_malloc(10 * mesh->ngt3);
 				ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, 10 * mesh->ngt3);
 				ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, 10 * mesh->ngt3);
 
@@ -789,56 +700,32 @@ void ProcessMeshData(long num_meshes)
 	Log(2, "End ProcessMeshData");
 }
 
-void InitBuckets()
-{
+void InitBuckets() {
 	TEXTUREBUCKET *bucket;
 
-	for (int i = 0; i < MAX_BUCKETS; i++)
-	{
+	for (int i = 0; i < MAX_BUCKETS; i++) {
 		bucket = &Bucket[i];
 		bucket->tpage = -1;
 		bucket->nVtx = 0;
 	}
 }
 
-void DrawBucket(TEXTUREBUCKET* bucket)
-{
+void DrawBucket(TEXTUREBUCKET* bucket) {
 	if (bucket->tpage == 1)
 		bucket->tpage = 1;
 
 	if (!bucket->nVtx)
 		return;
 
-	if (Textures[bucket->tpage].bump && App.BumpMapping)
-	{
-#ifndef USE_BGFX
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CURRENT);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
-		DXAttempt(App.dx.lpD3DDevice->SetTexture(0, Textures[Textures[bucket->tpage].bumptpage].tex));
-		App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, FVF, bucket->vtx, bucket->nVtx, D3DDP_DONOTCLIP);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, 1);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_DESTCOLOR);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-#endif
+	if (Textures[bucket->tpage].bump && App.BumpMapping) {
 		DrawPrimitiveCnt++;
 	}
 
-#ifdef USE_BGFX
 	uint64_t state = 0
-		| BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_Z
-		| BGFX_STATE_DEPTH_TEST_LESS
-		| UINT64_C(0);
+	                 | BGFX_STATE_WRITE_RGB
+	                 | BGFX_STATE_WRITE_Z
+	                 | BGFX_STATE_DEPTH_TEST_LESS
+	                 | UINT64_C(0);
 
 	bgfx::update(bucket->handle, 0, bgfx::makeRef(bucket->vtx, BUCKET_VERT_COUNT * sizeof(GFXTLBUMPVERTEX)));
 
@@ -847,171 +734,33 @@ void DrawBucket(TEXTUREBUCKET* bucket)
 	bgfx::setState(state);
 
 	bgfx::submit(0, m_outputVTLTexProgram);
-#else
-	DXAttempt(App.dx.lpD3DDevice->SetTexture(0, Textures[bucket->tpage].tex));
-	App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, FVF, bucket->vtx, bucket->nVtx, 0);
-
-	if (App.BumpMapping)
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
-#endif
 
 	bucket->nVtx = 0;
 	bucket->tpage = -1;
 	DrawPrimitiveCnt++;
 }
 
-void FindBucket(long tpage, GFXTLBUMPVERTEX** Vpp, long** nVtxpp)
-{
-#ifndef USE_BGFX
-	TEXTUREBUCKET* bucket;
-	long nVtx, biggest;
-
-	for (int i = 0; i < MAX_BUCKETS; i++)
-	{
-		bucket = &Bucket[i];
-
-		if (bucket->tpage == tpage && bucket->nVtx < BUCKET_VERT_COUNT - 32)
-		{
-			*Vpp = &bucket->vtx[bucket->nVtx];
-			*nVtxpp = &bucket->nVtx;
-			return;
-		}
-
-		if (bucket->nVtx > BUCKET_VERT_COUNT - 32)
-		{
-			DrawBucket(bucket);
-			bucket->tpage = tpage;
-			bucket->nVtx = 0;
-			*Vpp = bucket->vtx;
-			*nVtxpp = &bucket->nVtx;
-			return;
-		}
-	}
-
-	nVtx = 0;
-	biggest = 0;
-
-	for (int i = 0; i < MAX_BUCKETS; i++)
-	{
-		bucket = &Bucket[i];
-
-		if (bucket->tpage == -1)
-		{
-			bucket->tpage = tpage;
-			*Vpp = bucket->vtx;
-			*nVtxpp = &bucket->nVtx;
-			return;
-		}
-
-		if (bucket->nVtx > nVtx)
-		{
-			nVtx = bucket->nVtx;
-			biggest = i;
-		}
-	}
-
-	bucket = &Bucket[biggest];
-	DrawBucket(bucket);
-	bucket->tpage = tpage;
-	bucket->nVtx = 0;
-	*Vpp = bucket->vtx;
-	*nVtxpp = &bucket->nVtx;
-#endif
+void FindBucket(int32_t tpage, GFXTLBUMPVERTEX** Vpp, int32_t** nVtxpp) {
 }
 
-void DrawBuckets()
-{
-#ifndef USE_BGFX
-	TEXTUREBUCKET* bucket;
-
-	if (App.BumpMapping)
-	{
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CURRENT);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
-		for (int i = 0; i < MAX_BUCKETS; i++)
-		{
-			bucket = &Bucket[i];
-
-			if (Textures[bucket->tpage].bump && bucket->nVtx)
-			{
-				DXAttempt(App.dx.lpD3DDevice->SetTexture(0, Textures[Textures[bucket->tpage].bumptpage].tex));
-				App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, FVF, bucket->vtx, bucket->nVtx, D3DDP_DONOTCLIP);
-				DrawPrimitiveCnt++;
-			}
-		}
-
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, 1);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_DESTCOLOR);
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-		App.dx.lpD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
-		for (int i = 0; i < MAX_BUCKETS; i++)
-		{
-			bucket = &Bucket[i];
-
-			if (Textures[bucket->tpage].bump && bucket->nVtx)
-			{
-				DXAttempt(App.dx.lpD3DDevice->SetTexture(0, Textures[bucket->tpage].tex));
-				App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, FVF, bucket->vtx, bucket->nVtx, D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTCLIP);
-				bucket->nVtx = 0;
-				bucket->tpage = -1;
-				DrawPrimitiveCnt++;
-			}
-		}
-
-		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
-
-		for (int i = 0; i < MAX_BUCKETS; i++)
-		{
-			bucket = &Bucket[i];
-
-			if (!Textures[bucket->tpage].bump && bucket->nVtx)
-			{
-				DXAttempt(App.dx.lpD3DDevice->SetTexture(0, Textures[bucket->tpage].tex));
-				App.dx.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, FVF, bucket->vtx, bucket->nVtx, D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTCLIP);
-				bucket->nVtx = 0;
-				bucket->tpage = -1;
-				DrawPrimitiveCnt++;
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < MAX_BUCKETS; i++)
-		{
-			bucket = &Bucket[i];
-			DrawBucket(bucket);
-		}
-	}
-#endif
+void DrawBuckets() {
 }
 
-void CreateVertexNormals(ROOM_INFO* r)
-{
+void CreateVertexNormals(ROOM_INFO* r) {
 	GFXVECTOR p1;
 	GFXVECTOR p2;
 	GFXVECTOR p3;
 	GFXVECTOR n1;
 	GFXVECTOR n2;
-	short* data;
-	short nQuads;
-	short nTris;
+	int16_t* data;
+	int16_t nQuads;
+	int16_t nTris;
 
 	data = r->FaceData;
 	r->fnormals = (GFXVECTOR*)game_malloc(sizeof(GFXVECTOR) * (r->gt3cnt + r->gt4cnt));
 	nQuads = *data++;
 
-	for (int i = 0; i < nQuads; i++)
-	{
+	for (int i = 0; i < nQuads; i++) {
 		p1 = r->verts[data[0]];
 		p2 = r->verts[data[1]];
 		p3 = r->verts[data[2]];
@@ -1032,8 +781,7 @@ void CreateVertexNormals(ROOM_INFO* r)
 
 	nTris = *data++;
 
-	for (int i = 0; i < nTris; i++)
-	{
+	for (int i = 0; i < nTris; i++) {
 		p1 = r->verts[data[0]];
 		p2 = r->verts[data[1]];
 		p3 = r->verts[data[2]];
@@ -1051,18 +799,15 @@ void CreateVertexNormals(ROOM_INFO* r)
 	data += nQuads * 5;
 	nTris = *data;
 
-	for (int i = 0; i < r->nVerts; i++)
-	{
+	for (int i = 0; i < r->nVerts; i++) {
 		n1.x = 0;
 		n1.y = 0;
 		n1.z = 0;
 
 		data = r->FaceData + 1;
 
-		for (int j = 0; j < nQuads; j++)
-		{
-			if (data[0] == i || data[1] == i || data[2] == i || data[3] == i)
-			{
+		for (int j = 0; j < nQuads; j++) {
+			if (data[0] == i || data[1] == i || data[2] == i || data[3] == i) {
 				n1.x += r->fnormals[j].x;
 				n1.y += r->fnormals[j].y;
 				n1.z += r->fnormals[j].z;
@@ -1073,10 +818,8 @@ void CreateVertexNormals(ROOM_INFO* r)
 
 		data++;
 
-		for (int j = 0; j < nTris; j++)
-		{
-			if (data[0] == i || data[1] == i || data[2] == i)
-			{
+		for (int j = 0; j < nTris; j++) {
+			if (data[0] == i || data[1] == i || data[2] == i) {
 				n1.x += r->fnormals[nQuads + j].x;
 				n1.y += r->fnormals[nQuads + j].y;
 				n1.z += r->fnormals[nQuads + j].z;

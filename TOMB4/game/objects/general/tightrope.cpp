@@ -17,8 +17,7 @@
 
 LARA_TIGHTROPE_EXTRASTATE lara_tightrope_extrastate;
 
-static void GetTighRopeFallOff(long chance)
-{
+static void GetTighRopeFallOff(int32_t chance) {
 	if (lara_item->hit_points <= 0 || lara_item->hit_status) {
 		lara_item->anim_number = ANIM_TROPEFALLOFF_L;
 		lara_item->frame_number = anims[ANIM_TROPEFALLOFF_L].frame_base;
@@ -47,19 +46,15 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll) {
 	if (lara_item->current_anim_state == AS_TROPEFALL_L)
 		return;
 
-	if (lara_tightrope_extrastate.TightRopeFall)
-	{
+	if (lara_tightrope_extrastate.TightRopeFall) {
 		if (GetRandomControl() & 1)
 			item->goal_anim_state = AS_TROPEFALL_R;
 		else
 			item->goal_anim_state = AS_TROPEFALL_L;
-	}
-	else if (input & IN_FORWARD)
+	} else if (input & IN_FORWARD)
 		item->goal_anim_state = AS_TROPEWALK;
-	else if (input & IN_ROLL || input & IN_BACK)
-	{
-		if (item->anim_number == ANIM_TRPOSE)
-		{
+	else if (input & IN_ROLL || input & IN_BACK) {
+		if (item->anim_number == ANIM_TRPOSE) {
 			item->current_anim_state = AS_TROPETURN;
 			item->anim_number = ANIM_TROPETURN;
 			item->frame_number = anims[ANIM_TROPETURN].frame_base;
@@ -78,7 +73,7 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) {
 	}
 
 	FLOOR_INFO* floor;
-	short room_number;
+	int16_t room_number;
 
 	if (lara_tightrope_extrastate.TightRopeOnCount)
 		lara_tightrope_extrastate.TightRopeOnCount--;
@@ -86,8 +81,7 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) {
 		room_number = item->room_number;
 		floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
 
-		if (GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos) == item->pos.y_pos)
-		{
+		if (GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos) == item->pos.y_pos) {
 			lara_tightrope_extrastate.TightRopeOff = 0;
 			item->goal_anim_state = AS_TROPEGETOFF;
 		}
@@ -100,7 +94,7 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) {
 			LookUpDown();
 
 		if (item->goal_anim_state != AS_TROPEGETOFF &&
-			(lara_tightrope_extrastate.TightRopeFall || (input & (IN_BACK | IN_ROLL) || !(input & IN_FORWARD)) && !lara_tightrope_extrastate.TightRopeOnCount && !lara_tightrope_extrastate.TightRopeOff))
+		        (lara_tightrope_extrastate.TightRopeFall || (input & (IN_BACK | IN_ROLL) || !(input & IN_FORWARD)) && !lara_tightrope_extrastate.TightRopeOnCount && !lara_tightrope_extrastate.TightRopeOff))
 			item->goal_anim_state = AS_TROPEPOSE;
 	}
 }
@@ -111,7 +105,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 	coll->enable_spaz = false;
 
 	PHD_VECTOR pos;
-	long UndoInput, WrongInput, UndoAnim, UndoFrame;
+	int32_t UndoInput, WrongInput, UndoAnim, UndoFrame;
 
 	if (item->anim_number == ANIM_TROPEFALLOFF_L || item->anim_number == ANIM_TROPEFALLOFF_R) {
 		if (item->frame_number == anims[item->anim_number].frame_end) {
@@ -136,39 +130,33 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 	if (lara_tightrope_extrastate.TightRopeOnCount)
 		lara_tightrope_extrastate.TightRopeOnCount--;
 
-	if (item->anim_number == ANIM_TROPEFALL_L)
-	{
+	if (item->anim_number == ANIM_TROPEFALL_L) {
 		UndoInput = IN_RIGHT;
 		WrongInput = IN_LEFT;
 		UndoAnim = ANIM_TROPEUNDO_L;
-	}
-	else if (item->anim_number == ANIM_TROPEFALL_R)
-	{
+	} else if (item->anim_number == ANIM_TROPEFALL_R) {
 		UndoInput = IN_LEFT;
 		WrongInput = IN_RIGHT;
 		UndoAnim = ANIM_TROPEUNDO_R;
-	}
-	else
+	} else
 		return;
 
 	UndoFrame = anims[item->anim_number].frame_end + anims[UndoAnim].frame_base - item->frame_number;
 
-	if (input & UndoInput && !lara_tightrope_extrastate.TightRopeOnCount)
-	{
-		item->anim_number = (short)UndoAnim;
-		item->frame_number = (short)UndoFrame;
+	if (input & UndoInput && !lara_tightrope_extrastate.TightRopeOnCount) {
+		item->anim_number = (int16_t)UndoAnim;
+		item->frame_number = (int16_t)UndoFrame;
 		item->current_anim_state = AS_TROPEUNDOFALL;
 		item->goal_anim_state = AS_TROPEPOSE;
 		lara_tightrope_extrastate.TightRopeFall--;
-	}
-	else if (input & WrongInput && lara_tightrope_extrastate.TightRopeOnCount < 10)
+	} else if (input & WrongInput && lara_tightrope_extrastate.TightRopeOnCount < 10)
 		lara_tightrope_extrastate.TightRopeOnCount += (GetRandomControl() & 3) + 2;
 }
 
-static short TightRopeBounds[12] = { -256, 256, 0, 0, -256, 256, -1820, 1820, -5460, 5460, -1820, 1820 };
+static int16_t TightRopeBounds[12] = { -256, 256, 0, 0, -256, 256, -1820, 1820, -5460, 5460, -1820, 1820 };
 static PHD_VECTOR TightRopePos = { 0, 0, 0 };
 
-void InitialiseTightRope(short item_number) {
+void InitialiseTightRope(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -183,20 +171,17 @@ void InitialiseTightRope(short item_number) {
 		item->pos.z_pos += CLICK_SIZE;
 }
 
-void TightRopeCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll) {
+void TightRopeCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 	ITEM_INFO* item;
 
 	item = &items[item_num];
 
 	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status &&
-		lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_num)
-	{
+	        lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_num) {
 		item->pos.y_rot += 0x8000;
 
-		if (TestLaraPosition(TightRopeBounds, item, l))
-		{
-			if (MoveLaraPosition(&TightRopePos, item, l))
-			{
+		if (TestLaraPosition(TightRopeBounds, item, l)) {
+			if (MoveLaraPosition(&TightRopePos, item, l)) {
 				l->current_anim_state = AS_TROPEGETON;
 				l->anim_number = ANIM_TROPEGETON;
 				l->frame_number = anims[ANIM_TROPEGETON].frame_base;
@@ -208,17 +193,14 @@ void TightRopeCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll) {
 				lara_tightrope_extrastate.TightRopeOnCount = 60;
 				lara_tightrope_extrastate.TightRopeOff = 0;
 				lara_tightrope_extrastate.TightRopeFall = 0;
-			}
-			else
+			} else
 				lara.GeneralPtr = item_num;
-		}
-		else if (lara.IsMoving && lara.GeneralPtr == item_num)
+		} else if (lara.IsMoving && lara.GeneralPtr == item_num)
 			lara.IsMoving = 0;
 
 		item->pos.y_rot += 0x8000;
-	}
-	else if (l->current_anim_state == AS_TROPEWALK && l->goal_anim_state != AS_TROPEGETOFF && !lara_tightrope_extrastate.TightRopeOff &&
-		item->pos.y_rot == l->pos.y_rot && ((abs(item->pos.x_pos - l->pos.x_pos) + abs(item->pos.z_pos - l->pos.z_pos)) < (HALF_BLOCK_SIZE + HALF_CLICK_SIZE)))
+	} else if (l->current_anim_state == AS_TROPEWALK && l->goal_anim_state != AS_TROPEGETOFF && !lara_tightrope_extrastate.TightRopeOff &&
+	           item->pos.y_rot == l->pos.y_rot && ((abs(item->pos.x_pos - l->pos.x_pos) + abs(item->pos.z_pos - l->pos.z_pos)) < (HALF_BLOCK_SIZE + HALF_CLICK_SIZE)))
 		lara_tightrope_extrastate.TightRopeOff = 1;
 }
 

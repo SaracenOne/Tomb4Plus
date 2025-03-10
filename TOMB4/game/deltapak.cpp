@@ -26,44 +26,42 @@
 #include "../tomb4/mod_config.h"
 #include "../tomb4/tomb4plus/t4plus_objects.h"
 
-static short cutseq_shadow_bbox[6] = { -165, 150, -777, 1, -87, 78 };
-static short cutseq_jeep_shadow_bbox[6] = { -600, 600, -777, 1, -600, 600 };
-static short troop_chat_ranges4[14] = { 485, 587, 558, 625, 639, 652, 661, 721, 729, 793, 805, 872, -1, -1 };
-static short lara_chat_ranges6[4] = { 257, 345, -1, -1 };
-static short voncroy_chat_ranges6[4] = { 6, 209, -1, -1 };
-static short lara_chat_ranges7[4] = { 675, 877, -1, -1 };
-static short voncroy_chat_ranges7[4] = { 396, 654, -1, -1 };
-static short lara_chat_ranges8[4] = { 592, 688, -1, -1 };
-static short voncroy_chat_ranges8[6] = { 160, 273, 323, 446, -1, -1 };
-static short lara_chat_ranges9[18] = { 149, 276, 297, 348, 844, 957, 1180, 1217, 1249, 1277, 2231, 2251, 2714, 2786, 3019, 3037, -1, -1 };
-static short voncroy_chat_ranges9[22] = { 12, 24, 30, 145, 361, 528, 539, 556, 564, 577, 581, 765, 781, 839, 985, 1136, 1921, 2084, 2464, 2645, -1, -1 };
-static short lara_chat_ranges10[18] = { 283, 296, 305, 603, 1244, 1312, 1759, 1795, 1806, 1848, 1878, 1912, 1925, 1947, 1960, 2000, -1, -1 };
-static short voncroy_chat_ranges10[16] = { 963, 1056, 1069, 1137, 1153, 1204, 1339, 1739, 2027, 2193, 2200, 2333, 2368, 2406, -1, -1 };
-static short lara_chat_ranges11[12] = { 1216, 1232, 1241, 1323, 1337, 1393, 1678, 1706, 1927, 1954, -1, -1 };
-static short captain_chat_ranges11[12] = { 1141, 1181, 1509, 1666, 1758, 1914, 1964, 2016, 2194, 2261, -1, -1 };
-static short lara_chat_ranges15[10] = { 684, 715, 1314, 1372, 1392, 1417, 1792, 1824, -1, -1 };
-static short voncroy_chat_ranges15[10] = { 290, 317, 330, 375, 388, 673, 729, 1301, -1, -1 };
-static short lara_chat_ranges16[10] = { 386, 419, 430, 489, 1021, 1058, 1072, 1175, -1, -1 };
-static short jeanyves_chat_ranges16[18] = { 97, 136, 174, 197, 214, 308, 329, 372, 511, 672, 684, 781, 812, 845, 863, 988, -1, -1 };
-static short voncroy_chat_ranges16[10] = { 1614, 1641, 1657, 1726, 1741, 1760, 1775, 1974, -1, -1 };
-static short jeanyves_chat_ranges17[24] = { 45, 86, 122, 196, 258, 370, 398, 445, 467, 490, 518, 537, 547, 564, 579, 619, 641, 650, 668, 714, 733, 788, -1, -1 };
-static short jeanyves_chat_ranges18[14] = { 47, 59, 75, 113, 123, 250, 331, 419, 437, 570, 592, 652, -1, -1 };
-static short jeanyves_chat_ranges19[20] = { 224, 251, 288, 304, 328, 472, 502, 794, 1028, 1042, 1067, 1182, 1206, 1294, 1330, 1386, 1402, 1427, -1, -1 };
-static short jeanyves_chat_ranges20[28] = { 150, 158, 174, 187, 208, 312, 334, 418, 437, 457, 479, 525, 547, 623, 640, 662, 751, 811, 828, 859, 879, 894, 908, 942, 955, 962, -1, -1 };
-static short lara_chat_ranges24[16] = { 91, 122, 139, 172, 504, 552, 565, 637, 648, 678, 1596, 1616, 1774, 1821, -1, -1 };
-static short troop_chat_ranges24[16] = { 209, 490, 701, 975, 1146, 1583, 1654, 1768, 1839, 1879, 1893, 1930, 1940, 2160, -1, -1 };
-static short lara_chat_ranges25[14] = { 476, 578, 976, 1018, 1028, 1069, 1317, 1340, 2065, 2178, 2835, 2865, -1, -1 };
-static short troop_chat_ranges25[26] = { 289, 363, 378, 449, 596, 604, 635, 744, 764, 780, 811, 959, 1088, 1157, 1191, 1313, 1360, 2046, 2227, 2295, 2330, 2821, 2877, 3322, -1, -1 };
-static short troop_chat_ranges26[4] = { 108, 432, -1, -1 };
-static short lara_chat_ranges_times[28] = { 188, 271, 307, 330, 584, 638, 668, 700, 728, 755, 763, 819, 1181, 1238, 1263, 1290, 1363, 1411, 1926, 1934, 1981, 2011, 2017, 2045, 3030, 3095, -1, -1 };
-static short editor_chat_ranges_times[40] =
-{
+static int16_t cutseq_shadow_bbox[6] = { -165, 150, -777, 1, -87, 78 };
+static int16_t cutseq_jeep_shadow_bbox[6] = { -600, 600, -777, 1, -600, 600 };
+static int16_t troop_chat_ranges4[14] = { 485, 587, 558, 625, 639, 652, 661, 721, 729, 793, 805, 872, -1, -1 };
+static int16_t lara_chat_ranges6[4] = { 257, 345, -1, -1 };
+static int16_t voncroy_chat_ranges6[4] = { 6, 209, -1, -1 };
+static int16_t lara_chat_ranges7[4] = { 675, 877, -1, -1 };
+static int16_t voncroy_chat_ranges7[4] = { 396, 654, -1, -1 };
+static int16_t lara_chat_ranges8[4] = { 592, 688, -1, -1 };
+static int16_t voncroy_chat_ranges8[6] = { 160, 273, 323, 446, -1, -1 };
+static int16_t lara_chat_ranges9[18] = { 149, 276, 297, 348, 844, 957, 1180, 1217, 1249, 1277, 2231, 2251, 2714, 2786, 3019, 3037, -1, -1 };
+static int16_t voncroy_chat_ranges9[22] = { 12, 24, 30, 145, 361, 528, 539, 556, 564, 577, 581, 765, 781, 839, 985, 1136, 1921, 2084, 2464, 2645, -1, -1 };
+static int16_t lara_chat_ranges10[18] = { 283, 296, 305, 603, 1244, 1312, 1759, 1795, 1806, 1848, 1878, 1912, 1925, 1947, 1960, 2000, -1, -1 };
+static int16_t voncroy_chat_ranges10[16] = { 963, 1056, 1069, 1137, 1153, 1204, 1339, 1739, 2027, 2193, 2200, 2333, 2368, 2406, -1, -1 };
+static int16_t lara_chat_ranges11[12] = { 1216, 1232, 1241, 1323, 1337, 1393, 1678, 1706, 1927, 1954, -1, -1 };
+static int16_t captain_chat_ranges11[12] = { 1141, 1181, 1509, 1666, 1758, 1914, 1964, 2016, 2194, 2261, -1, -1 };
+static int16_t lara_chat_ranges15[10] = { 684, 715, 1314, 1372, 1392, 1417, 1792, 1824, -1, -1 };
+static int16_t voncroy_chat_ranges15[10] = { 290, 317, 330, 375, 388, 673, 729, 1301, -1, -1 };
+static int16_t lara_chat_ranges16[10] = { 386, 419, 430, 489, 1021, 1058, 1072, 1175, -1, -1 };
+static int16_t jeanyves_chat_ranges16[18] = { 97, 136, 174, 197, 214, 308, 329, 372, 511, 672, 684, 781, 812, 845, 863, 988, -1, -1 };
+static int16_t voncroy_chat_ranges16[10] = { 1614, 1641, 1657, 1726, 1741, 1760, 1775, 1974, -1, -1 };
+static int16_t jeanyves_chat_ranges17[24] = { 45, 86, 122, 196, 258, 370, 398, 445, 467, 490, 518, 537, 547, 564, 579, 619, 641, 650, 668, 714, 733, 788, -1, -1 };
+static int16_t jeanyves_chat_ranges18[14] = { 47, 59, 75, 113, 123, 250, 331, 419, 437, 570, 592, 652, -1, -1 };
+static int16_t jeanyves_chat_ranges19[20] = { 224, 251, 288, 304, 328, 472, 502, 794, 1028, 1042, 1067, 1182, 1206, 1294, 1330, 1386, 1402, 1427, -1, -1 };
+static int16_t jeanyves_chat_ranges20[28] = { 150, 158, 174, 187, 208, 312, 334, 418, 437, 457, 479, 525, 547, 623, 640, 662, 751, 811, 828, 859, 879, 894, 908, 942, 955, 962, -1, -1 };
+static int16_t lara_chat_ranges24[16] = { 91, 122, 139, 172, 504, 552, 565, 637, 648, 678, 1596, 1616, 1774, 1821, -1, -1 };
+static int16_t troop_chat_ranges24[16] = { 209, 490, 701, 975, 1146, 1583, 1654, 1768, 1839, 1879, 1893, 1930, 1940, 2160, -1, -1 };
+static int16_t lara_chat_ranges25[14] = { 476, 578, 976, 1018, 1028, 1069, 1317, 1340, 2065, 2178, 2835, 2865, -1, -1 };
+static int16_t troop_chat_ranges25[26] = { 289, 363, 378, 449, 596, 604, 635, 744, 764, 780, 811, 959, 1088, 1157, 1191, 1313, 1360, 2046, 2227, 2295, 2330, 2821, 2877, 3322, -1, -1 };
+static int16_t troop_chat_ranges26[4] = { 108, 432, -1, -1 };
+static int16_t lara_chat_ranges_times[28] = { 188, 271, 307, 330, 584, 638, 668, 700, 728, 755, 763, 819, 1181, 1238, 1263, 1290, 1363, 1411, 1926, 1934, 1981, 2011, 2017, 2045, 3030, 3095, -1, -1 };
+static int16_t editor_chat_ranges_times[40] = {
 	340, 424, 432, 462, 480, 518, 521, 552, 843, 907, 931, 969, 974, 1002, 1020, 1057, 1060, 1090, 1110, 1119,
 	1123, 1172, 1299, 1352, 1417, 1423, 1442, 1513, 1544, 1627, 1634, 1691, 1710, 1770, 1775, 1843, 1864, 1902, -1, -1
 };
 
-static CUTSEQ_ROUTINES cutseq_control_routines[] =
-{
+static CUTSEQ_ROUTINES cutseq_control_routines[] = {
 	{0, 0, 0},
 	{do_spade_meshswap, 0, 0},
 	{0, 0, do_spade_meshswap},
@@ -98,10 +96,10 @@ static CUTSEQ_ROUTINES cutseq_control_routines[] =
 	{times_init, times_control, 0}
 };
 
-long cutseq_trig = 0;
-long cutseq_num = 0;
-long GLOBAL_playing_cutseq = 0;
-long GLOBAL_cutseq_frame;
+int32_t cutseq_trig = 0;
+int32_t cutseq_num = 0;
+int32_t GLOBAL_playing_cutseq = 0;
+int32_t GLOBAL_cutseq_frame;
 
 static NEW_CUTSCENE* GLOBAL_cutme;
 static ITEM_INFO* horus_item_thing;
@@ -110,29 +108,27 @@ static PACKNODE* actor_pnodes[10];
 static ITEM_INFO duff_item[10];
 static char* GLOBAL_resident_depack_buffers;	//not really used
 static camera_type GLOBAL_oldcamtype;
-static ulong cutseq_meshbits[10];
-static ulong cutseq_meshswapbits[10];
-static long GLOBAL_numcutseq_frames;
-static long lastcamnum;
-static long numnailed;
-static short old_lara_holster;
-static short temp_rotation_buffer[160];
-static char cutseq_busy_timeout = 0;
-static char lara_chat_cnt = 0;
-static char actor_chat_cnt = 0;
-static char old_status_flags[16];
+static uint32_t cutseq_meshbits[10];
+static uint32_t cutseq_meshswapbits[10];
+static int32_t GLOBAL_numcutseq_frames;
+static int32_t lastcamnum;
+static int32_t numnailed;
+static int16_t old_lara_holster;
+static int16_t temp_rotation_buffer[160];
+static int8_t cutseq_busy_timeout = 0;
+static int8_t lara_chat_cnt = 0;
+static int8_t actor_chat_cnt = 0;
+static int8_t old_status_flags[16];
 
-void handle_cutseq_triggering(long name)
-{
-	long n, goin, cutseq_id;
+void handle_cutseq_triggering(int32_t name) {
+	int32_t n, goin, cutseq_id;
 
 	if (!cutseq_num)
 		return;
 
-	if (!cutseq_trig)
-	{
+	if (!cutseq_trig) {
 		if ((lara.gun_status != LG_NO_ARMS || lara.gun_type == WEAPON_FLARE) && cutseq_num != 27 &&
-			(lara.gun_type == WEAPON_FLARE || lara.gun_status != LG_HANDS_BUSY))
+		        (lara.gun_type == WEAPON_FLARE || lara.gun_status != LG_HANDS_BUSY))
 			lara.gun_status = LG_UNDRAW_GUNS;
 
 		cutseq_trig = 1;
@@ -146,30 +142,24 @@ void handle_cutseq_triggering(long name)
 		if (!ScreenFadedOut)
 			// if gfCurrentLevel -> empty func call here
 			SetScreenFadeOut(16, 0);
-	}
-	else if (cutseq_trig == 1)
-	{
+	} else if (cutseq_trig == 1) {
 		if (cutseq_num == 11)
 			lara.vehicle = NO_ITEM;
 
 		cutseq_id = 0;
 		n = lara_item->current_anim_state;
 
-		if (ScreenFadedOut)
-		{
+		if (ScreenFadedOut) {
 			cutseq_busy_timeout--;
 
-			if (!cutseq_busy_timeout)
-			{
+			if (!cutseq_busy_timeout) {
 				cutseq_busy_timeout = 0;
 				cutseq_id = 1;
 			}
 
 			if (cutseq_num == 27 || lara.gun_status == LG_HANDS_BUSY || lara.gun_status == LG_NO_ARMS && !lara.flare_control_left ||
-				n == AS_ALL4S || n == AS_CRAWL || n == AS_ALL4TURNL || n == AS_ALL4TURNR || n == AS_CRAWLBACK || cutseq_id)
-			{
-				if (!(gfLevelFlags & GF_YOUNGLARA))
-				{
+			        n == AS_ALL4S || n == AS_CRAWL || n == AS_ALL4TURNL || n == AS_ALL4TURNR || n == AS_CRAWLBACK || cutseq_id) {
+				if (!(gfLevelFlags & GF_YOUNGLARA)) {
 					lara.gun_type = WEAPON_NONE;
 					lara.request_gun_type = WEAPON_NONE;
 					lara.gun_status = LG_NO_ARMS;
@@ -190,8 +180,7 @@ void handle_cutseq_triggering(long name)
 					lara_item->gravity_status = 0;
 					lara.back_gun = 0;
 
-					if (lara.weapon_item != NO_ITEM)
-					{
+					if (lara.weapon_item != NO_ITEM) {
 						KillItem(lara.weapon_item);
 						lara.weapon_item = NO_ITEM;
 					}
@@ -207,7 +196,7 @@ void handle_cutseq_triggering(long name)
 				SetScreenFadeIn(16);
 				Load_and_Init_Cutseq(goin);
 				cutseq_trig = 2;
-					
+
 				if (cutseq_control_routines[goin].init_func)
 					cutseq_control_routines[goin].init_func();
 
@@ -217,20 +206,15 @@ void handle_cutseq_triggering(long name)
 					S_StartSyncedAudio(GLOBAL_cutme->audio_track);
 			}
 		}
-	}
-	else if (cutseq_trig == 3)
-	{
+	} else if (cutseq_trig == 3) {
 		SetScreenFadeOut(16, 1);
 
-	//	if (cutseq_num != 1 && gfCurrentLevel)
-			//empty func call here
+		//	if (cutseq_num != 1 && gfCurrentLevel)
+		//empty func call here
 
 		cutseq_trig = 4;
-	}
-	else if (cutseq_trig == 4)
-	{
-		if (ScreenFadedOut)
-		{
+	} else if (cutseq_trig == 4) {
+		if (ScreenFadedOut) {
 			if (gfCurrentLevel)
 				S_CDStop();
 
@@ -244,35 +228,29 @@ void handle_cutseq_triggering(long name)
 			cutseq_trig = 0;
 			GLOBAL_playing_cutseq = 0;
 
-			if (cutseq_id == 1)
-			{
+			if (cutseq_id == 1) {
 				FlipMap(0);
 				cutseq_num = 2;
 				Load_and_Init_Cutseq(2);
 				cutseq_trig = 2;
 				lara.puzzleitems[0] = 0;
-			}
-			else if (bDoCredits)
-			{
-				switch (cutseq_id)
-				{
-				case 28:
-					cutseq_num = 29;
-					break;
+			} else if (bDoCredits) {
+				switch (cutseq_id) {
+					case 28:
+						cutseq_num = 29;
+						break;
 
-				case 29:
-					cutseq_num = 30;
-					break;
+					case 29:
+						cutseq_num = 30;
+						break;
 
-				case 30:
-					cutseq_num = 28;
+					case 30:
+						cutseq_num = 28;
 				}
 
 				Load_and_Init_Cutseq(cutseq_num);
 				cutseq_trig = 2;
-			}
-			else if (cutseq_id == 7 || cutseq_id == 8)
-			{
+			} else if (cutseq_id == 7 || cutseq_id == 8) {
 				cutseq_num = 9;
 				Load_and_Init_Cutseq(9);
 				cutseq_trig = 2;
@@ -282,15 +260,12 @@ void handle_cutseq_triggering(long name)
 
 				if (GLOBAL_cutme->audio_track != -1)
 					S_StartSyncedAudio(GLOBAL_cutme->audio_track);
-			}
-			else if (
-				(get_game_mod_global_info()->tr_times_exclusive && (cutseq_id == 31)) ||
-				(!get_game_mod_global_info()->tr_times_exclusive && ((cutseq_id == 9 || cutseq_id == 11 || cutseq_id == 15 || cutseq_id == 23)))
-				)
-			{
+			} else if (
+			    (get_game_mod_global_info()->tr_times_exclusive && (cutseq_id == 31)) ||
+			    (!get_game_mod_global_info()->tr_times_exclusive && ((cutseq_id == 9 || cutseq_id == 11 || cutseq_id == 15 || cutseq_id == 23)))
+			) {
 				gfLevelComplete = gfCurrentLevel + 1;
-				if (get_game_mod_global_info()->tr_times_exclusive)
-				{
+				if (get_game_mod_global_info()->tr_times_exclusive) {
 					skipped_level = 1;
 				}
 				gfRequiredStartPos = 0;
@@ -304,9 +279,7 @@ void handle_cutseq_triggering(long name)
 				ScreenFadedOut = 0;
 				ScreenFading = 0;
 				ScreenFadeSpeed = 8;
-			}
-			else
-			{
+			} else {
 				finish_cutseq();
 				camera.type = GLOBAL_oldcamtype;
 
@@ -326,8 +299,7 @@ void handle_cutseq_triggering(long name)
 	}
 }
 
-void do_new_cutscene_camera()
-{
+void do_new_cutscene_camera() {
 	if (cutseq_control_routines[cutseq_num].control_func)
 		cutseq_control_routines[cutseq_num].control_func();
 
@@ -359,17 +331,15 @@ void do_new_cutscene_camera()
 		GLOBAL_cutseq_frame = GLOBAL_numcutseq_frames;
 }
 
-void InitPackNodes(NODELOADHEADER* lnode, PACKNODE* pnode, char* packed, long numnodes)
-{
-	long offset, xoff, yoff, zoff;
+void InitPackNodes(NODELOADHEADER* lnode, PACKNODE* pnode, char* packed, int32_t numnodes) {
+	int32_t offset, xoff, yoff, zoff;
 
 	offset = ((numnodes << 3) - numnodes) << 1;
 
-	for (int i = 0; i < numnodes; i++)
-	{
-		pnode->xkey = (ushort)lnode->xkey;
-		pnode->ykey = (ushort)lnode->ykey;
-		pnode->zkey = (ushort)lnode->zkey;
+	for (int i = 0; i < numnodes; i++) {
+		pnode->xkey = (uint16_t)lnode->xkey;
+		pnode->ykey = (uint16_t)lnode->ykey;
+		pnode->zkey = (uint16_t)lnode->zkey;
 		pnode->decode_x.packmethod = (lnode->packmethod >> 10) & 0xF;
 		pnode->decode_y.packmethod = (lnode->packmethod >> 5) & 0xF;
 		pnode->decode_z.packmethod = (lnode->packmethod) & 0xF;
@@ -388,17 +358,14 @@ void InitPackNodes(NODELOADHEADER* lnode, PACKNODE* pnode, char* packed, long nu
 	}
 }
 
-void DecodeAnim(PACKNODE* node, long num_nodes, long frame, long flags)
-{
-	if (frame)
-	{
+void DecodeAnim(PACKNODE* node, int32_t num_nodes, int32_t frame, int32_t flags) {
+	if (frame) {
 		node->xrot_run += DecodeTrack(node->xpacked, &node->decode_x);
 		node->yrot_run += DecodeTrack(node->ypacked, &node->decode_y);
 		node->zrot_run += DecodeTrack(node->zpacked, &node->decode_z);
 		node++;
 
-		for (int i = 1; i < num_nodes; i++, node++)
-		{
+		for (int i = 1; i < num_nodes; i++, node++) {
 			node->xrot_run += DecodeTrack(node->xpacked, &node->decode_x);
 			node->yrot_run += DecodeTrack(node->ypacked, &node->decode_y);
 			node->zrot_run += DecodeTrack(node->zpacked, &node->decode_z);
@@ -406,11 +373,8 @@ void DecodeAnim(PACKNODE* node, long num_nodes, long frame, long flags)
 			node->yrot_run &= flags;
 			node->zrot_run &= flags;
 		}
-	}
-	else
-	{
-		for (int i = num_nodes; i; i--, node++)
-		{
+	} else {
+		for (int i = num_nodes; i; i--, node++) {
 			node->decode_x.off = 0;
 			node->decode_x.counter = 0;
 			node->decode_x.data = 0;
@@ -433,16 +397,13 @@ void DecodeAnim(PACKNODE* node, long num_nodes, long frame, long flags)
 	}
 }
 
-short DecodeTrack(char* packed, RTDECODE* decode)
-{
-	short word;
+int16_t DecodeTrack(char* packed, RTDECODE* decode) {
+	int16_t word;
 
-	if (!decode->decodetype)
-	{
+	if (!decode->decodetype) {
 		word = GetTrackWord(decode->off, packed, decode->packmethod);
 
-		if (word & 0x20)
-		{
+		if (word & 0x20) {
 			if (word & 0xF)
 				decode->counter = word & 0xF;
 			else
@@ -451,21 +412,16 @@ short DecodeTrack(char* packed, RTDECODE* decode)
 			decode->decodetype = 1;
 			decode->off++;
 			decode->length--;
-		}
-		else
-		{
+		} else {
 			decode->decodetype = 2;
 
-			if (word & 0x10)
-			{
+			if (word & 0x10) {
 				GetTrackWord(decode->off + 1, packed, decode->packmethod);
 				decode->counter = ((word & 7) << 5) | (GetTrackWord(decode->off + 1, packed, decode->packmethod) & 0x1F);
 				decode->data = GetTrackWord(decode->off + 2, packed, decode->packmethod);
 				decode->off += 3;
 				decode->length -= 3;
-			}
-			else
-			{
+			} else {
 				decode->data = GetTrackWord(decode->off + 1, packed, decode->packmethod);
 				decode->counter = word & 0x7;
 				decode->off += 2;
@@ -474,17 +430,14 @@ short DecodeTrack(char* packed, RTDECODE* decode)
 		}
 	}
 
-	if (decode->decodetype == 2)
-	{
+	if (decode->decodetype == 2) {
 		decode->counter--;
 
 		if (!decode->counter)
 			decode->decodetype = 0;
 
 		return decode->data;
-	}
-	else
-	{
+	} else {
 		word = GetTrackWord(decode->off, packed, decode->packmethod);
 		decode->off++;
 		decode->length--;
@@ -497,27 +450,25 @@ short DecodeTrack(char* packed, RTDECODE* decode)
 	}
 }
 
-short GetTrackWord(long off, char* packed, long packmethod)
-{
-	long offset, offset2;
-	short ret;
+int16_t GetTrackWord(int32_t off, char* packed, int32_t packmethod) {
+	int32_t offset, offset2;
+	int16_t ret;
 
 	offset = packmethod * off;
 	offset2 = offset >> 3;
 
-	ret = ((1 << packmethod) - 1) & ((ulong)(*(uchar*)(packed + offset2) |
-		((*(uchar*)(packed + offset2 + 1) |
-			(*(ushort*)(packed + offset2 + 2) << 8)) << 8)) >> (offset & 7));
+	ret = ((1 << packmethod) - 1) & ((uint32_t)(*(uint8_t*)(packed + offset2) |
+	                                 ((*(uint8_t*)(packed + offset2 + 1) |
+	                                   (*(uint16_t*)(packed + offset2 + 2) << 8)) << 8)) >> (offset & 7));
 
 	if (((1 << (packmethod - 1)) & ret) != 0)
-		return (ulong)(ret | ~((1 << packmethod) - 1));
+		return (uint32_t)(ret | ~((1 << packmethod) - 1));
 
 	return ret;
 }
 
-void fix_lara_for_cutseq()
-{
-	long* bone;
+void fix_lara_for_cutseq() {
+	int32_t* bone;
 
 	lara_item->pos.x_pos = GLOBAL_cutme->orgx;
 	lara_item->pos.y_pos = GLOBAL_cutme->orgy;
@@ -556,49 +507,42 @@ void fix_lara_for_cutseq()
 		GLaraShadowframe = cutseq_shadow_bbox;
 }
 
-void updateAnimFrame(PACKNODE* node, int flags, short* frame)
-{
-	short* nex;
+void updateAnimFrame(PACKNODE* node, int flags, int16_t* frame) {
+	int16_t* nex;
 
 	frame[6] = 3 * node->xrot_run;
 	frame[7] = 3 * node->yrot_run;
 	frame[8] = 3 * node->zrot_run;
 	nex = frame + 9;
 
-	for (int i = 1; i < flags; i++, nex += 2)
-	{
+	for (int i = 1; i < flags; i++, nex += 2) {
 		nex[0] = (node[i].zrot_run | ((node[i].yrot_run | (node[i].xrot_run << 10)) << 10)) >> 16;
 		nex[1] = node[i].zrot_run | ((node[i].yrot_run | (node[i].xrot_run << 10)) << 10);
 	}
 }
 
-void* cutseq_malloc(long size)
-{
+void* cutseq_malloc(int32_t size) {
 	return game_malloc(size);
 }
 
-void finish_cutseq()
-{
+void finish_cutseq() {
 	GLOBAL_playing_cutseq = 0;
 	InitialiseHair();
 }
 
-void DrawCutSeqActors()
-{
+void DrawCutSeqActors() {
 	OBJECT_INFO* obj;
-	short** mesh;
-	long* bone;
-	short* rot;
-	long n;
+	int16_t** mesh;
+	int32_t* bone;
+	int16_t* rot;
+	int32_t n;
 
 	phd_PushMatrix();
 
-	for (int i = 1; i < GLOBAL_cutme->numactors; i++)
-	{
+	for (int i = 1; i < GLOBAL_cutme->numactors; i++) {
 		phd_PushMatrix();
 
-		if (cutseq_meshbits[i] & 0x80000000)
-		{
+		if (cutseq_meshbits[i] & 0x80000000) {
 			n = 1;
 			updateAnimFrame(actor_pnodes[i], GLOBAL_cutme->actor_data[i].nodes + 1, temp_rotation_buffer);
 			phd_TranslateAbs(GLOBAL_cutme->orgx, GLOBAL_cutme->orgy, GLOBAL_cutme->orgz);
@@ -610,8 +554,7 @@ void DrawCutSeqActors()
 			rot = &temp_rotation_buffer[9];
 			gar_RotYXZsuperpack(&rot, 0);
 
-			if (cutseq_meshbits[i] & 1)
-			{
+			if (cutseq_meshbits[i] & 1) {
 				if (cutseq_meshswapbits[i] & 1)
 					phd_PutPolygons(mesh[1], -1);
 				else
@@ -620,8 +563,7 @@ void DrawCutSeqActors()
 
 			mesh += 2;
 
-			for (int j = 0; j < obj->nmeshes - 1; j++, bone += 4, mesh += 2)
-			{
+			for (int j = 0; j < obj->nmeshes - 1; j++, bone += 4, mesh += 2) {
 				if (*bone & 1)
 					phd_PopMatrix();
 
@@ -632,8 +574,7 @@ void DrawCutSeqActors()
 				gar_RotYXZsuperpack(&rot, 0);
 				n <<= 1;
 
-				if (cutseq_meshbits[i] & n)
-				{
+				if (cutseq_meshbits[i] & n) {
 					if (cutseq_meshswapbits[i] & n)
 						phd_PutPolygons(mesh[1], -1);
 					else
@@ -648,8 +589,7 @@ void DrawCutSeqActors()
 	phd_PopMatrix();
 }
 
-void CalcActorLighting(ITEM_INFO* item, OBJECT_INFO* obj, short* rot)
-{
+void CalcActorLighting(ITEM_INFO* item, OBJECT_INFO* obj, int16_t* rot) {
 	PHD_VECTOR pos;
 
 	GetJointAbsPositionCutSeq(item, obj, rot, &pos);
@@ -668,27 +608,25 @@ void CalcActorLighting(ITEM_INFO* item, OBJECT_INFO* obj, short* rot)
 	CreateLightList(item);
 }
 
-void GetJointAbsPositionCutSeq(ITEM_INFO* item, OBJECT_INFO* obj, short* rot, PHD_VECTOR* pos)
-{
-	short* rot2;
+void GetJointAbsPositionCutSeq(ITEM_INFO* item, OBJECT_INFO* obj, int16_t* rot, PHD_VECTOR* pos) {
+	int16_t* rot2;
 
 	phd_PushUnitMatrix();
 	phd_TranslateRel(rot[6], rot[7], rot[8]);
 	rot2 = rot + 9;
 	gar_RotYXZsuperpack(&rot2, 0);
-	pos->x = (long)mMXPtr[M03];
-	pos->y = (long)mMXPtr[M13];
-	pos->z = (long)mMXPtr[M23];
+	pos->x = (int32_t)mMXPtr[M03];
+	pos->y = (int32_t)mMXPtr[M13];
+	pos->z = (int32_t)mMXPtr[M23];
 	pos->x += item->pos.x_pos;
 	pos->y += item->pos.y_pos;
 	pos->z += item->pos.z_pos;
 	phd_PopMatrix();
 }
 
-void CalculateObjectLightingLaraCutSeq()
-{
+void CalculateObjectLightingLaraCutSeq() {
 	PHD_VECTOR pos;
-	short room_num, room_num2;
+	int16_t room_num, room_num2;
 
 	pos.x = 0;
 	pos.y = 0;
@@ -712,47 +650,39 @@ void CalculateObjectLightingLaraCutSeq()
 	lara_item->room_number = room_num2;
 }
 
-void force_sky_lightning()	//optimized out, in Mac symbols.
-{
+void force_sky_lightning() {	//optimized out, in Mac symbols.
 	LightningCount = (GetRandomDraw() & 0x1F) + 64;
 	dLightningRand = (GetRandomDraw() & 0xFF) + 256;
 }
 
-void third_cutseq_control()
-{
+void third_cutseq_control() {
 	if (GLOBAL_cutseq_frame == 1890)
 		force_sky_lightning();
 }
 
-void fourth_cutseq_init()
-{
+void fourth_cutseq_init() {
 	old_lara_holster = lara.holster;
 	lara.holster = T4PlusGetLaraHolstersSlotID();
 	draw_pistol_meshes(1);
 }
 
-void fourth_cutseq_control()
-{
-	long frame;
+void fourth_cutseq_control() {
+	int32_t frame;
 
 	frame = GLOBAL_cutseq_frame;
 
-	if (frame == 309)
-	{
+	if (frame == 309) {
 		undraw_pistol_mesh_left(1);
 		undraw_pistol_mesh_right(1);
 		lara.holster = old_lara_holster;
-	}
-	else
-	{
+	} else {
 		if (frame == 51 || frame == 68)
 			cutseq_shoot_pistols(11);
 
 		if (frame == 51 || frame == 64 || frame == 73)
 			cutseq_shoot_pistols(14);
 
-		if (frame == 108 || frame == 114 || frame == 120 || frame == 128 || frame == 134 || frame == 141 || frame == 147 || frame == 158)
-		{
+		if (frame == 108 || frame == 114 || frame == 120 || frame == 128 || frame == 134 || frame == 141 || frame == 147 || frame == 158) {
 			cutseq_shoot_pistols(11);
 			cutseq_shoot_pistols(14);
 		}
@@ -763,10 +693,8 @@ void fourth_cutseq_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void fourth_cutseq_end()
-{
-	if (GLOBAL_cutseq_frame <= 309)
-	{
+void fourth_cutseq_end() {
+	if (GLOBAL_cutseq_frame <= 309) {
 		undraw_pistol_mesh_left(1);
 		undraw_pistol_mesh_right(1);
 		lara.holster = old_lara_holster;
@@ -776,68 +704,58 @@ void fourth_cutseq_end()
 	lara.keyitems |= 0xC00;
 }
 
-void do_backpack_meshswap()	//optimized out, in Mac symbols.
-{
-	short* temp;
+void do_backpack_meshswap() {	//optimized out, in Mac symbols.
+	int16_t* temp;
 
 	temp = lara.mesh_ptrs[LM_TORSO];
 	lara.mesh_ptrs[LM_TORSO] = meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_TORSO * 2];
 	meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_TORSO * 2] = temp;
 }
 
-void fifth_cutseq_control()
-{
+void fifth_cutseq_control() {
 	if (GLOBAL_cutseq_frame == 1350)
 		do_backpack_meshswap();
 }
 
-void fifth_cutseq_end()
-{
+void fifth_cutseq_end() {
 	if (GLOBAL_cutseq_frame <= 1350)
 		do_backpack_meshswap();
 	DelsHandyTeleportLara(100938, 768, 58040, -32552);
 }
 
-void sixth_cutseq_init()
-{
+void sixth_cutseq_init() {
 	init_voncroy_meshbits(1);
 }
 
-void sixth_cutseq_control()
-{
+void sixth_cutseq_control() {
 	handle_lara_chatting(lara_chat_ranges6);
 	handle_actor_chatting(ACTOR1_SPEECH_HEAD1, 21, 1, VON_CROY, voncroy_chat_ranges6);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void sixth_cutseq_end()
-{
+void sixth_cutseq_end() {
 	DelsHandyTeleportLara(5632, 1280, 86528, 28987);
 }
 
-void seventh_cutseq_init()
-{
+void seventh_cutseq_init() {
 	init_voncroy_meshbits(1);
 	cutseq_kill_item(ANIMATING3);
 	nail_intelligent_object(VON_CROY);
 }
 
-void seventh_control()
-{
+void seventh_control() {
 	handle_lara_chatting(lara_chat_ranges7);
 	handle_actor_chatting(ACTOR1_SPEECH_HEAD1, 21, 1, VON_CROY, voncroy_chat_ranges7);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void eighth_control()
-{
+void eighth_control() {
 	handle_lara_chatting(lara_chat_ranges8);
 	handle_actor_chatting(ACTOR1_SPEECH_HEAD1, 21, 1, VON_CROY, voncroy_chat_ranges8);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void ninth_cutseq_init()
-{
+void ninth_cutseq_init() {
 	init_voncroy_meshbits(1);
 	cutseq_meshbits[3] &= ~0x80000000;
 	cutseq_meshbits[4] &= ~0x80000000;
@@ -846,26 +764,24 @@ void ninth_cutseq_init()
 	cutseq_meshbits[7] &= ~0x80000000;
 }
 
-void ninth_control()
-{
-	switch (GLOBAL_cutseq_frame)
-	{
-	case 3000:
-		cutseq_meshbits[1] &= ~0x80000000;
-		cutseq_meshbits[3] |= 0x80000000;
-		cutseq_meshbits[4] |= 0x80000000;
-		cutseq_meshbits[5] |= 0x80000000;
-		cutseq_meshbits[6] |= 0x80000000;
-		cutseq_meshbits[7] |= 0x80000000;
-		break;
+void ninth_control() {
+	switch (GLOBAL_cutseq_frame) {
+		case 3000:
+			cutseq_meshbits[1] &= ~0x80000000;
+			cutseq_meshbits[3] |= 0x80000000;
+			cutseq_meshbits[4] |= 0x80000000;
+			cutseq_meshbits[5] |= 0x80000000;
+			cutseq_meshbits[6] |= 0x80000000;
+			cutseq_meshbits[7] |= 0x80000000;
+			break;
 
-	case 1300:
-		cutseq_meshbits[1] &= ~0x80000000;
-		break;
+		case 1300:
+			cutseq_meshbits[1] &= ~0x80000000;
+			break;
 
-	case 1677:
-		cutseq_meshbits[1] |= 0x80000000;
-		break;
+		case 1677:
+			cutseq_meshbits[1] |= 0x80000000;
+			break;
 	}
 
 	handle_lara_chatting(lara_chat_ranges9);
@@ -873,8 +789,7 @@ void ninth_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void tenth_cutseq_init()
-{
+void tenth_cutseq_init() {
 	cutseq_kill_item(DOOR_TYPE5);
 	cutseq_meshbits[1] &= ~0x80000000;
 	cutseq_meshbits[2] &= ~0x80000000;
@@ -882,14 +797,12 @@ void tenth_cutseq_init()
 	cutseq_meshbits[4] &= ~0x80000000;
 }
 
-void tenth_cutseq_control()
-{
-	long frame, r, g, b;
+void tenth_cutseq_control() {
+	int32_t frame, r, g, b;
 
 	frame = GLOBAL_cutseq_frame;
 
-	if (frame >= 2360 && frame <= 2450 && (GetRandomControl() & 7) >= 4)
-	{
+	if (frame >= 2360 && frame <= 2450 && (GetRandomControl() & 7) >= 4) {
 		r = (GetRandomControl() & 0x3F) + 192;
 		g = (GetRandomControl() & 0x1F) + 128;
 		b = GetRandomControl() & 0x3F;
@@ -899,23 +812,20 @@ void tenth_cutseq_control()
 	if (frame >= 1203 && frame <= 1205)
 		InitialiseHair();
 
-	if (frame == 1205 || frame == 1747)
-	{
+	if (frame == 1205 || frame == 1747) {
 		cutseq_meshbits[1] &= ~0x80000000;
 		cutseq_meshbits[2] &= ~0x80000000;
 		cutseq_meshbits[3] &= ~0x80000000;
 		cutseq_meshbits[4] &= ~0x80000000;
 	}
 
-	if (frame == 2241)
-	{
+	if (frame == 2241) {
 		cutseq_meshbits[2] &= ~0x80000000;
 		cutseq_meshbits[3] &= ~0x80000000;
 		cutseq_meshbits[4] &= ~0x80000000;
 	}
 
-	if (frame == 906 || frame == 1316 || frame == 2007)
-	{
+	if (frame == 906 || frame == 1316 || frame == 2007) {
 		cutseq_meshbits[1] |= 0x80000000;
 		cutseq_meshbits[2] |= 0x80000000;
 		cutseq_meshbits[3] |= 0x80000000;
@@ -927,14 +837,12 @@ void tenth_cutseq_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void tenth_cutseq_end()
-{
+void tenth_cutseq_end() {
 	cutseq_restore_item(DOOR_TYPE5);
 	DelsHandyTeleportLara(68756, 512, 56493, 983);
 }
 
-void eleventh_cutseq_init()
-{
+void eleventh_cutseq_init() {
 	ITEM_INFO* item;
 
 	item = find_an_item_with_object_type(ANIMATING5);
@@ -952,9 +860,8 @@ void eleventh_cutseq_init()
 	cutseq_meshbits[6] &= ~0x80000000;
 }
 
-void eleventh_cutseq_control()
-{
-	long frame, r, g, b;
+void eleventh_cutseq_control() {
+	int32_t frame, r, g, b;
 
 	frame = GLOBAL_cutseq_frame;
 
@@ -966,8 +873,7 @@ void eleventh_cutseq_control()
 
 	if (GLOBAL_cutseq_frame == 671)
 		cutseq_meshbits[5] |= 0x80000000;
-	else
-	{
+	else {
 		if (frame == 763 || frame == 1201 || frame == 1668 || frame == 2383)
 			cutseq_meshbits[1] |= 0x80000000;
 
@@ -976,23 +882,18 @@ void eleventh_cutseq_control()
 
 		if (frame == 2280)
 			cutseq_meshbits[2] &= ~0x80000000;
-		else if (frame == 2790)
-		{
+		else if (frame == 2790) {
 			cutseq_meshbits[4] |= 0x80000000;
 			cutseq_meshbits[6] |= 0x80000000;
-		}
-		else
-		{
-			if (frame >= 2536 && frame <= 2710)
-			{
-				if (GetRandomControl() & 1)
-				{
+		} else {
+			if (frame >= 2536 && frame <= 2710) {
+				if (GetRandomControl() & 1) {
 					r = (GetRandomControl() & 0x3F) + 192;
 					g = (GetRandomControl() & 0x1F) + 128;
 					b = GetRandomControl() & 0x3F;
 					TriggerDynamic(58672 - (GetRandomControl() & 0xFFF), -2816, 57865, 24, r, g, b);
 				}
-					
+
 				r = (GetRandomControl() & 0x3F) + 192;
 				g = (GetRandomControl() & 0x1F) + 128;
 				b = GetRandomControl() & 0x3F;
@@ -1009,42 +910,35 @@ void eleventh_cutseq_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void twelth_cutseq_init()
-{
+void twelth_cutseq_init() {
 	cutseq_kill_item(ANIMATING6);
 }
 
-void twelth_cutseq_end()
-{
+void twelth_cutseq_end() {
 	cutseq_restore_item(ANIMATING6);
 }
 
-void thirteen_end()
-{
+void thirteen_end() {
 	DelsHandyTeleportLara(79194, 0, 40951, -20741);
 }
 
-void fourteen_end()
-{
+void fourteen_end() {
 	DelsHandyTeleportLara(27282, 256, 65654, 0);
 	FlipMap(1);
 	lara.questitems |= 1;
 }
 
-void fourteen_control()
-{
+void fourteen_control() {
 	ITEM_INFO* item;
 
-	if (GLOBAL_cutseq_frame == 393)
-	{
+	if (GLOBAL_cutseq_frame == 393) {
 		item = find_an_item_with_object_type(SARCOPHAGUS_CUT);
 		item->flags = IFL_TRIGGERED;
 		item->mesh_bits = 3;
 	}
 }
 
-void fifteen_init()
-{
+void fifteen_init() {
 	cutseq_meshbits[6] &= 0xFFFFFFFE;
 	trigger_item_in_room(184, FLAME_EMITTER2);
 	trigger_item_in_room(177, AMBER_LIGHT);
@@ -1058,9 +952,8 @@ void fifteen_init()
 	cutseq_meshbits[8] &= ~0x80000000;
 }
 
-void fifteen_control()
-{
-	long frame;
+void fifteen_control() {
+	int32_t frame;
 
 	frame = GLOBAL_cutseq_frame;
 
@@ -1070,29 +963,24 @@ void fifteen_control()
 	if (frame == 681 || frame == 1306 || frame == 1750)
 		cutseq_meshbits[1] &= ~0x80000000;
 
-	if (frame == 360 || frame == 781 || frame == 1402 || frame == 1691)
-	{
+	if (frame == 360 || frame == 781 || frame == 1402 || frame == 1691) {
 		cutseq_meshbits[2] |= 0x80000000;
 		cutseq_meshbits[3] |= 0x80000000;
 		cutseq_meshbits[4] |= 0x80000000;
 		cutseq_meshbits[5] |= 0x80000000;
 	}
 
-	if (frame == 681 || frame == 1306 || frame == 1552 || frame == 1750)
-	{
+	if (frame == 681 || frame == 1306 || frame == 1552 || frame == 1750) {
 		cutseq_meshbits[2] &= ~0x80000000;
 		cutseq_meshbits[3] &= ~0x80000000;
 		cutseq_meshbits[4] &= ~0x80000000;
 		cutseq_meshbits[5] &= ~0x80000000;
 	}
 
-	if (frame == 1601)
-	{
+	if (frame == 1601) {
 		cutseq_meshbits[6] |= 0x80000000;
 		cutseq_meshbits[7] |= 0x80000000;
-	}
-	else if (frame == 1691)
-	{
+	} else if (frame == 1691) {
 		cutseq_meshbits[8] |= 0x80000000;
 		cutseq_meshbits[6] &= ~0x80000000;
 	}
@@ -1102,13 +990,11 @@ void fifteen_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void fifteen_end()
-{
+void fifteen_end() {
 	lara.questitems |= 1;
 }
 
-void sixteen_init()
-{
+void sixteen_init() {
 	cutseq_meshbits[6] &= 0xFFFFFFFE;
 	trigger_item_in_room(169, FLAME_EMITTER2);
 	trigger_item_in_room(184, FLAME_EMITTER2);
@@ -1122,16 +1008,14 @@ void sixteen_init()
 	cutseq_meshbits[9] &= ~0x80000000;
 }
 
-void sixteen_control()
-{
-	long frame;
+void sixteen_control() {
+	int32_t frame;
 
 	frame = GLOBAL_cutseq_frame;
 
 	if (frame == 1194)
 		cutseq_meshbits[3] &= ~0x80000000;
-	else
-	{
+	else {
 		if (frame == 1257 || frame == 1740)
 			cutseq_meshbits[2] |= 0x80000000;
 
@@ -1152,15 +1036,13 @@ void sixteen_control()
 			cutseq_meshbits[6] |= 0x80000000;
 		else if (frame == 2340)
 			cutseq_meshbits[7] |= 0x80000000;
-		else if (frame == 2501)
-		{
+		else if (frame == 2501) {
 			cutseq_meshbits[6] &= ~0x80000000;
 			cutseq_meshbits[7] &= ~0x80000000;
 			cutseq_meshbits[4] |= 0x80000000;
 			cutseq_meshbits[5] |= 0x80000000;
 			cutseq_meshbits[8] |= 0x80000000;
-		}
-		else if (frame == 2980)
+		} else if (frame == 2980)
 			trigger_item_in_room(177, AMBER_LIGHT);
 	}
 
@@ -1170,148 +1052,128 @@ void sixteen_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void sixteen_end()
-{
+void sixteen_end() {
 	untrigger_item_in_room(169, FLAME_EMITTER2);
 	untrigger_item_in_room(184, FLAME_EMITTER2);
 	untrigger_item_in_room(177, AMBER_LIGHT);
 	DelsHandyTeleportLara(61868, 0, 44994, -16060);
 }
 
-void seventeen_control()
-{
+void seventeen_control() {
 	handle_actor_chatting(ACTOR2_SPEECH_HEAD1, 18, 1, JEAN_YVES, jeanyves_chat_ranges17);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void seventeen_end()
-{
+void seventeen_end() {
 	cutseq_restore_item(ANIMATING4);
 	cutseq_restore_item(JEAN_YVES);
 	DelsHandyTeleportLara(54706, -8192, 50470, 4514);
 }
 
-void eighteen_init()
-{
+void eighteen_init() {
 	cutseq_kill_item(JEAN_YVES);
 }
 
-void eighteen_control()
-{
+void eighteen_control() {
 	handle_actor_chatting(ACTOR2_SPEECH_HEAD1, 18, 1, JEAN_YVES, jeanyves_chat_ranges18);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void eighteen_end()
-{
+void eighteen_end() {
 	cutseq_restore_item(JEAN_YVES);
 	DelsHandyTeleportLara(55311, -8192, 53160, 2304);
 }
 
-void nineteen_init()
-{
+void nineteen_init() {
 	cutseq_kill_item(ANIMATING4);
 	cutseq_kill_item(JEAN_YVES);
 }
 
-void nineteen_control()
-{
+void nineteen_control() {
 	handle_actor_chatting(ACTOR2_SPEECH_HEAD1, 18, 1, JEAN_YVES, jeanyves_chat_ranges19);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void nineteen_end()
-{
+void nineteen_end() {
 	cutseq_restore_item(ANIMATING4);
 	cutseq_restore_item(JEAN_YVES);
 	DelsHandyTeleportLara(53469, -8192, 48687, 23355);
 }
 
-void twenty_control()
-{
+void twenty_control() {
 	handle_actor_chatting(ACTOR2_SPEECH_HEAD1, 18, 1, JEAN_YVES, jeanyves_chat_ranges20);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void twenty_end()
-{
+void twenty_end() {
 	cutseq_restore_item(ANIMATING4);
 	cutseq_restore_item(JEAN_YVES);
 	DelsHandyTeleportLara(55348, -8192, 50436, -9731);
 }
 
-void twentyone_init()
-{
+void twentyone_init() {
 	cutseq_kill_item(ANIMATING10);
 	do_key_meshswap();
 }
 
-void twentyone_end()
-{
+void twentyone_end() {
 	do_key_meshswap();
 	DelsHandyTeleportLara(33279, -4352, 40697, 21847);
 }
 
-void twentythree_init()
-{
+void twentythree_init() {
 	horus_item_thing = find_an_item_with_object_type(HORUS_STATUE);
 }
 
-void twentythree_control()
-{
+void twentythree_control() {
 	horus_item_thing->flags |= IFL_TRIGGERED;
 
-	switch (GLOBAL_cutseq_frame)
-	{
-	case 210:
-		horus_item_thing->mesh_bits &= ~0x200;
-		horus_item_thing->mesh_bits |= 0x20;
-		break;
+	switch (GLOBAL_cutseq_frame) {
+		case 210:
+			horus_item_thing->mesh_bits &= ~0x200;
+			horus_item_thing->mesh_bits |= 0x20;
+			break;
 
-	case 251:
-		horus_item_thing->mesh_bits &= ~0x400;
-		horus_item_thing->mesh_bits |= 0x10;
-		break;
+		case 251:
+			horus_item_thing->mesh_bits &= ~0x400;
+			horus_item_thing->mesh_bits |= 0x10;
+			break;
 
-	case 350:
-		horus_item_thing->mesh_bits &= ~0x40;
-		horus_item_thing->mesh_bits |= 8;
-		break;
+		case 350:
+			horus_item_thing->mesh_bits &= ~0x40;
+			horus_item_thing->mesh_bits |= 8;
+			break;
 
-	case 440:
-		horus_item_thing->mesh_bits &= ~4;
-		horus_item_thing->mesh_bits |= 0x80;
-		break;
+		case 440:
+			horus_item_thing->mesh_bits &= ~4;
+			horus_item_thing->mesh_bits |= 0x80;
+			break;
 
-	case 500:
-		horus_item_thing->mesh_bits &= ~2;
-		horus_item_thing->mesh_bits |= 0x100;
-		break;
+		case 500:
+			horus_item_thing->mesh_bits &= ~2;
+			horus_item_thing->mesh_bits |= 0x100;
+			break;
 
-	case 556:
-		horus_item_thing->mesh_bits |= 0x800;
-		break;
+		case 556:
+			horus_item_thing->mesh_bits |= 0x800;
+			break;
 	}
 }
 
-void twentythree_end()
-{
+void twentythree_end() {
 	DelsHandyTeleportLara(17476, 29952, 15872, -16135);
 	lara.questitems = 0;
 }
 
-void twentyfour_init()
-{
+void twentyfour_init() {
 	cutseq_kill_item(ANIMATING13);
 	old_lara_holster = lara.holster;
 	lara.holster = T4PlusGetLaraHolstersSlotID();
 	draw_pistol_meshes(1);
 }
 
-void twentyfour_control()
-{
-	if (GLOBAL_cutseq_frame == 552)
-	{
+void twentyfour_control() {
+	if (GLOBAL_cutseq_frame == 552) {
 		undraw_pistol_mesh_left(1);
 		undraw_pistol_mesh_right(1);
 		lara.holster = old_lara_holster;
@@ -1322,10 +1184,8 @@ void twentyfour_control()
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void twentyfour_end()
-{
-	if (GLOBAL_cutseq_frame <= 552)
-	{
+void twentyfour_end() {
+	if (GLOBAL_cutseq_frame <= 552) {
 		undraw_pistol_mesh_left(1);
 		undraw_pistol_mesh_right(1);
 		lara.holster = old_lara_holster;
@@ -1335,15 +1195,13 @@ void twentyfour_end()
 	trigger_item_in_room(107, PUZZLE_ITEM8_COMBO1);
 }
 
-void twentyfive_control()
-{
+void twentyfive_control() {
 	handle_lara_chatting(lara_chat_ranges25);
 	handle_actor_chatting(ACTOR1_SPEECH_HEAD1, 14, 1, ANIMATING8, troop_chat_ranges25);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void twentyfive_end()
-{
+void twentyfive_end() {
 	ITEM_INFO* item;
 
 	item = find_an_item_with_object_type(ANIMATING5);
@@ -1353,8 +1211,7 @@ void twentyfive_end()
 	DelsHandyTeleportLara(55396, -1792, 77122, -7105);
 }
 
-void twentyfive_init()
-{
+void twentyfive_init() {
 	ITEM_INFO* item;
 
 	item = find_an_item_with_object_type(ANIMATING5);
@@ -1364,14 +1221,12 @@ void twentyfive_init()
 	numnailed++;
 }
 
-void twentysix_control()
-{
+void twentysix_control() {
 	handle_actor_chatting(ACTOR1_SPEECH_HEAD1, 14, 1, ANIMATING8, troop_chat_ranges26);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;
 }
 
-void twentyseven_init()
-{
+void twentyseven_init() {
 	ITEM_INFO* item;
 
 	item = find_an_item_with_object_type(ANIMATING4);
@@ -1380,14 +1235,12 @@ void twentyseven_init()
 	lara.questitems = 0;
 }
 
-void twentyseven_control()
-{
+void twentyseven_control() {
 	if (GLOBAL_cutseq_frame == 283)
 		cutseq_meshbits[1] |= 0x200;
 }
 
-void twentyseven_end()
-{
+void twentyseven_end() {
 	ITEM_INFO* item;
 
 	item = find_an_item_with_object_type(ANIMATING5);
@@ -1397,53 +1250,44 @@ void twentyseven_end()
 	nail_intelligent_object(SETHA);
 }
 
-void twentytwo_init()
-{
+void twentytwo_init() {
 	cutseq_kill_item(DOOR_TYPE6);
 }
 
-void twentytwo_end()
-{
+void twentytwo_end() {
 	DelsHandyTeleportLara(72770, -11776, 54077, 0);
 	cutseq_restore_item(DOOR_TYPE6);
 	trigger_item_in_room(39, DOOR_TYPE6);
 	trigger_item_in_room(39, DEMIGOD3);
 }
 
-void do_spade_meshswap()
-{
-	short* temp;
+void do_spade_meshswap() {
+	int16_t* temp;
 
 	temp = lara.mesh_ptrs[LM_LHAND];
 	lara.mesh_ptrs[LM_LHAND] = meshes[objects[T4PlusGetMeshSwap1SlotID()].mesh_index + LM_LHAND * 2];
 	meshes[objects[T4PlusGetMeshSwap1SlotID()].mesh_index + LM_LHAND * 2] = temp;
 }
 
-void do_key_meshswap()
-{
-	short* temp;
+void do_key_meshswap() {
+	int16_t* temp;
 
 	temp = lara.mesh_ptrs[LM_RHAND];
 	lara.mesh_ptrs[LM_RHAND] = meshes[objects[T4PlusGetMeshSwap1SlotID()].mesh_index + LM_RHAND * 2];
 	meshes[objects[T4PlusGetMeshSwap1SlotID()].mesh_index + LM_RHAND * 2] = temp;
 }
 
-void cutseq_shoot_pistols(long left_or_right)
-{
-	if (left_or_right == 14)
-	{
+void cutseq_shoot_pistols(int32_t left_or_right) {
+	if (left_or_right == 14) {
 		lara.left_arm.flash_gun = 4;
 		SmokeCountL = 16;
-	}
-	else
-	{
+	} else {
 		lara.right_arm.flash_gun = 4;
 		SmokeCountR = 16;
 	}
 }
 
-void trigger_weapon_dynamics(long left_or_right)
-{
+void trigger_weapon_dynamics(int32_t left_or_right) {
 	PHD_VECTOR pos;
 
 	pos.x = (GetRandomControl() & 0xFF) - 128;
@@ -1453,12 +1297,10 @@ void trigger_weapon_dynamics(long left_or_right)
 	TriggerDynamic(pos.x, pos.y, pos.z, 10, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
 }
 
-void deal_with_pistols()
-{
+void deal_with_pistols() {
 	PHD_VECTOR pos;
 
-	if (SmokeCountL)
-	{
+	if (SmokeCountL) {
 		pos.x = 4;
 		pos.y = 128;
 		pos.z = 40;
@@ -1466,8 +1308,7 @@ void deal_with_pistols()
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
-	if (SmokeCountR)
-	{
+	if (SmokeCountR) {
 		pos.x = -16;
 		pos.y = 128;
 		pos.z = 40;
@@ -1475,29 +1316,24 @@ void deal_with_pistols()
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountR);
 	}
 
-	if (lara.left_arm.flash_gun)
-	{
+	if (lara.left_arm.flash_gun) {
 		lara.left_arm.flash_gun--;
 		trigger_weapon_dynamics(14);
 	}
 
-	if (lara.right_arm.flash_gun)
-	{
+	if (lara.right_arm.flash_gun) {
 		lara.right_arm.flash_gun--;
 		trigger_weapon_dynamics(11);
 	}
 }
 
-void cutseq_kill_item(long num)
-{
+void cutseq_kill_item(int32_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item = &items[i];
 
-		if (item->object_number == num)
-		{
+		if (item->object_number == num) {
 			old_status_flags[numnailed] = item->status;
 			item->status = ITEM_INVISIBLE;
 			numnailed++;
@@ -1505,16 +1341,13 @@ void cutseq_kill_item(long num)
 	}
 }
 
-ITEM_INFO* cutseq_restore_item(long num)
-{
+ITEM_INFO* cutseq_restore_item(int32_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item = &items[i];
 
-		if (item->object_number == num)
-		{
+		if (item->object_number == num) {
 			item->status = old_status_flags[numnailed];
 			numnailed++;
 			return item;
@@ -1524,19 +1357,18 @@ ITEM_INFO* cutseq_restore_item(long num)
 	return 0;
 }
 
-long Load_and_Init_Cutseq(long num)
-{
+int32_t Load_and_Init_Cutseq(int32_t num) {
 	ACTORME* actor;
-	long* headerbuf;
+	int32_t* headerbuf;
 	char* packed;
-	long Offset, Length;
+	int32_t Offset, Length;
 
 	Log(5, "Initialising Cut Scene");
 	SetCutPlayed(num);
 
-	headerbuf = (long*)cutseqpakPtr + (2 * num);	//cutseq.pak header is offsets then lengths, go to current num
-	Offset = headerbuf[0];							//first long, offset
-	Length = headerbuf[1];							//second long, length
+	headerbuf = (int32_t*)cutseqpakPtr + (2 * num);	//cutseq.pak header is offsets then lengths, go to current num
+	Offset = headerbuf[0];							//first int32_t, offset
+	Length = headerbuf[1];							//second int32_t, length
 
 	Log(5, "Offset=%d, Length=%d\n", Offset, Length);
 	packed = &cutseqpakPtr[Offset];
@@ -1547,41 +1379,36 @@ long Load_and_Init_Cutseq(long num)
 	Log(5, "OrgX=%d,OrgY=%d,OrgZ=%d\n", GLOBAL_cutme->orgx, GLOBAL_cutme->orgy, GLOBAL_cutme->orgz);
 	Log(5, "CameraOffset=%d\n", GLOBAL_cutme->camera_offset);
 
-	for (int i = 0; i < GLOBAL_cutme->numactors; i++)
-	{
+	for (int i = 0; i < GLOBAL_cutme->numactors; i++) {
 		actor = &GLOBAL_cutme->actor_data[i];
 		Log(5, "Actor %d --- offset=%d,slot=%d,nodes=%d\n", i, actor->offset, actor->objslot, actor->nodes);
 	}
-		
+
 	init_cutseq_actors(packed, 0);
 	return 0;
 }
 
-void init_cutseq_actors(char* data, long resident)
-{
+void init_cutseq_actors(char* data, int32_t resident) {
 	ITEM_INFO* item;
 	char* packed;
 	char* resident_addr;
-	long pda_nodes, offset;
+	int32_t pda_nodes, offset;
 
 	resident_addr = GLOBAL_resident_depack_buffers;
 	lastcamnum = -1;
 	GLOBAL_playing_cutseq = 0;
 	GLOBAL_numcutseq_frames = GLOBAL_cutme->numframes;
 
-	for (int i = 0; i < GLOBAL_cutme->numactors; i++)
-	{
+	for (int i = 0; i < GLOBAL_cutme->numactors; i++) {
 		item = &duff_item[i];
 		offset = GLOBAL_cutme->actor_data[i].offset;
 		packed = &data[offset];
 		pda_nodes = GLOBAL_cutme->actor_data[i].nodes;
 
-		if (resident)
-		{
+		if (resident) {
 			actor_pnodes[i] = (PACKNODE*)resident_addr;
 			resident_addr += (pda_nodes + 1) * sizeof(PACKNODE);
-		}
-		else
+		} else
 			actor_pnodes[i] = (PACKNODE*)cutseq_malloc((pda_nodes + 1) * sizeof(PACKNODE));
 
 		InitPackNodes((NODELOADHEADER*)packed, actor_pnodes[i], packed, pda_nodes + 1);
@@ -1622,13 +1449,11 @@ void init_cutseq_actors(char* data, long resident)
 	InitialiseHair();
 }
 
-void init_voncroy_meshbits(long num)
-{
+void init_voncroy_meshbits(int32_t num) {
 	cutseq_meshswapbits[num] = 0x240080;
 }
 
-void DelsHandyTeleportLara(long x, long y, long z, long yrot)
-{
+void DelsHandyTeleportLara(int32_t x, int32_t y, int32_t z, int32_t yrot) {
 	lara_item->pos.x_pos = x;
 	lara_item->pos.y_pos = y;
 	lara_item->pos.z_pos = z;
@@ -1637,7 +1462,7 @@ void DelsHandyTeleportLara(long x, long y, long z, long yrot)
 	lara.torso_x_rot = 0;
 	lara.torso_y_rot = 0;
 	lara_item->pos.x_rot = 0;
-	lara_item->pos.y_rot = (short)yrot;
+	lara_item->pos.y_rot = (int16_t)yrot;
 	lara_item->pos.z_rot = 0;
 	IsRoomOutside(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
@@ -1655,16 +1480,13 @@ void DelsHandyTeleportLara(long x, long y, long z, long yrot)
 	camera.fixed_camera = 1;
 }
 
-void nail_intelligent_object(short num)
-{
+void nail_intelligent_object(int16_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item = &items[i];
 
-		if (item->object_number == num)
-		{
+		if (item->object_number == num) {
 			item->status = ITEM_INVISIBLE;
 			RemoveActiveItem(i);
 			DisableBaddieAI(i);
@@ -1672,20 +1494,17 @@ void nail_intelligent_object(short num)
 	}
 }
 
-void handle_lara_chatting(short* _ranges)
-{
-	long r1, r2, f;
+void handle_lara_chatting(int16_t* _ranges) {
+	int32_t r1, r2, f;
 
 	lara_chat_cnt = (lara_chat_cnt - 1) & 1;
 	f = GLOBAL_cutseq_frame;
 
-	while (1)
-	{
+	while (1) {
 		r1 = _ranges[0];
 		r2 = _ranges[1];
 
-		if (r1 == -1)
-		{
+		if (r1 == -1) {
 			lara.mesh_ptrs[LM_HEAD] = meshes[objects[T4PlusGetLaraSkinSlotID()].mesh_index + 2 * LM_HEAD];
 			return;
 		}
@@ -1700,20 +1519,17 @@ void handle_lara_chatting(short* _ranges)
 		lara.mesh_ptrs[LM_HEAD] = meshes[objects[(GetRandomControl() & 3) + LARA_SPEECH_HEAD1].mesh_index + 2 * LM_HEAD];
 }
 
-void handle_actor_chatting(long speechslot, long node, long slot, long objslot, short* _ranges)
-{
-	long r1, r2, f, rnd;
+void handle_actor_chatting(int32_t speechslot, int32_t node, int32_t slot, int32_t objslot, int16_t* _ranges) {
+	int32_t r1, r2, f, rnd;
 
 	rnd = GetRandomControl() & 1;
 	f = GLOBAL_cutseq_frame;
 
-	while (1)
-	{
+	while (1) {
 		r1 = _ranges[0];
 		r2 = _ranges[1];
 
-		if (r1 == -1)
-		{
+		if (r1 == -1) {
 			cutseq_meshswapbits[slot] &= ~(1 << node);
 			return;
 		}
@@ -1724,8 +1540,7 @@ void handle_actor_chatting(long speechslot, long node, long slot, long objslot, 
 		_ranges += 2;
 	}
 
-	if (!actor_chat_cnt)
-	{
+	if (!actor_chat_cnt) {
 		cutseq_meshswapbits[slot] |= (1 << node);
 		meshes[objects[objslot].mesh_index + (2 * node) + 1] = meshes[objects[speechslot + rnd].mesh_index + 2 * node];
 
@@ -1734,17 +1549,14 @@ void handle_actor_chatting(long speechslot, long node, long slot, long objslot, 
 	}
 }
 
-void trigger_item_in_room(long room_number, long object_number)
-{
+void trigger_item_in_room(int32_t room_number, int32_t object_number) {
 	ITEM_INFO* item;
-	short item_number;
+	int16_t item_number;
 
-	for (item_number = room[room_number].item_number; item_number != NO_ITEM; item_number = item->next_item)
-	{
+	for (item_number = room[room_number].item_number; item_number != NO_ITEM; item_number = item->next_item) {
 		item = &items[item_number];
 
-		if (item->object_number == object_number)
-		{
+		if (item->object_number == object_number) {
 			AddActiveItem(item_number);
 
 			if (object_number != DEMIGOD3)
@@ -1755,17 +1567,14 @@ void trigger_item_in_room(long room_number, long object_number)
 	}
 }
 
-void untrigger_item_in_room(long room_number, long object_number)
-{
+void untrigger_item_in_room(int32_t room_number, int32_t object_number) {
 	ITEM_INFO* item;
-	short item_number;
+	int16_t item_number;
 
-	for (item_number = room[room_number].item_number; item_number != NO_ITEM; item_number = item->next_item)
-	{
+	for (item_number = room[room_number].item_number; item_number != NO_ITEM; item_number = item->next_item) {
 		item = &items[item_number];
 
-		if (item->object_number == object_number)
-		{
+		if (item->object_number == object_number) {
 			RemoveActiveItem(item_number);
 			item->status = ITEM_INACTIVE;
 			item->flags &= ~IFL_CODEBITS;
@@ -1773,12 +1582,10 @@ void untrigger_item_in_room(long room_number, long object_number)
 	}
 }
 
-ITEM_INFO *find_an_item_with_object_type(long object_number)
-{
+ITEM_INFO *find_an_item_with_object_type(int32_t object_number) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == object_number)
@@ -1788,10 +1595,8 @@ ITEM_INFO *find_an_item_with_object_type(long object_number)
 	return 0;
 }
 
-void special2_end()
-{
-	if (!bDoCredits)
-	{
+void special2_end() {
+	if (!bDoCredits) {
 		InitialiseSpotCam(3);
 		lara_item->mesh_bits = 0;
 	}
@@ -1800,16 +1605,13 @@ void special2_end()
 	title_controls_locked_out = 0;
 }
 
-void special2_init()
-{
+void special2_init() {
 	lara_item->mesh_bits = -1;
 	Chris_Menu = 0;
 }
 
-void special3_end()
-{
-	if (!bDoCredits)
-	{
+void special3_end() {
+	if (!bDoCredits) {
 		InitialiseSpotCam(1);
 		lara_item->mesh_bits = 0;
 	}
@@ -1819,22 +1621,18 @@ void special3_end()
 	title_controls_locked_out = 0;
 }
 
-void special3_control()
-{
+void special3_control() {
 	if (GLOBAL_cutseq_frame >= 348 && GLOBAL_cutseq_frame <= 358 && GLOBAL_cutseq_frame & 1)
 		DoBloodSplat(6799 - (GetRandomDraw() & 0xFF), (GetRandomDraw() & 0x1FF) - 768, 76209, 7, -1, 24);
 }
 
-void special1_init()
-{
+void special1_init() {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++)
-	{
+	for (int i = 0; i < level_items; i++) {
 		item = &items[i];
 
-		if (item->object_number == ANIMATING6)
-		{
+		if (item->object_number == ANIMATING6) {
 			item->anim_number = objects[ANIMATING6].anim_index;
 			item->frame_number = anims[item->anim_number].frame_base;
 			item->flags &= ~IFL_CODEBITS;
@@ -1845,10 +1643,8 @@ void special1_init()
 	Chris_Menu = 0;
 }
 
-void special1_end()
-{
-	if (!bDoCredits)
-	{
+void special1_end() {
+	if (!bDoCredits) {
 		lara_item->mesh_bits = 0;
 		InitialiseSpotCam(2);
 	}
@@ -1857,13 +1653,11 @@ void special1_end()
 	title_controls_locked_out = 0;
 }
 
-void times_init()
-{
+void times_init() {
 	SetDistanceFogColor(128, 128, 128);
 }
 
-void times_control()
-{
+void times_control() {
 	handle_lara_chatting(lara_chat_ranges_times);
 	handle_actor_chatting(ACTOR2_SPEECH_HEAD1, 11, 1, ANIMATING16, editor_chat_ranges_times);
 	actor_chat_cnt = (actor_chat_cnt - 1) & 1;

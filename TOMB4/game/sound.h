@@ -2,27 +2,25 @@
 #include "../global/types.h"
 
 void GetPanVolume(SoundSlot* slot);
-void StopSoundEffect(long sfx);
+void StopSoundEffect(int32_t sfx);
 void SOUND_Init();
 void SOUND_Stop();
-long SoundEffect(long sfx, PHD_3DPOS* pos, long flags);
+int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags);
 void SayNo();
 
 extern SAMPLE_INFO* sample_infos;
 extern SoundSlot LaSlot[32];
-extern short* sample_lut;
+extern int16_t* sample_lut;
 extern bool sound_active;
 
-enum sfx_options
-{
+enum sfx_options {
 	SFX_DEFAULT =	0,
 	SFX_WATER =		1,
 	SFX_ALWAYS =	2,
 	SFX_SETPITCH =	4
 };
 
-enum sound_effect_names
-{
+enum sound_effect_names {
 	SFX_LARA_FEET,
 	SFX_LARA_CLIMB2,
 	SFX_LARA_NO,

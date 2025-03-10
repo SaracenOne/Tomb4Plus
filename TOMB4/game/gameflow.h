@@ -12,57 +12,56 @@ enum GameFlowGameMode {
 char *GetCustomStringForTextID(int id);
 char *GetFixedStringForTextID(int id);
 void DoGameflow();
-void DoLevel(uchar Name, uchar Audio);
-void DoTitle(uchar Name, uchar Audio);
+void DoLevel(uint8_t Name, uint8_t Audio);
+void DoTitle(uint8_t Name, uint8_t Audio);
 void LoadGameflow();
-long DoCredits();
+int32_t DoCredits();
 
 extern GAMEFLOW* Gameflow;
 extern PHD_VECTOR gfLoadCam;
 extern PHD_VECTOR gfLoadTarget;
-extern uchar gfLoadRoom;
+extern uint8_t gfLoadRoom;
 extern PHD_VECTOR gfLensFlare;
 extern CVECTOR gfLensFlareColour;
 extern CVECTOR gfDistanceFog;
 extern CVECTOR gfVolumetricFog;
 extern CVECTOR gfLayer1Col;
 extern CVECTOR gfLayer2Col;
-extern ushort* gfStringOffset;
-extern ushort* gfFilenameOffset;
-extern uchar* gfScriptFile;
-extern uchar* gfLanguageFile;
+extern uint16_t* gfStringOffset;
+extern uint16_t* gfFilenameOffset;
+extern uint8_t* gfScriptFile;
+extern uint8_t* gfLanguageFile;
 extern char* gfStringWad;
 extern char* gfFilenameWad;
-extern long gfMirrorZPlane;
-extern long gfStatus;
-extern ushort gfLevelFlags;
-extern uchar gfCurrentLevel;
-extern uchar gfLevelComplete;
+extern int32_t gfMirrorZPlane;
+extern int32_t gfStatus;
+extern uint16_t gfLevelFlags;
+extern uint8_t gfCurrentLevel;
+extern uint8_t gfLevelComplete;
 extern GameFlowGameMode gfGameMode;
-extern uchar gfMirrorRoom;
-extern uchar gfNumMips;
-extern uchar gfRequiredStartPos;
-extern uchar gfMips[8];
-extern uchar gfLevelNames[255]; // T4Plus: increased to 255
+extern uint8_t gfMirrorRoom;
+extern uint8_t gfNumMips;
+extern uint8_t gfRequiredStartPos;
+extern uint8_t gfMips[8];
+extern uint8_t gfLevelNames[255]; // T4Plus: increased to 255
 extern int16_t gfLevelFilenames[255];
-extern char gfUVRotate;
-extern char gfLayer1Vel;
-extern char gfLayer2Vel;
+extern int8_t gfUVRotate;
+extern int8_t gfLayer1Vel;
+extern int8_t gfLayer2Vel;
 
-extern ulong GameTimer;
-extern uchar bDoCredits;
+extern uint32_t GameTimer;
+extern uint8_t bDoCredits;
 extern bool JustLoaded;
 
-extern char DEL_playingamefmv;
-extern char skipped_level;
-extern char Chris_Menu;
-extern char title_controls_locked_out;
+extern int8_t DEL_playingamefmv;
+extern int8_t skipped_level;
+extern int8_t Chris_Menu;
+extern int8_t title_controls_locked_out;
 
 extern uint8_t gfLegend;
 extern int32_t gfLegendTime;
 
-enum gf_commands
-{
+enum gf_commands {
 	CMD_FMV = 0x80,
 	CMD_LEVEL,
 	CMD_TITLE,
@@ -155,8 +154,7 @@ enum gf_commands
 	CMD_PICKUPCOMBO4_2,
 };
 
-enum gf_strings	//auto generated from the script compiler
-{
+enum gf_strings {	//auto generated from the script compiler
 	TXT_Cambodia_1984,
 	TXT_Egypt_present_day,
 	TXT_Angkor_Wat,

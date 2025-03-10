@@ -12,16 +12,15 @@ FILE *global_logF = nullptr;
 #define MAX_ALLOCATION_FILENAME 64
 
 struct allocation_table_entry {
-	char filename[64];
+	int8_t filename[64];
 	int line_number = -1;
 	void* buffer = nullptr;
 };
 
 allocation_table_entry allocation_table[MAX_MEMORY_ALLOCATIONS];
-long alloc_count = 0;
+int32_t alloc_count = 0;
 
-void* system_malloc(size_t size, const char* filename, int line_number)
-{
+void* system_malloc(size_t size, const char* filename, int line_number) {
 	alloc_count++;
 	if (alloc_count >= MAX_MEMORY_ALLOCATIONS) {
 		platform_fatal_error("Exceed maximum memory allocations!");
@@ -75,8 +74,7 @@ void* system_realloc(void* ptr, size_t size, const char* filename, int line_numb
 	return new_ptr;
 }
 
-void system_free(void* ptr)
-{
+void system_free(void* ptr) {
 	if (!ptr) {
 		platform_fatal_error("Attempted to free nullptr!");
 	}
@@ -98,8 +96,7 @@ void system_free(void* ptr)
 }
 #endif
 
-void system_report_stray_allocation()
-{
+void system_report_stray_allocation() {
 #ifdef DEBUG
 	if (alloc_count != 0) {
 		for (int i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
@@ -116,7 +113,7 @@ void system_report_stray_allocation()
 PHD_VECTOR CamPos;
 PHD_VECTOR CamRot;
 
-long nPolyType;
+int32_t nPolyType;
 
 char* malloc_buffer;
 char* malloc_ptr;
@@ -128,33 +125,28 @@ size_t virtual_malloc_offset = 0;
 
 static size_t malloc_used;
 
-static long rand_1 = 0xD371F947;
-static long rand_2 = 0xD371F947;
+static int32_t rand_1 = 0xD371F947;
+static int32_t rand_2 = 0xD371F947;
 
-long GetRandomControl()
-{
+int32_t GetRandomControl() {
 	rand_1 = 0x41C64E6D * rand_1 + 12345;
 	return (rand_1 >> 10) & 0x7FFF;
 }
 
-void SeedRandomControl(long seed)
-{
+void SeedRandomControl(int32_t seed) {
 	rand_1 = seed;
 }
 
-long GetRandomDraw()
-{
+int32_t GetRandomDraw() {
 	rand_2 = 0x41C64E6D * rand_2 + 12345;
 	return (rand_2 >> 10) & 0x7FFF;
 }
 
-void SeedRandomDraw(long seed)
-{
+void SeedRandomDraw(int32_t seed) {
 	rand_2 = seed;
 }
 
-void init_game_malloc()
-{
+void init_game_malloc() {
 	malloc_buffer = (char*)SYSTEM_MALLOC(MALLOC_SIZE);
 	malloc_size = MALLOC_SIZE;
 	malloc_ptr = malloc_buffer;
@@ -162,19 +154,15 @@ void init_game_malloc()
 	malloc_used = 0;
 }
 
-void* game_malloc(size_t size)
-{
+void* game_malloc(size_t size) {
 	char* ptr;
 
 	size = (size + 3) & -4;
 
-	if (size > malloc_free)
-	{
+	if (size > malloc_free) {
 		platform_fatal_error("game_malloc: out of memory!");
 		return 0;
-	}
-	else
-	{
+	} else {
 		ptr = malloc_ptr;
 		malloc_free -= size;
 		malloc_used += size;
@@ -197,11 +185,10 @@ size_t get_virtual_game_malloc_offset() {
 	return virtual_malloc_offset;
 }
 
-void GlobalLog(const char* s, ...)
-{
+void GlobalLog(const char* s, ...) {
 #ifdef DO_LOG
 	va_list list;
-	char log_bufffer[8192];
+	int8_t log_bufffer[8192];
 
 	va_start(list, s);
 	vsprintf(log_bufffer, s, list);
@@ -217,16 +204,14 @@ void GlobalLog(const char* s, ...)
 #endif
 }
 
-void Log(ulong type, const char* s, ...)
-{
-#ifdef DO_LOG
+void Log(uint32_t type, const char* s, ...) {
 	va_list list;
 	char log_buffer[8192];
 
 	va_start(list, s);
 	vsprintf(log_buffer, s, list);
 	va_end(list);
-
+#ifdef DO_LOG
 	if (!game_user_dir_path.empty()) {
 		std::string full_path = game_user_dir_path + "log.txt";
 
@@ -238,5 +223,8 @@ void Log(ulong type, const char* s, ...)
 	} else {
 		GlobalLog(log_buffer);
 	}
+#else
+	printf(log_buffer);
+	printf("\n");
 #endif
 }

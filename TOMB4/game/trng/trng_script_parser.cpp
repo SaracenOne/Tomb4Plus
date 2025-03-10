@@ -43,7 +43,7 @@ void NGDecryptScriptBlock(char *block) {
 		block_counter++;
 	}
 
-	char decrypted_block[SWIZZLE_CYPHER_COUNT] = {};
+	int8_t decrypted_block[SWIZZLE_CYPHER_COUNT] = {};
 
 	for (int32_t i = 0; i < SWIZZLE_CYPHER_COUNT; i++) {
 		int32_t j = 0;
@@ -144,15 +144,15 @@ if (level.records->record_name_lowercase##_table) { \
 	level.records->record_name_lowercase##_table = NULL; \
 }
 
-#define NG_ALLOCATE_RECORD(record_name_lowercase, record_name_uppercase, struct_name) level.records->record_name_lowercase##_count = struct_name##.record_name_lowercase##_table_count; \
+#define NG_ALLOCATE_RECORD(record_name_lowercase, record_name_uppercase, struct_name) level.records->record_name_lowercase##_count = struct_name.record_name_lowercase##_table_count; \
 level.records->record_name_lowercase##_table = NULL; \
-if (struct_name##.record_name_lowercase##_table_count) { \
-	level.records->record_name_lowercase##_table = (NG_##record_name_uppercase##_RECORD*)SYSTEM_MALLOC(sizeof(NG_##record_name_uppercase##_RECORD) * struct_name##.record_name_lowercase##_table_count); \
+if (struct_name.record_name_lowercase##_table_count) { \
+	level.records->record_name_lowercase##_table = (NG_##record_name_uppercase##_RECORD*)SYSTEM_MALLOC(sizeof(NG_##record_name_uppercase##_RECORD) * struct_name.record_name_lowercase##_table_count); \
 	if (!level.records->record_name_lowercase##_table) { \
 		NGLog(NG_LOG_TYPE_ERROR, "NGReallocateLevel: Memory allocation failed!"); \
 		return false; \
 	} \
-	memset(level.records->record_name_lowercase##_table, 0x00, sizeof(NG_##record_name_uppercase##_RECORD) * struct_name##.record_name_lowercase##_table_count); \
+	memset(level.records->record_name_lowercase##_table, 0x00, sizeof(NG_##record_name_uppercase##_RECORD) * struct_name.record_name_lowercase##_table_count); \
 } \
 
 struct NG_TABLE_ALLOCATION_COUNT {
@@ -190,8 +190,8 @@ void NGFreeLevel(NG_LEVEL& level) {
 }
 
 bool NGReallocateLevel(
-	NG_LEVEL& level,
-	NG_TABLE_ALLOCATION_COUNT &allocation_struct) {
+    NG_LEVEL& level,
+    NG_TABLE_ALLOCATION_COUNT &allocation_struct) {
 	NGFreeLevel(level);
 
 	level.records = (NG_LEVEL_RECORD_DATA*)SYSTEM_MALLOC(sizeof(NG_LEVEL_RECORD_DATA));
@@ -252,8 +252,7 @@ int32_t NGGetT4PluginID(int16_t plugin_id) {
 		if (ng_plugins[plugin_id].t4plus_plugin) {
 			return ng_plugins[plugin_id].t4plus_plugin;
 		}
-	}
-	else {
+	} else {
 		NGLog(NG_LOG_TYPE_ERROR, "MAX_NG_STRINGS exceeded!");
 	}
 
@@ -308,12 +307,12 @@ void NGLoadTablesForLevel(uint32_t level) {
 }
 
 void NGSetupFlareCustomization(int32_t current_level,
-	uint16_t flare_flags,
-	uint16_t flare_lifetime_in_seconds,
-	uint8_t flare_light_r,
-	uint8_t flare_light_g,
-	uint8_t flare_light_b,
-	uint8_t flare_light_intensity) {
+                               uint16_t flare_flags,
+                               uint16_t flare_lifetime_in_seconds,
+                               uint8_t flare_light_r,
+                               uint8_t flare_light_g,
+                               uint8_t flare_light_b,
+                               uint8_t flare_light_intensity) {
 
 	MOD_LEVEL_FLARE_INFO* flare_info = get_game_mod_level_flare_info(current_level);
 
@@ -370,7 +369,7 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 
 	// Params
 	memset(tables->level_move_item_table, 0x00, sizeof(NG_MOVE_ITEM_RECORD) * MAX_NG_MOVE_ITEMS);
-	memset(tables->level_rotate_item_table , 0x00, sizeof(NG_ROTATE_ITEM_RECORD) * MAX_NG_ROTATE_ITEMS);
+	memset(tables->level_rotate_item_table, 0x00, sizeof(NG_ROTATE_ITEM_RECORD) * MAX_NG_ROTATE_ITEMS);
 	memset(tables->level_big_number_table, 0x00, sizeof(NG_BIG_NUMBER_RECORD) * MAX_NG_BIG_NUMBERS);
 
 	tables->level_global_trigger_count = 0;
@@ -427,1255 +426,1923 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 		command_blocks_parsed++;
 
 		switch (block_type) {
-		case 0x01: {
-			// AssignSlot
-			uint32_t plugin_id = 0;
-			uint16_t dest_slot = NG_READ_16(gfScriptFile, offset);
-			uint16_t src_slot = 0;
-			if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
-				src_slot = NG_READ_16(gfScriptFile, offset);
-			} else {
-				src_slot = NG_READ_16(gfScriptFile, offset);
-				plugin_id = NG_READ_16(gfScriptFile, offset);
-			}
+			case 0x01: {
+				// AssignSlot
+				uint32_t plugin_id = 0;
+				uint16_t dest_slot = NG_READ_16(gfScriptFile, offset);
+				uint16_t src_slot = 0;
+				if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
+					src_slot = NG_READ_16(gfScriptFile, offset);
+				} else {
+					src_slot = NG_READ_16(gfScriptFile, offset);
+					plugin_id = NG_READ_16(gfScriptFile, offset);
+				}
 #
-			if (plugin_id != 0) {
-				char* plugin_string = NGGetPluginString(plugin_id);
-				if (plugin_string) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) AssignSlot(%u, %u) commands are not currently supported (level %u)", plugin_string, dest_slot, src_slot, current_level);
+				if (plugin_id != 0) {
+					char* plugin_string = NGGetPluginString(plugin_id);
+					if (plugin_string) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) AssignSlot(%u, %u) commands are not currently supported (level %u)", plugin_string, dest_slot, src_slot, current_level);
+					} else {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) AssignSlot(%u, %u) are not currently supported (level %u)", plugin_id, dest_slot, src_slot, current_level);
+					}
 				} else {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) AssignSlot(%u, %u) are not currently supported (level %u)", plugin_id, dest_slot, src_slot, current_level);
-				}
-			} else {
-				switch (src_slot) {
-					case 1:
-						game_mod_config.level_info[current_level].objects_info.rubber_boat_slot = dest_slot;
-						assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT);
-						break;
-					case 2:
-						game_mod_config.level_info[current_level].objects_info.motor_boat_slot = dest_slot;
-						assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT);
-						break;
-					case 5:
-						game_mod_config.level_info[current_level].objects_info.rubber_boat_extra_slot = dest_slot;
-						//assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT_LARA);
-						break;
-					case 6:
-						game_mod_config.level_info[current_level].objects_info.motor_boat_extra_slot = dest_slot;
-						//assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT_LARA);
-						break;
-					case 501:
-						game_mod_config.level_info[current_level].objects_info.rubber_boat_slot = dest_slot;
-						assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT);
-						break;
-					case 502:
-						game_mod_config.level_info[current_level].objects_info.motor_boat_slot = dest_slot;
-						assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT);
-						break;
-					case 505:
-						game_mod_config.level_info[current_level].objects_info.rubber_boat_extra_slot = dest_slot;
-						//assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT_LARA);
-						break;
-					case 506:
-						game_mod_config.level_info[current_level].objects_info.motor_boat_extra_slot = dest_slot;
-						//assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT_LARA);
-						break;
-					default:
-						assign_slot_for_level(current_level, dest_slot, src_slot);
-						break;
-				}
-			}
-
-			break;
-		}
-		case 0x02: {
-			// Snow
-			uint16_t snow_type = NG_READ_16(gfScriptFile, offset);
-			switch (snow_type) {
-			case 0:
-				get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_DISABLED;
-				break;
-			case 1:
-				get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS;
-				break;
-			case 2:
-				get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_ENABLED_ALL_OUTSIDE;
-				break;
-			default:
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: unknown snow type! (level %u)", current_level);
-				break;
-			}
-			break;
-		}
-		case 0x03: {
-			// LevelFarView
-			far_view = NG_READ_16(gfScriptFile, offset);
-
-			if (far_view != -1) {
-				if (far_view > world_far_view)
-					far_view = world_far_view;
-
-				get_game_mod_level_environment_info(current_level)->far_view = (uint32_t)far_view * BLOCK_SIZE;
-			}
-			break;
-		}
-		case 0x04: {
-			// FogRange
-			// Negative font values appear to control the intensity, but that is currently unsupported
-			int16_t fog_start = NG_READ_16(gfScriptFile, offset);
-			int16_t fog_end = NG_READ_16(gfScriptFile, offset);
-
-			if (fog_start != -1) {
-				get_game_mod_level_environment_info(current_level)->fog_start_range = fog_start * BLOCK_SIZE;
-			} else {
-				get_game_mod_level_environment_info(current_level)->fog_start_range = 12 * BLOCK_SIZE;
-			}
-
-			if (fog_end != -1) {
-				get_game_mod_level_environment_info(current_level)->fog_end_range = fog_end * BLOCK_SIZE;
-			} else {
-				if (far_view != -1) {
-					get_game_mod_level_environment_info(current_level)->fog_end_range = far_view * BLOCK_SIZE;
-				} else {
-					if (world_far_view != -1) {
-						get_game_mod_level_environment_info(current_level)->fog_end_range = world_far_view * BLOCK_SIZE;
+					switch (src_slot) {
+						case 1:
+							game_mod_config.level_info[current_level].objects_info.rubber_boat_slot = dest_slot;
+							assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT);
+							break;
+						case 2:
+							game_mod_config.level_info[current_level].objects_info.motor_boat_slot = dest_slot;
+							assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT);
+							break;
+						case 5:
+							game_mod_config.level_info[current_level].objects_info.rubber_boat_extra_slot = dest_slot;
+							//assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT_LARA);
+							break;
+						case 6:
+							game_mod_config.level_info[current_level].objects_info.motor_boat_extra_slot = dest_slot;
+							//assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT_LARA);
+							break;
+						case 501:
+							game_mod_config.level_info[current_level].objects_info.rubber_boat_slot = dest_slot;
+							assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT);
+							break;
+						case 502:
+							game_mod_config.level_info[current_level].objects_info.motor_boat_slot = dest_slot;
+							assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT);
+							break;
+						case 505:
+							game_mod_config.level_info[current_level].objects_info.rubber_boat_extra_slot = dest_slot;
+							//assign_slot_for_level(current_level, dest_slot, RUBBER_BOAT_LARA);
+							break;
+						case 506:
+							game_mod_config.level_info[current_level].objects_info.motor_boat_extra_slot = dest_slot;
+							//assign_slot_for_level(current_level, dest_slot, MOTOR_BOAT_LARA);
+							break;
+						default:
+							assign_slot_for_level(current_level, dest_slot, src_slot);
+							break;
 					}
 				}
-			}
-			break;
-		}
-		case 0x05: {
-			// WorldViewFar
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WorldViewFar is not implemented! (level %u)", current_level);
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x06: {
-			// TextFormat
-			uint16_t text_color_id = NG_READ_16(gfScriptFile, offset);
-			if (text_color_id != 0xffff) {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat color unimplemented! (level %u)", current_level);
-			}
-			uint16_t text_format_flags = NG_READ_16(gfScriptFile, offset);
-			if (text_format_flags != 0xffff) {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat flags unimplemented! (level %u)", current_level);
-			}
 
-			uint16_t text_blink_time = NG_READ_16(gfScriptFile, offset);
-			if (text_blink_time != 0xffff) {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat blink time unimplemented! (level %u)", current_level);
-			}
-
-			uint16_t size_character_menu = NG_READ_16(gfScriptFile, offset);
-			if (size_character_menu != 0xffff) {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat size character menu unimplemented! (level %u)", current_level);
-			}
-
-			break;
-		}
-		case 0x07: {
-			// Rain
-			uint16_t rain_type = NG_READ_16(gfScriptFile, offset);
-			switch (rain_type) {
-			case 0:
-				get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_DISABLED;
-				break;
-			case 1:
-				get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS;
-				break;
-			case 2:
-				get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_ENABLED_ALL_OUTSIDE;
-				break;
-			default:
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: unknown rain type! (level %u)", current_level);
 				break;
 			}
-			break;
-		}
-		case 0x08: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Damage unimplemented! (level %u)", current_level);
-
-			// Damage (WIP)
-			uint16_t damage_flags = NG_READ_16(gfScriptFile, offset);
-			uint16_t seconds_for_death = NG_READ_16(gfScriptFile, offset);
-			uint16_t seconds_for_barbar_restore = NG_READ_16(gfScriptFile, offset);
-			uint32_t bar_color = NG_READ_32(gfScriptFile, offset);
-			uint16_t bar_name = NG_READ_16(gfScriptFile, offset);
-			uint16_t blink_percentage = NG_READ_16(gfScriptFile, offset);
-
-			break;
-		}
-		case 0x09: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy configuration unfinished! (level %u)", current_level);
-
-			// Enemy (WIP)
-			uint16_t slot = NG_READ_16(gfScriptFile, offset);
-
-			MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = nullptr;
-			if (current_level == 0) {
-				for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
-					mod_object_customization = get_game_mod_level_object_customization_for_slot(i, slot);
+			case 0x02: {
+				// Snow
+				uint16_t snow_type = NG_READ_16(gfScriptFile, offset);
+				switch (snow_type) {
+					case 0:
+						get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_DISABLED;
+						break;
+					case 1:
+						get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS;
+						break;
+					case 2:
+						get_game_mod_level_misc_info(current_level)->snow_type = T4P_WEATHER_ENABLED_ALL_OUTSIDE;
+						break;
+					default:
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: unknown snow type! (level %u)", current_level);
+						break;
 				}
-			} else {
-				mod_object_customization = get_game_mod_level_object_customization_for_slot(current_level, slot);
-			}
-			
-			if (!mod_object_customization) {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Invalid slot for enemy info! (level %u)", current_level);
 				break;
 			}
+			case 0x03: {
+				// LevelFarView
+				far_view = NG_READ_16(gfScriptFile, offset);
 
-			uint16_t hp = NG_READ_16(gfScriptFile, offset);
-			if (hp != 0xffff) {
-				mod_object_customization->hit_points = hp;
-				mod_object_customization->override_hit_points = true;
-			}
+				if (far_view != -1) {
+					if (far_view > world_far_view)
+						far_view = world_far_view;
 
-			if (offset < command_block_end_position) {
-				uint16_t nef_flags = NG_READ_16(gfScriptFile, offset);
-				if (nef_flags != 0xffff) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy EF_ flags unsupported (level %u)", current_level);
+					get_game_mod_level_environment_info(current_level)->far_view = (uint32_t)far_view * BLOCK_SIZE;
 				}
+				break;
 			}
+			case 0x04: {
+				// FogRange
+				// Negative font values appear to control the intensity, but that is currently unsupported
+				int16_t fog_start = NG_READ_16(gfScriptFile, offset);
+				int16_t fog_end = NG_READ_16(gfScriptFile, offset);
 
-			if (offset < command_block_end_position) {
-				uint16_t tomb_flags = NG_READ_16(gfScriptFile, offset);
-				if (tomb_flags != 0xffff) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy TombFlags unsupported (level %u)", current_level);
+				if (fog_start != -1) {
+					get_game_mod_level_environment_info(current_level)->fog_start_range = fog_start * BLOCK_SIZE;
+				} else {
+					get_game_mod_level_environment_info(current_level)->fog_start_range = 12 * BLOCK_SIZE;
 				}
-			}
 
-			if (offset < command_block_end_position) {
-				uint16_t extra_flags = NG_READ_16(gfScriptFile, offset);
-				if (extra_flags != 0xffff) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy extra_flags unsupported (level %u)", current_level);
+				if (fog_end != -1) {
+					get_game_mod_level_environment_info(current_level)->fog_end_range = fog_end * BLOCK_SIZE;
+				} else {
+					if (far_view != -1) {
+						get_game_mod_level_environment_info(current_level)->fog_end_range = far_view * BLOCK_SIZE;
+					} else {
+						if (world_far_view != -1) {
+							get_game_mod_level_environment_info(current_level)->fog_end_range = world_far_view * BLOCK_SIZE;
+						}
+					}
 				}
+				break;
 			}
-
-			if (offset < command_block_end_position) {
-				uint16_t damage_1 = NG_READ_16(gfScriptFile, offset);
-				if (damage_1 != 0xffff) {
-					mod_object_customization->damage_1 = damage_1;
+			case 0x05: {
+				// WorldViewFar
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WorldViewFar is not implemented! (level %u)", current_level);
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x06: {
+				// TextFormat
+				uint16_t text_color_id = NG_READ_16(gfScriptFile, offset);
+				if (text_color_id != 0xffff) {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat color unimplemented! (level %u)", current_level);
 				}
-			}
-			if (offset < command_block_end_position) {
-				uint16_t damage_2 = NG_READ_16(gfScriptFile, offset);
-				if (damage_2 != 0xffff) {
-					mod_object_customization->damage_2 = damage_2;
+				uint16_t text_format_flags = NG_READ_16(gfScriptFile, offset);
+				if (text_format_flags != 0xffff) {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat flags unimplemented! (level %u)", current_level);
 				}
-			}
-			if (offset < command_block_end_position) {
-				uint16_t damage_3 = NG_READ_16(gfScriptFile, offset);
-				if (damage_3 != 0xffff) {
-					mod_object_customization->damage_3 = damage_3;
+
+				uint16_t text_blink_time = NG_READ_16(gfScriptFile, offset);
+				if (text_blink_time != 0xffff) {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat blink time unimplemented! (level %u)", current_level);
 				}
-			}
 
-			break;
-		}
-		case 0x0a: {
-			// Animation (WIP)
-			if (tables->level_animation_count >= MAX_NG_ANIMATIONS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Animation overflow! (level %u)", current_level);
-				return 0;
-				// Broken
-			}
+				uint16_t size_character_menu = NG_READ_16(gfScriptFile, offset);
+				if (size_character_menu != 0xffff) {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextFormat size character menu unimplemented! (level %u)", current_level);
+				}
 
-			tables->level_animation_table[tables->level_animation_count].record_id = tables->level_animation_count;
+				break;
+			}
+			case 0x07: {
+				// Rain
+				uint16_t rain_type = NG_READ_16(gfScriptFile, offset);
+				switch (rain_type) {
+					case 0:
+						get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_DISABLED;
+						break;
+					case 1:
+						get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS;
+						break;
+					case 2:
+						get_game_mod_level_misc_info(current_level)->rain_type = T4P_WEATHER_ENABLED_ALL_OUTSIDE;
+						break;
+					default:
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: unknown rain type! (level %u)", current_level);
+						break;
+				}
+				break;
+			}
+			case 0x08: {
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Damage unimplemented! (level %u)", current_level);
 
-			tables->level_animation_table[tables->level_animation_count].record.animation_index = NG_READ_16(gfScriptFile, offset);
-			tables->level_animation_table[tables->level_animation_count].record.key_1 = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.key_1 == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.key_1 = 0;
-			}
-			tables->level_animation_table[tables->level_animation_count].record.key_2 = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.key_2 == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.key_2 = 0;
-			}
-			tables->level_animation_table[tables->level_animation_count].record.fan_flags = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.fan_flags == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.fan_flags = 0;
-			}
-			tables->level_animation_table[tables->level_animation_count].record.environment.env_condition = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.environment.env_condition == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.environment.env_condition = 0;
-			}
-			tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env = 0;
-			}
-			tables->level_animation_table[tables->level_animation_count].record.environment.extra = NG_READ_16(gfScriptFile, offset);
-			if (tables->level_animation_table[tables->level_animation_count].record.environment.extra == 0xffff) {
-				tables->level_animation_table[tables->level_animation_count].record.environment.extra = 0;
-			}
+				// Damage (WIP)
+				uint16_t damage_flags = NG_READ_16(gfScriptFile, offset);
+				uint16_t seconds_for_death = NG_READ_16(gfScriptFile, offset);
+				uint16_t seconds_for_barbar_restore = NG_READ_16(gfScriptFile, offset);
+				uint32_t bar_color = NG_READ_32(gfScriptFile, offset);
+				uint16_t bar_name = NG_READ_16(gfScriptFile, offset);
+				uint16_t blink_percentage = NG_READ_16(gfScriptFile, offset);
 
-			while ((offset != command_block_end_position)) {
-				if (tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count >= NG_ANIMATION_CONDTION_MAX_SIZE) {
-					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Animation state/condition overflow! (level %u)", current_level);
+				break;
+			}
+			case 0x09: {
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy configuration unfinished! (level %u)", current_level);
+
+				// Enemy (WIP)
+				uint16_t slot = NG_READ_16(gfScriptFile, offset);
+
+				MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = nullptr;
+				if (current_level == 0) {
+					for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
+						mod_object_customization = get_game_mod_level_object_customization_for_slot(i, slot);
+					}
+				} else {
+					mod_object_customization = get_game_mod_level_object_customization_for_slot(current_level, slot);
+				}
+
+				if (!mod_object_customization) {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Invalid slot for enemy info! (level %u)", current_level);
+					break;
+				}
+
+				uint16_t hp = NG_READ_16(gfScriptFile, offset);
+				if (hp != 0xffff) {
+					mod_object_customization->hit_points = hp;
+					mod_object_customization->override_hit_points = true;
+				}
+
+				if (offset < command_block_end_position) {
+					uint16_t nef_flags = NG_READ_16(gfScriptFile, offset);
+					if (nef_flags != 0xffff) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy EF_ flags unsupported (level %u)", current_level);
+					}
+				}
+
+				if (offset < command_block_end_position) {
+					uint16_t tomb_flags = NG_READ_16(gfScriptFile, offset);
+					if (tomb_flags != 0xffff) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy TombFlags unsupported (level %u)", current_level);
+					}
+				}
+
+				if (offset < command_block_end_position) {
+					uint16_t extra_flags = NG_READ_16(gfScriptFile, offset);
+					if (extra_flags != 0xffff) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Enemy extra_flags unsupported (level %u)", current_level);
+					}
+				}
+
+				if (offset < command_block_end_position) {
+					uint16_t damage_1 = NG_READ_16(gfScriptFile, offset);
+					if (damage_1 != 0xffff) {
+						mod_object_customization->damage_1 = damage_1;
+					}
+				}
+				if (offset < command_block_end_position) {
+					uint16_t damage_2 = NG_READ_16(gfScriptFile, offset);
+					if (damage_2 != 0xffff) {
+						mod_object_customization->damage_2 = damage_2;
+					}
+				}
+				if (offset < command_block_end_position) {
+					uint16_t damage_3 = NG_READ_16(gfScriptFile, offset);
+					if (damage_3 != 0xffff) {
+						mod_object_customization->damage_3 = damage_3;
+					}
+				}
+
+				break;
+			}
+			case 0x0a: {
+				// Animation (WIP)
+				if (tables->level_animation_count >= MAX_NG_ANIMATIONS) {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Animation overflow! (level %u)", current_level);
 					return 0;
 					// Broken
 				}
 
-				tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_array[
-					tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count] = NG_READ_16(gfScriptFile, offset);
+				tables->level_animation_table[tables->level_animation_count].record_id = tables->level_animation_count;
 
-					tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count++;
-			}
-
-			tables->level_animation_count++;
-
-			break;
-		}
-		case 0x0b: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: MirrorEffect Unimplemented! (level %u)", current_level);
-
-			// MirrorEffect (WIP)
-			uint16_t in_front_room = NG_READ_16(gfScriptFile, offset);
-			uint16_t hidden_room = NG_READ_16(gfScriptFile, offset);
-			uint16_t mirror_type = NG_READ_16(gfScriptFile, offset);
-
-			// The rest of it should be an array of animatings:
-			while ((offset != command_block_end_position)) {
-				uint16_t animating_index = NG_READ_16(gfScriptFile, offset);
-				if (animating_index != 0xffff) {
-
+				tables->level_animation_table[tables->level_animation_count].record.animation_index = NG_READ_16(gfScriptFile, offset);
+				tables->level_animation_table[tables->level_animation_count].record.key_1 = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.key_1 == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.key_1 = 0;
 				}
-			}
-			break;
-		}
-		case 0x0c: {
-			// Elevator
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Elevator Unimplemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x0d: {
-			// Keypad
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Keypad Unimplemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x0e: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: AddEffect Unimplemented! (level %u)", current_level);
-
-			// AddEffect
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-			uint16_t effect_type = NG_READ_16(gfScriptFile, offset); // Obsolete
-			uint16_t flags_effects = NG_READ_16(gfScriptFile, offset);
-			uint16_t joint_type = NG_READ_16(gfScriptFile, offset);
-			int16_t disp_x = NG_READ_16(gfScriptFile, offset);
-			int16_t disp_y = NG_READ_16(gfScriptFile, offset);
-			int16_t disp_z = NG_READ_16(gfScriptFile, offset);
-			uint16_t durate_emit = NG_READ_16(gfScriptFile, offset);
-			uint16_t durate_pause = NG_READ_16(gfScriptFile, offset);
-
-			switch ((NG_ADD_EFFECT_TYPE)effect_type) {
-			case NG_ADD_MIST: {
-				if (offset == command_block_end_position)
-					break;
-				uint16_t size_of_mist_ball = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t number_of_mist_balls = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t color_of_mist = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t persistence_of_mist = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				break;
-			}
-			case NG_ADD_LIGHT_BLINK:
-			case NG_ADD_LIGHT_FLAT:
-			case NG_ADD_LIGHT_GLOVE:
-			case NG_ADD_LIGHT_SPOT: {
-				if (offset == command_block_end_position)
-					break;
-				uint16_t light_intensity = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t maximum_spotlight_distance = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t light_color = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				break;
-			}
-			case NG_ADD_FLAME: {
-				if (offset == command_block_end_position)
-					break;
-				uint16_t flame_intensity = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t lara_burn_settings = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t flame_direction = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				uint16_t flame_unknown = NG_READ_16(gfScriptFile, offset);
-				if (offset == command_block_end_position)
-					break;
-				break;
-			}
-			}
-			break;
-		}
-		case 0x0f: {
-			// Detector
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Detector Unimplemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x11: {
-			// TextureSequence
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextureSequence Unimplemented! (level %u)", current_level);
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x12: {
-			// Equipment (TODO: add support for LOAD_AMMO types)
-			uint16_t object_id = NG_READ_16(gfScriptFile, offset);
-			uint16_t amount = NG_READ_16(gfScriptFile, offset);
-
-			// Special-case for shotgun.
-			if (object_id == SHOTGUN_AMMO1_ITEM || object_id == SHOTGUN_AMMO2_ITEM) {
-				amount *= 6;
-			}
-
-			int32_t cur_level_idx = 0;
-			int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-			if (current_level != 0) {
-				cur_level_idx = current_level;
-				last_level_idx = current_level + 1;
-			}
-
-			for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-				MOD_EQUIPMENT_MODIFIER* equipment_modifiers = get_game_mod_level_stat_info(cur_level_idx)->equipment_modifiers;
-
-				int32_t current_modifier_idx = 0;
-				for (current_modifier_idx = 0; current_modifier_idx < MAX_EQUIPMENT_MODIFIERS; current_modifier_idx++) {
-					if (equipment_modifiers[current_modifier_idx].object_id == -1) {
-						equipment_modifiers[current_modifier_idx].object_id = object_id;
-						equipment_modifiers[current_modifier_idx].amount = amount;
-
-						break;
-					}
+				tables->level_animation_table[tables->level_animation_count].record.key_2 = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.key_2 == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.key_2 = 0;
+				}
+				tables->level_animation_table[tables->level_animation_count].record.fan_flags = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.fan_flags == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.fan_flags = 0;
+				}
+				tables->level_animation_table[tables->level_animation_count].record.environment.env_condition = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.environment.env_condition == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.environment.env_condition = 0;
+				}
+				tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.environment.distance_for_env = 0;
+				}
+				tables->level_animation_table[tables->level_animation_count].record.environment.extra = NG_READ_16(gfScriptFile, offset);
+				if (tables->level_animation_table[tables->level_animation_count].record.environment.extra == 0xffff) {
+					tables->level_animation_table[tables->level_animation_count].record.environment.extra = 0;
 				}
 
-				if (current_modifier_idx >= MAX_EQUIPMENT_MODIFIERS) {
-					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Max equipment modifiers exceeded (level %u)", cur_level_idx);
-				}
-			}
-
-			break;
-		}
-		case 0x13: {
-			// MultiEnvCondition (WIP)
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			if (id >= MAX_NG_MULTI_ENV_CONDITIONS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Multi Env Condition id is not valid! (level %u)", current_level);
-			} else {
-				tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record_id = id;
-
-				while (offset < command_block_end_position) {
-					if (tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count >= NG_MULTI_ENV_CONDITION_MAX_TRIPLETS) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: MultiEnvCondition triplet overflow! (level %u)", current_level);
+				while ((offset != command_block_end_position)) {
+					if (tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count >= NG_ANIMATION_CONDTION_MAX_SIZE) {
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Animation state/condition overflow! (level %u)", current_level);
 						return 0;
 						// Broken
 					}
 
-					int32_t index = tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count;
+					tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_array[
+					    tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count] = NG_READ_16(gfScriptFile, offset);
 
-					tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].env_condition = NG_READ_16(gfScriptFile, offset);
-					tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].distance_for_env = NG_READ_16(gfScriptFile, offset);
-					tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].extra = NG_READ_16(gfScriptFile, offset);
-
-					tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count++;
+					tables->level_animation_table[tables->level_animation_count].record.state_or_animation_condition_count++;
 				}
 
-				tables->level_multi_env_condition_count++;
+				tables->level_animation_count++;
+
+				break;
 			}
+			case 0x0b: {
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: MirrorEffect Unimplemented! (level %u)", current_level);
 
-			break;
-		}
-		case 0x14: {
-			// Customize (WIP)
-			uint32_t customization_category = 0;
-			uint32_t plugin_id = 0;
-			if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
-				customization_category = NG_READ_16(gfScriptFile, offset);
-			} else {
-				customization_category = NG_READ_16(gfScriptFile, offset);
-				plugin_id = NG_READ_16(gfScriptFile, offset);
+				// MirrorEffect (WIP)
+				uint16_t in_front_room = NG_READ_16(gfScriptFile, offset);
+				uint16_t hidden_room = NG_READ_16(gfScriptFile, offset);
+				uint16_t mirror_type = NG_READ_16(gfScriptFile, offset);
+
+				// The rest of it should be an array of animatings:
+				while ((offset != command_block_end_position)) {
+					uint16_t animating_index = NG_READ_16(gfScriptFile, offset);
+					if (animating_index != 0xffff) {
+
+					}
+				}
+				break;
 			}
+			case 0x0c: {
+				// Elevator
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Elevator Unimplemented! (level %u)", current_level);
 
-			if (plugin_id == 0) {
-				switch (customization_category) {
-				case CUST_DISABLE_SCREAMING_HEAD: {
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x0d: {
+				// Keypad
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Keypad Unimplemented! (level %u)", current_level);
 
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x0e: {
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: AddEffect Unimplemented! (level %u)", current_level);
 
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
+				// AddEffect
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+				uint16_t effect_type = NG_READ_16(gfScriptFile, offset); // Obsolete
+				uint16_t flags_effects = NG_READ_16(gfScriptFile, offset);
+				uint16_t joint_type = NG_READ_16(gfScriptFile, offset);
+				int16_t disp_x = NG_READ_16(gfScriptFile, offset);
+				int16_t disp_y = NG_READ_16(gfScriptFile, offset);
+				int16_t disp_z = NG_READ_16(gfScriptFile, offset);
+				uint16_t durate_emit = NG_READ_16(gfScriptFile, offset);
+				uint16_t durate_pause = NG_READ_16(gfScriptFile, offset);
+
+				switch ((NG_ADD_EFFECT_TYPE)effect_type) {
+					case NG_ADD_MIST: {
+						if (offset == command_block_end_position)
+							break;
+						uint16_t size_of_mist_ball = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t number_of_mist_balls = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t color_of_mist = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t persistence_of_mist = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						break;
 					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_objects_info(cur_level_idx)->lara_scream_slot = -1;
+					case NG_ADD_LIGHT_BLINK:
+					case NG_ADD_LIGHT_FLAT:
+					case NG_ADD_LIGHT_GLOVE:
+					case NG_ADD_LIGHT_SPOT: {
+						if (offset == command_block_end_position)
+							break;
+						uint16_t light_intensity = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t maximum_spotlight_distance = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t light_color = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						break;
 					}
-					break;
+					case NG_ADD_FLAME: {
+						if (offset == command_block_end_position)
+							break;
+						uint16_t flame_intensity = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t lara_burn_settings = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t flame_direction = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						uint16_t flame_unknown = NG_READ_16(gfScriptFile, offset);
+						if (offset == command_block_end_position)
+							break;
+						break;
+					}
 				}
-				case CUST_SET_SECRET_NUMBER: {
-					uint16_t secret_count = NG_READ_16(gfScriptFile, offset);
+				break;
+			}
+			case 0x0f: {
+				// Detector
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Detector Unimplemented! (level %u)", current_level);
 
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x11: {
+				// TextureSequence
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: TextureSequence Unimplemented! (level %u)", current_level);
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x12: {
+				// Equipment (TODO: add support for LOAD_AMMO types)
+				uint16_t object_id = NG_READ_16(gfScriptFile, offset);
+				uint16_t amount = NG_READ_16(gfScriptFile, offset);
 
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
+				// Special-case for shotgun.
+				if (object_id == SHOTGUN_AMMO1_ITEM || object_id == SHOTGUN_AMMO2_ITEM) {
+					amount *= 6;
+				}
+
+				int32_t cur_level_idx = 0;
+				int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+				if (current_level != 0) {
+					cur_level_idx = current_level;
+					last_level_idx = current_level + 1;
+				}
+
+				for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+					MOD_EQUIPMENT_MODIFIER* equipment_modifiers = get_game_mod_level_stat_info(cur_level_idx)->equipment_modifiers;
+
+					int32_t current_modifier_idx = 0;
+					for (current_modifier_idx = 0; current_modifier_idx < MAX_EQUIPMENT_MODIFIERS; current_modifier_idx++) {
+						if (equipment_modifiers[current_modifier_idx].object_id == -1) {
+							equipment_modifiers[current_modifier_idx].object_id = object_id;
+							equipment_modifiers[current_modifier_idx].amount = amount;
+
+							break;
+						}
 					}
 
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_stat_info(cur_level_idx)->secret_count = secret_count;
+					if (current_modifier_idx >= MAX_EQUIPMENT_MODIFIERS) {
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Max equipment modifiers exceeded (level %u)", cur_level_idx);
+					}
+				}
+
+				break;
+			}
+			case 0x13: {
+				// MultiEnvCondition (WIP)
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+				if (id >= MAX_NG_MULTI_ENV_CONDITIONS) {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Multi Env Condition id is not valid! (level %u)", current_level);
+				} else {
+					tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record_id = id;
+
+					while (offset < command_block_end_position) {
+						if (tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count >= NG_MULTI_ENV_CONDITION_MAX_TRIPLETS) {
+							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: MultiEnvCondition triplet overflow! (level %u)", current_level);
+							return 0;
+							// Broken
+						}
+
+						int32_t index = tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count;
+
+						tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].env_condition = NG_READ_16(gfScriptFile, offset);
+						tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].distance_for_env = NG_READ_16(gfScriptFile, offset);
+						tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_array[index].extra = NG_READ_16(gfScriptFile, offset);
+
+						tables->level_multi_env_condition_table[tables->level_multi_env_condition_count].record.env_condition_triplet_count++;
 					}
 
-					break;
+					tables->level_multi_env_condition_count++;
 				}
-				case CUST_SET_CREDITS_LEVEL: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_CREDITS_LEVEL unimplemented! (level %u)", current_level);
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
+
+				break;
+			}
+			case 0x14: {
+				// Customize (WIP)
+				uint32_t customization_category = 0;
+				uint32_t plugin_id = 0;
+				if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
+					customization_category = NG_READ_16(gfScriptFile, offset);
+				} else {
+					customization_category = NG_READ_16(gfScriptFile, offset);
+					plugin_id = NG_READ_16(gfScriptFile, offset);
 				}
-				case CUST_DISABLE_FORCING_ANIM_96: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_FORCING_ANIM_96 unimplemented! (level %u)", current_level);
 
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_ROLLINGBALL_PUSHING: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ROLLINGBALL_PUSHING unimplemented! (level %u)", current_level);
+				if (plugin_id == 0) {
+					switch (customization_category) {
+						case CUST_DISABLE_SCREAMING_HEAD: {
 
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_NEW_SOUND_ENGINE: {
-					uint16_t new_sound_engine_flags = NG_READ_16(gfScriptFile, offset);
-					if (new_sound_engine_flags == 0xffff || new_sound_engine_flags == 0) {
-						new_sound_engine_flags = 0;
-					} else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE flags not supported! (level %u)", current_level);
-					}
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
 
-					uint16_t sound_extension = NG_READ_16(gfScriptFile, offset); // Obsolete
-					uint16_t long_fade_out = NG_READ_16(gfScriptFile, offset);
-					if (long_fade_out != 0xffff) {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE custom long_fade_out unsupported! (level %u)", current_level);
-					}
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
 
-					uint16_t short_fade_out = NG_READ_16(gfScriptFile, offset);
-					if (short_fade_out != 0xffff) {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE custom short_fade_out unsupported! (level %u)", current_level);
-					}
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_objects_info(cur_level_idx)->lara_scream_slot = -1;
+							}
+							break;
+						}
+						case CUST_SET_SECRET_NUMBER: {
+							uint16_t secret_count = NG_READ_16(gfScriptFile, offset);
 
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SPEED_MOVING: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SPEED_MOVING unimplemented! (level %u)", current_level);
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
 
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SHATTER_RANGE: {
-					uint16_t first_static_as_shatter = NG_READ_16(gfScriptFile, offset);
-					uint16_t last_static_as_shatter = NG_READ_16(gfScriptFile, offset);
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
 
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_stat_info(cur_level_idx)->secret_count = secret_count;
+							}
 
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
+							break;
+						}
+						case CUST_SET_CREDITS_LEVEL: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_CREDITS_LEVEL unimplemented! (level %u)", current_level);
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_DISABLE_FORCING_ANIM_96: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_FORCING_ANIM_96 unimplemented! (level %u)", current_level);
 
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						ng_levels[cur_level_idx].first_shatter_id = first_static_as_shatter;
-						ng_levels[cur_level_idx].last_shatter_id = last_static_as_shatter;
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_ROLLINGBALL_PUSHING: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ROLLINGBALL_PUSHING unimplemented! (level %u)", current_level);
 
-						for (int32_t static_idx = 0; static_idx < NUMBER_STATIC_OBJECTS; static_idx++) {
-							if (static_idx >= first_static_as_shatter && static_idx <= last_static_as_shatter) {
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].large_objects_can_shatter = true;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].creatures_can_shatter = true;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].lara_guns_can_shatter = true;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].record_shatter_state_in_savegames = true;
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_NEW_SOUND_ENGINE: {
+							uint16_t new_sound_engine_flags = NG_READ_16(gfScriptFile, offset);
+							if (new_sound_engine_flags == 0xffff || new_sound_engine_flags == 0) {
+								new_sound_engine_flags = 0;
 							} else {
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].large_objects_can_shatter = false;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].creatures_can_shatter = false;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].lara_guns_can_shatter = false;
-								get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].record_shatter_state_in_savegames = false;
-
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE flags not supported! (level %u)", current_level);
 							}
-						}
-					}
 
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_WEAPON: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_WEAPON unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_AMMO: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_AMMO unimplemented! (level %u)", current_level);
-
-					uint16_t ammo_slot = NG_READ_16(gfScriptFile, offset);
-					uint16_t ammo_flags = NG_READ_16(gfScriptFile, offset);
-					uint16_t damage = NG_READ_16(gfScriptFile, offset);
-					uint16_t shots_for_box = NG_READ_16(gfScriptFile, offset);
-					uint16_t shots_with_weapon = NG_READ_16(gfScriptFile, offset);
-					uint16_t extra = NG_READ_16(gfScriptFile, offset);
-					uint16_t id_trigger_group_when_hit_enemy = NG_READ_16(gfScriptFile, offset);
-					uint16_t damage_for_explosion = NG_READ_16(gfScriptFile, offset);
-					uint16_t speed = 0xffff;
-					if (offset < command_block_end_position) {
-						speed = NG_READ_16(gfScriptFile, offset);
-					}
-					uint16_t gravity = 0xffff;
-					if (offset < command_block_end_position) {
-						gravity = NG_READ_16(gfScriptFile, offset);
-					}
-					uint16_t id_add_effect_to_ammo = 0xffff;
-					if (offset < command_block_end_position) {
-						id_add_effect_to_ammo = NG_READ_16(gfScriptFile, offset);
-					}
-					uint16_t id_trigger_group_at_end = 0xffff;
-					if (offset < command_block_end_position) {
-						id_trigger_group_at_end = NG_READ_16(gfScriptFile, offset);
-					}
-
-					MOD_LEVEL_WEAPON_INFO *weapon_info = get_game_mod_level_weapon_info(current_level);
-					MOD_LEVEL_AMMO_INFO *ammo_info = nullptr;
-
-					switch (ammo_slot) {
-						case PISTOLS_AMMO_ITEM:
-							ammo_info = &weapon_info->pistol_ammo_info;
-							break;
-						case UZI_AMMO_ITEM:
-							ammo_info = &weapon_info->uzi_ammo_info;
-							break;
-						case SHOTGUN_AMMO1_ITEM:
-							ammo_info = &weapon_info->shotgun_1_ammo_info;
-							break;
-						case SHOTGUN_AMMO2_ITEM:
-							ammo_info = &weapon_info->shotgun_2_ammo_info;
-							break;
-						case CROSSBOW_AMMO1_ITEM:
-							ammo_info = &weapon_info->crossbow_1_ammo_info;
-							break;
-						case CROSSBOW_AMMO2_ITEM:
-							ammo_info = &weapon_info->crossbow_2_ammo_info;
-							break;
-						case CROSSBOW_AMMO3_ITEM:
-							ammo_info = &weapon_info->crossbow_3_ammo_info;
-							break;
-						case GRENADE_GUN_AMMO1_ITEM:
-							ammo_info = &weapon_info->grenade_1_ammo_info;
-							break;
-						case GRENADE_GUN_AMMO2_ITEM:
-							ammo_info = &weapon_info->grenade_2_ammo_info;
-							break;
-						case GRENADE_GUN_AMMO3_ITEM:
-							ammo_info = &weapon_info->grenade_3_ammo_info;
-							break;
-						case SIXSHOOTER_AMMO_ITEM:
-							ammo_info = &weapon_info->six_shooter_ammo_info;
-							break;
-						default:
-							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: CUST_AMMO unknown ammo type! (level %u)", current_level);
-							break;
-					}
-
-					if (ammo_info) {
-						if (ammo_flags != 0xffff) {
-							if (ammo_flags & AMMO_PUSH_TARGET)
-								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_FLAG_PUSH_TARGET unsupported! (level %u)", current_level);
-							if (ammo_flags & AMMO_PUSH_TARGET)
-								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_FLAG_PUSH_LARA unsupported! (level %u)", current_level);
-							if (ammo_flags & AMMO_SET_GRENADE_TIMER)
-								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_SET_GRENADE_TIMER unsupported! (level %u)", current_level);
-							if (ammo_flags & AMMO_ADD_GUN_SHELL)
-								ammo_info->add_pistol_shell = true;
-							if (ammo_flags & AMMO_ADD_SHOTGUN_SHELL)
-								ammo_info->add_shotgun_shell = true;
-							if (ammo_flags & AMMO_REMOVE_SHOTGUN_SHELL)
-								ammo_info->add_shotgun_shell = false;
-						}
-
-						if (damage != 0xffff) {
-							ammo_info->damage = damage;
-						}
-
-						if (damage_for_explosion != 0xffff) {
-							ammo_info->explosion_damage = damage_for_explosion;
-						}
-
-						if (shots_for_box != 0xffff) {
-							ammo_info->ammo_pickup_amount = shots_for_box;
-						}
-
-						if (shots_with_weapon != 0xffff) {
-							ammo_info->weapon_pickup_amount = shots_with_weapon;
-						}
-
-						if (speed != 0xffff) {
-							ammo_info->speed = speed;
-						}
-
-						if (gravity != 0xffff) {
-							ammo_info->gravity = gravity;
-						}
-
-						if (id_trigger_group_when_hit_enemy != 0xffff) {
-							ammo_info->trng_trigger_id_when_enemy_hit = id_trigger_group_when_hit_enemy;
-						}
-
-						if (id_trigger_group_at_end != 0xffff) {
-							ammo_info->trng_trigger_id_at_end = id_trigger_group_at_end;
-						}
-
-						if (id_add_effect_to_ammo != 0xffff) {
-							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TRNG AddEffect unsupported! (level %u)", current_level);
-							ammo_info->trng_effect = id_add_effect_to_ammo;
-						}
-					}
-
-					break;
-				}
-				case CUST_SHOW_AMMO_COUNTER: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SHOW_AMMO_COUNTER unimplemented! (level %u)", current_level);
-
-					uint16_t color = NG_READ_16(gfScriptFile, offset);
-					uint16_t format_flags = NG_READ_16(gfScriptFile, offset); // Obsolete
-					uint16_t blink_time = NG_READ_16(gfScriptFile, offset);
-					uint16_t size_character = NG_READ_16(gfScriptFile, offset);
-					uint16_t show_counter_flags = 0xffff;
-					if (offset < command_block_end_position) {
-						show_counter_flags = NG_READ_16(gfScriptFile, offset);
-					}
-					break;
-				}
-				case CUST_SET_INV_ITEM: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_INV_ITEM unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SET_JEEP_KEY_SLOT: {
-					int16_t jeep_key_slot = NG_READ_16(gfScriptFile, offset);
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						if (jeep_key_slot != -1) {
-							get_game_mod_level_objects_info(cur_level_idx)->jeep_key_slot = jeep_key_slot;
-						}
-					}
-					break;
-				}
-				case CUST_STATIC_TRANSPARENCY: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_STATIC_TRANSPARENCY unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SET_STATIC_DAMAGE: {
-					int16_t damage = NG_READ_16(gfScriptFile, offset);
-					int16_t poison_intensity = NG_READ_16(gfScriptFile, offset);
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						if (damage != -1) {
-							get_game_mod_level_misc_info(cur_level_idx)->damage_static_interaction = damage;
-						}
-						if (poison_intensity != -1) {
-							get_game_mod_level_misc_info(cur_level_idx)->poison_static_interaction = poison_intensity;
-						}
-					}
-					break;
-				}
-				case CUST_LOOK_TRANSPARENT: {
-					int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
-
-					bool use_look_transparency = true;
-					if (is_enabled == 0) {
-						use_look_transparency = false;
-					} else if (is_enabled == 1) {
-						use_look_transparency = true;
-					} else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_LOOK_TRANSPARENT type unimplemented! (level %u)", current_level);
-					}
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_lara_info(cur_level_idx)->use_look_transparency = use_look_transparency;
-					}
-					break;
-				}
-				case CUST_HAIR_TYPE: {
-					uint16_t hair_type = NG_READ_16(gfScriptFile, offset);
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						switch (hair_type) {
-						case 0x00:
-							break;
-						case 0x01:
-							get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_NONE;
-							break;
-						case 0x02:
-							get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_PIGTAILS;
-							break;
-						case 0x03:
-							get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_BRAID;
-							break;
-						case 0x04:
-							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_HAIR_TYPE hair type 04 unimplemented! (level %u)", cur_level_idx);
-							break;
-						case 0xffff:
-							break;
-						}
-					}
-					break;
-				}
-				case CUST_KEEP_DEAD_ENEMIES: {
-					int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
-
-					bool fade_dead_enemies = true;
-					if (is_enabled == 1) {
-						fade_dead_enemies = false;
-					} else if (is_enabled == 0) {
-						fade_dead_enemies = true;
-					} else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_KEEP_DEAD_ENEMIES type unimplemented! (level %u)", current_level);
-					}
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_creature_info(cur_level_idx)->fade_dead_enemies = fade_dead_enemies;
-					}
-					break;
-				}
-				case CUST_SET_OLD_CD_TRIGGER: {
-					int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
-
-					bool old_cd_trigger = true;
-					if (is_enabled == 1) {
-						old_cd_trigger = false;
-					}
-					else if (is_enabled == 0) {
-						old_cd_trigger = true;
-					} else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_OLD_CD_TRIGGER type unimplemented! (level %u)", current_level);
-					}
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_audio_info(cur_level_idx)->old_cd_trigger_system = old_cd_trigger;
-					}
-					break;
-				}
-				case CUST_ESCAPE_FLY_CAMERA: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ESCAPE_FLY_CAMERA unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_PAUSE_FLY_CAMERA: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_PAUSE_FLY_CAMERA unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_TEXT_ON_FLY_SCREEN: {
-					bool text_on_fly_screen = NG_READ_16(gfScriptFile, offset);
-					get_game_mod_level_misc_info(current_level)->draw_legend_on_flyby = text_on_fly_screen;
-
-					break;
-				}
-				case CUST_CD_SINGLE_PLAYBACK: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_CD_SINGLE_PLAYBACK unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_ADD_DEATH_ANIMATION: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ADD_DEATH_ANIMATION unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_BAR: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BAR unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_NO_TIME_IN_SAVELIST: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NO_TIME_IN_SAVELIST unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_PARALLEL_BARS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_PARALLEL_BARS unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_CAMERA: {
-					int16_t fcam_properties = NG_READ_16(gfScriptFile, offset);
-					int16_t distance_chase_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t v_orient_chase_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t h_orient_chase_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t distance_combat_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t v_orient_combat_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t distance_look_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t height_look_cam = NG_READ_16(gfScriptFile, offset);
-					int16_t speed_camera = NG_READ_16(gfScriptFile, offset);
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						if (fcam_properties != -1) {
-							if (fcam_properties & 0x01) {
-								get_game_mod_level_camera_info(cur_level_idx)->disable_battle_camera = true;
+							uint16_t sound_extension = NG_READ_16(gfScriptFile, offset); // Obsolete
+							uint16_t long_fade_out = NG_READ_16(gfScriptFile, offset);
+							if (long_fade_out != 0xffff) {
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE custom long_fade_out unsupported! (level %u)", current_level);
 							}
-							if (fcam_properties & ~0x01) {
-								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_CAMERA unsupported FCAM_ property! (level %u)", current_level);
+
+							uint16_t short_fade_out = NG_READ_16(gfScriptFile, offset);
+							if (short_fade_out != 0xffff) {
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NEW_SOUND_ENGINE custom short_fade_out unsupported! (level %u)", current_level);
 							}
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
-						if (distance_chase_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->chase_camera_distance = distance_chase_cam;
+						case CUST_SPEED_MOVING: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SPEED_MOVING unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
-						if (v_orient_chase_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->chase_camera_vertical_orientation = v_orient_chase_cam;
+						case CUST_SHATTER_RANGE: {
+							uint16_t first_static_as_shatter = NG_READ_16(gfScriptFile, offset);
+							uint16_t last_static_as_shatter = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								ng_levels[cur_level_idx].first_shatter_id = first_static_as_shatter;
+								ng_levels[cur_level_idx].last_shatter_id = last_static_as_shatter;
+
+								for (int32_t static_idx = 0; static_idx < NUMBER_STATIC_OBJECTS; static_idx++) {
+									if (static_idx >= first_static_as_shatter && static_idx <= last_static_as_shatter) {
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].large_objects_can_shatter = true;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].creatures_can_shatter = true;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].lara_guns_can_shatter = true;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].record_shatter_state_in_savegames = true;
+									} else {
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].large_objects_can_shatter = false;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].creatures_can_shatter = false;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].lara_guns_can_shatter = false;
+										get_game_mod_level_statics_info(cur_level_idx)->static_info[static_idx].record_shatter_state_in_savegames = false;
+
+									}
+								}
+							}
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
-						if (h_orient_chase_cam != -1) {
-							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: h_orient_chase_cam is not supported! (level %u)", current_level);
+						case CUST_WEAPON: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_WEAPON unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
-						if (distance_combat_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->combat_camera_distance = distance_combat_cam;
+						case CUST_AMMO: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_AMMO unimplemented! (level %u)", current_level);
+
+							uint16_t ammo_slot = NG_READ_16(gfScriptFile, offset);
+							uint16_t ammo_flags = NG_READ_16(gfScriptFile, offset);
+							uint16_t damage = NG_READ_16(gfScriptFile, offset);
+							uint16_t shots_for_box = NG_READ_16(gfScriptFile, offset);
+							uint16_t shots_with_weapon = NG_READ_16(gfScriptFile, offset);
+							uint16_t extra = NG_READ_16(gfScriptFile, offset);
+							uint16_t id_trigger_group_when_hit_enemy = NG_READ_16(gfScriptFile, offset);
+							uint16_t damage_for_explosion = NG_READ_16(gfScriptFile, offset);
+							uint16_t speed = 0xffff;
+							if (offset < command_block_end_position) {
+								speed = NG_READ_16(gfScriptFile, offset);
+							}
+							uint16_t gravity = 0xffff;
+							if (offset < command_block_end_position) {
+								gravity = NG_READ_16(gfScriptFile, offset);
+							}
+							uint16_t id_add_effect_to_ammo = 0xffff;
+							if (offset < command_block_end_position) {
+								id_add_effect_to_ammo = NG_READ_16(gfScriptFile, offset);
+							}
+							uint16_t id_trigger_group_at_end = 0xffff;
+							if (offset < command_block_end_position) {
+								id_trigger_group_at_end = NG_READ_16(gfScriptFile, offset);
+							}
+
+							MOD_LEVEL_WEAPON_INFO *weapon_info = get_game_mod_level_weapon_info(current_level);
+							MOD_LEVEL_AMMO_INFO *ammo_info = nullptr;
+
+							switch (ammo_slot) {
+								case PISTOLS_AMMO_ITEM:
+									ammo_info = &weapon_info->pistol_ammo_info;
+									break;
+								case UZI_AMMO_ITEM:
+									ammo_info = &weapon_info->uzi_ammo_info;
+									break;
+								case SHOTGUN_AMMO1_ITEM:
+									ammo_info = &weapon_info->shotgun_1_ammo_info;
+									break;
+								case SHOTGUN_AMMO2_ITEM:
+									ammo_info = &weapon_info->shotgun_2_ammo_info;
+									break;
+								case CROSSBOW_AMMO1_ITEM:
+									ammo_info = &weapon_info->crossbow_1_ammo_info;
+									break;
+								case CROSSBOW_AMMO2_ITEM:
+									ammo_info = &weapon_info->crossbow_2_ammo_info;
+									break;
+								case CROSSBOW_AMMO3_ITEM:
+									ammo_info = &weapon_info->crossbow_3_ammo_info;
+									break;
+								case GRENADE_GUN_AMMO1_ITEM:
+									ammo_info = &weapon_info->grenade_1_ammo_info;
+									break;
+								case GRENADE_GUN_AMMO2_ITEM:
+									ammo_info = &weapon_info->grenade_2_ammo_info;
+									break;
+								case GRENADE_GUN_AMMO3_ITEM:
+									ammo_info = &weapon_info->grenade_3_ammo_info;
+									break;
+								case SIXSHOOTER_AMMO_ITEM:
+									ammo_info = &weapon_info->six_shooter_ammo_info;
+									break;
+								default:
+									NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: CUST_AMMO unknown ammo type! (level %u)", current_level);
+									break;
+							}
+
+							if (ammo_info) {
+								if (ammo_flags != 0xffff) {
+									if (ammo_flags & AMMO_PUSH_TARGET)
+										NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_FLAG_PUSH_TARGET unsupported! (level %u)", current_level);
+									if (ammo_flags & AMMO_PUSH_TARGET)
+										NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_FLAG_PUSH_LARA unsupported! (level %u)", current_level);
+									if (ammo_flags & AMMO_SET_GRENADE_TIMER)
+										NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: AMMO_SET_GRENADE_TIMER unsupported! (level %u)", current_level);
+									if (ammo_flags & AMMO_ADD_GUN_SHELL)
+										ammo_info->add_pistol_shell = true;
+									if (ammo_flags & AMMO_ADD_SHOTGUN_SHELL)
+										ammo_info->add_shotgun_shell = true;
+									if (ammo_flags & AMMO_REMOVE_SHOTGUN_SHELL)
+										ammo_info->add_shotgun_shell = false;
+								}
+
+								if (damage != 0xffff) {
+									ammo_info->damage = damage;
+								}
+
+								if (damage_for_explosion != 0xffff) {
+									ammo_info->explosion_damage = damage_for_explosion;
+								}
+
+								if (shots_for_box != 0xffff) {
+									ammo_info->ammo_pickup_amount = shots_for_box;
+								}
+
+								if (shots_with_weapon != 0xffff) {
+									ammo_info->weapon_pickup_amount = shots_with_weapon;
+								}
+
+								if (speed != 0xffff) {
+									ammo_info->speed = speed;
+								}
+
+								if (gravity != 0xffff) {
+									ammo_info->gravity = gravity;
+								}
+
+								if (id_trigger_group_when_hit_enemy != 0xffff) {
+									ammo_info->trng_trigger_id_when_enemy_hit = id_trigger_group_when_hit_enemy;
+								}
+
+								if (id_trigger_group_at_end != 0xffff) {
+									ammo_info->trng_trigger_id_at_end = id_trigger_group_at_end;
+								}
+
+								if (id_add_effect_to_ammo != 0xffff) {
+									NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TRNG AddEffect unsupported! (level %u)", current_level);
+									ammo_info->trng_effect = id_add_effect_to_ammo;
+								}
+							}
+
+							break;
 						}
-						if (v_orient_combat_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->combat_camera_vertical_orientation = v_orient_combat_cam;
+						case CUST_SHOW_AMMO_COUNTER: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SHOW_AMMO_COUNTER unimplemented! (level %u)", current_level);
+
+							uint16_t color = NG_READ_16(gfScriptFile, offset);
+							uint16_t format_flags = NG_READ_16(gfScriptFile, offset); // Obsolete
+							uint16_t blink_time = NG_READ_16(gfScriptFile, offset);
+							uint16_t size_character = NG_READ_16(gfScriptFile, offset);
+							uint16_t show_counter_flags = 0xffff;
+							if (offset < command_block_end_position) {
+								show_counter_flags = NG_READ_16(gfScriptFile, offset);
+							}
+							break;
 						}
-						if (distance_look_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->look_camera_distance = distance_look_cam;
+						case CUST_SET_INV_ITEM: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_INV_ITEM unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
-						if (height_look_cam != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->look_camera_height = height_look_cam;
+						case CUST_SET_JEEP_KEY_SLOT: {
+							int16_t jeep_key_slot = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								if (jeep_key_slot != -1) {
+									get_game_mod_level_objects_info(cur_level_idx)->jeep_key_slot = jeep_key_slot;
+								}
+							}
+							break;
 						}
-						if (speed_camera != -1) {
-							get_game_mod_level_camera_info(cur_level_idx)->camera_speed = speed_camera;
+						case CUST_STATIC_TRANSPARENCY: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_STATIC_TRANSPARENCY unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SET_STATIC_DAMAGE: {
+							int16_t damage = NG_READ_16(gfScriptFile, offset);
+							int16_t poison_intensity = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								if (damage != -1) {
+									get_game_mod_level_misc_info(cur_level_idx)->damage_static_interaction = damage;
+								}
+								if (poison_intensity != -1) {
+									get_game_mod_level_misc_info(cur_level_idx)->poison_static_interaction = poison_intensity;
+								}
+							}
+							break;
+						}
+						case CUST_LOOK_TRANSPARENT: {
+							int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
+
+							bool use_look_transparency = true;
+							if (is_enabled == 0) {
+								use_look_transparency = false;
+							} else if (is_enabled == 1) {
+								use_look_transparency = true;
+							} else {
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_LOOK_TRANSPARENT type unimplemented! (level %u)", current_level);
+							}
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_lara_info(cur_level_idx)->use_look_transparency = use_look_transparency;
+							}
+							break;
+						}
+						case CUST_HAIR_TYPE: {
+							uint16_t hair_type = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								switch (hair_type) {
+									case 0x00:
+										break;
+									case 0x01:
+										get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_NONE;
+										break;
+									case 0x02:
+										get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_PIGTAILS;
+										break;
+									case 0x03:
+										get_game_mod_level_lara_info(cur_level_idx)->hair_type = LARA_HAIR_TYPE_BRAID;
+										break;
+									case 0x04:
+										NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_HAIR_TYPE hair type 04 unimplemented! (level %u)", cur_level_idx);
+										break;
+									case 0xffff:
+										break;
+								}
+							}
+							break;
+						}
+						case CUST_KEEP_DEAD_ENEMIES: {
+							int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
+
+							bool fade_dead_enemies = true;
+							if (is_enabled == 1) {
+								fade_dead_enemies = false;
+							} else if (is_enabled == 0) {
+								fade_dead_enemies = true;
+							} else {
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_KEEP_DEAD_ENEMIES type unimplemented! (level %u)", current_level);
+							}
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_creature_info(cur_level_idx)->fade_dead_enemies = fade_dead_enemies;
+							}
+							break;
+						}
+						case CUST_SET_OLD_CD_TRIGGER: {
+							int16_t is_enabled = NG_READ_16(gfScriptFile, offset);
+
+							bool old_cd_trigger = true;
+							if (is_enabled == 1) {
+								old_cd_trigger = false;
+							} else if (is_enabled == 0) {
+								old_cd_trigger = true;
+							} else {
+								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_OLD_CD_TRIGGER type unimplemented! (level %u)", current_level);
+							}
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_audio_info(cur_level_idx)->old_cd_trigger_system = old_cd_trigger;
+							}
+							break;
+						}
+						case CUST_ESCAPE_FLY_CAMERA: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ESCAPE_FLY_CAMERA unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_PAUSE_FLY_CAMERA: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_PAUSE_FLY_CAMERA unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_TEXT_ON_FLY_SCREEN: {
+							bool text_on_fly_screen = NG_READ_16(gfScriptFile, offset);
+							get_game_mod_level_misc_info(current_level)->draw_legend_on_flyby = text_on_fly_screen;
+
+							break;
+						}
+						case CUST_CD_SINGLE_PLAYBACK: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_CD_SINGLE_PLAYBACK unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_ADD_DEATH_ANIMATION: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ADD_DEATH_ANIMATION unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_BAR: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BAR unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_NO_TIME_IN_SAVELIST: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_NO_TIME_IN_SAVELIST unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_PARALLEL_BARS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_PARALLEL_BARS unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_CAMERA: {
+							int16_t fcam_properties = NG_READ_16(gfScriptFile, offset);
+							int16_t distance_chase_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t v_orient_chase_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t h_orient_chase_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t distance_combat_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t v_orient_combat_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t distance_look_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t height_look_cam = NG_READ_16(gfScriptFile, offset);
+							int16_t speed_camera = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								if (fcam_properties != -1) {
+									if (fcam_properties & 0x01) {
+										get_game_mod_level_camera_info(cur_level_idx)->disable_battle_camera = true;
+									}
+									if (fcam_properties & ~0x01) {
+										NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_CAMERA unsupported FCAM_ property! (level %u)", current_level);
+									}
+								}
+								if (distance_chase_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->chase_camera_distance = distance_chase_cam;
+								}
+								if (v_orient_chase_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->chase_camera_vertical_orientation = v_orient_chase_cam;
+								}
+								if (h_orient_chase_cam != -1) {
+									NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: h_orient_chase_cam is not supported! (level %u)", current_level);
+								}
+								if (distance_combat_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->combat_camera_distance = distance_combat_cam;
+								}
+								if (v_orient_combat_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->combat_camera_vertical_orientation = v_orient_combat_cam;
+								}
+								if (distance_look_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->look_camera_distance = distance_look_cam;
+								}
+								if (height_look_cam != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->look_camera_height = height_look_cam;
+								}
+								if (speed_camera != -1) {
+									get_game_mod_level_camera_info(cur_level_idx)->camera_speed = speed_camera;
+								}
+							}
+
+							break;
+						}
+						case CUST_DISABLE_MISSING_SOUNDS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_MISSING_SOUNDS unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_INNER_SCREENSHOT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_INNER_SCREENSHOT unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_FMV_CUTSCENE: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FMV_CUTSCENE unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_FIX_WATER_FOG_BUG: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FIX_WATER_FOG_BUG unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SAVE_LOCUST: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SAVE_LOCUST unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_LIGHT_OBJECT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_LIGHT_OBJECT unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_HARPOON: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_HARPOON unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SCREENSHOT_CAPTURE: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SCREENSHOT_CAPTURE unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_RAIN: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_RAIN unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_TR5_UNDERWATER_COLLISIONS: {
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								get_game_mod_level_lara_info(cur_level_idx)->use_tr5_swimming_collision = true;
+							}
+							break;
+						}
+						case CUST_DARTS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DARTS unimplemented! (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_FLARE: {
+							uint16_t flare_flags = NG_READ_16(gfScriptFile, offset);
+							uint16_t flare_lifetime_in_seconds = NG_READ_16(gfScriptFile, offset);
+							uint8_t flare_light_r = NG_READ_16(gfScriptFile, offset);
+							uint8_t flare_light_g = NG_READ_16(gfScriptFile, offset);
+							uint8_t flare_light_b = NG_READ_16(gfScriptFile, offset);
+							uint8_t flare_light_intensity = NG_READ_16(gfScriptFile, offset);
+
+							int32_t cur_level_idx = 0;
+							int32_t last_level_idx = MOD_LEVEL_COUNT;
+
+							if (current_level != 0) {
+								cur_level_idx = current_level;
+								last_level_idx = current_level + 1;
+							}
+
+							for (; cur_level_idx < last_level_idx; cur_level_idx++) {
+								NGSetupFlareCustomization(cur_level_idx, flare_flags, flare_lifetime_in_seconds, flare_light_r, flare_light_g, flare_light_b, flare_light_intensity);
+							}
+							break;
+						}
+						case CUST_SET_TEXT_COLOR: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_TEXT_COLOR unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SET_STILL_COLLISION: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_STILL_COLLISION unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_WATERFALL_SPEED: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_WATERFALL_SPEED unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_ROLLING_BOAT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ROLLING_BOAT unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SFX: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SFX unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_TITLE_FMV: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_TITLE_FMV unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_KEEP_LARA_HP: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_KEEP_LARA_HP unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_BINOCULARS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BINOCULARS unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_BACKGROUND: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BACKGROUND unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_DISABLE_PUSH_AWAY_ANIMATION: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_PUSH_AWAY_ANIMATION unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_SLOT_FLAGS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SLOT_FLAGS unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case CUST_FIX_BUGS: {
+							uint8_t bug_fix_flags_lower = NG_READ_8(gfScriptFile, offset);
+							uint8_t bug_fix_flags_upper = 0;
+
+							if (offset != command_block_end_position) {
+								bug_fix_flags_upper = NG_READ_8(gfScriptFile, offset);
+								if (bug_fix_flags_upper) {
+									NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FIX_BUGS unknown upper bits! (level %u)", current_level);
+								}
+							}
+
+							if (current_level == 0) {
+								for (int32_t cur_level_idx = 0; cur_level_idx < MOD_LEVEL_COUNT; cur_level_idx++) {
+									NGSetupBugfixCustomization(cur_level_idx, (bug_fix_flags_upper << 8) | bug_fix_flags_lower);
+								}
+							} else {
+								NGSetupBugfixCustomization(current_level, (bug_fix_flags_upper << 8) | bug_fix_flags_lower);
+							}
+
+							// Sometimes this can be one or two bytes, so just set it
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+
+							break;
+						}
+						case CUST_SHATTER_SPECIFIC: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SHATTER_SPECIFIC unimplemented (level %u)", current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						default: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented NG customization category: %u (level %u)", customization_category, current_level);
+
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
 						}
 					}
 
-					break;
-				}
-				case CUST_DISABLE_MISSING_SOUNDS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_MISSING_SOUNDS unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_INNER_SCREENSHOT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_INNER_SCREENSHOT unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_FMV_CUTSCENE: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FMV_CUTSCENE unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_FIX_WATER_FOG_BUG: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FIX_WATER_FOG_BUG unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SAVE_LOCUST: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SAVE_LOCUST unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_LIGHT_OBJECT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_LIGHT_OBJECT unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_HARPOON: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_HARPOON unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SCREENSHOT_CAPTURE: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SCREENSHOT_CAPTURE unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_RAIN: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_RAIN unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_TR5_UNDERWATER_COLLISIONS: {
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						get_game_mod_level_lara_info(cur_level_idx)->use_tr5_swimming_collision = true;
-					}
-					break;
-				}
-				case CUST_DARTS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DARTS unimplemented! (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_FLARE: {
-					uint16_t flare_flags = NG_READ_16(gfScriptFile, offset);
-					uint16_t flare_lifetime_in_seconds = NG_READ_16(gfScriptFile, offset);
-					uint8_t flare_light_r = NG_READ_16(gfScriptFile, offset);
-					uint8_t flare_light_g = NG_READ_16(gfScriptFile, offset);
-					uint8_t flare_light_b = NG_READ_16(gfScriptFile, offset);
-					uint8_t flare_light_intensity = NG_READ_16(gfScriptFile, offset);
-
-					int32_t cur_level_idx = 0;
-					int32_t last_level_idx = MOD_LEVEL_COUNT;
-
-					if (current_level != 0) {
-						cur_level_idx = current_level;
-						last_level_idx = current_level + 1;
-					}
-
-					for (; cur_level_idx < last_level_idx; cur_level_idx++) {
-						NGSetupFlareCustomization(cur_level_idx, flare_flags, flare_lifetime_in_seconds, flare_light_r, flare_light_g, flare_light_b, flare_light_intensity);
-					}
-					break;
-				}
-				case CUST_SET_TEXT_COLOR: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_TEXT_COLOR unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SET_STILL_COLLISION: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SET_STILL_COLLISION unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_WATERFALL_SPEED: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_WATERFALL_SPEED unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_ROLLING_BOAT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_ROLLING_BOAT unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SFX: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SFX unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_TITLE_FMV: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_TITLE_FMV unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_KEEP_LARA_HP: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_KEEP_LARA_HP unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_BINOCULARS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BINOCULARS unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_BACKGROUND: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_BACKGROUND unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_DISABLE_PUSH_AWAY_ANIMATION: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_DISABLE_PUSH_AWAY_ANIMATION unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_SLOT_FLAGS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SLOT_FLAGS unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case CUST_FIX_BUGS: {
-					uint8_t bug_fix_flags_lower = NG_READ_8(gfScriptFile, offset);
-					uint8_t bug_fix_flags_upper = 0;
+					size_t command_block_end_position = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
 
 					if (offset != command_block_end_position) {
-						bug_fix_flags_upper = NG_READ_8(gfScriptFile, offset);
-						if (bug_fix_flags_upper) {
-							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_FIX_BUGS unknown upper bits! (level %u)", current_level);
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Customize block size mismatch for category %u (level %u)", customization_category, current_level);
+					}
+
+					// Skip to the end
+					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				} else {
+					if (offset != command_block_end_position) {
+						char* plugin_string = NGGetPluginString(plugin_id);
+						if (plugin_string) {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) customizations are not currently supported (level %u)", plugin_string, current_level);
+						} else {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) customizations are not currently supported (level %u)", plugin_id, current_level);
 						}
 					}
 
-					if (current_level == 0) {
-						for (int32_t cur_level_idx = 0; cur_level_idx < MOD_LEVEL_COUNT; cur_level_idx++) {
-							NGSetupBugfixCustomization(cur_level_idx, (bug_fix_flags_upper << 8) | bug_fix_flags_lower);
-						}
-					}
-					else {
-						NGSetupBugfixCustomization(current_level, (bug_fix_flags_upper << 8) | bug_fix_flags_lower);
-					}
-
-					// Sometimes this can be one or two bytes, so just set it
+					// Skip to the end
 					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-
-					break;
 				}
-				case CUST_SHATTER_SPECIFIC: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: CUST_SHATTER_SPECIFIC unimplemented (level %u)", current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				default: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented NG customization category: %u (level %u)", customization_category, current_level);
-
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				}
-
-				size_t command_block_end_position = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-
-				if (offset != command_block_end_position) {
-					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Customize block size mismatch for category %u (level %u)", customization_category, current_level);
-				}
-
-				// Skip to the end
-				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			} else {
-				if (offset != command_block_end_position) {
-					char* plugin_string = NGGetPluginString(plugin_id);
-					if (plugin_string) {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) customizations are not currently supported (level %u)", plugin_string, current_level);
-					}
-					else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) customizations are not currently supported (level %u)", plugin_id, current_level);
-					}
-				}
-
-				// Skip to the end
-				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
 			}
-			break;
-		}
-		case 0x15:
-			// TriggerGroup (legacy/plugin)
-			// Older builds of TRNG seem to use this opcode for TriggerGroups. Newer ones seem to use it for triggers exported from plugins
-			if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
-				// TriggerGroup (WIP)
+			case 0x15:
+				// TriggerGroup (legacy/plugin)
+				// Older builds of TRNG seem to use this opcode for TriggerGroups. Newer ones seem to use it for triggers exported from plugins
+				if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
+					// TriggerGroup (WIP)
+					uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+					NGLog(NG_LOG_TYPE_PRINT, "Triggergroup %u: (level %u)", id, current_level);
+
+					if (id >= MAX_NG_TRIGGER_GROUPS) {
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup id (%u) is not valid! (level %u)", id, current_level);
+					} else {
+
+						tables->level_trigger_group_table[tables->level_trigger_group_count].record_id = id;
+
+						uint8_t data_index = 0;
+						while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
+							uint16_t first_field = NG_READ_16(gfScriptFile, offset);
+							// I assume this indicates the end of the command.
+							if (first_field == 0x0000 || first_field == 0xffff) {
+								break;
+							}
+							uint16_t second_field = NG_READ_16(gfScriptFile, offset);
+							uint16_t third_field = NG_READ_16(gfScriptFile, offset);
+
+							NGLog(NG_LOG_TYPE_PRINT, "0x%04x, 0x%04x, 0x%04x", first_field, second_field, third_field);
+
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].plugin_id = 0;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].flags = first_field;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].object = second_field;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].timer = third_field;
+
+							data_index++;
+							if (data_index >= NG_TRIGGER_GROUP_DATA_SIZE) {
+								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup size overflow! (level %u)", current_level);
+								return 0;
+							}
+
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data_size = data_index;
+						}
+					}
+					tables->level_trigger_group_count++;
+				} else {
+					uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+					if (id >= MAX_NG_TRIGGER_GROUPS) {
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup id (%u) is not valid! (level %u)", id, current_level);
+					} else {
+
+						tables->level_trigger_group_table[tables->level_trigger_group_count].record_id = id;
+
+						uint8_t data_index = 0;
+						while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
+							uint16_t first_field = NG_READ_16(gfScriptFile, offset);
+							// I assume this indicates the end of the command.
+							if (first_field == 0x0000 || first_field == 0xffff) {
+								break;
+							}
+
+							uint16_t plugin_id = NG_READ_16(gfScriptFile, offset);
+							uint16_t second_field_lower = NG_READ_16(gfScriptFile, offset);
+							uint16_t second_field_upper = NG_READ_16(gfScriptFile, offset);
+							uint16_t third_field_lower = NG_READ_16(gfScriptFile, offset);
+							uint16_t third_field_upper = NG_READ_16(gfScriptFile, offset);
+
+							if (plugin_id != 0) {
+								char* plugin_string = NGGetPluginString(plugin_id);
+								if (plugin_string) {
+									if (NGGetT4PluginID(plugin_id) == -1) {
+										NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "TriggerGroup %u - Plugin TriggerGroup plugin:%s, first_field:0x%x, second_field:%u, third_field:0x%x (level %u)",
+										      id,
+										      plugin_string,
+										      first_field,
+										      ((int32_t)second_field_upper << 16 | (int32_t)second_field_lower),
+										      ((int32_t)third_field_upper << 16 | (int32_t)third_field_lower),
+										      current_level);
+									}
+								} else {
+									NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "TriggerGroup %u - Plugin TriggerGroup plugin_id:%u, first_field:0x%x, second_field:%u, third_field:0x%x (level %u)",
+									      id,
+									      plugin_id,
+									      first_field,
+									      ((int32_t)second_field_upper << 16 | (int32_t)second_field_lower),
+									      ((int32_t)third_field_upper << 16 | (int32_t)third_field_lower),
+									      current_level);
+								}
+							}
+
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].plugin_id = plugin_id;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].flags = first_field;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].object = second_field_lower;
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].timer = third_field_lower;
+
+							data_index++;
+							if (data_index >= NG_TRIGGER_GROUP_DATA_SIZE) {
+								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup size overflow! (level %u)", current_level);
+								return 0;
+							}
+
+							tables->level_trigger_group_table[tables->level_trigger_group_count].record.data_size = data_index;
+						}
+						tables->level_trigger_group_count++;
+					}
+				}
+				break;
+			case 0x16: {
+				// Global Trigger
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+				if (id >= MAX_NG_GLOBAL_TRIGGERS) {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Global Trigger id (%u) is not valid! (level %u)", id, current_level);
+				} else {
+
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record_id = id;
+
+					uint16_t flags = NG_READ_16(gfScriptFile, offset);
+					if (flags == 0xffff)
+						flags = 0;
+
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record.flags = flags;
+
+					uint16_t global_trigger_type = NG_READ_16(gfScriptFile, offset);
+					if (global_trigger_type != GT_USED_INVENTORY_ITEM &&
+					        global_trigger_type != GT_ENEMY_KILLED &&
+					        global_trigger_type != GT_LARA_HP_LESS_THAN &&
+					        global_trigger_type != GT_LARA_HP_HIGHER_THAN &&
+					        global_trigger_type != GT_LARA_POISONED &&
+					        global_trigger_type != GT_CONDITION_GROUP &&
+					        global_trigger_type != GT_COLLIDE_ITEM &&
+					        global_trigger_type != GT_COLLIDE_SLOT &&
+					        global_trigger_type != GT_COLLIDE_CREATURE &&
+					        global_trigger_type != GT_LOADED_SAVEGAME &&
+					        global_trigger_type != GT_COLLIDE_STATIC_SLOT &&
+					        global_trigger_type != GT_KEYBOARD_CODE &&
+					        global_trigger_type != GT_ALWAYS &&
+					        global_trigger_type != GT_TRNG_G_TIMER_EQUALS &&
+					        global_trigger_type != GT_TRNG_L_TIMER_EQUALS &&
+					        global_trigger_type != GT_SELECTED_INVENTORY_ITEM) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented GlobalTrigger type %u (level %u)", global_trigger_type, current_level);
+					}
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record.type = global_trigger_type;
+
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record.parameter = NG_READ_32(gfScriptFile, offset);
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record.condition_trigger_group = NG_READ_16(gfScriptFile, offset);
+					tables->level_global_triggers_table[tables->level_global_trigger_count].record.perform_trigger_group = NG_READ_16(gfScriptFile, offset);
+					// The block may end here on older version of TRNG
+					if (offset < command_block_end_position) {
+						tables->level_global_triggers_table[tables->level_global_trigger_count].record.on_false_trigger_group = NG_READ_16(gfScriptFile, offset);
+					} else {
+						tables->level_global_triggers_table[tables->level_global_trigger_count].record.on_false_trigger_group = 0xffff;
+					}
+
+					tables->level_global_trigger_count++;
+				}
+
+				break;
+			}
+			case 0x17: {
+				// Organizer
+				// 2 bytes - ID
+				// 2 bytes - flags (0x01 - FO_ENABLED, 0x02 - FO_LOOP, 0x04 - FO_TICK_TIME)
+				// 2 bytes - dummy (?)
+				// 2 bytes - execution time
+				// 2 bytes - trigger group
+				// ... cont.
+
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+				if (id >= MAX_NG_ORGANIZERS) {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer id (%u) is not valid! (level %u)", id, current_level);
+				} else {
+
+					tables->level_organizer_table[tables->level_organizer_count].record_id = id;
+
+					uint16_t flags = NG_READ_16(gfScriptFile, offset);;
+					if (flags == 0xffff)
+						flags = 0;
+
+					// FO_DEMO_ORGANIZER
+					if (flags & 0x08) {
+						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer FO_DEMO_ORGANIZER flag not supported (level %u)", current_level);
+						break;
+					}
+
+					tables->level_organizer_table[tables->level_organizer_count].record.flags = flags;
+					tables->level_organizer_table[tables->level_organizer_count].record.parameters = NG_READ_16(gfScriptFile, offset);
+					if (!(tables->level_organizer_table[tables->level_organizer_count].record.parameters == 0 || tables->level_organizer_table[tables->level_organizer_count].record.parameters == -1)) {
+						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Organizer parameters are not supported! (level %u)", current_level);
+
+					}
+
+					tables->level_organizer_table[tables->level_organizer_count].record.appointment_count = 0;
+
+					uint32_t index = 0;
+					uint32_t current_time = 0;
+					while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
+						int32_t relative_time = NG_READ_16(gfScriptFile, offset);
+
+						// Organizer complete
+						if (offset == command_block_end_position) {
+							break;
+						}
+
+						// !FO_TICK_TIME
+						if (!(flags & 0x04)) {
+							relative_time *= 30;
+						}
+
+						current_time += relative_time;
+						tables->level_organizer_table[tables->level_organizer_count].record.appointments[index].time = current_time;
+						tables->level_organizer_table[tables->level_organizer_count].record.appointments[index].trigger_group = NG_READ_16(gfScriptFile, offset);
+
+						index++;
+
+						tables->level_organizer_table[tables->level_organizer_count].record.appointment_count = index;
+
+						if (index >= NG_ORGANIZER_MAX_APPOINTMENTS) {
+							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer appointment size overflow! (level %u)", current_level);
+							return 0;
+						}
+					}
+					tables->level_organizer_count++;
+				}
+				break;
+			}
+			case 0x18: {
+				// SoundSettings
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Turbo is not implemented! (level %u)", current_level);
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x19: {
+				// Item Groups
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+				if (id < MAX_NG_ITEM_GROUPS) {
+					tables->level_item_group_table[tables->level_item_group_count].record_id = id;
+
+					uint8_t index = 0;
+					while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
+						tables->level_item_group_table[tables->level_item_group_count].record.item_list[index] = NG_READ_16(gfScriptFile, offset);
+
+						index++;
+						if (index >= NG_ITEM_GROUP_MAX_LIST) {
+							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: ItemGroup record size overflow! (level %u)", current_level);
+							return 0;
+						}
+					}
+					tables->level_item_group_table[tables->level_item_group_count].record.item_count = index;
+					tables->level_item_group_count++;
+					// Broken
+				} else {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: ItemGroup id (%u) is not valid! (level %u)", id, current_level);
+				}
+				break;
+			}
+			case 0x1a: {
+				// ColorRGB (WIP)
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+				uint16_t r = NG_READ_16(gfScriptFile, offset);
+				uint16_t g = NG_READ_16(gfScriptFile, offset);
+				uint16_t b = NG_READ_16(gfScriptFile, offset);
+
+				break;
+			}
+			case 0x1b: {
+				// Parameters (WIP)
+				uint32_t param_category = 0;
+				uint32_t plugin_id = 0;
+				if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
+					param_category = NG_READ_16(gfScriptFile, offset);
+				} else {
+					param_category = NG_READ_16(gfScriptFile, offset);
+					plugin_id = NG_READ_16(gfScriptFile, offset);
+				}
+
+				if (plugin_id == 0) {
+					switch (param_category) {
+						case PARAM_MOVE_ITEM: {
+							uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+							if (id >= MAX_NG_MOVE_ITEMS) {
+								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Move item id (%u) is not valid! (level %u)", id, current_level);
+							} else {
+
+								uint16_t flags = NG_READ_16(gfScriptFile, offset);
+								if (flags == 0xffff || flags == 0) {
+									flags = 0;
+								} else {
+									if (flags & ~(FMOV_INFINITE_LOOP | FMOV_HEAVY_AT_END | FMOV_TRIGGERS_ALL | FMOV_HEAVY_ALL)) {
+										NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: PARAM_MOVE_ITEM flags unsupported! (level %u)", current_level);
+									}
+								}
+								uint16_t index_item = NG_READ_16(gfScriptFile, offset);
+								uint16_t direction = NG_READ_16(gfScriptFile, offset);
+								uint16_t distance = NG_READ_16(gfScriptFile, offset);
+								uint16_t speed = NG_READ_16(gfScriptFile, offset);
+								int16_t moving_sound = NG_READ_16(gfScriptFile, offset);
+								int16_t final_sound = NG_READ_16(gfScriptFile, offset);
+								int16_t extra = 0;
+								if (offset < command_block_end_position) {
+									extra = NG_READ_16(gfScriptFile, offset);
+								}
+
+								tables->level_move_item_table[tables->level_move_item_count].record_id = id;
+								tables->level_move_item_table[tables->level_move_item_count].record.flags = flags;
+								tables->level_move_item_table[tables->level_move_item_count].record.index_item = index_item;
+								tables->level_move_item_table[tables->level_move_item_count].record.direction = direction;
+								tables->level_move_item_table[tables->level_move_item_count].record.distance = distance;
+								tables->level_move_item_table[tables->level_move_item_count].record.speed = speed;
+								tables->level_move_item_table[tables->level_move_item_count].record.moving_sound = moving_sound;
+								tables->level_move_item_table[tables->level_move_item_count].record.final_sound = final_sound;
+								tables->level_move_item_table[tables->level_move_item_count].record.extra = extra;
+
+								tables->level_move_item_count++;
+							}
+							break;
+						}
+						case PARAM_ROTATE_ITEM: {
+							uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+							if (id >= MAX_NG_ROTATE_ITEMS) {
+								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Rotate item id (%u) is not valid! (level %u)", id, current_level);
+							} else {
+
+								uint16_t flags = NG_READ_16(gfScriptFile, offset);
+								if (flags == 0xffff || flags == 0) {
+									flags = 0;
+								}
+
+								uint16_t index_item = NG_READ_16(gfScriptFile, offset);
+
+								uint16_t dir_h_rotation = NG_READ_16(gfScriptFile, offset);
+								uint16_t h_rotation_angle = NG_READ_16(gfScriptFile, offset);
+								uint16_t speed_h_rotation = NG_READ_16(gfScriptFile, offset);
+
+								uint16_t dir_v_rotation = NG_READ_16(gfScriptFile, offset);
+								uint16_t v_rotation_angle = NG_READ_16(gfScriptFile, offset);
+								uint16_t speed_v_rotation = NG_READ_16(gfScriptFile, offset);
+
+								int16_t moving_sound = NG_READ_16(gfScriptFile, offset);
+								int16_t final_sound = NG_READ_16(gfScriptFile, offset);
+
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record_id = id;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.flags = flags;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.index_item = index_item;
+
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.dir_h_rotation = dir_h_rotation;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.h_rotation_angle = h_rotation_angle;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.speed_h_rotation = speed_h_rotation;
+
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.dir_v_rotation = dir_v_rotation;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.v_rotation_angle = v_rotation_angle;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.speed_v_rotation = speed_v_rotation;
+
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.moving_sound = moving_sound;
+								tables->level_rotate_item_table[tables->level_rotate_item_count].record.final_sound = final_sound;
+
+								tables->level_move_item_count++;
+							}
+							break;
+						}
+						case PARAM_COLOR_ITEM: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_COLOR_ITEM not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_PRINT_TEXT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_PRINT_TEXT not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_SET_CAMERA: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SET_CAMERA not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_BIG_NUMBERS: {
+							if (tables->level_big_number_count >= MAX_NG_BIG_NUMBERS) {
+								NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Big number id (%u) is not valid! (level %u)", tables->level_big_number_count, current_level);
+								return 0;
+								// Broken
+							}
+
+							while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
+								tables->level_big_number_table[tables->level_big_number_count].record_id = tables->level_big_number_count;
+								tables->level_big_number_table[tables->level_big_number_count].record.big_number = NG_READ_16(gfScriptFile, offset);
+								tables->level_big_number_count++;
+							}
+
+							break;
+						}
+						case PARAM_SCALE_ITEM: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SCALE_ITEM not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_SHOW_SPRITE: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SHOW_SPRITE not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_TRIANGLE: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_TRIANGLE not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_QUADRILATERAL: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_QUADRILATERAL not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_CIRCLE: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_CIRCLE not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_LIGHTNING: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_LIGHTNING not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_WTEXT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_WTEXT not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_RECT: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_RECT not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_SWAP_ANIMATIONS: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SWAP_ANIMATIONS not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_ACTOR_SPEECH: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_ACTOR_SPEECH not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						case PARAM_INPUT_BOX: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_INPUT_BOX not implemented! (level %u)", current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+						default: {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category %u not implemented! (level %u)", param_category, current_level);
+
+							// Skip to the end
+							offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+							break;
+						}
+					}
+				} else {
+					if (offset != command_block_end_position) {
+						char* plugin_string = NGGetPluginString(plugin_id);
+						if (plugin_string) {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) parameters are not currently supported (level %u)", plugin_string, current_level);
+						} else {
+							NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) parameters are not currently supported (level %u)", plugin_id, current_level);
+						}
+					}
+
+					// Skip to the end
+					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				}
+				break;
+			}
+			case 0x1c: {
+				// Turbo (WIP)
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Turbo is not implemented! (level %u)", current_level);
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x1d: {
+				// WindowTitle (WIP)
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WindowTitle is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x1e: {
+				// TestPosition (WIP)
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+
+				if (id >= MAX_NG_TEST_POSITIONS) {
+					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Test position id (%u) is not valid! (level %u)", id, current_level);
+				} else {
+
+					tables->level_test_position_table[tables->level_test_position_count].record_id = id;
+
+					tables->level_test_position_table[tables->level_test_position_count].record.flags = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.moveable_slot = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.x_distance_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.x_distance_max = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.y_distance_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.y_distance_max = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.z_distance_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.z_distance_max = NG_READ_16(gfScriptFile, offset);
+
+					tables->level_test_position_table[tables->level_test_position_count].record.h_orient_diff_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.h_orient_diff_max = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.v_orient_diff_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.v_orient_diff_max = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.r_orient_diff_min = NG_READ_16(gfScriptFile, offset);
+					tables->level_test_position_table[tables->level_test_position_count].record.r_orient_diff_max = NG_READ_16(gfScriptFile, offset);
+
+					tables->level_test_position_count++;
+				}
+				break;
+			}
+			case 0x1f: {
+				// LogItem
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: LogItem is not implemented (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x20: {
+				// WindowsFont
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WindowsFont(?) is not implemented! (level %u)", current_level);
+
+				uint16_t id = NG_READ_16(gfScriptFile, offset);
+				uint16_t window_font_name = NG_READ_16(gfScriptFile, offset);
+				uint16_t windows_font_flags = NG_READ_16(gfScriptFile, offset);
+				uint16_t size_font = NG_READ_16(gfScriptFile, offset);
+				uint16_t color_rgb_id = NG_READ_16(gfScriptFile, offset);
+				uint16_t shadow_color_rgb_id = NG_READ_16(gfScriptFile, offset);
+
+				break;
+			}
+			case 0x21: {
+				// Diary
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Diary is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x22: {
+				// Image
+				uint16_t image_command_id = NG_READ_16(gfScriptFile, offset);
+				uint16_t image_file = NG_READ_16(gfScriptFile, offset);
+				uint16_t image_flags = NG_READ_16(gfScriptFile, offset);
+				uint16_t effect_time = NG_READ_16(gfScriptFile, offset);
+				uint16_t audio_track = NG_READ_16(gfScriptFile, offset);
+				uint16_t x_position = NG_READ_16(gfScriptFile, offset);
+				uint16_t y_position = NG_READ_16(gfScriptFile, offset);
+				uint16_t size_x = NG_READ_16(gfScriptFile, offset);
+				uint16_t size_y = NG_READ_16(gfScriptFile, offset);
+
+				break;
+			}
+			case 0x23: {
+				// SavegamePanel
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: SavegamePanel is not implemented (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x24: {
+				// DiagnosticType
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: DiagnosticType is not implemented (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x25: {
+				// Switch
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Switch is not implemented (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x26: {
+				// CombineItems
+				uint16_t first_item = NG_READ_16(gfScriptFile, offset);
+				uint16_t second_item = NG_READ_16(gfScriptFile, offset);
+				uint16_t final_item = NG_READ_16(gfScriptFile, offset);
+				break;
+			}
+			case 0x27: {
+				// Standby
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Standby is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x28: {
+				// AnimationSlot
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: AnimationSlot is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x29: {
+				// DefaultWindowsFont
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: DefaultWindowsFont is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x2a: {
+				// Demo
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Demo is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x2b: {
+				// Plugin
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x2c: {
+				// LaraStartPos
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: LaraStartPos is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x2d: {
+				// StaticMIP
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: StaticMIP is not implemented! (level %u)", current_level);
+
+				// Skip to the end
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				break;
+			}
+			case 0x2e: {
+				// TriggerGroupWord
 				uint16_t id = NG_READ_16(gfScriptFile, offset);
 
 				NGLog(NG_LOG_TYPE_PRINT, "Triggergroup %u: (level %u)", id, current_level);
@@ -1683,7 +2350,6 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 				if (id >= MAX_NG_TRIGGER_GROUPS) {
 					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup id (%u) is not valid! (level %u)", id, current_level);
 				} else {
-
 					tables->level_trigger_group_table[tables->level_trigger_group_count].record_id = id;
 
 					uint8_t data_index = 0;
@@ -1704,69 +2370,7 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].timer = third_field;
 
 						data_index++;
-						if (data_index >= NG_TRIGGER_GROUP_DATA_SIZE) {
-							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup size overflow! (level %u)", current_level);
-							return 0;
-						}
-
-						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data_size = data_index;
-					}
-				}
-				tables->level_trigger_group_count++;
-			} else {
-				uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-				if (id >= MAX_NG_TRIGGER_GROUPS) {
-					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup id (%u) is not valid! (level %u)", id, current_level);
-				} else {
-
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record_id = id;
-
-					uint8_t data_index = 0;
-					while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
-						uint16_t first_field = NG_READ_16(gfScriptFile, offset);
-						// I assume this indicates the end of the command.
-						if (first_field == 0x0000 || first_field == 0xffff) {
-							break;
-						}
-
-						uint16_t plugin_id = NG_READ_16(gfScriptFile, offset);
-						uint16_t second_field_lower = NG_READ_16(gfScriptFile, offset);
-						uint16_t second_field_upper = NG_READ_16(gfScriptFile, offset);
-						uint16_t third_field_lower = NG_READ_16(gfScriptFile, offset);
-						uint16_t third_field_upper = NG_READ_16(gfScriptFile, offset);
-
-						if (plugin_id != 0) {
-							char* plugin_string = NGGetPluginString(plugin_id);
-							if (plugin_string) {
-								if (NGGetT4PluginID(plugin_id) == -1) {
-									NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "TriggerGroup %u - Plugin TriggerGroup plugin:%s, first_field:0x%x, second_field:%u, third_field:0x%x (level %u)",
-										id,
-										plugin_string,
-										first_field,
-										((int32_t)second_field_upper << 16 | (int32_t)second_field_lower),
-										((int32_t)third_field_upper << 16 | (int32_t)third_field_lower),
-										current_level);
-								}
-							}
-							else {
-								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "TriggerGroup %u - Plugin TriggerGroup plugin_id:%u, first_field:0x%x, second_field:%u, third_field:0x%x (level %u)",
-									id,
-									plugin_id,
-									first_field,
-									((int32_t)second_field_upper << 16 | (int32_t)second_field_lower),
-									((int32_t)third_field_upper << 16 | (int32_t)third_field_lower),
-									current_level);
-							}
-						}
-
-						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].plugin_id = plugin_id;
-						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].flags = first_field;
-						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].object = second_field_lower;
-						tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].timer = third_field_lower;
-
-						data_index++;
-						if (data_index >= NG_TRIGGER_GROUP_DATA_SIZE) {
+						if (data_index > NG_TRIGGER_GROUP_DATA_SIZE) {
 							NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup size overflow! (level %u)", current_level);
 							return 0;
 						}
@@ -1775,648 +2379,36 @@ size_t NGReadLevelBlock(char* gfScriptFile, size_t offset, NG_LEVEL_RECORD_TABLE
 					}
 					tables->level_trigger_group_count++;
 				}
+				break;
 			}
-			break;
-		case 0x16: {
-			// Global Trigger
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			if (id >= MAX_NG_GLOBAL_TRIGGERS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Global Trigger id (%u) is not valid! (level %u)", id, current_level);
-			} else {
-
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record_id = id;
-
+			case 0xc9: {
+				// Level flags
 				uint16_t flags = NG_READ_16(gfScriptFile, offset);
-				if (flags == 0xffff)
-					flags = 0;
 
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record.flags = flags;
+#define UPDATE_LEVEL_INFO_WITH_FLAGS \
+MOD_LEVEL_MISC_INFO *misc_info = get_game_mod_level_misc_info(current_level); \
+if (flags & 0x04) \
+misc_info->override_fog_mode = T4P_FOG_FORCE_VOLUMETRIC; \
+if (flags & 0x08) \
+misc_info->override_fog_mode = T4P_FOG_FORCE_DISTANT;
 
-				uint16_t global_trigger_type = NG_READ_16(gfScriptFile, offset);
-				if (global_trigger_type != GT_USED_INVENTORY_ITEM &&
-					global_trigger_type != GT_ENEMY_KILLED &&
-					global_trigger_type != GT_LARA_HP_LESS_THAN &&
-					global_trigger_type != GT_LARA_HP_HIGHER_THAN &&
-					global_trigger_type != GT_LARA_POISONED &&
-					global_trigger_type != GT_CONDITION_GROUP &&
-					global_trigger_type != GT_COLLIDE_ITEM &&
-					global_trigger_type != GT_COLLIDE_SLOT &&
-					global_trigger_type != GT_COLLIDE_CREATURE &&
-					global_trigger_type != GT_LOADED_SAVEGAME &&
-					global_trigger_type != GT_COLLIDE_STATIC_SLOT &&
-					global_trigger_type != GT_KEYBOARD_CODE &&
-					global_trigger_type != GT_ALWAYS &&
-					global_trigger_type != GT_TRNG_G_TIMER_EQUALS &&
-					global_trigger_type != GT_TRNG_L_TIMER_EQUALS &&
-					global_trigger_type != GT_SELECTED_INVENTORY_ITEM) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented GlobalTrigger type %u (level %u)", global_trigger_type, current_level);
-				}
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record.type = global_trigger_type;
-
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record.parameter = NG_READ_32(gfScriptFile, offset);
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record.condition_trigger_group = NG_READ_16(gfScriptFile, offset);
-				tables->level_global_triggers_table[tables->level_global_trigger_count].record.perform_trigger_group = NG_READ_16(gfScriptFile, offset);
-				// The block may end here on older version of TRNG
-				if (offset < command_block_end_position) {
-					tables->level_global_triggers_table[tables->level_global_trigger_count].record.on_false_trigger_group = NG_READ_16(gfScriptFile, offset);
-				}
-				else {
-					tables->level_global_triggers_table[tables->level_global_trigger_count].record.on_false_trigger_group = 0xffff;
-				}
-
-				tables->level_global_trigger_count++;
-			}
-
-			break;
-		}
-		case 0x17: {
-			// Organizer
-			// 2 bytes - ID
-			// 2 bytes - flags (0x01 - FO_ENABLED, 0x02 - FO_LOOP, 0x04 - FO_TICK_TIME)
-			// 2 bytes - dummy (?)
-			// 2 bytes - execution time
-			// 2 bytes - trigger group
-			// ... cont.
-
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			if (id >= MAX_NG_ORGANIZERS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer id (%u) is not valid! (level %u)", id, current_level);
-			} else {
-
-				tables->level_organizer_table[tables->level_organizer_count].record_id = id;
-
-				uint16_t flags = NG_READ_16(gfScriptFile, offset);;
-				if (flags == 0xffff)
-					flags = 0;
-
-				// FO_DEMO_ORGANIZER
-				if (flags & 0x08) {
-					NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer FO_DEMO_ORGANIZER flag not supported (level %u)", current_level);
-					break;
-				}
-
-				tables->level_organizer_table[tables->level_organizer_count].record.flags = flags;
-				tables->level_organizer_table[tables->level_organizer_count].record.parameters = NG_READ_16(gfScriptFile, offset);
-				if (!(tables->level_organizer_table[tables->level_organizer_count].record.parameters == 0 || tables->level_organizer_table[tables->level_organizer_count].record.parameters == -1)) {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Organizer parameters are not supported! (level %u)", current_level);
-
-				}
-
-				tables->level_organizer_table[tables->level_organizer_count].record.appointment_count = 0;
-
-				uint32_t index = 0;
-				uint32_t current_time = 0;
-				while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
-					int32_t relative_time = NG_READ_16(gfScriptFile, offset);
-
-					// Organizer complete
-					if (offset == command_block_end_position) {
-						break;
+				if (current_level == 0) {
+					for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
+						UPDATE_LEVEL_INFO_WITH_FLAGS
 					}
-
-					// !FO_TICK_TIME
-					if (!(flags & 0x04)) {
-						relative_time *= 30;
-					}
-
-					current_time += relative_time;
-					tables->level_organizer_table[tables->level_organizer_count].record.appointments[index].time = current_time;
-					tables->level_organizer_table[tables->level_organizer_count].record.appointments[index].trigger_group = NG_READ_16(gfScriptFile, offset);
-
-					index++;
-
-					tables->level_organizer_table[tables->level_organizer_count].record.appointment_count = index;
-
-					if (index >= NG_ORGANIZER_MAX_APPOINTMENTS) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Organizer appointment size overflow! (level %u)", current_level);
-						return 0;
-					}
-				}
-				tables->level_organizer_count++;
-			}
-			break;
-		}
-		case 0x18: {
-			// SoundSettings
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Turbo is not implemented! (level %u)", current_level);
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x19: {
-			// Item Groups
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			if (id < MAX_NG_ITEM_GROUPS) {
-				tables->level_item_group_table[tables->level_item_group_count].record_id = id;
-
-				uint8_t index = 0;
-				while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
-					tables->level_item_group_table[tables->level_item_group_count].record.item_list[index] = NG_READ_16(gfScriptFile, offset);
-
-					index++;
-					if (index >= NG_ITEM_GROUP_MAX_LIST) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: ItemGroup record size overflow! (level %u)", current_level);
-						return 0;
-					}
-				}
-				tables->level_item_group_table[tables->level_item_group_count].record.item_count = index;
-				tables->level_item_group_count++;
-				// Broken
-			} else {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: ItemGroup id (%u) is not valid! (level %u)", id, current_level);
-			}
-			break;
-		}
-		case 0x1a: {
-			// ColorRGB (WIP)
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-			uint16_t r = NG_READ_16(gfScriptFile, offset);
-			uint16_t g = NG_READ_16(gfScriptFile, offset);
-			uint16_t b = NG_READ_16(gfScriptFile, offset);
-
-			break;
-		}
-		case 0x1b: {
-			// Parameters (WIP)
-			uint32_t param_category = 0;
-			uint32_t plugin_id = 0;
-			if (!is_mod_trng_version_equal_or_greater_than_target(1, 3, 0, 0)) {
-				param_category = NG_READ_16(gfScriptFile, offset);
-			} else {
-				param_category = NG_READ_16(gfScriptFile, offset);
-				plugin_id = NG_READ_16(gfScriptFile, offset);
-			}
-
-			if (plugin_id == 0) {
-				switch (param_category) {
-				case PARAM_MOVE_ITEM: {
-					uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-					if (id >= MAX_NG_MOVE_ITEMS) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Move item id (%u) is not valid! (level %u)", id, current_level);
-					} else {
-
-						uint16_t flags = NG_READ_16(gfScriptFile, offset);
-						if (flags == 0xffff || flags == 0) {
-							flags = 0;
-						}
-						else {
-							if (flags & ~(FMOV_INFINITE_LOOP | FMOV_HEAVY_AT_END | FMOV_TRIGGERS_ALL | FMOV_HEAVY_ALL)) {
-								NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: PARAM_MOVE_ITEM flags unsupported! (level %u)", current_level);
-							}
-						}
-						uint16_t index_item = NG_READ_16(gfScriptFile, offset);
-						uint16_t direction = NG_READ_16(gfScriptFile, offset);
-						uint16_t distance = NG_READ_16(gfScriptFile, offset);
-						uint16_t speed = NG_READ_16(gfScriptFile, offset);
-						int16_t moving_sound = NG_READ_16(gfScriptFile, offset);
-						int16_t final_sound = NG_READ_16(gfScriptFile, offset);
-						int16_t extra = 0;
-						if (offset < command_block_end_position) {
-							extra = NG_READ_16(gfScriptFile, offset);
-						}
-
-						tables->level_move_item_table[tables->level_move_item_count].record_id = id;
-						tables->level_move_item_table[tables->level_move_item_count].record.flags = flags;
-						tables->level_move_item_table[tables->level_move_item_count].record.index_item = index_item;
-						tables->level_move_item_table[tables->level_move_item_count].record.direction = direction;
-						tables->level_move_item_table[tables->level_move_item_count].record.distance = distance;
-						tables->level_move_item_table[tables->level_move_item_count].record.speed = speed;
-						tables->level_move_item_table[tables->level_move_item_count].record.moving_sound = moving_sound;
-						tables->level_move_item_table[tables->level_move_item_count].record.final_sound = final_sound;
-						tables->level_move_item_table[tables->level_move_item_count].record.extra = extra;
-
-						tables->level_move_item_count++;
-					}
-					break;
-				}
-				case PARAM_ROTATE_ITEM: {
-					uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-					if (id >= MAX_NG_ROTATE_ITEMS) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Rotate item id (%u) is not valid! (level %u)", id, current_level);
-					} else {
-
-						uint16_t flags = NG_READ_16(gfScriptFile, offset);
-						if (flags == 0xffff || flags == 0) {
-							flags = 0;
-						}
-
-						uint16_t index_item = NG_READ_16(gfScriptFile, offset);
-
-						uint16_t dir_h_rotation = NG_READ_16(gfScriptFile, offset);
-						uint16_t h_rotation_angle = NG_READ_16(gfScriptFile, offset);
-						uint16_t speed_h_rotation = NG_READ_16(gfScriptFile, offset);
-
-						uint16_t dir_v_rotation = NG_READ_16(gfScriptFile, offset);
-						uint16_t v_rotation_angle = NG_READ_16(gfScriptFile, offset);
-						uint16_t speed_v_rotation = NG_READ_16(gfScriptFile, offset);
-
-						int16_t moving_sound = NG_READ_16(gfScriptFile, offset);
-						int16_t final_sound = NG_READ_16(gfScriptFile, offset);
-
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record_id = id;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.flags = flags;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.index_item = index_item;
-
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.dir_h_rotation = dir_h_rotation;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.h_rotation_angle = h_rotation_angle;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.speed_h_rotation = speed_h_rotation;
-
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.dir_v_rotation = dir_v_rotation;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.v_rotation_angle = v_rotation_angle;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.speed_v_rotation = speed_v_rotation;
-
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.moving_sound = moving_sound;
-						tables->level_rotate_item_table[tables->level_rotate_item_count].record.final_sound = final_sound;
-
-						tables->level_move_item_count++;
-					}
-					break;
-				}
-				case PARAM_COLOR_ITEM: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_COLOR_ITEM not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_PRINT_TEXT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_PRINT_TEXT not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_SET_CAMERA: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SET_CAMERA not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_BIG_NUMBERS: {
-					if (tables->level_big_number_count >= MAX_NG_BIG_NUMBERS) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Big number id (%u) is not valid! (level %u)", tables->level_big_number_count, current_level);
-						return 0;
-						// Broken
-					}
-
-					while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
-						tables->level_big_number_table[tables->level_big_number_count].record_id = tables->level_big_number_count;
-						tables->level_big_number_table[tables->level_big_number_count].record.big_number = NG_READ_16(gfScriptFile, offset);
-						tables->level_big_number_count++;
-					}
-
-					break;
-				}
-				case PARAM_SCALE_ITEM: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SCALE_ITEM not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_SHOW_SPRITE: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SHOW_SPRITE not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_TRIANGLE: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_TRIANGLE not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_QUADRILATERAL: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_QUADRILATERAL not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_CIRCLE: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_CIRCLE not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_LIGHTNING: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_LIGHTNING not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_WTEXT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_WTEXT not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_RECT: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_RECT not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_SWAP_ANIMATIONS: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_SWAP_ANIMATIONS not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_ACTOR_SPEECH: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_ACTOR_SPEECH not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				case PARAM_INPUT_BOX: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category PARAM_INPUT_BOX not implemented! (level %u)", current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				default: {
-					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Parameter category %u not implemented! (level %u)", param_category, current_level);
-
-					// Skip to the end
-					offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-					break;
-				}
-				}
-			} else {
-				if (offset != command_block_end_position) {
-					char* plugin_string = NGGetPluginString(plugin_id);
-					if (plugin_string) {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%s) parameters are not currently supported (level %u)", plugin_string, current_level);
-					}
-					else {
-						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin (%u) parameters are not currently supported (level %u)", plugin_id, current_level);
-					}
-				}
-
-				// Skip to the end
-				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			}
-			break;
-		}
-		case 0x1c: {
-			// Turbo (WIP)
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Turbo is not implemented! (level %u)", current_level);
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x1d: {
-			// WindowTitle (WIP)
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WindowTitle is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x1e: {
-			// TestPosition (WIP)
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			if (id >= MAX_NG_TEST_POSITIONS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: Test position id (%u) is not valid! (level %u)", id, current_level);
-			} else {
-
-				tables->level_test_position_table[tables->level_test_position_count].record_id = id;
-
-				tables->level_test_position_table[tables->level_test_position_count].record.flags = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.moveable_slot = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.x_distance_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.x_distance_max = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.y_distance_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.y_distance_max = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.z_distance_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.z_distance_max = NG_READ_16(gfScriptFile, offset);
-
-				tables->level_test_position_table[tables->level_test_position_count].record.h_orient_diff_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.h_orient_diff_max = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.v_orient_diff_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.v_orient_diff_max = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.r_orient_diff_min = NG_READ_16(gfScriptFile, offset);
-				tables->level_test_position_table[tables->level_test_position_count].record.r_orient_diff_max = NG_READ_16(gfScriptFile, offset);
-
-				tables->level_test_position_count++;
-			}
-			break;
-		}
-		case 0x1f: {
-			// LogItem
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: LogItem is not implemented (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x20: {
-			// WindowsFont
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: WindowsFont(?) is not implemented! (level %u)", current_level);
-
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-			uint16_t window_font_name = NG_READ_16(gfScriptFile, offset);
-			uint16_t windows_font_flags = NG_READ_16(gfScriptFile, offset);
-			uint16_t size_font = NG_READ_16(gfScriptFile, offset);
-			uint16_t color_rgb_id = NG_READ_16(gfScriptFile, offset);
-			uint16_t shadow_color_rgb_id = NG_READ_16(gfScriptFile, offset);
-
-			break;
-		}
-		case 0x21: {
-			// Diary
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Diary is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x22: {
-			// Image
-			uint16_t image_command_id = NG_READ_16(gfScriptFile, offset);
-			uint16_t image_file = NG_READ_16(gfScriptFile, offset);
-			uint16_t image_flags = NG_READ_16(gfScriptFile, offset);
-			uint16_t effect_time = NG_READ_16(gfScriptFile, offset);
-			uint16_t audio_track = NG_READ_16(gfScriptFile, offset);
-			uint16_t x_position = NG_READ_16(gfScriptFile, offset);
-			uint16_t y_position = NG_READ_16(gfScriptFile, offset);
-			uint16_t size_x = NG_READ_16(gfScriptFile, offset);
-			uint16_t size_y = NG_READ_16(gfScriptFile, offset);
-
-			break;
-		}
-		case 0x23: {
-			// SavegamePanel
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: SavegamePanel is not implemented (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x24: {
-			// DiagnosticType
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: DiagnosticType is not implemented (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x25: {
-			// Switch
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Switch is not implemented (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x26: {
-			// CombineItems
-			uint16_t first_item = NG_READ_16(gfScriptFile, offset);
-			uint16_t second_item = NG_READ_16(gfScriptFile, offset);
-			uint16_t final_item = NG_READ_16(gfScriptFile, offset);
-			break;
-		}
-		case 0x27: {
-			// Standby
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Standby is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x28: {
-			// AnimationSlot
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: AnimationSlot is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x29: {
-			// DefaultWindowsFont
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: DefaultWindowsFont is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x2a: {
-			// Demo
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Demo is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x2b: {
-			// Plugin
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Plugin is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x2c: {
-			// LaraStartPos
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: LaraStartPos is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x2d: {
-			// StaticMIP
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: StaticMIP is not implemented! (level %u)", current_level);
-
-			// Skip to the end
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			break;
-		}
-		case 0x2e: {
-			// TriggerGroupWord
-			uint16_t id = NG_READ_16(gfScriptFile, offset);
-
-			NGLog(NG_LOG_TYPE_PRINT, "Triggergroup %u: (level %u)", id, current_level);
-
-			if (id >= MAX_NG_TRIGGER_GROUPS) {
-				NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup id (%u) is not valid! (level %u)", id, current_level);
-			} else {
-				tables->level_trigger_group_table[tables->level_trigger_group_count].record_id = id;
-
-				uint8_t data_index = 0;
-				while (offset < data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t))) {
-					uint16_t first_field = NG_READ_16(gfScriptFile, offset);
-					// I assume this indicates the end of the command.
-					if (first_field == 0x0000 || first_field == 0xffff) {
-						break;
-					}
-					uint16_t second_field = NG_READ_16(gfScriptFile, offset);
-					uint16_t third_field = NG_READ_16(gfScriptFile, offset);
-
-					NGLog(NG_LOG_TYPE_PRINT, "0x%04x, 0x%04x, 0x%04x", first_field, second_field, third_field);
-
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].plugin_id = 0;
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].flags = first_field;
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].object = second_field;
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record.data[data_index].timer = third_field;
-
-					data_index++;
-					if (data_index > NG_TRIGGER_GROUP_DATA_SIZE) {
-						NGLog(NG_LOG_TYPE_ERROR, "NGReadNGGameflowInfo: TriggerGroup size overflow! (level %u)", current_level);
-						return 0;
-					}
-
-					tables->level_trigger_group_table[tables->level_trigger_group_count].record.data_size = data_index;
-				}
-				tables->level_trigger_group_count++;
-			}
-			break;
-		}
-		case 0xc9: {
-			// Level flags
-			uint16_t flags = NG_READ_16(gfScriptFile, offset);
-
-			#define UPDATE_LEVEL_INFO_WITH_FLAGS \
-			MOD_LEVEL_MISC_INFO *misc_info = get_game_mod_level_misc_info(current_level); \
-			if (flags & 0x04) \
-				misc_info->override_fog_mode = T4P_FOG_FORCE_VOLUMETRIC; \
-			if (flags & 0x08) \
-				misc_info->override_fog_mode = T4P_FOG_FORCE_DISTANT;
-
-			if (current_level == 0) {
-				for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
+				} else {
 					UPDATE_LEVEL_INFO_WITH_FLAGS
 				}
-			} else {
-				UPDATE_LEVEL_INFO_WITH_FLAGS
+
+				break;
 			}
+			default: {
+				offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
+				command_blocks_failed++;
 
-			break;
-		}
-		default: {
-			offset = data_block_start_start_position + (current_data_block_size_wide * sizeof(int16_t) + sizeof(int16_t));
-			command_blocks_failed++;
-
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented NG level data block type: %u! (level %u)", block_type, current_level);
-			break;
-		}
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGReadNGGameflowInfo: Unimplemented NG level data block type: %u! (level %u)", block_type, current_level);
+				break;
+			}
 		}
 		if (offset != command_block_end_position) {
 			intmax_t size_difference = offset - command_block_end_position;
@@ -2515,7 +2507,7 @@ void NGReadNGGameflowInfo(char *gfScriptFile, size_t offset, size_t len) {
 			environment_info->room_swamp_flag = ROOM_SWAMP;
 			environment_info->room_cold_flag = ROOM_COLD;
 			environment_info->room_damage_flag = ROOM_DAMAGE;
-			
+
 			MOD_LEVEL_GFX_INFO* gfx_info = get_game_mod_level_gfx_info(i);
 			gfx_info->cold_breath = COLD_BREATH_ENABLED_IN_COLD_ROOMS;
 		}
@@ -2630,7 +2622,7 @@ void NGReadNGGameflowInfo(char *gfScriptFile, size_t offset, size_t len) {
 			}
 			offset = command_block_end_position;
 		}
-		
+
 		offset = options_header_block_end_pos;
 
 		uint16_t second_header_block_size = NG_READ_16(gfScriptFile, offset);
@@ -2668,7 +2660,7 @@ void NGReadNGGameflowInfo(char *gfScriptFile, size_t offset, size_t len) {
 
 			// Now save the tables
 			NGReallocateLevel(ng_levels[current_level], table_allocation_count);
-			
+
 			memcpy(ng_levels[current_level].records->global_trigger_table, record_tables.level_global_triggers_table, sizeof(NG_GLOBAL_TRIGGER_RECORD) * record_tables.level_global_trigger_count);
 			memcpy(ng_levels[current_level].records->trigger_group_table, record_tables.level_trigger_group_table, sizeof(NG_TRIGGER_GROUP_RECORD) * record_tables.level_trigger_group_count);
 			memcpy(ng_levels[current_level].records->organizer_table, record_tables.level_organizer_table, sizeof(NG_ORGANIZER_RECORD) * record_tables.level_organizer_count);
@@ -2733,7 +2725,7 @@ void NGReadNGExtraStrings(char *gfLanguageFile, size_t offset, size_t len) {
 					current_string[j] ^= 0xa5;
 				}
 			}
-			
+
 			// Detect duplicates...
 			if (ng_strings[string_id]) {
 				SYSTEM_FREE(ng_strings[string_id]);

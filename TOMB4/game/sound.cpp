@@ -9,32 +9,26 @@
 
 SAMPLE_INFO* sample_infos;
 SoundSlot LaSlot[32];
-short* sample_lut;
+int16_t* sample_lut;
 bool sound_active = false;
 
-void GetPanVolume(SoundSlot* slot)
-{
-	long dx, dy, dz, radius, distance, nPan, nVolume;
+void GetPanVolume(SoundSlot* slot) {
+	int32_t dx, dy, dz, radius, distance, nPan, nVolume;
 
-	if (slot->distance || slot->pos.x || slot->pos.y || slot->pos.z)
-	{
+	if (slot->distance || slot->pos.x || slot->pos.y || slot->pos.z) {
 		dx = slot->pos.x - camera.pos.x;
 		dy = slot->pos.y - camera.pos.y;
 		dz = slot->pos.z - camera.pos.z;
 		radius = sample_infos[slot->nSampleInfo].radius << 10;
 
-		if (dx < -radius || dx > radius || dy < -radius || dy > radius || dz < -radius || dz > radius)
-		{
+		if (dx < -radius || dx > radius || dy < -radius || dy > radius || dz < -radius || dz > radius) {
 			slot->distance = 0;
 			slot->nPan = 0;
 			slot->nVolume = 0;
-		}
-		else
-		{
+		} else {
 			distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
 
-			if (distance <= SQUARE(radius))
-			{
+			if (distance <= SQUARE(radius)) {
 				if (distance >= 0x100000)
 					distance = phd_sqrt(distance) - BLOCK_SIZE;
 				else
@@ -46,24 +40,19 @@ void GetPanVolume(SoundSlot* slot)
 				if (distance)
 					nVolume = (nVolume * ((BLOCK_SIZE * 4) - (phd_sin((distance << W2V_SHIFT) / radius) >> 2))) >> 12;
 
-				if (nVolume > 0)
-				{
+				if (nVolume > 0) {
 					if (nVolume > 0x7FFF)
 						nVolume = 0x7FFF;
 
 					slot->nVolume = nVolume;
 					slot->nPan = nPan;
 					slot->distance = distance;
-				}
-				else
-				{
+				} else {
 					slot->distance = 0;
 					slot->nPan = 0;
 					slot->nVolume = 0;
 				}
-			}
-			else
-			{
+			} else {
 				slot->distance = 0;
 				slot->nPan = 0;
 				slot->nVolume = 0;
@@ -72,18 +61,14 @@ void GetPanVolume(SoundSlot* slot)
 	}
 }
 
-void StopSoundEffect(long sfx)
-{
-	long lut;
+void StopSoundEffect(int32_t sfx) {
+	int32_t lut;
 
-	if (sound_active)
-	{
+	if (sound_active) {
 		lut = sample_lut[sfx];
 
-		for (int i = 0; i < MAX_VOICES; i++)
-		{
-			if (LaSlot[i].nSampleInfo >= lut && LaSlot[i].nSampleInfo < (lut + ((sample_infos[lut].flags >> 2) & 0xF)))
-			{
+		for (int i = 0; i < MAX_VOICES; i++) {
+			if (LaSlot[i].nSampleInfo >= lut && LaSlot[i].nSampleInfo < (lut + ((sample_infos[lut].flags >> 2) & 0xF))) {
 				S_SoundStopSample(i);
 				LaSlot[i].nSampleInfo = -1;
 			}
@@ -91,8 +76,7 @@ void StopSoundEffect(long sfx)
 	}
 }
 
-void SOUND_Init()
-{
+void SOUND_Init() {
 	//empty func call here
 
 	for (int i = 0; i < MAX_VOICES; i++)
@@ -101,10 +85,8 @@ void SOUND_Init()
 	sound_active = true;
 }
 
-void SOUND_Stop()
-{
-	if (sound_active)
-	{
+void SOUND_Stop() {
+	if (sound_active) {
 		S_SoundStopAllSamples();
 
 		for (int i = 0; i < MAX_VOICES; i++)
@@ -112,29 +94,26 @@ void SOUND_Stop()
 	}
 }
 
-long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
-{
+int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags) {
 	SAMPLE_INFO* info;
 	PHD_3DPOS pos2;
-	long lut, radius, pan, dx, dy, dz, distance, volume, OrigVolume, pitch, rnd, sample, flag, vol, slot;
+	int32_t lut, radius, pan, dx, dy, dz, distance, volume, OrigVolume, pitch, rnd, sample, flag, vol, slot;
 
-	if (sfx == SFX_LARA_NO)
-	{
-		switch (Gameflow->Language)
-		{
-		case 1:
-			sfx = SFX_LARA_NO_FRENCH;
-			break;
+	if (sfx == SFX_LARA_NO) {
+		switch (Gameflow->Language) {
+			case 1:
+				sfx = SFX_LARA_NO_FRENCH;
+				break;
 
-		case 2:
-		case 3:
-		case 4:
-			sfx = SFX_LARA_NO;
-			break;
+			case 2:
+			case 3:
+			case 4:
+				sfx = SFX_LARA_NO;
+				break;
 
-		case 6:
-			sfx = SFX_LARA_NO_JAPAN;
-			break;
+			case 6:
+				sfx = SFX_LARA_NO_JAPAN;
+				break;
 		}
 	}
 
@@ -143,8 +122,7 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 
 	lut = sample_lut[sfx];
 
-	if (lut == -1)
-	{
+	if (lut == -1) {
 		//empty func call here
 		sample_lut[sfx] = -2;
 		return 0;
@@ -155,8 +133,7 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 
 	info = &sample_infos[lut];
 
-	if (info->randomness)
-	{
+	if (info->randomness) {
 		if ((GetRandomDraw() & 0xFF) > info->randomness)
 			return 0;
 	}
@@ -164,8 +141,7 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 	radius = (info->radius + 1) << 10;
 	pan = 0;
 
-	if (pos)
-	{
+	if (pos) {
 		dx = pos->x_pos - camera.pos.x;
 		dy = pos->y_pos - camera.pos.y;
 		dz = pos->z_pos - camera.pos.z;
@@ -185,9 +161,7 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 
 		if (!(info->flags & 0x1000))
 			pan = (CamRot.y << 4) + phd_atan(dz, dx);
-	}
-	else
-	{
+	} else {
 		distance = 0;
 		pos2.x_pos = 0;
 		pos2.y_pos = 0;
@@ -233,70 +207,61 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 
 	flag = info->flags & 3;
 
-	switch (flag)
-	{
-	case 1:
+	switch (flag) {
+		case 1:
 
-		for (int i = 0; i < MAX_VOICES; i++)
-		{
-			if (LaSlot[i].nSampleInfo == lut)
-			{
-				if (S_SoundSampleIsPlayingOnChannel(i))
-					return 0;
+			for (int i = 0; i < MAX_VOICES; i++) {
+				if (LaSlot[i].nSampleInfo == lut) {
+					if (S_SoundSampleIsPlayingOnChannel(i))
+						return 0;
 
-				LaSlot[i].nSampleInfo = -1;
-			}
-		}
-
-		break;
-
-	case 2:
-
-		for (int i = 0; i < MAX_VOICES; i++)
-		{
-			if (LaSlot[i].nSampleInfo == lut)
-			{
-				S_SoundStopSample(i);
-				LaSlot[i].nSampleInfo = -1;
-				break;
-			}
-		}
-
-		break;
-
-	case 3:
-
-		for (int i = 0; i < MAX_VOICES; i++)
-		{
-			if (LaSlot[i].nSampleInfo == lut)
-			{
-				if (volume > LaSlot[i].nVolume)
-				{
-					LaSlot[i].OrigVolume = OrigVolume;
-					LaSlot[i].nVolume = volume;
-					LaSlot[i].nPan = pan;
-					LaSlot[i].nPitch = pitch;
-					LaSlot[i].distance = distance;
-					LaSlot[i].pos.x = pos->x_pos;
-					LaSlot[i].pos.y = pos->y_pos;
-					LaSlot[i].pos.z = pos->z_pos;
-					return 1;
+					LaSlot[i].nSampleInfo = -1;
 				}
-
-				return 0;
 			}
-		}
 
-		break;
+			break;
+
+		case 2:
+
+			for (int i = 0; i < MAX_VOICES; i++) {
+				if (LaSlot[i].nSampleInfo == lut) {
+					S_SoundStopSample(i);
+					LaSlot[i].nSampleInfo = -1;
+					break;
+				}
+			}
+
+			break;
+
+		case 3:
+
+			for (int i = 0; i < MAX_VOICES; i++) {
+				if (LaSlot[i].nSampleInfo == lut) {
+					if (volume > LaSlot[i].nVolume) {
+						LaSlot[i].OrigVolume = OrigVolume;
+						LaSlot[i].nVolume = volume;
+						LaSlot[i].nPan = pan;
+						LaSlot[i].nPitch = pitch;
+						LaSlot[i].distance = distance;
+						LaSlot[i].pos.x = pos->x_pos;
+						LaSlot[i].pos.y = pos->y_pos;
+						LaSlot[i].pos.z = pos->z_pos;
+						return 1;
+					}
+
+					return 0;
+				}
+			}
+
+			break;
 	}
 
 	if (flag == 3)
-		dx = S_SoundPlaySampleLooped(sample, (ushort)volume, pitch, (short)pan);
+		dx = S_SoundPlaySampleLooped(sample, (uint16_t)volume, pitch, (int16_t)pan);
 	else
-		dx = S_SoundPlaySample(sample, (ushort)volume, pitch, (short)pan);
+		dx = S_SoundPlaySample(sample, (uint16_t)volume, pitch, (int16_t)pan);
 
-	if (dx >= 0)
-	{
+	if (dx >= 0) {
 		LaSlot[dx].OrigVolume = OrigVolume;
 		LaSlot[dx].nVolume = volume;
 		LaSlot[dx].nPan = pan;
@@ -309,32 +274,27 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 		return 1;
 	}
 
-	if (dx == -1)
-	{
+	if (dx == -1) {
 		vol = 0x8000000;
 		slot = -1;
 
-		for (int i = 1; i < MAX_VOICES; i++)
-		{
-			if ((LaSlot[i].nSampleInfo >= 0) && (LaSlot[i].nVolume <= vol))
-			{
+		for (int i = 1; i < MAX_VOICES; i++) {
+			if ((LaSlot[i].nSampleInfo >= 0) && (LaSlot[i].nVolume <= vol)) {
 				vol = LaSlot[i].nVolume;
 				slot = i;
 			}
 		}
 
-		if (volume > vol)
-		{
+		if (volume > vol) {
 			S_SoundStopSample(slot);
 			LaSlot[slot].nSampleInfo = -1;
 
 			if (flag == 3)
-				dx = S_SoundPlaySampleLooped(sample, (ushort)volume, pitch, (short)pan);
+				dx = S_SoundPlaySampleLooped(sample, (uint16_t)volume, pitch, (int16_t)pan);
 			else
-				dx = S_SoundPlaySample(sample, (ushort)volume, pitch, (short)pan);
+				dx = S_SoundPlaySample(sample, (uint16_t)volume, pitch, (int16_t)pan);
 
-			if (dx >= 0)
-			{
+			if (dx >= 0) {
 				LaSlot[dx].OrigVolume = OrigVolume;
 				LaSlot[dx].nVolume = volume;
 				LaSlot[dx].nPan = pan;
@@ -352,15 +312,14 @@ long SoundEffect(long sfx, PHD_3DPOS* pos, long flags)
 	}
 
 //	if (sample >= 0)
-		//empty func call here
+	//empty func call here
 
 	info->number = -1;
 	return 0;
 }
 
-void SayNo()
-{
-	long fx;
+void SayNo() {
+	int32_t fx;
 
 	fx = SFX_LARA_NO;
 

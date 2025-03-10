@@ -9,28 +9,25 @@
 	result.tv = clipper * (v2->tv - v1->tv) + v1->tv;\
 }
 
-long ZClipper(long n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out)
-{
+int32_t ZClipper(int32_t n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out) {
 	GFXTLBUMPVERTEX* pIn;
 	GFXTLBUMPVERTEX* pOut;
 	GFXTLBUMPVERTEX* last;
 	float lastZ, inZ, dz, iR, iG, iB, iA, lR, lG, lB, lA, fR, fG, fB, fA;
-	long nPoints, r, g, b, a;
+	int32_t nPoints, r, g, b, a;
 
 	pIn = in;
 	last = &in[n - 1];
 	pOut = out;
 
-	for (nPoints = 0; n--; last = pIn++)
-	{
+	for (nPoints = 0; n--; last = pIn++) {
 		inZ = f_mznear - pIn->sz;
 		lastZ = f_mznear - last->sz;
 
-		if (((*(long*)&lastZ) | (*(long*)&inZ)) >= 0)
+		if (((*(int32_t*)&lastZ) | (*(int32_t*)&inZ)) >= 0)
 			continue;
 
-		if (((*(long*)&lastZ) ^ (*(long*)&inZ)) < 0)
-		{
+		if (((*(int32_t*)&lastZ) ^ (*(int32_t*)&inZ)) < 0) {
 			dz = inZ / (last->sz - pIn->sz);
 			pOut->sx = ((last->tx - pIn->tx) * dz + pIn->tx) * f_mperspoznear + f_centerx;
 			pOut->sy = ((last->ty - pIn->ty) * dz + pIn->ty) * f_mperspoznear + f_centery;
@@ -52,10 +49,10 @@ long ZClipper(long n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out)
 			fR = iR + (lR - iR) * dz;
 			fG = iG + (lG - iG) * dz;
 			fB = iB + (lB - iB) * dz;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			pOut->color = RGBA(r, g, b, a);
 
 			iR = (float)CLRR(pIn->specular);
@@ -72,18 +69,17 @@ long ZClipper(long n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out)
 			fR = iR + (lR - iR) * dz;
 			fG = iG + (lG - iG) * dz;
 			fB = iB + (lB - iB) * dz;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			pOut->specular = RGBA(r, g, b, a);
 
 			pOut++;
 			nPoints++;
 		}
 
-		if ((*(long*)&inZ) < 0)
-		{
+		if ((*(int32_t*)&inZ) < 0) {
 			pOut->sx = pIn->sx;
 			pOut->sy = pIn->sy;
 			pOut->rhw = pIn->rhw;
@@ -102,15 +98,13 @@ long ZClipper(long n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out)
 	return nPoints;
 }
 
-long visible_zclip(GFXTLVERTEX* v0, GFXTLVERTEX* v1, GFXTLVERTEX* v2)
-{
+int32_t visible_zclip(GFXTLVERTEX* v0, GFXTLVERTEX* v1, GFXTLVERTEX* v2) {
 	return (v2->tu * v0->sz - v2->sz * v0->tu) * v1->tv
-		+ (v2->sz * v0->tv - v2->tv * v0->sz) * v1->tu
-		+ (v2->tv * v0->tu - v2->tu * v0->tv) * v1->sz < 0;
+	       + (v2->sz * v0->tv - v2->tv * v0->sz) * v1->tu
+	       + (v2->tv * v0->tu - v2->tu * v0->tv) * v1->sz < 0;
 }
 
-long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
-{
+int32_t XYUVGClipper(int32_t n, GFXTLBUMPVERTEX* in) {
 	GFXTLBUMPVERTEX* v1;
 	GFXTLBUMPVERTEX* v2;
 	GFXTLBUMPVERTEX output[8];
@@ -119,7 +113,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 	float cr2, cg2, cb2, ca2;
 	float sr2, sg2, sb2, sa2;
 	float clipper, fR, fG, fB, fA;
-	long nPoints, r, g, b, a;
+	int32_t nPoints, r, g, b, a;
 
 	v2 = &in[n - 1];
 	cr2 = float(CLRR(v2->color));
@@ -132,9 +126,8 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 	sa2 = float(CLRA(v2->specular));
 
 	nPoints = 0;
-	
-	for (int i = 0; i < n; i++)
-	{
+
+	for (int i = 0; i < n; i++) {
 		v1 = v2;
 		cr1 = cr2;
 		cg1 = cg2;
@@ -155,8 +148,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 		sb2 = float(CLRB(v2->specular));
 		sa2 = float(CLRA(v2->specular));
 
-		if (v1->sx < f_left)
-		{
+		if (v1->sx < f_left) {
 			if (v2->sx < f_left)
 				continue;
 
@@ -167,28 +159,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].specular = RGBA(r, g, b, a);
 
 			output[nPoints].sx = f_left;
 			output[nPoints].sy = clipper * (v1->sy - v2->sy) + v2->sy;
 			nPoints++;
-		}
-		else if (v1->sx > f_right)
-		{
+		} else if (v1->sx > f_right) {
 			if (v2->sx > f_right)
 				continue;
 
@@ -199,20 +189,20 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].specular = RGBA(r, g, b, a);
 
 			output[nPoints].sx = f_right;
@@ -221,8 +211,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 		}
 
 
-		if (v2->sx < f_left)
-		{
+		if (v2->sx < f_left) {
 			clipper = (f_left - v2->sx) / (v1->sx - v2->sx);
 			VertClip(output[nPoints], v2, v1);
 
@@ -230,28 +219,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].specular = RGBA(r, g, b, a);
 
 			output[nPoints].sx = f_left;
 			output[nPoints].sy = clipper * (v1->sy - v2->sy) + v2->sy;
 			nPoints++;
-		}
-		else if (v2->sx > f_right)
-		{
+		} else if (v2->sx > f_right) {
 			clipper = (f_right - v2->sx) / (v1->sx - v2->sx);
 			VertClip(output[nPoints], v2, v1);
 
@@ -259,28 +246,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			output[nPoints].specular = RGBA(r, g, b, a);
 
 			output[nPoints].sx = f_right;
 			output[nPoints].sy = clipper * (v1->sy - v2->sy) + v2->sy;
 			nPoints++;
-		}
-		else
-		{
+		} else {
 			output[nPoints].sx = v2->sx;
 			output[nPoints].sy = v2->sy;
 			output[nPoints].sz = v2->sz;
@@ -310,8 +295,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 
 	nPoints = 0;
 
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		v1 = v2;
 		cr1 = cr2;
 		cg1 = cg2;
@@ -332,8 +316,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 		sb2 = float(CLRB(v2->specular));
 		sa2 = float(CLRA(v2->specular));
 
-		if (v1->sy < f_top)
-		{
+		if (v1->sy < f_top) {
 			if (v2->sy < f_top)
 				continue;
 
@@ -344,28 +327,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].specular = RGBA(r, g, b, a);
 
 			in[nPoints].sx = clipper * (v1->sx - v2->sx) + v2->sx;
 			in[nPoints].sy = f_top;
 			nPoints++;
-		}
-		else if (v1->sy > f_bottom)
-		{
+		} else if (v1->sy > f_bottom) {
 			if (v2->sy > f_bottom)
 				continue;
 
@@ -376,20 +357,20 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].specular = RGBA(r, g, b, a);
 
 			in[nPoints].sx = clipper * (v1->sx - v2->sx) + v2->sx;
@@ -397,8 +378,7 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			nPoints++;
 		}
 
-		if (v2->sy < f_top)
-		{
+		if (v2->sy < f_top) {
 			clipper = (f_top - v2->sy) / (v1->sy - v2->sy);
 			VertClip(in[nPoints], v2, v1);
 
@@ -406,28 +386,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].specular = RGBA(r, g, b, a);
 
 			in[nPoints].sx = clipper * (v1->sx - v2->sx) + v2->sx;
 			in[nPoints].sy = f_top;
 			nPoints++;
-		}
-		else if (v2->sy > f_bottom)
-		{
+		} else if (v2->sy > f_bottom) {
 			clipper = (f_bottom - v2->sy) / (v1->sy - v2->sy);
 			VertClip(in[nPoints], v2, v1);
 
@@ -435,28 +413,26 @@ long XYUVGClipper(long n, GFXTLBUMPVERTEX* in)
 			fR = cr2 + (cr1 - cr2) * clipper;
 			fG = cg2 + (cg1 - cg2) * clipper;
 			fB = cb2 + (cb1 - cb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].color = RGBA(r, g, b, a);
 
 			fA = sa2 + (sa1 - sa2) * clipper;
 			fR = sr2 + (sr1 - sr2) * clipper;
 			fG = sg2 + (sg1 - sg2) * clipper;
 			fB = sb2 + (sb1 - sb2) * clipper;
-			a = (long)fA;
-			r = (long)fR;
-			g = (long)fG;
-			b = (long)fB;
+			a = (int32_t)fA;
+			r = (int32_t)fR;
+			g = (int32_t)fG;
+			b = (int32_t)fB;
 			in[nPoints].specular = RGBA(r, g, b, a);
 
 			in[nPoints].sx = clipper * (v1->sx - v2->sx) + v2->sx;
 			in[nPoints].sy = f_bottom;
 			nPoints++;
-		}
-		else
-		{
+		} else {
 			in[nPoints].sx = v2->sx;
 			in[nPoints].sy = v2->sy;
 			in[nPoints].sz = v2->sz;

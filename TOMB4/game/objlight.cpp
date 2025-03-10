@@ -12,10 +12,9 @@
 #include "lara.h"
 #include "items.h"
 
-void ControlPulseLight(short item_number)
-{
+void ControlPulseLight(int16_t item_number) {
 	ITEM_INFO* item;
-	long sin, r, g, b;
+	int32_t sin, r, g, b;
 
 	item = &items[item_number];
 
@@ -25,8 +24,7 @@ void ControlPulseLight(short item_number)
 	if (!flip_stats[4] && gfLevelFlags & GF_PULSE)
 		return;
 
-	if (item->trigger_flags == 1)
-	{
+	if (item->trigger_flags == 1) {
 		item->trigger_flags = 0;
 		FlashFadeR = 128;
 		FlashFadeG = 255;
@@ -35,13 +33,10 @@ void ControlPulseLight(short item_number)
 		camera.bounce = -128;
 		SoundEffect(SFX_BOULDER_FALL, 0, 0);
 		SoundEffect(SFX_EXPLOSION2, 0, 0);
-	}
-	else if (item->trigger_flags == 2)
-	{
+	} else if (item->trigger_flags == 2) {
 		SoundEffect(SFX_MAPPER_PYRAMID_OPEN, &item->pos, 0);
 
-		if (room[camera.pos.room_number].flags & ROOM_NOT_INSIDE)
-		{
+		if (room[camera.pos.room_number].flags & ROOM_NOT_INSIDE) {
 			FlashFadeR = 64;
 			FlashFadeG = 128;
 			FlashFadeB = 128;
@@ -61,32 +56,25 @@ void ControlPulseLight(short item_number)
 	TriggerDynamic(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 18, r, g, b);
 }
 
-void ControlElectricalLight(short item_number)
-{
+void ControlElectricalLight(int16_t item_number) {
 	ITEM_INFO* item;
-	long shade, r, g, b;
+	int32_t shade, r, g, b;
 
 	item = &items[item_number];
 
-	if (!TriggerActive(item))
-	{
+	if (!TriggerActive(item)) {
 		item->item_flags[0] = 0;
 		return;
 	}
 
-	if (item->item_flags[0] < 16)
-	{
+	if (item->item_flags[0] < 16) {
 		shade = (GetRandomControl() & 0x3F) << 2;
 		item->item_flags[0]++;
-	}
-	else
-	{
-		if (item->item_flags[0] >= 96)
-		{
+	} else {
+		if (item->item_flags[0] >= 96) {
 			if (item->item_flags[0] >= 160)
 				shade = 255 - (GetRandomControl() & 0x1F);
-			else
-			{
+			else {
 				shade = 96 - (GetRandomControl() & 0x1F);
 
 				if (!(GetRandomControl() & 0x1F) && item->item_flags[0] > 128)
@@ -94,9 +82,7 @@ void ControlElectricalLight(short item_number)
 				else
 					item->item_flags[0]++;
 			}
-		}
-		else
-		{
+		} else {
 			if (wibble & 0x3F && GetRandomControl() & 7)
 				shade = GetRandomControl() & 0x3F;
 			else
@@ -112,8 +98,7 @@ void ControlElectricalLight(short item_number)
 	TriggerDynamic(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 16, r, g, b);
 }
 
-void ControlBlinker(short item_number)
-{
+void ControlBlinker(int16_t item_number) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 
@@ -126,8 +111,7 @@ void ControlBlinker(short item_number)
 
 	if (item->trigger_flags >= 3)
 		item->mesh_bits = 1;
-	else
-	{
+	else {
 		pos.z = 0;
 		pos.y = 0;
 		pos.x = 0;

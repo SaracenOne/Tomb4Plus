@@ -58,5 +58,5 @@
 #define BADDY_JUMP_OFF_3_CLICKS_ANIMATION 66
 #define BADDY_BLIND_ANIMATION 68
 
-void InitialiseBaddy(short item_number);
-void BaddyControl(short item_number);
+void InitialiseBaddy(int16_t item_number);
+void BaddyControl(int16_t item_number);

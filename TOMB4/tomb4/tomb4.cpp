@@ -9,16 +9,14 @@
 
 tomb4_options tomb4;
 
-void init_tomb4_stuff()
-{
+void init_tomb4_stuff() {
 	char buf[40];
 	bool first;
 
 	OpenRegistry("tomb4");
 	first = REG_KeyWasCreated();
 
-	if (first)	//key was created = no settings found, write defaults
-	{
+	if (first) {	//key was created = no settings found, write defaults
 		sprintf(buf, "footprints");
 		tomb4.footprints = 1;								//footprints on
 		REG_WriteBool(buf, tomb4.footprints);
@@ -119,17 +117,15 @@ void init_tomb4_stuff()
 		tomb4.pickup_lighting = PICKUP_LIGHTING_DEFAULT;	// default
 		REG_WriteLong(buf, tomb4.pickup_lighting);
 
-		sprintf(buf, "volumetric_flash_greandes");
+		sprintf(buf, "volumetric_flash_grenades");
 		tomb4.volumetric_flash_grenades = VOLUMETRIC_FLASH_GRENADES_DEFAULT;	// default
 		REG_WriteLong(buf, tomb4.pickup_lighting);
-	}
-	else	//Key already exists, settings already written, read them. also falls back to default if any of them missing
-	{
+	} else {	//Key already exists, settings already written, read them. also falls back to default if any of them missing
 		sprintf(buf, "footprints");
 		REG_ReadBool(buf, tomb4.footprints, 1);
 
 		sprintf(buf, "shadow");
-		ulong shadow_mode;
+		uint32_t shadow_mode;
 		REG_ReadLong(buf, shadow_mode, SHADOW_MODE_PSX_CIRCLE);
 		tomb4.shadow_mode = (shadow_mode_enum)shadow_mode;
 
@@ -146,12 +142,12 @@ void init_tomb4_stuff()
 		REG_ReadBool(buf, tomb4.gameover, 1);
 
 		sprintf(buf, "barMode");
-		ulong bar_mode;
+		uint32_t bar_mode;
 		REG_ReadLong(buf, bar_mode, BAR_MODE_CUSTOM);
 		tomb4.bar_mode = (bar_mode_enum)bar_mode;
 
 		sprintf(buf, "bar_pos");
-		ulong bars_pos;
+		uint32_t bars_pos;
 		REG_ReadLong(buf, bars_pos, BARS_POS_CUSTOM);
 		tomb4.bars_pos = (bars_pos_enum)bars_pos;
 
@@ -168,14 +164,14 @@ void init_tomb4_stuff()
 		REG_ReadBool(buf, tomb4.loadingtxt, 1);
 
 		sprintf(buf, "inv_bgM");
-		ulong inv_bg_mode;
+		uint32_t inv_bg_mode;
 		REG_ReadLong(buf, inv_bg_mode, 1);
 		tomb4.inv_bg_mode = (inv_bg_mode_enum)inv_bg_mode;
 
 		sprintf(buf, "tr5LB");
 		REG_ReadBool(buf, tomb4.tr5_loadbar, 0);
 
-		ulong ltransparency;
+		uint32_t ltransparency;
 		sprintf(buf, "ltransparency");
 		REG_ReadLong(buf, ltransparency, LOOK_TRANSPARENCY_DEFAULT);
 		tomb4.look_transparency = (look_transparency_enum)ltransparency;
@@ -196,7 +192,7 @@ void init_tomb4_stuff()
 		REG_ReadBool(buf, tomb4.static_lighting, 1);
 
 		sprintf(buf, "reverb");
-		ulong reverb;
+		uint32_t reverb;
 		REG_ReadLong(buf, reverb, REVERB_LARA_ROOM);
 		tomb4.reverb = (reverb_enum)reverb;
 
@@ -209,12 +205,12 @@ void init_tomb4_stuff()
 		sprintf(buf, "hang_game_thread");
 		REG_ReadBool(buf, tomb4.hang_game_thread, 1);
 
-		ulong pickup_lighting;
+		uint32_t pickup_lighting;
 		sprintf(buf, "pickup_lighting");
 		REG_ReadLong(buf, pickup_lighting, PICKUP_LIGHTING_DEFAULT);
 		tomb4.pickup_lighting = (pickup_lighting_enum)pickup_lighting;
 
-		ulong volumetric_flash_grenades;
+		uint32_t volumetric_flash_grenades;
 		sprintf(buf, "volumetric_flash_grenades");
 		REG_ReadLong(buf, volumetric_flash_grenades, VOLUMETRIC_FLASH_GRENADES_DEFAULT);
 		tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum) volumetric_flash_grenades;
@@ -223,8 +219,7 @@ void init_tomb4_stuff()
 	CloseRegistry();
 }
 
-void save_new_tomb4_settings()
-{
+void save_new_tomb4_settings() {
 	char buf[40];
 
 	OpenRegistry("tomb4");
@@ -310,8 +305,7 @@ void save_new_tomb4_settings()
 	CloseRegistry();
 }
 
-void RPC_Init()
-{
+void RPC_Init() {
 #ifdef UNSTUBBED
 	DiscordEventHandlers handlers;
 
@@ -320,22 +314,18 @@ void RPC_Init()
 #endif
 }
 
-const char* RPC_GetLevelName()
-{
-	if (!gfCurrentLevel)
-	{
+const char* RPC_GetLevelName() {
+	if (!gfCurrentLevel) {
 		if (bDoCredits)
 			return "In Credits";
 		else
 			return "In Title";
-	}
-	else
+	} else
 		return GetCustomStringForTextID(gfLevelNames[gfCurrentLevel]);
 }
 
-const char* RPC_GetTimer()
-{
-	long sec, days, hours, min;
+const char* RPC_GetTimer() {
+	int32_t sec, days, hours, min;
 	static char buf[64];
 
 	sec = GameTimer / 30;
@@ -347,148 +337,143 @@ const char* RPC_GetTimer()
 	return buf;
 }
 
-const char* RPC_GetLevelPic()
-{
-	switch (gfCurrentLevel)
-	{
-	case 1:
-		return "angkor";
-		
-	case 2:
-		return "iris";
+const char* RPC_GetLevelPic() {
+	switch (gfCurrentLevel) {
+		case 1:
+			return "angkor";
 
-	case 3:
-		return "seth";
+		case 2:
+			return "iris";
 
-	case 4:
-		return "chamber";
+		case 3:
+			return "seth";
 
-	case 5:
-		return "valley";
+		case 4:
+			return "chamber";
 
-	case 6:
-		return "kv5";
+		case 5:
+			return "valley";
 
-	case 7:
-		return "karnak";
+		case 6:
+			return "kv5";
 
-	case 8:
-		return "hypostyle";
+		case 7:
+			return "karnak";
 
-	case 9:
-		return "lake";
+		case 8:
+			return "hypostyle";
+
+		case 9:
+			return "lake";
 
 		//10 doesnt exist
 
-	case 11:
-		return "senet";
+		case 11:
+			return "senet";
 
-	case 12:
-		return "guardian";
+		case 12:
+			return "guardian";
 
-	case 13:
-		return "train";
+		case 13:
+			return "train";
 
-	case 14:
-		return "alexandria";
+		case 14:
+			return "alexandria";
 
-	case 15:
-		return "coastal";
+		case 15:
+			return "coastal";
 
-	case 16:
-		return "isis";
+		case 16:
+			return "isis";
 
-	case 17:
-		return "cleopetra";
+		case 17:
+			return "cleopetra";
 
-	case 18:
-		return "catacomb";
+		case 18:
+			return "catacomb";
 
-	case 19:
-		return "poseidon";
+		case 19:
+			return "poseidon";
 
-	case 20:
-		return "library";
+		case 20:
+			return "library";
 
-	case 21:
-		return "demi";
+		case 21:
+			return "demi";
 
-	case 22:
-		return "city";
+		case 22:
+			return "city";
 
-	case 23:
-		return "trenches";
+		case 23:
+			return "trenches";
 
-	case 24:
-		return "tulun";
+		case 24:
+			return "tulun";
 
-	case 25:
-		return "bazaar";
+		case 25:
+			return "bazaar";
 
-	case 26:
-		return "gate";
+		case 26:
+			return "gate";
 
-	case 27:
-		return "citadel";
+		case 27:
+			return "citadel";
 
-	case 28:
-		return "sphinx";
+		case 28:
+			return "sphinx";
 
 		//29 doesn't exist
 
-	case 30:
-		return "under";
+		case 30:
+			return "under";
 
-	case 31:
-		return "menkaure";
+		case 31:
+			return "menkaure";
 
-	case 32:
-		return "inmenkaure";
+		case 32:
+			return "inmenkaure";
 
-	case 33:
-		return "mastabas";
+		case 33:
+			return "mastabas";
 
-	case 34:
-		return "great";
+		case 34:
+			return "great";
 
-	case 35:
-		return "khufu";
+		case 35:
+			return "khufu";
 
-	case 36:
-		return "ingreat";
+		case 36:
+			return "ingreat";
 
-	case 37:
-		return "horusa";
+		case 37:
+			return "horusa";
 
-	case 38:
-		return "horusb";
+		case 38:
+			return "horusb";
 
-	default:
-		return "default";
+		default:
+			return "default";
 	}
 }
 
-const char* RPC_GetHealthPic()
-{
+const char* RPC_GetHealthPic() {
 	if (lara_item->hit_points > 666)
 		return "green";
-	
+
 	if (lara_item->hit_points > 333)
 		return "yellow";
 
 	return "red";
 }
 
-const char* RPC_GetHealthPercentage()
-{
+const char* RPC_GetHealthPercentage() {
 	static char buf[32];
 
 	sprintf(buf, "Health: %i%%", lara_item->hit_points / 10);
 	return buf;
 }
 
-void RPC_Update()
-{
+void RPC_Update() {
 #ifdef USE_DISCORD_RPC
 	DiscordRichPresence RPC;
 
@@ -508,8 +493,7 @@ void RPC_Update()
 #endif
 }
 
-void RPC_close()
-{
+void RPC_close() {
 #ifdef USE_DISCORD_RPC
 	Discord_Shutdown();
 #endif

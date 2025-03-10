@@ -172,8 +172,7 @@ int16_t T4PlusGetEnemyJeepSlotID() {
 void T4PlusSetupDefaultObjectCustomization() {
 	MOD_LEVEL_OBJECTS_INFO *objects_info = get_game_mod_level_objects_info(0);
 
-	for (int32_t i = 0; i < NUMBER_OBJECTS; i++)
-	{
+	for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 		objects_info->object_customization[i].initialise_routine = "";
 		objects_info->object_customization[i].collision_routine = "";
 		objects_info->object_customization[i].control_routine = "";
@@ -197,7 +196,7 @@ void T4PlusSetupDefaultObjectCustomization() {
 		objects_info->object_customization[i].shadow_size = 0;
 
 		objects_info->object_customization[i].explodable_meshbits = 0;
-		//obj->frame_base = (short*)((long)(size_t(obj->frame_base) & 0xffffffff) + (char*)frames);
+		//obj->frame_base = (int16_t*)((int32_t)(size_t(obj->frame_base) & 0xffffffff) + (int8_t*)frames);
 		//obj->object_mip = 0;
 	}
 
@@ -240,7 +239,7 @@ void T4PlusSetupDefaultObjectCustomization() {
 	//bones[obj->bone_index + 28] |= X_ROTATION_FLAG;
 }
 
-bool T4ObjectControlRoutine(short object_number, short item_num) {
+bool T4ObjectControlRoutine(int16_t object_number, int16_t item_num) {
 	NGStoreLastItemMovedIndex(item_num);
 
 	if (!NGIsItemFrozen(item_num)) {

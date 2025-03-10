@@ -1,11 +1,11 @@
 #pragma once
 #include "../global/types.h"
 
-void undraw_pistol_mesh_left(long weapon_type);
-void undraw_pistol_mesh_right(long weapon_type);
-void ready_pistols(long weapon_type);
-void draw_pistol_meshes(long weapon_type);
-void draw_pistols(long weapon_type);
-void undraw_pistols(long weapon_type);
-void AnimatePistols(long weapon_type);
-void PistolHandler(long weapon_type);
+void undraw_pistol_mesh_left(int32_t weapon_type);
+void undraw_pistol_mesh_right(int32_t weapon_type);
+void ready_pistols(int32_t weapon_type);
+void draw_pistol_meshes(int32_t weapon_type);
+void draw_pistols(int32_t weapon_type);
+void undraw_pistols(int32_t weapon_type);
+void AnimatePistols(int32_t weapon_type);
+void PistolHandler(int32_t weapon_type);

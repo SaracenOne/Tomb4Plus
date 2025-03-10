@@ -1,5 +1,5 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseSmallScorpion(short item_number);
-void SmallScorpionControl(short item_number);
+void InitialiseSmallScorpion(int16_t item_number);
+void SmallScorpionControl(int16_t item_number);

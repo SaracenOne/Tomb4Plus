@@ -6,8 +6,7 @@ const int DEFAULT_GLYPH_SCALE_HEIGHT = 240;
 
 #define CHAR_TABLE_COUNT 106
 
-static const CHARDEF DEFAULT_CHAR_TABLE[CHAR_TABLE_COUNT] =
-{
+static const CHARDEF DEFAULT_CHAR_TABLE[CHAR_TABLE_COUNT] = {
 	{0.68235302F, 0.203922F, 4, 13, -11, 0, 11},
 	{0.384314F, 0.227451F, 7, 5, -10, 1, 5},
 	{0.321569F, 0.101961F, 14, 12, -10, 1, 11},
@@ -118,14 +117,14 @@ static const CHARDEF DEFAULT_CHAR_TABLE[CHAR_TABLE_COUNT] =
 
 void InitFont();
 void UpdatePulseColour();
-long GetStringLength(const char* string, long* top, long* bottom);
-void DrawChar(long x, long y, ushort col, CHARDEF* def);
-void PrintStringScaled(long x, long y, uchar col, const char* string, ushort flags, float glyph_scale_width, float glyph_scale_height);
-void PrintString(long x, long y, uchar col, const char* string, ushort flags);
+int32_t GetStringLength(const char* string, int32_t* top, int32_t* bottom);
+void DrawChar(int32_t x, int32_t y, uint16_t col, CHARDEF* def);
+void PrintStringScaled(int32_t x, int32_t y, uint8_t col, const char* string, uint16_t flags, float glyph_scale_width, float glyph_scale_height);
+void PrintString(int32_t x, int32_t y, uint8_t col, const char* string, uint16_t flags);
 
-extern long stash_font_height;
-extern long smol_font_height;
-extern long savegame_font_height;
-extern long small_font;
-extern long font_height;
-extern long GnFrameCounter;
+extern int32_t stash_font_height;
+extern int32_t smol_font_height;
+extern int32_t savegame_font_height;
+extern int32_t small_font;
+extern int32_t font_height;
+extern int32_t GnFrameCounter;

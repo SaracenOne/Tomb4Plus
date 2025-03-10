@@ -5,8 +5,7 @@
 #include "../../control.h"
 #include "../../lara.h"
 
-void InitialiseJeanYves(short item_number)
-{
+void InitialiseJeanYves(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -16,15 +15,13 @@ void InitialiseJeanYves(short item_number)
 	item->frame_number = anims[item->anim_number].frame_base;
 }
 
-void JeanYvesControl(short item_number)
-{
+void JeanYvesControl(int16_t item_number) {
 	ITEM_INFO* item;
-	short random;
+	int16_t random;
 
 	item = &items[item_number];
 
-	if (item->trigger_flags < lara.highest_location)
-	{
+	if (item->trigger_flags < lara.highest_location) {
 		if (lara.highest_location > 3)
 			lara.highest_location = 3;
 
@@ -34,15 +31,13 @@ void JeanYvesControl(short item_number)
 		item->anim_number = objects[JEAN_YVES].anim_index + random;
 		item->frame_number = anims[item->anim_number].frame_base;
 		item->trigger_flags = lara.highest_location;
-	}
-	else
-	{
+	} else {
 		if (GetRandomControl() & 3)
 			item->goal_anim_state = (GetRandomControl() & 1) + 1;
 		else
 			item->goal_anim_state = 3 * (GetRandomControl() & 1);
 
-		item->goal_anim_state += ((char)item->current_anim_state - 1 & 0xC) + 1;
+		item->goal_anim_state += ((int8_t)item->current_anim_state - 1 & 0xC) + 1;
 	}
 
 	AnimateItem(item);

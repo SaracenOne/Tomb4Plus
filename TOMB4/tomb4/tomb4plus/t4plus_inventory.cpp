@@ -11,71 +11,70 @@
 void T4PlusSetValidLaraGunType() {
 	bool clear_current_weapon = false;
 
-	switch (lara.gun_type)
-	{
-	case WEAPON_PISTOLS:
-		if (!lara.pistols_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			if (lara.holster == T4PlusGetLaraHolstersPistolsSlotID()) {
-				lara.holster = T4PlusGetLaraHolstersSlotID();
-			}
+	switch (lara.gun_type) {
+		case WEAPON_PISTOLS:
+			if (!lara.pistols_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				if (lara.holster == T4PlusGetLaraHolstersPistolsSlotID()) {
+					lara.holster = T4PlusGetLaraHolstersSlotID();
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	case WEAPON_REVOLVER:
-		if (!lara.sixshooter_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			lara.weapon_item = NO_ITEM;
-			if (lara.holster == T4PlusGetLaraHolstersRevolverSlotID()) {
-				lara.holster = T4PlusGetLaraHolstersSlotID();
+				clear_current_weapon = true;
 			}
+			break;
+		case WEAPON_REVOLVER:
+			if (!lara.sixshooter_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				lara.weapon_item = NO_ITEM;
+				if (lara.holster == T4PlusGetLaraHolstersRevolverSlotID()) {
+					lara.holster = T4PlusGetLaraHolstersSlotID();
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	case WEAPON_UZI:
-		if (!lara.uzis_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			if (lara.holster == T4PlusGetLaraHolstersUzisSlotID()) {
-				lara.holster = T4PlusGetLaraHolstersSlotID();
+				clear_current_weapon = true;
 			}
+			break;
+		case WEAPON_UZI:
+			if (!lara.uzis_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				if (lara.holster == T4PlusGetLaraHolstersUzisSlotID()) {
+					lara.holster = T4PlusGetLaraHolstersSlotID();
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	case WEAPON_SHOTGUN:
-		if (!lara.shotgun_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			if (lara.back_gun == T4PlusGetShotgunAnimSlotID()) {
-				lara.back_gun = 0;
+				clear_current_weapon = true;
 			}
+			break;
+		case WEAPON_SHOTGUN:
+			if (!lara.shotgun_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				if (lara.back_gun == T4PlusGetShotgunAnimSlotID()) {
+					lara.back_gun = 0;
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	case WEAPON_GRENADE:
-		if (!lara.grenade_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			if (lara.back_gun == T4PlusGetGrenadeGunAnimSlotID()) {
-				lara.back_gun = 0;
+				clear_current_weapon = true;
 			}
+			break;
+		case WEAPON_GRENADE:
+			if (!lara.grenade_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				if (lara.back_gun == T4PlusGetGrenadeGunAnimSlotID()) {
+					lara.back_gun = 0;
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	case WEAPON_CROSSBOW:
-		if (!lara.crossbow_type_carried) {
-			lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
-			if (lara.back_gun == T4PlusGetCrossbowAnimSlotID()) {
-				lara.back_gun = 0;
+				clear_current_weapon = true;
 			}
+			break;
+		case WEAPON_CROSSBOW:
+			if (!lara.crossbow_type_carried) {
+				lara.last_gun_type = lara.request_gun_type = lara.gun_type = WEAPON_NONE;
+				if (lara.back_gun == T4PlusGetCrossbowAnimSlotID()) {
+					lara.back_gun = 0;
+				}
 
-			clear_current_weapon = true;
-		}
-		break;
-	default:
-		break;
+				clear_current_weapon = true;
+			}
+			break;
+		default:
+			break;
 	}
 
 	if (clear_current_weapon) {
@@ -98,7 +97,7 @@ void T4PlusSetValidLaraGunType() {
 
 // TODO: there may be some missing types still needing support
 
-int T4PlusGetInventoryCount(short object_number) {
+int T4PlusGetInventoryCount(int16_t object_number) {
 	if (object_number >= PUZZLE_ITEM1_COMBO1 && object_number <= PUZZLE_ITEM8_COMBO2)
 		return (lara.puzzleitemscombo >> (object_number - PUZZLE_ITEM1_COMBO1)) & 1;
 	else if (object_number >= PUZZLE_ITEM1 && object_number <= PUZZLE_ITEM12)
@@ -191,8 +190,7 @@ int T4PlusGetInventoryCount(short object_number) {
 	return 0;
 }
 
-void T4PlusSetInventoryCount(short object_number, int count, bool update_weapon_state)
-{
+void T4PlusSetInventoryCount(int16_t object_number, int count, bool update_weapon_state) {
 	if (object_number >= PUZZLE_ITEM1_COMBO1 && object_number <= PUZZLE_ITEM8_COMBO2) {
 		if (count)
 			lara.puzzleitemscombo |= (1 << (object_number - PUZZLE_ITEM1_COMBO1));
@@ -225,8 +223,7 @@ void T4PlusSetInventoryCount(short object_number, int count, bool update_weapon_
 			lara.questitems |= (1 << (object_number - QUEST_ITEM1));
 		else
 			lara.questitems &= ~(1 << (object_number - QUEST_ITEM1));
-	}
-	else if (object_number == CROWBAR_ITEM)
+	} else if (object_number == CROWBAR_ITEM)
 		lara.crowbar = count;
 	else if (object_number == PISTOLS_ITEM)
 		lara.pistols_type_carried = count;
@@ -306,7 +303,7 @@ void T4PlusSetInventoryCount(short object_number, int count, bool update_weapon_
 		T4PlusSetValidLaraGunType();
 }
 
-void T4ShowObjectPickup(int object_number, short displayable_lifetime) {
+void T4ShowObjectPickup(int object_number, int16_t displayable_lifetime) {
 	for (int i = 0; i < MAX_PICKUP_DISPLAYABLE_COUNT; i++) {
 		DISPLAYPU *pu = &pickups[i];
 

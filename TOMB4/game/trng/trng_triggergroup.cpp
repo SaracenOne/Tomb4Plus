@@ -17,7 +17,7 @@
 // There is some ambiguity if the implementation of SINGLE_SHOT_RESUMED is implemented correctly for secondary data blocks
 bool NGIsTriggerGroupDataResumed(NG_TRIGGER_GROUP_DATA* data) {
 	return ((data->flags & TGROUP_SINGLE_SHOT_RESUMED) &&
-		is_mod_trng_version_equal_or_greater_than_target(1, 2, 2, 7));
+	        is_mod_trng_version_equal_or_greater_than_target(1, 2, 2, 7));
 }
 
 bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
@@ -46,15 +46,15 @@ bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
 	while (index < trigger_group.data_size) {
 		// Check of unsupported TGROUP flags
 		if (trigger_group.data[index].flags & TGROUP_USE_EXECUTOR_ITEM_INDEX ||
-			trigger_group.data[index].flags & TGROUP_USE_ITEM_USED_BY_LARA_INDEX ||
-			trigger_group.data[index].flags & TGROUP_USE_OWNER_ANIM_ITEM_INDEX ||
-			trigger_group.data[index].flags & TGROUP_USE_TRIGGER_ITEM_INDEX) {
+		        trigger_group.data[index].flags & TGROUP_USE_ITEM_USED_BY_LARA_INDEX ||
+		        trigger_group.data[index].flags & TGROUP_USE_OWNER_ANIM_ITEM_INDEX ||
+		        trigger_group.data[index].flags & TGROUP_USE_TRIGGER_ITEM_INDEX) {
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Unsupported TGROUP flags detected!");
 			return false;
 		}
 
 		if ((trigger_group.data[index].flags & TGROUP_SINGLE_SHOT) ||
-			NGIsTriggerGroupDataResumed(&trigger_group.data[index])) {
+		        NGIsTriggerGroupDataResumed(&trigger_group.data[index])) {
 			if (trigger_group.oneshot_triggered) {
 				return false;
 			} else {
@@ -76,7 +76,7 @@ bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
 			break;
 
 		if ((!(trigger_group.data[index].flags & TGROUP_OR) && (operation_result == true || !parsed_first_operation)) ||
-			trigger_group.data[index].flags & TGROUP_OR) {
+		        trigger_group.data[index].flags & TGROUP_OR) {
 			bool current_result = false;
 
 			if (trigger_group.data[index].plugin_id != 0) {
@@ -108,18 +108,18 @@ bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
 				} else {
 					if (plugin_string) {
 						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Plugin triggers are not yet supported (trigger_id: %u, plugin:%s, first_field:0x%x, second_field:%u, third_field:0x%x)",
-							trigger_group_id,
-							plugin_string,
-							trigger_group.data[index].flags,
-							((int32_t)trigger_group.data[index].object),
-							((int32_t)trigger_group.data[index].timer));
+						      trigger_group_id,
+						      plugin_string,
+						      trigger_group.data[index].flags,
+						      ((int32_t)trigger_group.data[index].object),
+						      ((int32_t)trigger_group.data[index].timer));
 					} else {
 						NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Plugin triggers are not yet supported (trigger_id: %u, plugin_id:%u, first_field:0x%x, second_field:%u, third_field:0x%x)",
-							trigger_group_id,
-							trigger_group.data[index].plugin_id,
-							trigger_group.data[index].flags,
-							((int32_t)trigger_group.data[index].object),
-							((int32_t)trigger_group.data[index].timer));
+						      trigger_group_id,
+						      trigger_group.data[index].plugin_id,
+						      trigger_group.data[index].flags,
+						      ((int32_t)trigger_group.data[index].object),
+						      ((int32_t)trigger_group.data[index].timer));
 					}
 				}
 			} else {
@@ -177,8 +177,7 @@ bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
 					if (trigger_group.data[index].flags & TGROUP_MOVEABLE) {
 						if (trigger_group.data[index].flags & TGROUP_USE_FOUND_ITEM_INDEX) {
 							condition_index = NGGetItemIndexConditional();
-						}
-						else {
+						} else {
 							condition_index = ng_script_id_table[trigger_group.data[index].object].script_index;
 
 						}
@@ -224,8 +223,7 @@ bool NGTriggerGroupFunction(uint32_t trigger_group_id, uint8_t execution_type) {
 			if (trigger_group.data[index].flags & TGROUP_OR) {
 				if (current_result == true)
 					operation_result = true;
-			}
-			else {
+			} else {
 				operation_result = current_result;
 			}
 

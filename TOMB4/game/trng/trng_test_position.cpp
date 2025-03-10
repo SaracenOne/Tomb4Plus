@@ -45,13 +45,13 @@ PHD_VECTOR NGCalculatePositionForTestPosition(NG_TEST_POSITION* test_position) {
 }
 
 bool NGTestLaraPosition(NG_TEST_POSITION *test_position, ITEM_INFO *item, ITEM_INFO *l) {
-	short TestBoundsBounds[] = {
-		test_position->x_distance_min, 
-		test_position->x_distance_max, 
+	int16_t TestBoundsBounds[] = {
+		test_position->x_distance_min,
+		test_position->x_distance_max,
 		test_position->y_distance_min,
 		test_position->y_distance_max,
 		test_position->z_distance_min,
-		test_position->z_distance_max, 
+		test_position->z_distance_max,
 		test_position->v_orient_diff_min,
 		test_position->v_orient_diff_max,
 		test_position->h_orient_diff_min,

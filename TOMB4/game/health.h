@@ -1,18 +1,18 @@
 #pragma once
 #include "../global/types.h"
 
-long FlashIt();
-void DrawGameInfo(long timed);
-void DrawHealthBar(long flash_state);
-void DrawAirBar(long flash_state);
+int32_t FlashIt();
+void DrawGameInfo(int32_t timed);
+void DrawHealthBar(int32_t flash_state);
+void DrawAirBar(int32_t flash_state);
 void InitialisePickUpDisplay();
 void DrawPickups();
-void AddDisplayPickup(short object_number);
+void AddDisplayPickup(int16_t object_number);
 
 #define MAX_PICKUP_DISPLAYABLE_COUNT 8
 
 extern DISPLAYPU pickups[MAX_PICKUP_DISPLAYABLE_COUNT];
-extern long PickupX;
-extern short CurrentPickup;
+extern int32_t PickupX;
+extern int16_t CurrentPickup;
 
-extern long health_bar_timer;
+extern int32_t health_bar_timer;

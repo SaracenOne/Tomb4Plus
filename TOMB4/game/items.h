@@ -1,18 +1,18 @@
 #pragma once
 #include "../global/types.h"
 
-void InitialiseItemArray(short num);
-void KillItem(short item_num);
-short CreateItem();
-void InitialiseItem(short item_num);
-void RemoveActiveItem(short item_num);
-void RemoveDrawnItem(short item_num);
-void AddActiveItem(short item_num);
-void ItemNewRoom(short item_num, short room_num);
-void InitialiseFXArray(long allocmem);
-short CreateEffect(short room_num);
-void KillEffect(short fx_num);
-void EffectNewRoom(short fx_num, short room_num);
+void InitialiseItemArray(int16_t num);
+void KillItem(int16_t item_num);
+int16_t CreateItem();
+void InitialiseItem(int16_t item_num);
+void RemoveActiveItem(int16_t item_num);
+void RemoveDrawnItem(int16_t item_num);
+void AddActiveItem(int16_t item_num);
+void ItemNewRoom(int16_t item_num, int16_t room_num);
+void InitialiseFXArray(int32_t allocmem);
+int16_t CreateEffect(int16_t room_num);
+void KillEffect(int16_t fx_num);
+void EffectNewRoom(int16_t fx_num, int16_t room_num);
 
-extern short next_fx_active;
-extern short next_item_active;
+extern int16_t next_fx_active;
+extern int16_t next_item_active;

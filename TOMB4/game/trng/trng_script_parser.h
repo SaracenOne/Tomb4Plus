@@ -197,7 +197,7 @@ struct NG_GLOBAL_TRIGGER {
 struct NG_TRIGGER_GROUP_DATA {
 	uint16_t plugin_id = 0;
 	uint16_t flags = 0x00;
-	uint16_t object = 0x00;	
+	uint16_t object = 0x00;
 	uint16_t timer = 0x00;
 };
 

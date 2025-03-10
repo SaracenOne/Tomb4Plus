@@ -26,7 +26,7 @@
 NGLevelInfo ng_level_info[MOD_LEVEL_COUNT];
 
 int32_t ng_floor_id_size = 0;
-int8_t *ng_floor_id_table = NULL;
+char *ng_floor_id_table = NULL;
 
 int32_t ng_total_flip_rooms = 0;
 int16_t ng_flip_rooms[NG_MAX_FLIP_ROOMS];
@@ -43,8 +43,8 @@ int32_t ng_static_id_count = 0;
 NGStaticTableEntry ng_static_id_table[NG_STATIC_ID_TABLE_SIZE];
 
 void NGPreloadLevelInfo(int32_t current_level, FILE *level_fp) {
-	long ngle_ident = 0;
-	long ngle_offset = 0;
+	int32_t ngle_ident = 0;
+	int32_t ngle_offset = 0;
 
 	if (current_level >= MOD_LEVEL_COUNT) {
 		return;
@@ -52,8 +52,8 @@ void NGPreloadLevelInfo(int32_t current_level, FILE *level_fp) {
 
 	// Check footer for NGLE info
 	fseek(level_fp, -8L, SEEK_END);
-	fread(&ngle_ident, 1, sizeof(long), level_fp);
-	fread(&ngle_offset, 1, sizeof(long), level_fp);
+	fread(&ngle_ident, 1, sizeof(int32_t), level_fp);
+	fread(&ngle_offset, 1, sizeof(int32_t), level_fp);
 
 	if (ngle_ident == NGLE_END_SIGNATURE) {
 		ng_level_info[current_level].ngle_footer_found = true;
@@ -91,10 +91,10 @@ void NGPreloadLevelInfo(int32_t current_level, FILE *level_fp) {
 							get_game_mod_level_audio_info(current_level)->rubber_boat_moving_sfx_id = 1425;
 						}
 						break;
-					default: {
-						fseek(level_fp, (chunk_size * sizeof(int16_t)) - (sizeof(int16_t) * 2), SEEK_CUR);
-						break;
-					}
+						default: {
+							fseek(level_fp, (chunk_size * sizeof(int16_t)) - (sizeof(int16_t) * 2), SEEK_CUR);
+							break;
+						}
 					}
 				}
 			}
@@ -114,7 +114,15 @@ void NGPreloadAllLevelInfo(uint32_t valid_level_count) {
 			strcpy(name, &gfFilenameWad[gfFilenameOffset[level_filename_id]]);
 			strcat(name, ".TR4");
 
-			FILE *level_fp = FileOpen((const char *)name);
+			for (int i = 0; i < strlen(name); i++) {
+				if (name[i] == '\\') {
+					name[i] = '/';
+				} else {
+					name[i] = tolower((uint8_t)name[i]);
+				}
+			}
+
+			FILE *level_fp = T4PFileOpen((const char *)name);
 			if (level_fp) {
 				NGPreloadLevelInfo(i, level_fp);
 			}
@@ -132,17 +140,17 @@ void NGLoadLevelInfo(FILE* level_fp) {
 	ng_room_remap_count = 0;
 	ng_static_id_count = 0;
 
-	long level_version = 0;
-	long ngle_ident = 0;
-	long ngle_offset = 0;
+	int32_t level_version = 0;
+	int32_t ngle_ident = 0;
+	int32_t ngle_offset = 0;
 
 	ng_floor_id_size = 0;
 	ng_floor_id_table = NULL;
 
 	// Check footer for NGLE info
 	fseek(level_fp, -8L, SEEK_END);
-	fread(&ngle_ident, 1, sizeof(long), level_fp);
-	fread(&ngle_offset, 1, sizeof(long), level_fp);
+	fread(&ngle_ident, 1, sizeof(int32_t), level_fp);
+	fread(&ngle_offset, 1, sizeof(int32_t), level_fp);
 
 	if (ngle_ident == NGLE_END_SIGNATURE) {
 		fseek(level_fp, -ngle_offset, SEEK_END);
@@ -162,7 +170,8 @@ void NGLoadLevelInfo(FILE* level_fp) {
 
 				switch (chunk_ident) {
 					// Animated Textures
-					case 0x8002: {;
+					case 0x8002: {
+						;
 						if (chunk_size == ((sizeof(NGAnimatedTexture) / 2) + sizeof(int16_t))) {
 							fread(&ng_animated_texture, sizeof(NGAnimatedTexture), 1, level_fp);
 							ng_animated_texture.test = true;
@@ -245,7 +254,7 @@ void NGLoadLevelInfo(FILE* level_fp) {
 					case 0x8048: {
 						ng_floor_id_size = (chunk_size * sizeof(int16_t)) - (sizeof(int16_t) * 2);
 						if (ng_floor_id_size > sizeof(int16_t)) {
-							ng_floor_id_table = (int8_t*)game_malloc(sizeof(int8_t) * ng_floor_id_size);
+							ng_floor_id_table = (char*)game_malloc(sizeof(int8_t) * ng_floor_id_size);
 							fread(ng_floor_id_table, 1, ng_floor_id_size, level_fp);
 						} else {
 							fseek(level_fp, (chunk_size * sizeof(int16_t)) - (sizeof(int16_t) * 2), SEEK_CUR);
@@ -265,8 +274,7 @@ void NGLoadLevelInfo(FILE* level_fp) {
 				}
 			}
 		}
-	}
-	else {
+	} else {
 		return;
 	}
 }
@@ -481,8 +489,7 @@ bool NGIsSourcePositionLessThanDistanceToTargetPosition(PHD_3DPOS *source_pos, P
 	diffX = (int32_t)target_pos->x_pos - (int32_t)source_pos->x_pos;
 	if (ignore_y) {
 		diffY = 0;
-	}
-	else {
+	} else {
 		diffY = (int32_t)target_pos->y_pos - (int32_t)source_pos->y_pos;
 	}
 	diffZ = (int32_t)target_pos->z_pos - (int32_t)source_pos->z_pos;
@@ -502,11 +509,11 @@ bool NGIsSourcePositionLessThanDistanceToTargetPosition(PHD_3DPOS *source_pos, P
 }
 
 void NGSetItemAnimation(uint16_t item_id,
-	uint32_t animation,
-	bool update_state_id,
-	bool update_next_state_id,
-	bool update_speed,
-	bool force_reset) {
+                        uint32_t animation,
+                        bool update_state_id,
+                        bool update_next_state_id,
+                        bool update_speed,
+                        bool force_reset) {
 
 	ITEM_INFO *item = T4PlusGetItemInfoForID(item_id);
 	if (item) {
@@ -533,7 +540,7 @@ void NGSetItemAnimation(uint16_t item_id,
 	}
 }
 
-void NGLevelSetup() {	
+void NGLevelSetup() {
 	NGLoadTablesForLevel(gfCurrentLevel);
 	NGSetupLevelExtraState();
 
@@ -624,7 +631,7 @@ void NGFrameStart() {
 	//
 
 	NGStoreTestDummyFailed(false);
-	
+
 	//
 
 	NGStoreTestConditionsFound(false);
@@ -909,8 +916,7 @@ bool NGGetTestDummyFailed() {
 
 int32_t NGCalculateTriggerTimer(int16_t* data, int32_t timer) {
 	int16_t trigger;
-	do
-	{
+	do {
 		trigger = *data++;
 		int16_t value = trigger & 0x3FF;
 
@@ -930,7 +936,7 @@ int32_t NGCalculateTriggerTimer(int16_t* data, int32_t timer) {
 				break;
 			case TO_TIMERFIELD:
 				timer = (value & 0x3ff);
-				
+
 				if (timer & 0x200) {
 					timer |= 0xFFFFFC00;
 				}
@@ -997,7 +1003,7 @@ int32_t NGFindIndexForRoom(int32_t room_index) {
 
 void NGInitializeFlipMaps() {
 	ng_total_flip_rooms = number_rooms;
-	
+
 	for (int32_t i = 0; i < NG_MAX_FLIP_ROOMS; i++) {
 		ng_flip_rooms[i] = -1;
 	}

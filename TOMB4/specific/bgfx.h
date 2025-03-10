@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_BGFX
-
 #include <bgfx/bgfx.h>
 
 #define MAX_SORT_BUFFERS 64
@@ -60,10 +58,8 @@ extern void StartBGFXFrame();
 extern void EndBGFXFrame();
 
 extern void AddBGFXDrawCommand(bool is_sorted_command, bool clear_depth_buffer);
-extern void AddBGFXDrawSortCommand(GFXTLBUMPVERTEX* info, short num_verts, short texture, short type);
+extern void AddBGFXDrawSortCommand(GFXTLBUMPVERTEX* info, int16_t num_verts, int16_t texture, int16_t type);
 extern void ClearBGFXDrawCommand();
 
-extern void FindBGFXBucket(long tpage, GFXTLBUMPVERTEX** Vpp, long** nVtxpp);
+extern void FindBGFXBucket(int32_t tpage, GFXTLBUMPVERTEX** Vpp, int32_t** nVtxpp);
 extern void AddBGFXSortList(bool clear_depth_buffer);
-
-#endif

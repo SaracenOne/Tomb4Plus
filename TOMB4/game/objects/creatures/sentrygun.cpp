@@ -19,15 +19,13 @@
 
 static BITE_INFO AGOffsets = { 0, 0, 0, 8 };
 
-void TriggerAutogunFlamethrower(ITEM_INFO* item)
-{
+void TriggerAutogunFlamethrower(ITEM_INFO* item) {
 	SPARKS* sptr;
 	PHD_VECTOR pos;
 	PHD_VECTOR vel;
-	long v;
+	int32_t v;
 
-	for (int i = 0; i < 3; i++)
-	{
+	for (int i = 0; i < 3; i++) {
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
 		sptr->sR = (GetRandomControl() & 0x1F) + 48;
@@ -55,31 +53,29 @@ void TriggerAutogunFlamethrower(ITEM_INFO* item)
 		vel.z = -4;
 		GetJointAbsPosition(item, &vel, 7);
 		v = (GetRandomControl() & 0x3F) + 192;
-		sptr->Xvel = short(v * (vel.x - pos.x) / 10);
-		sptr->Yvel = short(v * (vel.y - pos.y) / 10);
-		sptr->Zvel = short(v * (vel.z - pos.z) / 10);
+		sptr->Xvel = int16_t(v * (vel.x - pos.x) / 10);
+		sptr->Yvel = int16_t(v * (vel.y - pos.y) / 10);
+		sptr->Zvel = int16_t(v * (vel.z - pos.z) / 10);
 
 		sptr->Friction = 85;
 		sptr->MaxYvel = 0;
 		sptr->Gravity = -16 - (GetRandomControl() & 0x1F);
 		sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 
-		if (GlobalCounter & 1)
-		{
+		if (GlobalCounter & 1) {
 			v = 255;
 			sptr->Flags = SF_FIRE | SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 		}
 
 		sptr->Scalar = 3;
 		v *= (GetRandomControl() & 7) + 60;
-		sptr->dSize = uchar(v >> 8);
-		sptr->Size = uchar(v >> 12);
+		sptr->dSize = uint8_t(v >> 8);
+		sptr->Size = uint8_t(v >> 12);
 		sptr->sSize = sptr->Size;
 	}
 }
 
-void InitialiseAutogun(short item_number)
-{
+void InitialiseAutogun(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -89,14 +85,13 @@ void InitialiseAutogun(short item_number)
 	item->item_flags[2] = 0;
 }
 
-void AutogunControl(short item_number)
-{
+void AutogunControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* autogun;
 	AI_INFO info;
 	PHD_VECTOR pos;
-	long ang;
-	short ahead;
+	int32_t ang;
+	int16_t ahead;
 
 	ang = 0;
 	item = &items[item_number];
@@ -111,8 +106,7 @@ void AutogunControl(short item_number)
 	if (!autogun)
 		return;
 
-	if (!(item->mesh_bits & 0x40))
-	{
+	if (!(item->mesh_bits & 0x40)) {
 		ExplodingDeath2(item_number, -1, 257);
 		DisableBaddieAI(item_number);
 		KillItem(item_number);
@@ -126,11 +120,8 @@ void AutogunControl(short item_number)
 
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0x1800000 | SFX_SETPITCH);
 		SoundEffect(SFX_EXPLOSION2, &item->pos, SFX_DEFAULT);
-	}
-	else
-	{
-		if (item->item_flags[0])
-		{
+	} else {
+		if (item->item_flags[0]) {
 			pos.x = AGOffsets.x;
 			pos.y = AGOffsets.y;
 			pos.z = AGOffsets.z;
@@ -144,8 +135,7 @@ void AutogunControl(short item_number)
 		else
 			item->mesh_bits &= ~0x100;
 
-		if (!item->trigger_flags)
-		{
+		if (!item->trigger_flags) {
 			item->pos.y_pos -= HALF_BLOCK_SIZE;
 			CreatureAIInfo(item, &info);
 			item->pos.y_pos += HALF_BLOCK_SIZE;
@@ -156,12 +146,9 @@ void AutogunControl(short item_number)
 			else
 				info.ahead = 0;
 
-			if (Targetable(item, &info) && info.distance < 0x5100000)
-			{
-				if (!have_i_got_object(PUZZLE_ITEM5) && !item->item_flags[0])
-				{
-					if (info.distance > 0x400000 || get_game_mod_level_creature_info(gfCurrentLevel)->disable_sentry_flame_attack)
-					{
+			if (Targetable(item, &info) && info.distance < 0x5100000) {
+				if (!have_i_got_object(PUZZLE_ITEM5) && !item->item_flags[0]) {
+					if (info.distance > 0x400000 || get_game_mod_level_creature_info(gfCurrentLevel)->disable_sentry_flame_attack) {
 						item->item_flags[0] = 2;
 						ShotLara(item, &info, &AGOffsets, autogun->joint_rotation[0], mod_object_customization->damage_1);
 						SoundEffect(SFX_AUTOGUNS, &item->pos, SFX_DEFAULT);
@@ -169,9 +156,7 @@ void AutogunControl(short item_number)
 
 						if (item->item_flags[2] > 6144)
 							item->item_flags[2] = 6144;
-					}
-					else
-					{
+					} else {
 						TriggerAutogunFlamethrower(item);
 						ang = (4 * rcossin_tbl[((BLOCK_SIZE * 2) * (GlobalCounter & 0x1F)) >> 3]) >> 2;
 					}
@@ -184,7 +169,7 @@ void AutogunControl(short item_number)
 				else if (ang < -DEGREES_TO_ROTATION(10))
 					ang = -DEGREES_TO_ROTATION(10);
 
-				autogun->joint_rotation[0] += (short)ang;
+				autogun->joint_rotation[0] += (int16_t)ang;
 				CreatureJoint(item, 1, -info.x_angle);
 			}
 
@@ -198,9 +183,7 @@ void AutogunControl(short item_number)
 
 			if (autogun->joint_rotation[2] > 0x4000 || autogun->joint_rotation[2] < -0x4000)
 				item->item_flags[1] = -item->item_flags[1];
-		}
-		else
-		{
+		} else {
 			CreatureJoint(item, 1, 0x2000);
 			CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - 0x2000);
 			CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - BLOCK_SIZE);

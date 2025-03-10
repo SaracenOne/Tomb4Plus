@@ -2,5 +2,5 @@
 #include "../../../global/types.h"
 
 void JeepFireGrenade(ITEM_INFO* item);
-void InitialiseEnemyJeep(short item_number);
-void EnemyJeepControl(short item_number);
+void InitialiseEnemyJeep(int16_t item_number);
+void EnemyJeepControl(int16_t item_number);

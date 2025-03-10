@@ -1,30 +1,29 @@
 #pragma once
 #include "../global/types.h"
 
-void ControlMapper(short item_number);
-void ControlLightningConductor(short item_number);
-void BridgeFlatFloor(ITEM_INFO* item, long x, long y, long z, long* height);
-void BridgeFlatCeiling(ITEM_INFO* item, long x, long y, long z, long* height);
-long GetOffset(ITEM_INFO* item, long x, long z);
-void BridgeTilt1Floor(ITEM_INFO* item, long x, long y, long z, long* height);
-void BridgeTilt1Ceiling(ITEM_INFO* item, long x, long y, long z, long* height);
-void BridgeTilt2Floor(ITEM_INFO* item, long x, long y, long z, long* height);
-void BridgeTilt2Ceiling(ITEM_INFO* item, long x, long y, long z, long* height);
-void StatuePlinthCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
+void ControlMapper(int16_t item_number);
+void ControlLightningConductor(int16_t item_number);
+void BridgeFlatFloor(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+void BridgeFlatCeiling(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+int32_t GetOffset(ITEM_INFO* item, int32_t x, int32_t z);
+void BridgeTilt1Floor(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+void BridgeTilt1Ceiling(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+void BridgeTilt2Floor(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+void BridgeTilt2Ceiling(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+void StatuePlinthCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
 void TriggerRopeFlame(PHD_VECTOR* pos);
-void ControlBurningRope(short item_number);
-void BurningRopeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-void ControlWaterfall(short item_number);
+void ControlBurningRope(int16_t item_number);
+void BurningRopeCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
+void ControlWaterfall(int16_t item_number);
 void AnimateWaterfalls();
-void ControlTriggerTriggerer(short item_number);
-void PoleCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void ControlAnimatingSlots(short item_number);
-void SmashObjectControl(short item_number);
-void SmashObject(short item_number);
-void EarthQuake(short item_number);
+void ControlTriggerTriggerer(int16_t item_number);
+void PoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void ControlAnimatingSlots(int16_t item_number);
+void SmashObjectControl(int16_t item_number);
+void SmashObject(int16_t item_number);
+void EarthQuake(int16_t item_number);
 
-enum object_types 
-{
+enum object_types {
 	LARA, PISTOLS_ANIM, UZI_ANIM, SHOTGUN_ANIM, CROSSBOW_ANIM, GRENADE_GUN_ANIM, SIXSHOOTER_ANIM, FLARE_ANIM,
 	LARA_SKIN, LARA_SKIN_JOINTS, LARA_SCREAM,
 	LARA_CROSSBOW_LASER,
@@ -251,7 +250,7 @@ enum object_types
 	RUBBER_BOAT,
 	RUBBER_BOAT_LARA,
 	MOTORBIKE_LARA,
-	
+
 	FONT_GRAPHICS,
 
 	PARALLEL_BARS,
@@ -281,8 +280,7 @@ enum object_types
 	NUMBER_OBJECTS
 };
 
-enum static_types 
-{
+enum static_types {
 	PLANT0, PLANT1, PLANT2, PLANT3, PLANT4, PLANT5, PLANT6, PLANT7, PLANT8, PLANT9,
 	FURNITURE0, FURNITURE1, FURNITURE2, FURNITURE3, FURNITURE4,
 	FURNITURE5, FURNITURE6, FURNITURE7, FURNITURE8, FURNITURE9,

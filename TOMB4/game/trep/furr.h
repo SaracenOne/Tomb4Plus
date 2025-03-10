@@ -6,7 +6,7 @@
 
 #define MAX_FURR_COMMANDS 4096
 
-extern char furr_oneshot_buffer[LAST_FURR_FLIPEFFECT];
+extern int8_t furr_oneshot_buffer[LAST_FURR_FLIPEFFECT];
 
 enum FURROpcode {
 	FURR_ONESHOT = 0,

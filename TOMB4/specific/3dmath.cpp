@@ -17,9 +17,9 @@ float mW2V[indices_count];
 float mMXStack[20 * indices_count];
 float fcossin_tbl[65536];
 
-long* phd_mxptr;
-long w2v_matrix[indices_count];
-long matrix_stack[20 * indices_count];
+int32_t* phd_mxptr;
+int32_t w2v_matrix[indices_count];
+int32_t matrix_stack[20 * indices_count];
 
 float f_centerx;
 float f_centery;
@@ -42,32 +42,30 @@ float f_a;
 float f_b;
 float f_boo;
 
-long phd_winheight;
-long phd_winwidth;
-long phd_centerx;
-long phd_centery;
-long phd_top;
-long phd_left;
-long phd_bottom;
-long phd_right;
-long phd_znear;
-long phd_zfar;
-long phd_persp;
-short phd_winxmax;
-short phd_winxmin;
-short phd_winymax;
-short phd_winymin;
+int32_t phd_winheight;
+int32_t phd_winwidth;
+int32_t phd_centerx;
+int32_t phd_centery;
+int32_t phd_top;
+int32_t phd_left;
+int32_t phd_bottom;
+int32_t phd_right;
+int32_t phd_znear;
+int32_t phd_zfar;
+int32_t phd_persp;
+int16_t phd_winxmax;
+int16_t phd_winxmin;
+int16_t phd_winymax;
+int16_t phd_winymin;
 
 static GFXMATRIX D3DMW2VMatrix;
 static float LfAspectCorrection;
 
-static void mInit()
-{
+static void mInit() {
 	float* ptr;
 	float ang;
 
-	for (int i = 0; i < 65536; i++)
-	{
+	for (int i = 0; i < 65536; i++) {
 		ptr = &fcossin_tbl[i];
 		ang = i * float(M_PI * 2.0F / 65536.0F);
 		*ptr = sin(ang);
@@ -76,8 +74,7 @@ static void mInit()
 	mMXPtr = mMXStack;
 }
 
-static void mPushMatrix()
-{
+static void mPushMatrix() {
 	mMXPtr[indices_count + M00] = mMXPtr[M00];
 	mMXPtr[indices_count + M01] = mMXPtr[M01];
 	mMXPtr[indices_count + M02] = mMXPtr[M02];
@@ -93,8 +90,7 @@ static void mPushMatrix()
 	mMXPtr += indices_count;
 }
 
-static void mPushUnitMatrix()
-{
+static void mPushUnitMatrix() {
 	mMXPtr += indices_count;
 	mMXPtr[M00] = 1;
 	mMXPtr[M01] = 0;
@@ -110,26 +106,22 @@ static void mPushUnitMatrix()
 	mMXPtr[M23] = 0;
 }
 
-static void mSetTrans(long x, long y, long z)
-{
+static void mSetTrans(int32_t x, int32_t y, int32_t z) {
 	mMXPtr[M03] = (float)x;
 	mMXPtr[M13] = (float)y;
 	mMXPtr[M23] = (float)z;
 }
 
-static void mTranslateRel(long x, long y, long z)
-{
+static void mTranslateRel(int32_t x, int32_t y, int32_t z) {
 	mMXPtr[M03] += x * mMXPtr[M00] + y * mMXPtr[M01] + z * mMXPtr[M02];
 	mMXPtr[M13] += x * mMXPtr[M10] + y * mMXPtr[M11] + z * mMXPtr[M12];
 	mMXPtr[M23] += x * mMXPtr[M20] + y * mMXPtr[M21] + z * mMXPtr[M22];
 }
 
-static void mRotX(short angle)
-{
+static void mRotX(int16_t angle) {
 	float sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = fSin(angle);
 		cos = fCos(angle);
 
@@ -150,12 +142,10 @@ static void mRotX(short angle)
 	}
 }
 
-static void mRotY(short angle)
-{
+static void mRotY(int16_t angle) {
 	float sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = fSin(angle);
 		cos = fCos(angle);
 
@@ -176,12 +166,10 @@ static void mRotY(short angle)
 	}
 }
 
-static void mRotZ(short angle)
-{
+static void mRotZ(int16_t angle) {
 	float sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = fSin(angle);
 		cos = fCos(angle);
 
@@ -202,9 +190,8 @@ static void mRotZ(short angle)
 	}
 }
 
-static void mRotYXZpack(long angles)
-{
-	short angle;
+static void mRotYXZpack(int32_t angles) {
+	int16_t angle;
 
 	angle = (angles >> 10) & 0x3FF;
 	angle <<= 6;
@@ -225,8 +212,7 @@ static void mRotYXZpack(long angles)
 		mRotZ(angle);
 }
 
-static void mRotYXZ(short y, short x, short z)
-{
+static void mRotYXZ(int16_t y, int16_t x, int16_t z) {
 	if (y)
 		mRotY(y);
 
@@ -237,8 +223,7 @@ static void mRotYXZ(short y, short x, short z)
 		mRotZ(z);
 }
 
-static void mTranslateAbs(long x, long y, long z)
-{
+static void mTranslateAbs(int32_t x, int32_t y, int32_t z) {
 	float fx, fy, fz;
 
 	fx = x - mW2V[M03];
@@ -249,8 +234,7 @@ static void mTranslateAbs(long x, long y, long z)
 	mMXPtr[M23] = fx * mMXPtr[M20] + fy * mMXPtr[M21] + fz * mMXPtr[M22];
 }
 
-static void mGenerateW2V(PHD_3DPOS* viewPos)
-{
+static void mGenerateW2V(PHD_3DPOS* viewPos) {
 	PHD_VECTOR scalar;
 	float sx, cx, sy, cy, sz, cz;
 
@@ -283,22 +267,19 @@ static void mGenerateW2V(PHD_3DPOS* viewPos)
 	mMXPtr[M21] = mW2V[M21];
 	mMXPtr[M22] = mW2V[M22];
 
-	if (lara.dpoisoned != lara.poisoned)
-	{
+	if (lara.dpoisoned != lara.poisoned) {
 		lara.poisoned += (lara.dpoisoned - lara.poisoned) >> 4;
 
 		if (abs(lara.dpoisoned - lara.poisoned) < 16)
 			lara.poisoned = lara.dpoisoned;
 	}
 
-	if (lara.poisoned >= 256)
-	{
+	if (lara.poisoned >= 256) {
 		scalar.x = (lara.poisoned - 256) * ((phd_sin(XSoff1) + phd_sin(XSoff2)) >> 2);
 		scalar.y = (lara.poisoned - 256) * ((phd_sin(YSoff1) + phd_sin(YSoff2)) >> 2);
 		scalar.z = (lara.poisoned - 256) * ((phd_sin(ZSoff1) + phd_sin(ZSoff2)) >> 2);
 
-		if (scalar.x || scalar.y || scalar.z)
-		{
+		if (scalar.x || scalar.y || scalar.z) {
 			scalar.x = (scalar.x >> 12) + 0x4000;
 			scalar.y = (scalar.y >> 12) + 0x4000;
 			scalar.z = (scalar.z >> 12) + 0x4000;
@@ -339,8 +320,7 @@ static void mGenerateW2V(PHD_3DPOS* viewPos)
 	D3DInvCameraMatrix._44 = D3DMW2VMatrix._44;
 }
 
-static void mScaleCurrentMatrix(PHD_VECTOR* vec)
-{
+static void mScaleCurrentMatrix(PHD_VECTOR* vec) {
 	float x, y, z;
 
 	x = vec->x * (1.0F / float(1 << W2V_SHIFT));
@@ -360,8 +340,7 @@ static void mScaleCurrentMatrix(PHD_VECTOR* vec)
 	mMXPtr[M22] = mMXPtr[M22] * z;
 }
 
-void phd_PushMatrix()
-{
+void phd_PushMatrix() {
 	phd_mxptr[indices_count + M00] = phd_mxptr[M00];
 	phd_mxptr[indices_count + M01] = phd_mxptr[M01];
 	phd_mxptr[indices_count + M02] = phd_mxptr[M02];
@@ -379,8 +358,7 @@ void phd_PushMatrix()
 	mPushMatrix();
 }
 
-void phd_PushUnitMatrix()
-{
+void phd_PushUnitMatrix() {
 	phd_mxptr += indices_count;
 	phd_mxptr[M00] = 1 << W2V_SHIFT;
 	phd_mxptr[M01] = 0;
@@ -398,30 +376,26 @@ void phd_PushUnitMatrix()
 	mPushUnitMatrix();
 }
 
-void phd_SetTrans(long x, long y, long z)
-{
+void phd_SetTrans(int32_t x, int32_t y, int32_t z) {
 	phd_mxptr[M03] = x << W2V_SHIFT;
 	phd_mxptr[M13] = y << W2V_SHIFT;
 	phd_mxptr[M23] = z << W2V_SHIFT;
 	mSetTrans(x, y, z);
 }
 
-long phd_TranslateRel(long x, long y, long z)
-{
+int32_t phd_TranslateRel(int32_t x, int32_t y, int32_t z) {
 	phd_mxptr[M03] += x * phd_mxptr[M00] + y * phd_mxptr[M01] + z * phd_mxptr[M02];
 	phd_mxptr[M13] += x * phd_mxptr[M10] + y * phd_mxptr[M11] + z * phd_mxptr[M12];
 	phd_mxptr[M23] += x * phd_mxptr[M20] + y * phd_mxptr[M21] + z * phd_mxptr[M22];
-	
+
 	mTranslateRel(x, y, z);
 	return 1;
 }
 
-void phd_RotX(short angle)
-{
-	long sin, cos, mx1, mx2;
+void phd_RotX(int16_t angle) {
+	int32_t sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -444,12 +418,10 @@ void phd_RotX(short angle)
 	mRotX(angle);
 }
 
-void phd_RotY(short angle)
-{
-	long sin, cos, mx1, mx2;
+void phd_RotY(int16_t angle) {
+	int32_t sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -472,12 +444,10 @@ void phd_RotY(short angle)
 	mRotY(angle);
 }
 
-void phd_RotZ(short angle)
-{
-	long sin, cos, mx1, mx2;
+void phd_RotZ(int16_t angle) {
+	int32_t sin, cos, mx1, mx2;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -500,16 +470,14 @@ void phd_RotZ(short angle)
 	mRotZ(angle);
 }
 
-void phd_RotYXZpack(long angles)
-{
-	long sin, cos, mx1, mx2;
-	short angle;
+void phd_RotYXZpack(int32_t angles) {
+	int32_t sin, cos, mx1, mx2;
+	int16_t angle;
 
 	angle = (angles >> 10) & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -532,8 +500,7 @@ void phd_RotYXZpack(long angles)
 	angle = (angles >> 20) & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -556,8 +523,7 @@ void phd_RotYXZpack(long angles)
 	angle = angles & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
-	{
+	if (angle) {
 		sin = phd_sin(angle);
 		cos = phd_cos(angle);
 
@@ -580,12 +546,10 @@ void phd_RotYXZpack(long angles)
 	mRotYXZpack(angles);
 }
 
-void phd_RotYXZ(short y, short x, short z)
-{
-	long sin, cos, mx1, mx2;
+void phd_RotYXZ(int16_t y, int16_t x, int16_t z) {
+	int32_t sin, cos, mx1, mx2;
 
-	if (y)
-	{
+	if (y) {
 		sin = phd_sin(y);
 		cos = phd_cos(y);
 
@@ -605,8 +569,7 @@ void phd_RotYXZ(short y, short x, short z)
 		phd_mxptr[M22] = mx2 >> W2V_SHIFT;
 	}
 
-	if (x)
-	{
+	if (x) {
 		sin = phd_sin(x);
 		cos = phd_cos(x);
 
@@ -626,8 +589,7 @@ void phd_RotYXZ(short y, short x, short z)
 		phd_mxptr[M22] = mx2 >> W2V_SHIFT;
 	}
 
-	if (z)
-	{
+	if (z) {
 		sin = phd_sin(z);
 		cos = phd_cos(z);
 
@@ -650,9 +612,8 @@ void phd_RotYXZ(short y, short x, short z)
 	mRotYXZ(y, x, z);
 }
 
-void phd_TranslateAbs(long x, long y, long z)
-{
-	long fx, fy, fz;
+void phd_TranslateAbs(int32_t x, int32_t y, int32_t z) {
+	int32_t fx, fy, fz;
 
 	fx = x - w2v_matrix[M03];
 	fy = y - w2v_matrix[M13];
@@ -664,20 +625,18 @@ void phd_TranslateAbs(long x, long y, long z)
 	mTranslateAbs(x, y, z);
 }
 
-void phd_GetVectorAngles(long x, long y, long z, short* angles)
-{
-	short atan;
+void phd_GetVectorAngles(int32_t x, int32_t y, int32_t z, int16_t* angles) {
+	int16_t atan;
 
-	angles[0] = (short)phd_atan(z, x);
+	angles[0] = (int16_t)phd_atan(z, x);
 
-	while ((short)x != x || (short)y != y || (short)z != z)
-	{
+	while ((int16_t)x != x || (int16_t)y != y || (int16_t)z != z) {
 		x >>= 2;
 		y >>= 2;
 		z >>= 2;
 	}
 
-	atan = (short)phd_atan(phd_sqrt(SQUARE(z) + SQUARE(x)), y);
+	atan = (int16_t)phd_atan(phd_sqrt(SQUARE(z) + SQUARE(x)), y);
 
 	if ((y > 0 && atan > 0) || (y < 0 && atan < 0))
 		atan = -atan;
@@ -685,9 +644,8 @@ void phd_GetVectorAngles(long x, long y, long z, short* angles)
 	angles[1] = atan;
 }
 
-ulong mGetAngle(long x, long z, long x1, long z1)
-{
-	long dx, dz, octant, swap, angle;
+uint32_t mGetAngle(int32_t x, int32_t z, int32_t x1, int32_t z1) {
+	int32_t dx, dz, octant, swap, angle;
 
 	dx = x1 - x;
 	dz = z1 - z;
@@ -697,28 +655,24 @@ ulong mGetAngle(long x, long z, long x1, long z1)
 
 	octant = 0;
 
-	if (dx < 0)
-	{
+	if (dx < 0) {
 		octant = 4;
 		dx = -dx;
 	}
 
-	if (dz < 0)
-	{
+	if (dz < 0) {
 		octant += 2;
 		dz = -dz;
 	}
 
-	if (dz > dx)
-	{
+	if (dz > dx) {
 		octant++;
 		swap = dx;
 		dx = dz;
 		dz = swap;
 	}
 
-	while (short(dz) != dz)
-	{
+	while (int16_t(dz) != dz) {
 		dx >>= 1;
 		dz >>= 1;
 	}
@@ -731,13 +685,12 @@ ulong mGetAngle(long x, long z, long x1, long z1)
 	return -angle & 0xFFFF;
 }
 
-void AlterFOV(short fov)
-{
+void AlterFOV(int16_t fov) {
 	if (fov == 0) {
 		return;
 	}
 
-	long fov_width;
+	int32_t fov_width;
 
 	CurrentFov = fov;
 	fov /= 2;
@@ -752,37 +705,31 @@ void AlterFOV(short fov)
 	f_mperspoznear = f_persp / f_mznear;
 }
 
-long phd_atan(long x, long y)
-{
-	long octant, n, result;
+int32_t phd_atan(int32_t x, int32_t y) {
+	int32_t octant, n, result;
 
 	result = 0;
 	octant = 0;
 
-	if (x || y)
-	{
-		if (x < 0)
-		{
+	if (x || y) {
+		if (x < 0) {
 			octant += 4;
 			x = -x;
 		}
 
-		if (y < 0)
-		{
+		if (y < 0) {
 			octant += 2;
 			y = -y;
 		}
 
-		if (y > x)
-		{
+		if (y > x) {
 			octant++;
 			n = x;
 			x = y;
 			y = n;
 		}
 
-		while ((short)y != y)
-		{
+		while ((int16_t)y != y) {
 			x >>= 1;
 			y >>= 1;
 		}
@@ -796,23 +743,20 @@ long phd_atan(long x, long y)
 	return result;
 }
 
-ulong phd_sqrt(ulong num)
-{
-	ulong base, result, tmp;
+uint32_t phd_sqrt(uint32_t num) {
+	uint32_t base, result, tmp;
 
 	base = 0x40000000;
 	result = 0;
 
-	do
-	{
+	do {
 		tmp = result;
 		result += base;
 		tmp >>= 1;
 
 		if (result > num)
 			result = tmp;
-		else
-		{
+		else {
 			num -= result;
 			result = base | tmp;
 		}
@@ -824,8 +768,7 @@ ulong phd_sqrt(ulong num)
 	return result;
 }
 
-void ScaleCurrentMatrix(PHD_VECTOR* vec)
-{
+void ScaleCurrentMatrix(PHD_VECTOR* vec) {
 	phd_mxptr[M00] = (phd_mxptr[M00] * vec->x) >> W2V_SHIFT;
 	phd_mxptr[M10] = (phd_mxptr[M10] * vec->x) >> W2V_SHIFT;
 	phd_mxptr[M20] = (phd_mxptr[M20] * vec->x) >> W2V_SHIFT;
@@ -841,8 +784,7 @@ void ScaleCurrentMatrix(PHD_VECTOR* vec)
 	mScaleCurrentMatrix(vec);
 }
 
-void SetupZRange(long znear, long zfar)
-{
+void SetupZRange(int32_t znear, int32_t zfar) {
 	phd_znear = znear;
 	phd_zfar = zfar;
 	f_zfar = (float)zfar;
@@ -858,21 +800,20 @@ void SetupZRange(long znear, long zfar)
 	f_boo = f_b / mone;
 }
 
-void InitWindow(long x, long y, long w, long h, long znear, long zfar, long fov, long a, long b)
-{
+void InitWindow(int32_t x, int32_t y, int32_t w, int32_t h, int32_t znear, int32_t zfar, int32_t fov, int32_t a, int32_t b) {
 	phd_winwidth = w;
-	phd_winxmax = short(w - 1);
-	phd_winxmin = (short)x;
+	phd_winxmax = int16_t(w - 1);
+	phd_winxmin = (int16_t)x;
 	phd_winheight = h;
-	phd_winymax = short(h - 1);
-	phd_winymin = (short)y;
+	phd_winymax = int16_t(h - 1);
+	phd_winymin = (int16_t)y;
 	phd_centerx = w / 2;
 	phd_centery = h / 2;
 	phd_znear = znear << W2V_SHIFT;
 	f_centerx = float(w / 2);
 	phd_zfar = zfar << W2V_SHIFT;
 	f_centery = float(h / 2);
-	AlterFOV(short(DEGREES_TO_ROTATION(fov)));
+	AlterFOV(int16_t(DEGREES_TO_ROTATION(fov)));
 	SetupZRange(phd_znear, phd_zfar);
 	phd_right = phd_winxmax;
 	phd_bottom = phd_winymax;
@@ -886,10 +827,9 @@ void InitWindow(long x, long y, long w, long h, long znear, long zfar, long fov,
 	mInit();
 }
 
-void phd_GenerateW2V(PHD_3DPOS* viewPos)
-{
+void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 	PHD_VECTOR scalar;
-	long sx, cx, sy, cy, sz, cz;
+	int32_t sx, cx, sy, cy, sz, cz;
 
 	sx = phd_sin(viewPos->x_rot);
 	cx = phd_cos(viewPos->x_rot);
@@ -920,22 +860,19 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos)
 	phd_mxptr[M21] = w2v_matrix[M21];
 	phd_mxptr[M22] = w2v_matrix[M22];
 
-	if (lara.dpoisoned != lara.poisoned)
-	{
+	if (lara.dpoisoned != lara.poisoned) {
 		lara.poisoned += (lara.dpoisoned - lara.poisoned) >> 4;
 
 		if (abs(lara.dpoisoned - lara.poisoned) < 16)
 			lara.poisoned = lara.dpoisoned;
 	}
 
-	if (lara.poisoned >= 256)
-	{
+	if (lara.poisoned >= 256) {
 		scalar.x = (lara.poisoned - 256) * ((phd_sin(XSoff1) + phd_sin(XSoff2)) >> 2);
 		scalar.y = (lara.poisoned - 256) * ((phd_sin(YSoff1) + phd_sin(YSoff2)) >> 2);
 		scalar.z = (lara.poisoned - 256) * ((phd_sin(ZSoff1) + phd_sin(ZSoff2)) >> 2);
 
-		if (scalar.x || scalar.y || scalar.z)
-		{
+		if (scalar.x || scalar.y || scalar.z) {
 			scalar.x = (scalar.x >> 12) + 0x4000;
 			scalar.y = (scalar.y >> 12) + 0x4000;
 			scalar.z = (scalar.z >> 12) + 0x4000;
@@ -950,20 +887,19 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos)
 	phd_mxptr[M13] = w2v_matrix[M13];
 	phd_mxptr[M23] = w2v_matrix[M23];
 
-	w2v_matrix[M10] = long(LfAspectCorrection * float(phd_mxptr[M10]));
-	w2v_matrix[M11] = long(LfAspectCorrection * float(phd_mxptr[M11]));
-	w2v_matrix[M12] = long(LfAspectCorrection * float(phd_mxptr[M12]));
+	w2v_matrix[M10] = int32_t(LfAspectCorrection * float(phd_mxptr[M10]));
+	w2v_matrix[M11] = int32_t(LfAspectCorrection * float(phd_mxptr[M11]));
+	w2v_matrix[M12] = int32_t(LfAspectCorrection * float(phd_mxptr[M12]));
 	phd_mxptr[M10] = w2v_matrix[M10];
 	phd_mxptr[M11] = w2v_matrix[M11];
 	phd_mxptr[M12] = w2v_matrix[M12];
 	mGenerateW2V(viewPos);
 }
 
-void phd_LookAt(long sx, long sy, long sz, long tx, long ty, long tz, short roll)
-{
+void phd_LookAt(int32_t sx, int32_t sy, int32_t sz, int32_t tx, int32_t ty, int32_t tz, int16_t roll) {
 	PHD_3DPOS viewPos;
-	long dx, dy, dz, val;
-	short angles[2];
+	int32_t dx, dy, dz, val;
+	int16_t angles[2];
 
 	phd_GetVectorAngles(tx - sx, ty - sy, tz - sz, angles);
 	viewPos.x_pos = sx;

@@ -11,19 +11,18 @@
 #pragma warning(push)
 #pragma warning(disable : 4838)
 #pragma warning(disable : 4309)
-static char source_pcm_format[50] =
-{
-	2, 0, 1, 0, 34, 86, 0, 0, 147, 43, 0, 0, 0, 2, 4, 0, 32, 0, 244, 3, 7, 0, 0, 1, 0, 0, 0, 2, 0, 255, 0, 0,
-	0, 0, 192, 0, 64, 0, 240, 0, 0, 0, 204, 1, 48, 255, 136, 1, 24, 255
+static int8_t source_pcm_format[50] = {
+	2, 0, 1, 0, 34, 86, 0, 0, (int8_t)147, 43, 0, 0, 0, 2, 4, 0, 32, 0, (int8_t)244, 3, 7, 0, 0, 1, 0, 0, 0, 2, 0, (int8_t)255, 0, 0,
+	0, 0, (int8_t)192, 0, 64, 0, (int8_t)240, 0, 0, 0, (int8_t)204, 1, 48, (int8_t)255, (int8_t)136, 1, 24, (int8_t)255
 };
 #pragma warning(pop)
 
 #ifdef MA_AUDIO_ENGINE
 #define STB_VORBIS_HEADER_ONLY // <-- Exclude stb_vorbis' implementation
-#include "../tomb4/libs/miniaudio/extras/stb_vorbis.c"
+#include "extras/stb_vorbis.c"
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "../tomb4/libs/miniaudio/miniaudio.h"
+#include "miniaudio.h"
 #endif
 #include "../tomb4/mod_config.h"
 #include "../game/gameflow.h"
@@ -50,8 +49,7 @@ static HACMSTREAM hACMStream;
 static ACMSTREAMHEADER ACMStreamHeader;
 static char* decompressed_samples_buffer;
 
-static XAUDIO2FX_REVERB_I3DL2_PARAMETERS reverb_preset[4] =
-{
+static XAUDIO2FX_REVERB_I3DL2_PARAMETERS reverb_preset[4] = {
 	{50.0F,-1000, -500, 0.0F, 2.31F, 0.64F, -711, 0.012F, -800, 0.017F, 100.0F, 100.0F, 5000.0F}, // Small Room
 	{50.0F,-1000, -500, 0.0F, 2.31F, 0.64F, -711, 0.012F, -300, 0.017F, 100.0F, 100.0F, 5000.0F}, // Medium Room
 	{50.0F,-1000, -500, 0.0F, 2.31F, 0.64F, -711, 0.012F, 200, 0.017F, 100.0F, 100.0F, 5000.0F}, // Large Room
@@ -59,11 +57,10 @@ static XAUDIO2FX_REVERB_I3DL2_PARAMETERS reverb_preset[4] =
 };
 static XAUDIO2FX_REVERB_PARAMETERS reverb_type[4];
 
-static long current_reverb = -1;
+static int32_t current_reverb = -1;
 #endif
 
-bool DXChangeOutputFormat(long nSamplesPerSec, bool force)
-{
+bool DXChangeOutputFormat(int32_t nSamplesPerSec, bool force) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	if (!force && ma_samples_engine.sampleRate == nSamplesPerSec)
 		return true;
@@ -81,9 +78,9 @@ bool DXChangeOutputFormat(long nSamplesPerSec, bool force)
 	}
 
 	return true;
-#else
+#elif _WIN32
 	WAVEFORMATEX pcfxFormat = {};
-	static long lastSPC;
+	static int32_t lastSPC;
 
 	if (!force && lastSPC == nSamplesPerSec)
 		return 1;
@@ -98,8 +95,7 @@ bool DXChangeOutputFormat(long nSamplesPerSec, bool force)
 	pcfxFormat.cbSize = 0;
 	S_SoundStopAllSamples();
 
-	if (DSPrimary && DXAttempt(DSPrimary->SetFormat(&pcfxFormat)) != DS_OK)
-	{
+	if (DSPrimary && DXAttempt(DSPrimary->SetFormat(&pcfxFormat)) != DS_OK) {
 		Log(1, "Can't set sound output format to %d", pcfxFormat.nSamplesPerSec);
 		return 0;
 	}
@@ -108,28 +104,25 @@ bool DXChangeOutputFormat(long nSamplesPerSec, bool force)
 #endif
 }
 
-void DSChangeVolume(long num, long volume)
-{
+void DSChangeVolume(int32_t num, int32_t volume) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	float miniaudio_volume = ma_volume_db_to_linear(volume / 100.0f);
 	miniaudio_volume = ((miniaudio_volume * (10.0f * (miniaudio_volume * 10.0f))) / 10.0f) * 0.1f;
 
 	ma_sound_set_volume(&ma_voices[num], miniaudio_volume);
-#else
+#elif _WIN32
 	float fvolume;
 
-	if (XA_Voices[num])
-	{
+	if (XA_Voices[num]) {
 		fvolume = XAudio2DecibelsToAmplitudeRatio(volume / 100.0F);
 		XA_Voices[num]->SetChannelVolumes(1, &fvolume, XAUDIO2_COMMIT_NOW);
 	}
 #endif
 }
 
-void DSAdjustPitch(long num, long pitch)
-{
+void DSAdjustPitch(int32_t num, int32_t pitch) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	ulong frequency = ulong((float)pitch / 65536.0F * 22050.0F);
+	uint32_t frequency = uint32_t((float)pitch / 65536.0F * 22050.0F);
 
 	if (frequency < 100)
 		frequency = 100;
@@ -137,12 +130,11 @@ void DSAdjustPitch(long num, long pitch)
 		frequency = 100000;
 
 	ma_sound_set_pitch(&ma_voices[num], (float)frequency / 22050.0f);
-#else
-	ulong frequency;
+#elif _WIN32
+	uint32_t frequency;
 
-	if (XA_Voices[num])
-	{
-		frequency = ulong((float)pitch / 65536.0F * current_voice_samples_per_second);
+	if (XA_Voices[num]) {
+		frequency = uint32_t((float)pitch / 65536.0F * current_voice_samples_per_second);
 
 		if (frequency < 100)
 			frequency = 100;
@@ -154,8 +146,7 @@ void DSAdjustPitch(long num, long pitch)
 #endif
 }
 
-void DSAdjustPan(long num, long pan)
-{
+void DSAdjustPan(int32_t num, int32_t pan) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	if (pan < 0) {
 		if (pan < -0x4000)
@@ -168,33 +159,25 @@ void DSAdjustPan(long num, long pan)
 
 	ma_sound_set_pan_mode(&ma_voices[num], ma_pan_mode_pan);
 	ma_sound_set_pan(&ma_voices[num], float(pan) / 10000.0f);
-#else
+#elif _WIN32
 	float matrix[2] = {0.0f, 0.0f};
 
-	if (XA_Voices[num])
-	{
-		if (pan < 0)
-		{
+	if (XA_Voices[num]) {
+		if (pan < 0) {
 			if (pan < -0x4000)
 				pan = -0x4000 - pan;
-		}
-		else if (pan > 0 && pan > 0x4000)
+		} else if (pan > 0 && pan > 0x4000)
 			pan = 0x8000 - pan;
 
 		pan >>= 4;
 
-		if (!pan)
-		{
+		if (!pan) {
 			matrix[0] = 1.0F;
 			matrix[1] = 1.0F;
-		}
-		else if (pan < 0)
-		{
+		} else if (pan < 0) {
 			matrix[0] = 1.0F;
 			matrix[1] = XAudio2DecibelsToAmplitudeRatio(pan / 100.0F);
-		}
-		else
-		{
+		} else {
 			matrix[0] = XAudio2DecibelsToAmplitudeRatio(-pan / 100.0F);
 			matrix[1] = 1.0F;
 		}
@@ -204,11 +187,10 @@ void DSAdjustPan(long num, long pan)
 #endif
 }
 
-bool DXSetOutputFormat()
-{
+bool DXSetOutputFormat() {
 #ifdef MA_AUDIO_SAMPLES
 	return true;
-#else
+#elif _WIN32
 	DSBUFFERDESC desc;
 
 	Log(2, "DXSetOutputFormat");
@@ -216,8 +198,7 @@ bool DXSetOutputFormat()
 	desc.dwSize = sizeof(desc);
 	desc.dwFlags = DSBCAPS_PRIMARYBUFFER;
 
-	if (DXAttempt(App.dx.lpDS->CreateSoundBuffer(&desc, &DSPrimary, 0)) == DS_OK)
-	{
+	if (DXAttempt(App.dx.lpDS->CreateSoundBuffer(&desc, &DSPrimary, 0)) == DS_OK) {
 		DXChangeOutputFormat(sfx_frequencies[SoundQuality], 0);
 		DSPrimary->Play(0, 0, DSBPLAY_LOOPING);
 		return 1;
@@ -228,8 +209,7 @@ bool DXSetOutputFormat()
 #endif
 }
 
-bool DXDSCreate()
-{
+bool DXDSCreate() {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	Log(2, "DXDSCreate");
 
@@ -254,7 +234,7 @@ bool DXDSCreate()
 
 	sound_active = true;
 	return true;
-#else
+#elif _WIN32
 	XAUDIO2_EFFECT_DESCRIPTOR chaind = {};
 	XAUDIO2_EFFECT_CHAIN chain = {};
 
@@ -292,22 +272,21 @@ bool DXDSCreate()
 #endif
 }
 
-bool InitSampleDecompress()
-{
+bool InitSampleDecompress() {
 #if !defined(MA_AUDIO_SAMPLES) || !defined(MA_AUDIO_ENGINE)
 	mmresult = acmStreamOpen(&hACMStream, hACMDriver, (LPWAVEFORMATEX)source_pcm_format, &pcm_format, 0, 0, 0, 0);
 
 	if (mmresult != DS_OK)
 		Log(1, "Stream Open %d", mmresult);
 
-	decompressed_samples_buffer = (char*)SYSTEM_MALLOC(DECOMPRESS_BUFFER_LEN);
+	decompressed_samples_buffer = (int8_t*)SYSTEM_MALLOC(DECOMPRESS_BUFFER_LEN);
 	samples_buffer = (char*)SYSTEM_MALLOC(DECOMPRESS_BUFFER_LEN + 0x5A);
 	memset(&ACMStreamHeader, 0, sizeof(ACMStreamHeader));
-	ACMStreamHeader.pbSrc = (uchar*)(samples_buffer + 0x5A);
+	ACMStreamHeader.pbSrc = (uint8_t*)(samples_buffer + 0x5A);
 	ACMStreamHeader.cbStruct = 84;
 	ACMStreamHeader.cbSrcLength = DECOMPRESS_BUFFER_LEN;
 	ACMStreamHeader.cbDstLength = DECOMPRESS_BUFFER_LEN;
-	ACMStreamHeader.pbDst = (uchar*)decompressed_samples_buffer;
+	ACMStreamHeader.pbDst = (uint8_t*)decompressed_samples_buffer;
 	mmresult = acmStreamPrepareHeader(hACMStream, &ACMStreamHeader, 0);
 
 	if (mmresult != DS_OK)
@@ -319,8 +298,7 @@ bool InitSampleDecompress()
 	return 1;
 }
 
-bool FreeSampleDecompress()
-{
+bool FreeSampleDecompress() {
 #if !defined(MA_AUDIO_SAMPLES) || !defined(MA_AUDIO_ENGINE)
 	ACMStreamHeader.cbSrcLength = DECOMPRESS_BUFFER_LEN;
 	mmresult = acmStreamUnprepareHeader(hACMStream, &ACMStreamHeader, 0);
@@ -342,19 +320,18 @@ bool FreeSampleDecompress()
 	return 1;
 }
 
-bool DXCreateSample(char* data, long size, int samples_per_second, long num)
-{
-	Log(8, "DXCreateSample");
+bool DXCreateSample(char* data, int32_t size, int samples_per_second, int32_t num) {
+	Log(8, "DXCreateSample - %u", num);
 
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	MOD_LEVEL_AUDIO_INFO *mod_audio_info = get_game_mod_level_audio_info(gfCurrentLevel);
 
 	ma_audio_buffer_config bufferConfig = ma_audio_buffer_config_init(
-		ma_format_s16,
-		1,
-		size / 2,
-		data,
-		NULL);
+	        ma_format_s16,
+	        1,
+	        size / 2,
+	        data,
+	        NULL);
 	bufferConfig.sampleRate = mod_audio_info->sample_rate;
 
 	ma_result result = ma_audio_buffer_alloc_and_init(&bufferConfig, &ma_sample_buffers[num]);
@@ -363,7 +340,7 @@ bool DXCreateSample(char* data, long size, int samples_per_second, long num)
 	}
 
 	return true;
-#else
+#elif _WIN32
 	if (!App.dx.lpDS)
 		return 0;
 
@@ -384,8 +361,7 @@ bool DXCreateSample(char* data, long size, int samples_per_second, long num)
 #endif
 }
 
-bool DXCreateSampleADPCM(char* data, long comp_size, long uncomp_size, long num)
-{
+bool DXCreateSampleADPCM(char* data, int32_t comp_size, int32_t uncomp_size, int32_t num) {
 	Log(8, "DXCreateSampleADPCM");
 
 	bool result = false;
@@ -410,18 +386,18 @@ bool DXCreateSampleADPCM(char* data, long comp_size, long uncomp_size, long num)
 #ifdef MA_AUDIO_SAMPLES
 				// Now you can use the PCM data with MiniAudio
 				ma_audio_buffer_config bufferConfig = ma_audio_buffer_config_init(
-					ma_format_s16,
-					1,
-					frameCount,
-					pPCMData,
-					NULL);
+				        ma_format_s16,
+				        1,
+				        frameCount,
+				        pPCMData,
+				        NULL);
 				bufferConfig.sampleRate = 22050;
 
 				ma_result audio_buffer_alloc_result = ma_audio_buffer_alloc_and_init(&bufferConfig, &ma_sample_buffers[num]);
 				if (audio_buffer_alloc_result == MA_SUCCESS) {
 					result = true;
 				}
-#else
+#elif _WIN32
 				XA_Buffers[num].pAudioData = (BYTE*)SYSTEM_MALLOC(uncomp_size - 32);
 				if (XA_Buffers[num].pAudioData) {
 					XA_SPS[num] = 22050;
@@ -448,36 +424,30 @@ bool DXCreateSampleADPCM(char* data, long comp_size, long uncomp_size, long num)
 	return result;
 }
 
-void DXStopSample(long channel)
-{
-	if (channel >= 0 && channel < MAX_VOICES)
-	{
+void DXStopSample(int32_t channel) {
+	if (channel >= 0 && channel < MAX_VOICES) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	ma_sound_stop(& ma_voices[channel]);
-	ma_voice_active[channel] = -1;
-#else
-	if (XA_Voices[channel])
-	{
-		DXAttempt(XA_Voices[channel]->Stop(0, XAUDIO2_COMMIT_NOW));
-		DXAttempt(XA_Voices[channel]->FlushSourceBuffers());
+		ma_sound_stop(& ma_voices[channel]);
+		ma_voice_active[channel] = -1;
+#elif _WIN32
+		if (XA_Voices[channel]) {
+			DXAttempt(XA_Voices[channel]->Stop(0, XAUDIO2_COMMIT_NOW));
+			DXAttempt(XA_Voices[channel]->FlushSourceBuffers());
 
-		XA_Voice_Active[channel] = -1;
-	}
+			XA_Voice_Active[channel] = -1;
+		}
 #endif
 	}
 }
 
-bool DSIsChannelPlaying(long channel)
-{
-	if (channel >= 0 && channel < MAX_VOICES)
-	{
+bool DSIsChannelPlaying(int32_t channel) {
+	if (channel >= 0 && channel < MAX_VOICES) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 		return ma_voice_active[channel] >= 0;
-#else
+#elif _WIN32
 		XAUDIO2_VOICE_STATE state;
 
-		if (XA_Voices[channel])
-		{
+		if (XA_Voices[channel]) {
 			XA_Voices[channel]->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 
 			if (state.BuffersQueued)
@@ -489,10 +459,8 @@ bool DSIsChannelPlaying(long channel)
 	return false;
 }
 
-long DSGetFreeChannel()
-{
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
+int32_t DSGetFreeChannel() {
+	for (int i = 0; i < MAX_VOICES; i++) {
 		if (!DSIsChannelPlaying(i))
 			return i;
 	}
@@ -500,21 +468,17 @@ long DSGetFreeChannel()
 	return -1;
 }
 
-bool DSIsSamplePlaying(long sample_id)
-{
+bool DSIsSamplePlaying(int32_t sample_id) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	for (int i = 0; i < MAX_VOICES; i++) {
 		if (ma_voice_active[sample_id] == sample_id) {
 			return true;
 		}
 	}
-#else
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
-		if (DSIsChannelPlaying(i))
-		{
-			if (XA_Voice_Active[i] == sample_id)
-			{
+#elif _WIN32
+	for (int i = 0; i < MAX_VOICES; i++) {
+		if (DSIsChannelPlaying(i)) {
+			if (XA_Voice_Active[i] == sample_id) {
 				return true;
 			}
 		}
@@ -532,10 +496,9 @@ void ma_sample_end_callback(void* pUserData, ma_sound* pSound) {
 }
 #endif
 
-long DXStartSample(long num, long volume, long pitch, long pan, ulong flags)
-{
+int32_t DXStartSample(int32_t num, int32_t volume, int32_t pitch, int32_t pan, uint32_t flags) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	long channel;
+	int32_t channel;
 
 	channel = DSGetFreeChannel();
 
@@ -550,11 +513,11 @@ long DXStartSample(long num, long volume, long pitch, long pan, ulong flags)
 	bool is_looping = flags & 0xff ? MA_TRUE : MA_FALSE;
 
 	ma_audio_buffer_config bufferConfig = ma_audio_buffer_config_init(
-		ma_sample_buffers[num]->ref.format,
-		ma_sample_buffers[num]->ref.channels,
-		ma_sample_buffers[num]->ref.sizeInFrames,
-		ma_sample_buffers[num]->ref.pData,
-		NULL);
+	        ma_sample_buffers[num]->ref.format,
+	        ma_sample_buffers[num]->ref.channels,
+	        ma_sample_buffers[num]->ref.sizeInFrames,
+	        ma_sample_buffers[num]->ref.pData,
+	        NULL);
 	bufferConfig.sampleRate = ma_sample_buffers[num]->ref.sampleRate;
 
 	ma_result buffer_result = ma_audio_buffer_init(&bufferConfig, &ma_voice_buffers[channel]);
@@ -588,7 +551,7 @@ long DXStartSample(long num, long volume, long pitch, long pan, ulong flags)
 #else
 	IXAudio2SourceVoice* voice;
 	XAUDIO2_BUFFER* buffer;
-	long channel;
+	int32_t channel;
 
 	channel = DSGetFreeChannel();
 
@@ -596,8 +559,7 @@ long DXStartSample(long num, long volume, long pitch, long pan, ulong flags)
 		return -1;
 
 	voice = XA_Voices[channel];
-	if (voice)
-	{
+	if (voice) {
 		current_voice_samples_per_second = XA_SPS[num];
 
 		DSChangeVolume(channel, volume);
@@ -613,11 +575,10 @@ long DXStartSample(long num, long volume, long pitch, long pan, ulong flags)
 #endif
 }
 
-long CalcVolume(long volume)
-{
-	long result;
+int32_t CalcVolume(int32_t volume) {
+	int32_t result;
 
-	result = 8000 - long(float(0x7FFF - volume) * 0.30518511F);
+	result = 8000 - int32_t(float(0x7FFF - volume) * 0.30518511F);
 
 	if (result > 0)
 		result = 0;
@@ -635,33 +596,28 @@ long CalcVolume(long volume)
 	return result;
 }
 
-void S_SoundStopAllSamples()
-{
+void S_SoundStopAllSamples() {
 	for (int i = 0; i < MAX_VOICES; i++)
 		DXStopSample(i);
 }
 
-void S_SoundStopSample(long num)
-{
+void S_SoundStopSample(int32_t num) {
 	DXStopSample(num);
 }
 
-long S_SoundPlaySample(long num, ushort volume, long pitch, short pan)
-{
+int32_t S_SoundPlaySample(int32_t num, uint16_t volume, int32_t pitch, int16_t pan) {
 	return DXStartSample(num, CalcVolume(volume), pitch, pan, 0);
 }
 
-long S_SoundPlaySampleLooped(long num, ushort volume, long pitch, short pan)
-{
+int32_t S_SoundPlaySampleLooped(int32_t num, uint16_t volume, int32_t pitch, int16_t pan) {
 #ifndef MA_AUDIO_SAMPLES
 	return DXStartSample(num, CalcVolume(volume), pitch, pan, XAUDIO2_LOOP_INFINITE);
-#else
+#elif _WIN32
 	return DXStartSample(num, CalcVolume(volume), pitch, pan, 0xff);
 #endif
 }
 
-void DXFreeSounds()
-{
+void DXFreeSounds() {
 	S_SoundStopAllSamples();
 
 #ifdef MA_AUDIO_SAMPLES
@@ -671,11 +627,9 @@ void DXFreeSounds()
 			ma_sample_buffers[i] = nullptr;
 		}
 	}
-#else
-	for (int i = 0; i < MAX_SAMPLE_BUFFERS; i++)
-	{
-		if (XA_Buffers[i].pAudioData)
-		{
+#elif _WIN32
+	for (int i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
+		if (XA_Buffers[i].pAudioData) {
 			SYSTEM_FREE((void*)XA_Buffers[i].pAudioData);
 			XA_Buffers[i].pAudioData = 0;
 		}
@@ -683,54 +637,44 @@ void DXFreeSounds()
 #endif
 }
 
-long S_SoundSampleIsPlayingOnChannel(long num)
-{
+int32_t S_SoundSampleIsPlayingOnChannel(int32_t num) {
 	if (sound_active && DSIsChannelPlaying(num))
 		return 1;
 
 	return 0;
 }
 
-void S_SoundSetPanAndVolume(long num, short pan, ushort volume)
-{
-	if (sound_active)
-	{
+void S_SoundSetPanAndVolume(int32_t num, int16_t pan, uint16_t volume) {
+	if (sound_active) {
 		DSChangeVolume(num, CalcVolume(volume));
 		DSAdjustPan(num, pan);
 	}
 }
 
-void S_SoundSetPitch(long num, long pitch)
-{
+void S_SoundSetPitch(int32_t num, int32_t pitch) {
 	if (sound_active)
 		DSAdjustPitch(num, pitch);
 }
 
-void S_SetReverbType(long reverb)
-{
+void S_SetReverbType(int32_t reverb) {
 #ifdef MA_AUDIO_SAMPLES
 	return;
-#else
+#elif _WIN32
 	if (App.SoundDisabled)
 		return;
 
 	if (tomb4.reverb == REVERB_OFF)
 		reverb = 0;
 
-	if (current_reverb != reverb)
-	{
-		if (reverb)
-		{
-			if (!current_reverb)
-			{
+	if (current_reverb != reverb) {
+		if (reverb) {
+			if (!current_reverb) {
 				XAMaster->EnableEffect(0, XAUDIO2_COMMIT_NOW);
 				XAMaster->SetVolume(2.0F, XAUDIO2_COMMIT_NOW);
 			}
 
 			XAMaster->SetEffectParameters(0, &reverb_type[reverb - 1], sizeof(XAUDIO2FX_REVERB_PARAMETERS), XAUDIO2_COMMIT_NOW);
-		}
-		else
-		{
+		} else {
 			XAMaster->DisableEffect(0, XAUDIO2_COMMIT_NOW);
 			XAMaster->SetVolume(1.0F, XAUDIO2_COMMIT_NOW);
 		}
@@ -760,20 +704,16 @@ void S_SoundUnpauseSamples() {
 #endif
 }
 
-void DXDSClose()
-{
+void DXDSClose() {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 	Log(2, "DXDSClose");
 	ma_engine_uninit(&ma_samples_engine);
-#else
-
+#elif _WIN32
 	if (App.SoundDisabled)
 		return;
 
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
-		if (XA_Voices[i])
-		{
+	for (int i = 0; i < MAX_VOICES; i++) {
+		if (XA_Voices[i]) {
 			XA_Voices[i]->DestroyVoice();
 			XA_Voices[i] = 0;
 		}

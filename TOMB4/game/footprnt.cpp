@@ -17,17 +17,16 @@
 #define PRINT_HEIGHT_CORRECTION 128 // The maximum difference between the footprint and the floor
 
 
-static char footsounds[14] = { 0, 5, 3, 2, 1, 9, 9, 4, 6, 5, 3, 9, 4, 6 };
+static int8_t footsounds[14] = { 0, 5, 3, 2, 1, 9, 9, 4, 6, 5, 3, 9, 4, 6 };
 
 FOOTPRINT FootPrint[32];
-long FootPrintNum;
+int32_t FootPrintNum;
 
-void AddFootPrint(ITEM_INFO* item)
-{
+void AddFootPrint(ITEM_INFO* item) {
 	FOOTPRINT* print;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos;
-	short room_num;
+	int16_t room_num;
 
 	pos.x = 0;
 	pos.y = 0;
@@ -47,8 +46,7 @@ void AddFootPrint(ITEM_INFO* item)
 	if (floor->fx != 6 && floor->fx != 5 && floor->fx != 11)
 		SoundEffect(footsounds[floor->fx] + SFX_FOOTSTEPS_MUD, &lara_item->pos, SFX_DEFAULT);
 
-	if (floor->fx < 3 && !OnObject)
-	{
+	if (floor->fx < 3 && !OnObject) {
 		print = &FootPrint[FootPrintNum];
 		print->x = pos.x;
 		print->y = GetHeight(floor, pos.x, pos.y, pos.z);
@@ -59,27 +57,23 @@ void AddFootPrint(ITEM_INFO* item)
 	}
 }
 
-void S_DrawFootPrints()
-{
+void S_DrawFootPrints() {
 	FOOTPRINT* print;
 	SPRITESTRUCT* sprite;
 	GFXTLVERTEX* v;
 	PHD_VECTOR pos[3];
 	TEXTURESTRUCT tex;
 	float u1, v1, u2, v2;
-	long x, z, x1, y1, z1, x2, y2, z2, x3, y3, z3, col;
-	short room_number;
-	
+	int32_t x, z, x1, y1, z1, x2, y2, z2, x3, y3, z3, col;
+	int16_t room_number;
+
 	v = MyVertexBuffer;
 
-	for (int i = 0; i < 32; i++)
-	{
+	for (int i = 0; i < 32; i++) {
 		print = &FootPrint[i];
 
-		if (print->Active)
-		{
-			if (!tomb4.footprints)
-			{
+		if (print->Active) {
+			if (!tomb4.footprints) {
 				print->Active = 0;
 				continue;
 			}
@@ -102,10 +96,9 @@ void S_DrawFootPrints()
 			phd_TranslateRel(print->x, print->y, print->z);
 			phd_RotY(print->YRot);
 
-			for (int j = 0; j < 3; j++)
-			{
-				x = long(pos[j].x * mMXPtr[M00] + pos[j].z * mMXPtr[M02] + mMXPtr[M03]);
-				z = long(pos[j].x * mMXPtr[M20] + pos[j].z * mMXPtr[M22] + mMXPtr[M23]);
+			for (int j = 0; j < 3; j++) {
+				x = int32_t(pos[j].x * mMXPtr[M00] + pos[j].z * mMXPtr[M02] + mMXPtr[M03]);
+				z = int32_t(pos[j].x * mMXPtr[M20] + pos[j].z * mMXPtr[M22] + mMXPtr[M23]);
 				room_number = lara_item->room_number;
 				pos[j].y = GetHeight(GetFloor(x, print->y, z, &room_number), x, print->y, z) - print->y;
 
@@ -126,8 +119,7 @@ void S_DrawFootPrints()
 			phd_PopMatrix();
 			setXYZ3(v, x1, y1, z1, x2, y2, z2, x3, y3, z3, clipflags);
 
-			for (int j = 0; j < 3; j++)
-			{
+			for (int j = 0; j < 3; j++) {
 				v[j].color = RGBA(col, col, col, 0xFF);
 				v[j].specular = 0xFF000000;
 			}

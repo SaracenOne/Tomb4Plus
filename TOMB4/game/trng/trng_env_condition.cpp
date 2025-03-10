@@ -40,13 +40,13 @@ uint16_t NGGetAlignedOrient(uint16_t orient, bool test_force_horthogonal, int32_
 		}
 
 
-		min_diff = NGAbsDiffO(orient, (short)0xA000);
+		min_diff = NGAbsDiffO(orient, (int16_t)0xA000);
 		if (min_diff <= 0x1000) {
 			*gap = min_diff;
 			return 0xA000;
 		}
 
-		min_diff = NGAbsDiffO(orient, (short)0xE000);
+		min_diff = NGAbsDiffO(orient, (int16_t)0xE000);
 		if (min_diff <= 0x1000) {
 			*gap = min_diff;
 			return 0xE000;
@@ -65,13 +65,13 @@ uint16_t NGGetAlignedOrient(uint16_t orient, bool test_force_horthogonal, int32_
 		return 0x4000;
 	}
 
-	min_diff = NGAbsDiffO(orient, (short)0x8000);
+	min_diff = NGAbsDiffO(orient, (int16_t)0x8000);
 	if (min_diff <= 0x2000) {
 		*gap = min_diff;
 		return 0x8000;
 	}
 
-	min_diff = NGAbsDiffO(orient, (short)0xc000);
+	min_diff = NGAbsDiffO(orient, (int16_t)0xc000);
 	if (min_diff <= 0x2000) {
 		*gap = min_diff;
 		return 0xc000;
@@ -87,7 +87,7 @@ int32_t NGProportionDistance(int32_t increment, int32_t distance) {
 	return (int32_t)((float)increment * ((float)distance / float(BLOCK_SIZE)));
 }
 
-void NGCalculateIncrement(short orientation, int32_t* inc_x_out, int32_t* inc_z_out, int32_t distance) {
+void NGCalculateIncrement(int16_t orientation, int32_t* inc_x_out, int32_t* inc_z_out, int32_t distance) {
 	int32_t inc_x, inc_z;
 	int32_t indice;
 
@@ -242,7 +242,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 		case ENV_HOLE_FLOOR_AT_RIGHT:
 		case ENV_HOLE_FLOOR_AT_LEFT:
 		case ENV_HOLE_FLOOR_BACK: {
-			short distance_test = (HALF_BLOCK_SIZE + CLICK_SIZE);
+			int16_t distance_test = (HALF_BLOCK_SIZE + CLICK_SIZE);
 			if (triplet->distance_for_env != -1) {
 				distance_test = triplet->distance_for_env;
 			}
@@ -266,7 +266,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 			coord_x += inc_x;
 			coord_z += inc_z;
 
-			short room_num = lara_item->room_number;
+			int16_t room_num = lara_item->room_number;
 
 			FLOOR_INFO* floor_info = GetFloor(coord_x, coord_y, coord_z, &room_num);
 			int32_t height = GetHeight(floor_info, coord_x, coord_y, coord_z);
@@ -444,7 +444,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 
 				if (floor_info->sky_room == -1)
 					result.is_valid = false;
-					break;
+				break;
 
 				room_num = floor_info->sky_room;
 				floor_info = GetFloor(coord_x, min_height, coord_z, &room_num);
@@ -472,7 +472,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 
 			if (triplet->env_condition == ENV_WALL_HOLE_IN_FRONT) {
 				if (current_hole_height < space_height ||
-					current_hole_height > space_height_max) {
+				        current_hole_height > space_height_max) {
 					result.is_valid = false;
 					break;
 				}
@@ -497,7 +497,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 		}
 		case ENV_ITEM_TEST_POSITION: {
 			ITEM_INFO *item = NULL;
-			short item_number;
+			int16_t item_number;
 
 			result.is_valid = false;
 			for (item_number = room[lara_item->room_number].item_number; item_number != NO_ITEM; item_number = item->next_item) {
@@ -517,7 +517,7 @@ TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* trip
 		case ENV_CONDITION_TRIGGER_GROUP: {
 			result.is_valid = NGTriggerGroupFunction(triplet->distance_for_env, TRIGGER_GROUP_EXECUTION_MULTIPLE);
 
-			break;	
+			break;
 		}
 		case ENV_LARA_IN_MICRO_STRIP: {
 			result.is_valid = false;

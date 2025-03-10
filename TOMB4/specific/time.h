@@ -1,6 +1,6 @@
 #pragma once
 #include "../global/types.h"
 
-long Sync();
+int32_t Sync();
 void TIME_Reset();
 bool TIME_Init();

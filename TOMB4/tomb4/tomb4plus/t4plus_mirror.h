@@ -11,7 +11,7 @@ enum T4PlusMirrorDirection {
 };
 
 struct T4PlusMirrorInfo {
-	unsigned int mirror_room;
+	uint32_t mirror_room;
 	int pivot_point;
 	T4PlusMirrorDirection direction;
 };

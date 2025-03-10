@@ -107,15 +107,15 @@ extern int32_t ng_last_input_number;
 extern int32_t ng_store_variables[STORE_VARIABLE_COUNT];
 
 #define REGULAR_TEXT_BUFFER_SIZE 80
-extern char ng_last_text_input[REGULAR_TEXT_BUFFER_SIZE];
+extern int8_t ng_last_text_input[REGULAR_TEXT_BUFFER_SIZE];
 
-extern char ng_string1[REGULAR_TEXT_BUFFER_SIZE];
-extern char ng_string2[REGULAR_TEXT_BUFFER_SIZE];
-extern char ng_string3[REGULAR_TEXT_BUFFER_SIZE];
-extern char ng_string4[REGULAR_TEXT_BUFFER_SIZE];
+extern int8_t ng_string1[REGULAR_TEXT_BUFFER_SIZE];
+extern int8_t ng_string2[REGULAR_TEXT_BUFFER_SIZE];
+extern int8_t ng_string3[REGULAR_TEXT_BUFFER_SIZE];
+extern int8_t ng_string4[REGULAR_TEXT_BUFFER_SIZE];
 
 #define BIG_TEXT_BUFFER_SIZE 320
-extern char ng_text_big[BIG_TEXT_BUFFER_SIZE];
+extern int8_t ng_text_big[BIG_TEXT_BUFFER_SIZE];
 
 // Visual
 
@@ -255,6 +255,8 @@ enum NGCreatureType {
 ITEM_INFO *NGIsLaraCollidingWithCreature(NGCreatureType creature_type, int32_t mask);
 extern int32_t NGIsLaraCollidingWithStaticID(int32_t id);
 extern int32_t NGIsLaraCollidingWithStaticSlot(int32_t slot);
+
+extern bool NGIsLaraHolding(int32_t hold_type);
 
 extern bool NGIsItemCollisionDisabled(uint32_t item_num);
 extern void NGDisableItemCollision(uint32_t item_num);

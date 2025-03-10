@@ -5,23 +5,22 @@
 #define CAMERA_COUNT 64
 #define MAXIMUM_SPOTCAMS CAMERA_COUNT * 4
 
-void SetSplineData(long num, long cam);
-void InitialiseSpotCam(short Sequence);
+void SetSplineData(int32_t num, int32_t cam);
+void InitialiseSpotCam(int16_t Sequence);
 void InitSpotCamSequences();
-long Spline(long x, long* knots, long nk);
+int32_t Spline(int32_t x, int32_t* knots, int32_t nk);
 void CalculateSpotCams();
 void SpotcamResetFOV();
 
 extern SPOTCAM SpotCam[];
-extern long bTrackCamInit;
-extern short LastSequence;
-extern short CurrentFov;
-extern short number_spotcams;
-extern long bUseSpotCam;
-extern long bDisableLaraControl;
+extern int32_t bTrackCamInit;
+extern int16_t LastSequence;
+extern int16_t CurrentFov;
+extern int16_t number_spotcams;
+extern int32_t bUseSpotCam;
+extern int32_t bDisableLaraControl;
 
-enum spotcam_flags
-{
+enum spotcam_flags {
 	SP_SNAPCAMERA = (1 << 0),	//snaps the camera to the first spline
 	SP_VIGNETTE = (1 << 1),	//?
 	SP_LOOPCAMERA = (1 << 2),	//loops the sequence (if past last camera -> go back to first)

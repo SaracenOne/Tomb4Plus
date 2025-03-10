@@ -9,7 +9,7 @@
 #include "../../game/objects.h"
 #include "../../specific/platform.h"
 
-void T4PlusActivateItem(short item_id, bool anti) {
+void T4PlusActivateItem(int16_t item_id, bool anti) {
 	ITEM_INFO *item;
 
 	if (item_id >= ITEM_COUNT) {
@@ -33,8 +33,7 @@ void T4PlusActivateItem(short item_id, bool anti) {
 					item->status = ITEM_ACTIVE;
 					AddActiveItem(item_id);
 					EnableBaddieAI(item_id, 1);
-				}
-				else if (item->status == ITEM_INVISIBLE) {
+				} else if (item->status == ITEM_INVISIBLE) {
 					item->touch_bits = 0;
 
 					if (EnableBaddieAI(item_id, 0))
@@ -44,8 +43,7 @@ void T4PlusActivateItem(short item_id, bool anti) {
 
 					AddActiveItem(item_id);
 				}
-			}
-			else {
+			} else {
 				item->touch_bits = 0;
 				AddActiveItem(item_id);
 				item->status = ITEM_ACTIVE;

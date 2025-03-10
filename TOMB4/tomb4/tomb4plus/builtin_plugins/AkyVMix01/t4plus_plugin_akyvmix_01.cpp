@@ -1,4 +1,4 @@
-#include "../../../.../../tomb4/pch.h"
+#include "../../../pch.h"
 #include "t4plus_plugin_akyvmix_01.h"
 
 void T4PlusPluginInitProgramLog_AkyVMix01(int log_type, const char* string, ...) {
@@ -9,15 +9,15 @@ void T4PlusPluginInitProgram_AkyVMix01() {
 	T4PlusPluginInitProgramLog_AkyVMix01(0, "Initializing");
 }
 
-void T4PlusPluginConditionCustom_AkyVMix01(short condition_index, int item_index, short extra, T4PlusActivationMode activation_mode) {
+void T4PlusPluginConditionCustom_AkyVMix01(int16_t condition_index, int item_index, int16_t extra, T4PlusActivationMode activation_mode) {
 	T4PlusPluginInitProgramLog_AkyVMix01(0, "Conditional %i is unimplemented", condition_index);
 }
 
-void T4PlusPluginActionCustom_AkyVMix01(short action_index, int item_index, short extra, T4PlusActivationMode activation_mode) {
+void T4PlusPluginActionCustom_AkyVMix01(int16_t action_index, int item_index, int16_t extra, T4PlusActivationMode activation_mode) {
 	T4PlusPluginInitProgramLog_AkyVMix01(0, "Action %i is unimplemented", action_index);
 }
 
-void T4PlusPluginFlipEffectCustom_AkyVMix01(short flip_index, short timer, short extra, T4PlusActivationMode activation_mode) {
+void T4PlusPluginFlipEffectCustom_AkyVMix01(int16_t flip_index, int16_t timer, int16_t extra, T4PlusActivationMode activation_mode) {
 	T4PlusPluginInitProgramLog_AkyVMix01(0, "Flipeffect %i is unimplemented", flip_index);
 }
 

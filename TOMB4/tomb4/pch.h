@@ -7,17 +7,17 @@
 #ifndef PCH_H
 #define PCH_H
 
-#ifndef USE_BGFX
-#define ENABLE_DX_FUNTIONS
-#endif
 #ifndef MA_AUDIO_SAMPLES
 #define ENABLE_MINIMUM_DX_FUNCTIONS
 #endif
 
 // add headers that you want to pre-compile here
+#ifdef _WIN32
 #define DIRECTINPUT_VERSION 0x0800
 #define _USE_MATH_DEFINES
-#define NOMINMAX 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <windowsx.h>
 #ifdef ENABLE_MINIMUM_DX_FUNCTIONS
@@ -35,20 +35,15 @@
 #include <xaudio2fx.h>
 #include <MSAcm.h>
 #endif
-#if !defined(USE_SDL)
-#include <dinput.h>
-#include <mmreg.h>
 #endif
 
-#ifdef USE_BGFX
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <bx/bx.h>
 #include <bx/allocator.h>
 #include <bx/math.h>
 #include <bx/platform.h>
-#endif
 
-#include "../../resource.h"
+#include "../resource.h"
 
 #endif //PCH_H

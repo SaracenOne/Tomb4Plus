@@ -11,8 +11,7 @@
 
 static BITE_INFO hammerhead_bite = { 0, 0, 0, 12 };
 
-void InitialiseHammerhead(short item_number)
-{
+void InitialiseHammerhead(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -23,12 +22,11 @@ void InitialiseHammerhead(short item_number)
 	item->goal_anim_state = 0;
 }
 
-void HammerheadControl(short item_number)
-{
+void HammerheadControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* shark;
 	AI_INFO info;
-	short angle;
+	int16_t angle;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -38,21 +36,17 @@ void HammerheadControl(short item_number)
 	item = &items[item_number];
 	shark = (CREATURE_INFO*)item->data;
 
-	if (item->hit_points <= 0)
-	{
+	if (item->hit_points <= 0) {
 		item->hit_points = 0;
 
-		if (item->current_anim_state != 5)
-		{
+		if (item->current_anim_state != 5) {
 			item->anim_number = objects[HAMMERHEAD].anim_index + 4;
 			item->frame_number = anims[item->anim_number].frame_base;
 			item->current_anim_state = 5;
 		}
 
 		CreatureFloat(item_number);
-	}
-	else
-	{
+	} else {
 		if (item->ai_bits)
 			GetAITarget(shark);
 		else if (shark->hurt_by_lara)
@@ -67,41 +61,39 @@ void HammerheadControl(short item_number)
 		CreatureMood(item, &info, true);
 		angle = CreatureTurn(item, shark->maximum_turn);
 
-		switch (item->current_anim_state)
-		{
-		case 0:
-			item->goal_anim_state = 1;
-			shark->flags = 0;
-			break;
-
-		case 1:
-			shark->maximum_turn = DEGREES_TO_ROTATION(7);
-
-			if (info.distance > 0x100000)
-				item->goal_anim_state = 2;
-			else if (info.distance < 0x718E4)
-				item->goal_anim_state = 3;
-
-			break;
-
-		case 2:
-
-			if (info.distance < 0x100000)
+		switch (item->current_anim_state) {
+			case 0:
 				item->goal_anim_state = 1;
+				shark->flags = 0;
+				break;
 
-			break;
+			case 1:
+				shark->maximum_turn = DEGREES_TO_ROTATION(7);
 
-		case 3:
+				if (info.distance > 0x100000)
+					item->goal_anim_state = 2;
+				else if (info.distance < 0x718E4)
+					item->goal_anim_state = 3;
 
-			if (!shark->flags && item->touch_bits & 0x3400)
-			{
-				lara_item->hit_points -= mod_object_customization->damage_1;
-				lara_item->hit_status = 1;
-				CreatureEffect(item, &hammerhead_bite, DoBloodSplat);
-				shark->flags = 1;
-			}
+				break;
 
-			break;
+			case 2:
+
+				if (info.distance < 0x100000)
+					item->goal_anim_state = 1;
+
+				break;
+
+			case 3:
+
+				if (!shark->flags && item->touch_bits & 0x3400) {
+					lara_item->hit_points -= mod_object_customization->damage_1;
+					lara_item->hit_status = 1;
+					CreatureEffect(item, &hammerhead_bite, DoBloodSplat);
+					shark->flags = 1;
+				}
+
+				break;
 		}
 
 		CreatureTilt(item, 0);
@@ -112,8 +104,7 @@ void HammerheadControl(short item_number)
 
 		if (item->current_anim_state == 6)
 			AnimateItem(item);
-		else
-		{
+		else {
 			CreatureAnimation(item_number, angle, 0);
 			CreatureUnderwater(item, 341);
 		}

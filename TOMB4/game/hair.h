@@ -8,8 +8,8 @@ enum LaraHairUpdateType {
 };
 
 void InitialiseHair();
-void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, short* cutscenething);
-void GetCorrectStashPoints(long pigtail, long hair_node, long skin_node);
+void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int16_t* cutscenething);
+void GetCorrectStashPoints(int32_t pigtail, int32_t hair_node, int32_t skin_node);
 void DrawHair();
 
 extern HAIR_STRUCT hairs[2][7];

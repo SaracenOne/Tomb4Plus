@@ -17,31 +17,23 @@
 
 LOCUST_STRUCT Locusts[MAX_LOCUSTS];
 
-static long next_locust = 0;
+static int32_t next_locust = 0;
 
-long GetFreeLocust()
-{
+int32_t GetFreeLocust() {
 	LOCUST_STRUCT* fx;
 
 	fx = &Locusts[next_locust];
 
-	for (int free = next_locust, i = 0; i < MAX_LOCUSTS; i++)
-	{
-		if (fx->On)
-		{
-			if (free == 63)
-			{
+	for (int free = next_locust, i = 0; i < MAX_LOCUSTS; i++) {
+		if (fx->On) {
+			if (free == 63) {
 				fx = Locusts;
 				free = 0;
-			}
-			else
-			{
+			} else {
 				free++;
 				fx++;
 			}
-		}
-		else
-		{
+		} else {
 			next_locust = (free + 1) & 0x3F;
 			return free;
 		}
@@ -50,13 +42,12 @@ long GetFreeLocust()
 	return NO_ITEM;
 }
 
-void TriggerLocust(ITEM_INFO* item)
-{
+void TriggerLocust(ITEM_INFO* item) {
 	LOCUST_STRUCT* fx;
 	PHD_VECTOR vec;
 	PHD_VECTOR vec2;
-	long fx_number;
-	short angles[2];
+	int32_t fx_number;
+	int16_t angles[2];
 
 	fx_number = GetFreeLocust();
 
@@ -65,15 +56,12 @@ void TriggerLocust(ITEM_INFO* item)
 
 	fx = &Locusts[fx_number];
 
-	if (item->object_number == FISH)
-	{
+	if (item->object_number == FISH) {
 		vec.x = item->pos.x_pos;
 		vec.y = item->pos.y_pos;
 		vec.z = item->pos.z_pos;
-		*(long*)angles = item->pos.y_rot + 0x8000;
-	}
-	else
-	{
+		*(int32_t*)angles = item->pos.y_rot + 0x8000;
+	} else {
 		vec2.x = 0;
 		vec2.y = -96;
 		vec2.z = 144;
@@ -98,8 +86,7 @@ void TriggerLocust(ITEM_INFO* item)
 	fx->Counter = 20 * ((GetRandomControl() & 7) + 15);
 }
 
-void InitialiseLocustEmitter(short item_number)
-{
+void InitialiseLocustEmitter(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -114,8 +101,7 @@ void InitialiseLocustEmitter(short item_number)
 		item->pos.x_pos -= HALF_BLOCK_SIZE;
 }
 
-void ControlLocustEmitter(short item_number)
-{
+void ControlLocustEmitter(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -123,26 +109,21 @@ void ControlLocustEmitter(short item_number)
 	if (!TriggerActive(item))
 		return;
 
-	if (item->trigger_flags)
-	{
+	if (item->trigger_flags) {
 		TriggerLocust(item);
 		item->trigger_flags--;
-	}
-	else
+	} else
 		KillItem(item_number);
 }
 
-void DrawLocusts()
-{
+void DrawLocusts() {
 	LOCUST_STRUCT* fx;
-	short** meshpp;
+	int16_t** meshpp;
 
-	for (int i = 0; i < MAX_LOCUSTS; i++)
-	{
+	for (int i = 0; i < MAX_LOCUSTS; i++) {
 		fx = &Locusts[i];
 
-		if (fx->On)
-		{
+		if (fx->On) {
 			meshpp = &meshes[objects[AHMET_MIP].mesh_index + 2 * (-GlobalCounter & 3)];
 			phd_PushMatrix();
 			phd_TranslateAbs(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos);
@@ -153,14 +134,13 @@ void DrawLocusts()
 	}
 }
 
-void UpdateLocusts()
-{
+void UpdateLocusts() {
 	LOCUST_STRUCT* fx;
-	short* lb;
-	long bounds[6];
-	long speed, ox, oy, oz, closestdist, closestnum;
-	short angles[2];
-	short max_turn;
+	int16_t* lb;
+	int32_t bounds[6];
+	int32_t speed, ox, oy, oz, closestdist, closestnum;
+	int16_t angles[2];
+	int16_t max_turn;
 
 	lb = GetBoundsAccurate(lara_item);
 	bounds[0] = lb[0] - (lb[0] >> 2) + lara_item->pos.x_pos;
@@ -174,41 +154,36 @@ void UpdateLocusts()
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = get_game_mod_level_object_customization_for_slot(gfCurrentLevel, FISH);
 
-	for (int i = 0; i < MAX_LOCUSTS; i++)
-	{
+	for (int i = 0; i < MAX_LOCUSTS; i++) {
 		fx = &Locusts[i];
 
-		if (fx->On)
-		{
+		if (fx->On) {
 			if ((lara.burn || lara_item->hit_points <= 0) && fx->Counter > 90 && !(GetRandomControl() & 7))
 				fx->Counter = 90;
 
 			fx->Counter--;
 
-			if (!fx->Counter)
-			{
+			if (!fx->Counter) {
 				fx->On = 0;
 				continue;
 			}
 
-			if (!(GetRandomControl() & 7))
-			{
+			if (!(GetRandomControl() & 7)) {
 				fx->LaraTarget = (GetRandomControl() % (HALF_BLOCK_SIZE + HALF_CLICK_SIZE)) + HALF_CLICK_SIZE;
 				fx->XTarget = (GetRandomControl() & 0x7F) - QUARTER_CLICK_SIZE;
 				fx->ZTarget = (GetRandomControl() & 0x7F) - QUARTER_CLICK_SIZE;
 			}
 
 			phd_GetVectorAngles(
-				lara_item->pos.x_pos + (fx->XTarget << 3) - fx->pos.x_pos,
-				lara_item->pos.y_pos - fx->LaraTarget - fx->pos.y_pos,
-				lara_item->pos.z_pos + (fx->ZTarget << 3) - fx->pos.z_pos,
-				angles);
+			    lara_item->pos.x_pos + (fx->XTarget << 3) - fx->pos.x_pos,
+			    lara_item->pos.y_pos - fx->LaraTarget - fx->pos.y_pos,
+			    lara_item->pos.z_pos + (fx->ZTarget << 3) - fx->pos.z_pos,
+			    angles);
 
 			ox = SQUARE(lara_item->pos.x_pos - fx->pos.x_pos);
 			oz = SQUARE(lara_item->pos.z_pos - fx->pos.z_pos);
 
-			if (ox + oz < closestdist)
-			{
+			if (ox + oz < closestdist) {
 				closestdist = ox + oz;
 				closestnum = i;
 			}
@@ -225,18 +200,17 @@ void UpdateLocusts()
 			else if (fx->speed > ox)
 				fx->speed--;
 
-			if (fx->Counter > 90)
-			{
+			if (fx->Counter > 90) {
 				max_turn = fx->speed << 7;
-				oy = (ushort)angles[0] - (ushort)fx->pos.y_rot;
+				oy = (uint16_t)angles[0] - (uint16_t)fx->pos.y_rot;
 
 				if (abs(oy) > 0x8000)
-					oy = (ushort)fx->pos.y_rot - (ushort)angles[0];
+					oy = (uint16_t)fx->pos.y_rot - (uint16_t)angles[0];
 
-				ox = (ushort)angles[1] - (ushort)fx->pos.x_rot;
+				ox = (uint16_t)angles[1] - (uint16_t)fx->pos.x_rot;
 
 				if (abs(ox) > 0x8000)
-					ox = (ushort)fx->pos.x_rot - (ushort)angles[0];
+					ox = (uint16_t)fx->pos.x_rot - (uint16_t)angles[0];
 
 				ox >>= 3;
 				oy >>= 3;
@@ -250,8 +224,8 @@ void UpdateLocusts()
 				else if (ox < -max_turn)
 					ox = -max_turn;
 
-				fx->pos.y_rot += (short)oy;
-				fx->pos.x_rot += (short)ox;
+				fx->pos.y_rot += (int16_t)oy;
+				fx->pos.x_rot += (int16_t)ox;
 			}
 
 			ox = fx->pos.x_pos;
@@ -262,11 +236,9 @@ void UpdateLocusts()
 			fx->pos.y_pos += fx->speed * phd_sin(-fx->pos.x_rot) >> W2V_SHIFT;
 			fx->pos.z_pos += speed * phd_cos(fx->pos.y_rot) >> W2V_SHIFT;
 
-			if (!(i & 1))
-			{
+			if (!(i & 1)) {
 				if (fx->pos.x_pos > bounds[0] && fx->pos.x_pos < bounds[1] && fx->pos.y_pos > bounds[2] &&
-					fx->pos.y_pos < bounds[3] && fx->pos.z_pos > bounds[4] && fx->pos.z_pos < bounds[5])
-				{
+				        fx->pos.y_pos < bounds[3] && fx->pos.z_pos > bounds[4] && fx->pos.z_pos < bounds[5]) {
 					TriggerBlood(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos, GetRandomControl() << 1, 2);
 
 					if (lara_item->hit_points > 0)
@@ -276,8 +248,7 @@ void UpdateLocusts()
 		}
 	}
 
-	if (closestnum != -1)
-	{
+	if (closestnum != -1) {
 		fx = &Locusts[closestnum];
 		SoundEffect(SFX_LOCUSTS_LOOP, &fx->pos, SFX_DEFAULT);
 	}

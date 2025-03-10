@@ -24,20 +24,19 @@ T4POverrideFogMode t4_override_fog_mode = T4P_FOG_DEFAULT;
 T4PWeatherType t4p_rain_type = T4P_WEATHER_DISABLED;
 T4PWeatherType t4p_snow_type = T4P_WEATHER_DISABLED;
 
-long rain_outside = 0;
-long snow_outside = 0;
+int32_t rain_outside = 0;
+int32_t snow_outside = 0;
 
 #define PERCIPITATION_ARRAY_SIZE 1024
 
 static RAINDROPS Rain[PERCIPITATION_ARRAY_SIZE];
 static SNOWFLAKE Snow[PERCIPITATION_ARRAY_SIZE];
-static short rain_count = 0;
-static short snow_count = 0;
-static short max_rain = 0;
-static short max_snow = 0;
+static int16_t rain_count = 0;
+static int16_t snow_count = 0;
+static int16_t max_rain = 0;
+static int16_t max_snow = 0;
 
-void InitWeatherFX()
-{
+void InitWeatherFX() {
 	t4p_rain_type = T4P_WEATHER_DISABLED;
 	t4p_snow_type = T4P_WEATHER_DISABLED;
 
@@ -50,35 +49,30 @@ void InitWeatherFX()
 	max_rain = 64;
 }
 
-void ClearWeatherFX()
-{
-	for (int i = 0; i < PERCIPITATION_ARRAY_SIZE; i++)
-	{
+void ClearWeatherFX() {
+	for (int i = 0; i < PERCIPITATION_ARRAY_SIZE; i++) {
 		Rain[i].x = 0;
 		Snow[i].x = 0;
 	}
 }
 
-void DoRain()
-{
+void DoRain() {
 	RAINDROPS* rptr;
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
 	GFXTLVERTEX v[2];
 	TEXTURESTRUCT tex;
-	short* clip;
+	int16_t* clip;
 	float ctop, cbottom, cright, cleft, zv, fx, fy, fz, mx, my, mz;
-	long num_alive, rad, angle, rnd, x, z, x_size, y_size, c;
-	short room_number, clipFlag;
+	int32_t num_alive, rad, angle, rnd, x, z, x_size, y_size, c;
+	int16_t room_number, clipFlag;
 
 	num_alive = 0;
 
-	for (int i = 0; i < rain_count; i++)
-	{
+	for (int i = 0; i < rain_count; i++) {
 		rptr = &Rain[i];
 
-		if (rain_outside && !rptr->x && num_alive < max_rain)
-		{
+		if (rain_outside && !rptr->x && num_alive < max_rain) {
 			num_alive++;
 			rad = GetRandomDraw() & DEGREES_TO_ROTATION(45) + 1;
 			angle = GetRandomDraw() & DEGREES_TO_ROTATION(45);
@@ -91,35 +85,30 @@ void DoRain()
 				continue;
 			}
 
-			if (IsRoomOutside(rptr->x, rptr->y, rptr->z) < 0)
-			{
+			if (IsRoomOutside(rptr->x, rptr->y, rptr->z) < 0) {
 				rptr->x = 0;
 				continue;
 			}
 
-			if (room[IsRoomOutsideNo].flags & ROOM_UNDERWATER)
-			{
+			if (room[IsRoomOutsideNo].flags & ROOM_UNDERWATER) {
 				rptr->x = 0;
 				continue;
 			}
 
-			if (!(room[IsRoomOutsideNo].flags & ROOM_RAIN) && t4p_rain_type == T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS)
-			{
+			if (!(room[IsRoomOutsideNo].flags & ROOM_RAIN) && t4p_rain_type == T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS) {
 				rptr->x = 0;
 				continue;
 			}
 
 			rptr->xv = (GetRandomDraw() & 7) - 4;
-			rptr->yv = uchar((GetRandomDraw() & 3) + GetFixedScale(8));
+			rptr->yv = uint8_t((GetRandomDraw() & 3) + GetFixedScale(8));
 			rptr->zv = (GetRandomDraw() & 7) - 4;
 			rptr->room_number = IsRoomOutsideNo;
 			rptr->life = 64 - rptr->yv;
 		}
 
-		if (rptr->x)
-		{
-			if (rptr->life > 240 || abs(CamPos.x - rptr->x) > 6000 || abs(CamPos.z - rptr->z) > 6000)
-			{
+		if (rptr->x) {
+			if (rptr->life > 240 || abs(CamPos.x - rptr->x) > 6000 || abs(CamPos.z - rptr->z) > 6000) {
 				rptr->x = 0;
 				continue;
 			}
@@ -134,8 +123,7 @@ void DoRain()
 			y_size = r->y_size - 1;
 
 			if (rptr->y <= r->maxceiling || rptr->y >= r->minfloor || rptr->z <= z ||
-				rptr->z >= r->z + (x_size << 10) || rptr->x <= x || rptr->x >= r->x + (y_size << 10))
-			{
+			        rptr->z >= r->z + (x_size << 10) || rptr->x <= x || rptr->x >= r->x + (y_size << 10)) {
 				room_number = rptr->room_number;
 				floor = GetFloor(rptr->x, rptr->y, rptr->z, &room_number);
 
@@ -156,8 +144,7 @@ void DoRain()
 
 			rnd = GetRandomDraw();
 
-			if ((rnd & 3) != 3)
-			{
+			if ((rnd & 3) != 3) {
 				rptr->xv += (rnd & 3) - 1;
 
 				if (rptr->xv < -4)
@@ -168,9 +155,8 @@ void DoRain()
 
 			rnd = (rnd >> 2) & 3;
 
-			if (rnd != 3)
-			{
-				rptr->zv += (char)(rnd - 1);
+			if (rnd != 3) {
+				rptr->zv += (int8_t)(rnd - 1);
 
 				if (rptr->zv < -4)
 					rptr->zv = -4;
@@ -195,12 +181,10 @@ void DoRain()
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
-	for (int i = 0; i < rain_count; i++)
-	{
+	for (int i = 0; i < rain_count; i++) {
 		rptr = &Rain[i];
 
-		if (rptr->x)
-		{
+		if (rptr->x) {
 			clipFlag = 0;
 			clip = clipflags;
 			fx = float(rptr->x - lara_item->pos.x_pos - (SmokeWindX << 2));
@@ -210,7 +194,7 @@ void DoRain()
 			my = mMXPtr[M10] * fx + mMXPtr[M11] * fy + mMXPtr[M12] * fz + mMXPtr[M13];
 			mz = mMXPtr[M20] * fx + mMXPtr[M21] * fy + mMXPtr[M22] * fz + mMXPtr[M23];
 
-			c = long((1.0F - (f_mzfar - mz) * (1.0F / f_mzfar)) * 8.0F + 8.0F);
+			c = int32_t((1.0F - (f_mzfar - mz) * (1.0F / f_mzfar)) * 8.0F + 8.0F);
 			v[0].specular = 0xFF000000;
 			v[0].color = RGBA(c, c, c, 128);
 			v[0].tu = mx;
@@ -218,10 +202,8 @@ void DoRain()
 
 			if (mz < f_mznear)
 				clipFlag = -128;
-			else
-			{
-				if (mz > f_mzfar)
-				{
+			else {
+				if (mz > f_mzfar) {
 					mz = f_zfar;
 					clipFlag = 16;
 				}
@@ -253,7 +235,7 @@ void DoRain()
 			my = mMXPtr[M10] * fx + mMXPtr[M11] * fy + mMXPtr[M12] * fz + mMXPtr[M13];
 			mz = mMXPtr[M20] * fx + mMXPtr[M21] * fy + mMXPtr[M22] * fz + mMXPtr[M23];
 
-			c = long((1.0F - (f_mzfar - mz) * (1.0F / f_mzfar)) * 16.0F + 16.0F);
+			c = int32_t((1.0F - (f_mzfar - mz) * (1.0F / f_mzfar)) * 16.0F + 16.0F);
 			c <<= 1;
 			v[1].specular = 0xFF000000;
 			v[1].color = RGBA(c, c, c, 0xFF);
@@ -262,10 +244,8 @@ void DoRain()
 
 			if (mz < f_mznear)
 				clipFlag = -128;
-			else
-			{
-				if (mz > f_mzfar)
-				{
+			else {
+				if (mz > f_mzfar) {
 					mz = f_zfar;
 					clipFlag = 16;
 				}
@@ -297,8 +277,7 @@ void DoRain()
 	phd_PopMatrix();
 }
 
-void DoSnow()
-{
+void DoSnow() {
 	SNOWFLAKE* snow;
 	ROOM_INFO* r;
 	SPRITESTRUCT* sprite;
@@ -306,17 +285,15 @@ void DoSnow()
 	TEXTURESTRUCT tex;
 	float* pSize;
 	float x, y, z, xv, yv, zv, vx, vy, xSize, ySize;
-	long num_alive, rad, angle, ox, oy, oz, col;
-	short room_number, clipFlag;
+	int32_t num_alive, rad, angle, ox, oy, oz, col;
+	int16_t room_number, clipFlag;
 
 	num_alive = 0;
 
-	for (int i = 0; i < snow_count; i++)
-	{
+	for (int i = 0; i < snow_count; i++) {
 		snow = &Snow[i];
 
-		if (!snow->x)
-		{
+		if (!snow->x) {
 			if (!snow_outside || num_alive >= max_snow)
 				continue;
 
@@ -332,20 +309,17 @@ void DoSnow()
 				continue;
 			}
 
-			if (IsRoomOutside(snow->x, snow->y, snow->z) < 0)
-			{
+			if (IsRoomOutside(snow->x, snow->y, snow->z) < 0) {
 				snow->x = 0;
 				continue;
 			}
 
-			if (room[IsRoomOutsideNo].flags & ROOM_UNDERWATER)
-			{
+			if (room[IsRoomOutsideNo].flags & ROOM_UNDERWATER) {
 				snow->x = 0;
 				continue;
 			}
 
-			if (!(room[IsRoomOutsideNo].flags & ROOM_SNOW) && t4p_snow_type == T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS)
-			{
+			if (!(room[IsRoomOutsideNo].flags & ROOM_SNOW) && t4p_snow_type == T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS) {
 				snow->x = 0;
 				continue;
 			}
@@ -362,28 +336,24 @@ void DoSnow()
 		oy = snow->y;
 		oz = snow->z;
 
-		if (!snow->stopped)
-		{
+		if (!snow->stopped) {
 			snow->x += snow->xv;
 			snow->y += (snow->yv >> 1) & 0xFC;
 			snow->z += snow->zv;
 			r = &room[snow->room_number];
 
 			if (snow->y <= r->maxceiling || snow->y >= r->minfloor ||
-				snow->z <= r->z + BLOCK_SIZE || snow->z >= (r->x_size << 10) + r->z - BLOCK_SIZE ||
-				snow->x <= r->x + BLOCK_SIZE || snow->x >= (r->y_size << 10) + r->x - BLOCK_SIZE)
-			{
+			        snow->z <= r->z + BLOCK_SIZE || snow->z >= (r->x_size << 10) + r->z - BLOCK_SIZE ||
+			        snow->x <= r->x + BLOCK_SIZE || snow->x >= (r->y_size << 10) + r->x - BLOCK_SIZE) {
 				room_number = snow->room_number;
 				GetFloor(snow->x, snow->y, snow->z, &room_number);
 
-				if (room_number == snow->room_number)
-				{
+				if (room_number == snow->room_number) {
 					snow->x = 0;
 					continue;
 				}
 
-				if (room[room_number].flags & ROOM_UNDERWATER)
-				{
+				if (room[room_number].flags & ROOM_UNDERWATER) {
 					snow->stopped = 1;
 					snow->x = ox;
 					snow->y = oy;
@@ -391,14 +361,12 @@ void DoSnow()
 
 					if (snow->life > 16)
 						snow->life = 16;
-				}
-				else
+				} else
 					snow->room_number = room_number;
 			}
 		}
 
-		if (!snow->life)
-		{
+		if (!snow->life) {
 			snow->x = 0;
 			continue;
 		}
@@ -444,8 +412,7 @@ void DoSnow()
 	clipflags[2] = 0;
 	clipflags[3] = 0;
 
-	for (int i = 0; i < snow_count; i++)
-	{
+	for (int i = 0; i < snow_count; i++) {
 		snow = &Snow[i];
 
 		if (!snow->x)
@@ -475,8 +442,7 @@ void DoSnow()
 
 		zv = f_mpersp / zv;
 
-		for (int j = 0; j < 4; j++)
-		{
+		for (int j = 0; j < 4; j++) {
 			xSize = pSize[0] * zv;
 			ySize = pSize[1] * zv;
 			pSize += 2;
@@ -511,8 +477,7 @@ void DoSnow()
 	phd_PopMatrix();
 }
 
-void DoWeather()
-{
+void DoWeather() {
 	if (rain_outside)
 		DoRain();
 

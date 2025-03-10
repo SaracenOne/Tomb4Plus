@@ -14,13 +14,11 @@
 
 #include "../tomb4/mod_config.h"
 
-short GunShot(long x, long y, long z, short speed, short yrot, short room_number)
-{
+int16_t GunShot(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t yrot, int16_t room_number) {
 	return -1;
 }
 
-short GunHit(long x, long y, long z, short speed, short yrot, short room_number)
-{
+int16_t GunHit(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t yrot, int16_t room_number) {
 	PHD_VECTOR pos;
 
 	pos.x = 0;
@@ -36,8 +34,7 @@ short GunHit(long x, long y, long z, short speed, short yrot, short room_number)
 	return GunShot(x, y, z, speed, yrot, room_number);
 }
 
-short GunMiss(long x, long y, long z, short speed, short yrot, short room_number)
-{
+int16_t GunMiss(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t yrot, int16_t room_number) {
 	GAME_VECTOR pos;
 
 	pos.x = lara_item->pos.x_pos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
@@ -48,19 +45,18 @@ short GunMiss(long x, long y, long z, short speed, short yrot, short room_number
 	return GunShot(x, y, z, speed, yrot, room_number);
 }
 
-long TargetVisible(ITEM_INFO* item, AI_INFO* info)
-{
+int32_t TargetVisible(ITEM_INFO* item, AI_INFO* info) {
 	ITEM_INFO* enemy;
 	CREATURE_INFO* creature;
 	GAME_VECTOR start;
 	GAME_VECTOR target;
-	short* bounds;
+	int16_t* bounds;
 
 	creature = (CREATURE_INFO*)item->data;
 	enemy = creature->enemy;
 
 	if (!enemy || enemy->hit_points <= 0 || !enemy->data || info->angle - creature->joint_rotation[2] <= -0x4000 ||
-		info->angle - creature->joint_rotation[2] >= 0x4000 || info->distance >= 0x4000000)
+	        info->angle - creature->joint_rotation[2] >= 0x4000 || info->distance >= 0x4000000)
 		return 0;
 
 	bounds = GetBestFrame(enemy);
@@ -76,13 +72,12 @@ long TargetVisible(ITEM_INFO* item, AI_INFO* info)
 	return LOS(&start, &target);
 }
 
-long Targetable(ITEM_INFO* item, AI_INFO* info)
-{
+int32_t Targetable(ITEM_INFO* item, AI_INFO* info) {
 	ITEM_INFO* enemy;
 	CREATURE_INFO* creature;
 	GAME_VECTOR start;
 	GAME_VECTOR target;
-	short* bounds;
+	int16_t* bounds;
 
 	creature = (CREATURE_INFO*)item->data;
 	enemy = creature->enemy;
@@ -103,57 +98,44 @@ long Targetable(ITEM_INFO* item, AI_INFO* info)
 	return LOS(&start, &target);
 }
 
-long ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, long damage)
-{
+int32_t ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, int16_t extra_rotation, int32_t damage) {
 	ITEM_INFO* enemy;
 	CREATURE_INFO* creature;
 	PHD_VECTOR pos;
-	long hit, targetable, random, distance;
+	int32_t hit, targetable, random, distance;
 
 	creature = (CREATURE_INFO*)item->data;
 	enemy = creature->enemy;
 
-	if (info->distance <= 0x4000000 && Targetable(item, info))
-	{
+	if (info->distance <= 0x4000000 && Targetable(item, info)) {
 		distance = phd_sin(info->enemy_facing) * enemy->speed * 0x4000000 / 300 >> W2V_SHIFT;
 		distance = info->distance + SQUARE(distance);
 
-		if (distance <= 0x4000000)
-		{
+		if (distance <= 0x4000000) {
 			random = (0x4000000 - info->distance) / 3276 + 0x2000;
 			hit = (GetRandomControl() < random);
-		}
-		else
+		} else
 			hit = 0;
 
 		targetable = 1;
-	}
-	else
-	{
+	} else {
 		hit = 0;
 		targetable = 0;
 	}
 
-	if (damage)
-	{
-		if (enemy == lara_item)
-		{
-			if (hit)
-			{
+	if (damage) {
+		if (enemy == lara_item) {
+			if (hit) {
 				CreatureEffect(item, gun, GunHit);
-				lara_item->hit_points -= (short)damage;
+				lara_item->hit_points -= (int16_t)damage;
 				lara_item->hit_status = 1;
-			}
-			else if (targetable)
+			} else if (targetable)
 				CreatureEffect(item, gun, GunMiss);
-		}
-		else
-		{
+		} else {
 			CreatureEffect(item, gun, GunShot);
 
-			if (hit)
-			{
-				enemy->hit_points -= short(damage / 10);
+			if (hit) {
+				enemy->hit_points -= int16_t(damage / 10);
 				enemy->hit_status = 1;
 				random = GetRandomControl() & 0xF;
 

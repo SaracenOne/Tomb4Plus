@@ -22,41 +22,27 @@
 #include "../tomb4/tomb4plus/t4plus_weather.h"
 #include "../tomb4/mod_config.h"
 
-#ifdef USE_BGFX
-#include "bgfx.h"
-#else
-LPDIRECT3DVERTEXBUFFER DestVB;
-#endif
 #include "../game/trng/trng_savegame.h"
+
+#include "bgfx.h"
 
 WATERTAB WaterTable[WATER_TABLE_COUNT][WATER_TABLE_SIZE];
 THREAD MainThread;
-short* clipflags;
+int16_t* clipflags;
 float vert_wibble_table[WIBBLE_TABLE_SIZE];
-long SaveCounter;
+int32_t SaveCounter;
 
 static float unused_vert_wibble_table[UNUSED_WIBBLE_TABLE_SIZE];
-static uchar water_abs[4] = { 4, 8, 12, 16 };
-static short water_shimmer[4] = { 31, 63, 95, 127 };
-static short water_choppy[4] = { 16, 53, 90, 127 };
+static uint8_t water_abs[4] = { 4, 8, 12, 16 };
+static int16_t water_shimmer[4] = { 31, 63, 95, 127 };
+static int16_t water_choppy[4] = { 16, 53, 90, 127 };
 
-void GameClose()
-{
+void GameClose() {
 	Log(2, "GameClose");
 	ACMClose();
 	FreeLevel();
 
 	T4PlusCleanup();
-
-#ifndef USE_BGFX
-	if (DestVB)
-	{
-		Log(4, "Released %s @ %x - RefCnt = %d", "Dest VB", DestVB, DestVB->Release());
-		DestVB = 0;
-	}
-	else
-		Log(1, "%s Attempt To Release NULL Ptr", "Dest VB");
-#endif
 
 	SYSTEM_FREE(clipflags);
 
@@ -75,21 +61,13 @@ void GameClose()
 
 	SYSTEM_FREE(mesh_mapping_table);
 
-#ifdef USE_BGFX
 	ShutdownBGFX();
-#endif
 }
 
-#ifdef USE_SDL
-int GameMain(void* ptr)
-#else
-unsigned int __stdcall GameMain(void* ptr)
-#endif
-{
+int GameMain(void* ptr) {
 	Log(2, "GameMain");
 
-	if (GameInitialise())
-	{
+	if (GameInitialise()) {
 		InitialiseFunctionTable();
 		HWInitialise();
 		InitWindow(0, 0, App.dx.dwRenderWidth, App.dx.dwRenderHeight, 20, (BLOCK_SIZE * 20), DEFAULT_FOV, App.dx.dwRenderWidth, App.dx.dwRenderHeight);
@@ -109,21 +87,26 @@ unsigned int __stdcall GameMain(void* ptr)
 		S_CDStop();
 
 		RPC_close();
+#ifdef _WIN32
 		PostMessage(App.hWnd, WM_CLOSE, 0, 0);
+#endif
 		MainThread.active = 0;
+
+#ifdef _WIN32
 		_endthreadex(1);
+#else
+		SDL_DetachThread(MainThread.handle);
+#endif
 	}
 
 	return 1;
 }
 
-ushort GetRandom(WATERTAB* wt, long lp)
-{
-	long loop;
-	ushort ret;
+uint16_t GetRandom(WATERTAB* wt, int32_t lp) {
+	int32_t loop;
+	uint16_t ret;
 
-	do
-	{
+	do {
 		ret = rand() & 0xFC;
 
 		for (loop = 0; loop < lp; loop++)
@@ -135,91 +118,74 @@ ushort GetRandom(WATERTAB* wt, long lp)
 	return ret;
 }
 
-void init_water_table()
-{
+void init_water_table() {
 	float fSin;
-	long lSin;
-	short sSin, angle;
+	int32_t lSin;
+	int16_t sSin, angle;
 
 	srand(121197);
 
-	for (int i = 0; i < WATER_TABLE_SIZE; i++)
-	{
+	for (int i = 0; i < WATER_TABLE_SIZE; i++) {
 		sSin = rcossin_tbl[i << 7];
 		WaterTable[0][i].shimmer = (63 * sSin) >> 15;
 		WaterTable[0][i].choppy = (16 * sSin) >> 12;
-		WaterTable[0][i].random = (uchar)GetRandom(&WaterTable[0][0], i);
+		WaterTable[0][i].random = (uint8_t)GetRandom(&WaterTable[0][0], i);
 		WaterTable[0][i].abs = 0;
 
 		WaterTable[1][i].shimmer = (32 * sSin) >> 15;
 		WaterTable[1][i].choppy = 0;
-		WaterTable[1][i].random = (uchar)GetRandom(&WaterTable[1][0], i);
+		WaterTable[1][i].random = (uint8_t)GetRandom(&WaterTable[1][0], i);
 		WaterTable[1][i].abs = -3;
 
 		WaterTable[2][i].shimmer = (64 * sSin) >> 15;
 		WaterTable[2][i].choppy = 0;
-		WaterTable[2][i].random = (uchar)GetRandom(&WaterTable[2][0], i);
+		WaterTable[2][i].random = (uint8_t)GetRandom(&WaterTable[2][0], i);
 		WaterTable[2][i].abs = 0;
 
 		WaterTable[3][i].shimmer = (96 * sSin) >> 15;
 		WaterTable[3][i].choppy = 0;
-		WaterTable[3][i].random = (uchar)GetRandom(&WaterTable[3][0], i);
+		WaterTable[3][i].random = (uint8_t)GetRandom(&WaterTable[3][0], i);
 		WaterTable[3][i].abs = 4;
 
 		WaterTable[4][i].shimmer = (127 * sSin) >> 15;
 		WaterTable[4][i].choppy = 0;
-		WaterTable[4][i].random = (uchar)GetRandom(&WaterTable[4][0], i);
+		WaterTable[4][i].random = (uint8_t)GetRandom(&WaterTable[4][0], i);
 		WaterTable[4][i].abs = 8;
 
-		for (int j = 0, k = 5; j < 4; j++, k += 4)
-		{
-			for (int m = 0; m < 4; m++)
-			{
+		for (int j = 0, k = 5; j < 4; j++, k += 4) {
+			for (int m = 0; m < 4; m++) {
 				WaterTable[k + m][i].shimmer = -((sSin * water_shimmer[m]) >> 15);
 				WaterTable[k + m][i].choppy = sSin * water_choppy[j] >> 12;
-				WaterTable[k + m][i].random = (uchar)GetRandom(&WaterTable[k + m][0], i);
+				WaterTable[k + m][i].random = (uint8_t)GetRandom(&WaterTable[k + m][0], i);
 				WaterTable[k + m][i].abs = water_abs[m];
 			}
 		}
 	}
 
-	for (int i = 0; i < WIBBLE_TABLE_SIZE; i++)
-	{
+	for (int i = 0; i < WIBBLE_TABLE_SIZE; i++) {
 		fSin = sinf(float(i * (M_PI / 16.0F)));
 		vert_wibble_table[i] = fSin + fSin;
 	}
 
-	for (int i = 0; i < UNUSED_WIBBLE_TABLE_SIZE; i++)
-	{
+	for (int i = 0; i < UNUSED_WIBBLE_TABLE_SIZE; i++) {
 		angle = 0x10000 * i / 256;
 		lSin = phd_sin(angle);
 		unused_vert_wibble_table[i] = float(lSin >> (W2V_SHIFT - 5));
 	}
 }
 
-bool GameInitialise()
-{
-#ifndef USE_BGFX
-	D3DVERTEXBUFFERDESC desc = {};
-
-	desc.dwCaps = 0;
-	desc.dwSize = sizeof(desc);
-	desc.dwFVF = D3DFVF_TLVERTEX;
-	desc.dwNumVertices = 0x2000;
-	DXAttempt(App.dx.lpD3D->CreateVertexBuffer(&desc, &DestVB, D3DDP_DONOTCLIP, 0));
-#endif
+bool GameInitialise() {
 	init_game_malloc();
 	reset_virtual_game_malloc_offset();
-	clipflags = (short*)SYSTEM_MALLOC(0x4000);
+	clipflags = (int16_t*)SYSTEM_MALLOC(0x4000);
 	init_water_table();
 	InitWeatherFX(); // TRLE
 	return 1;
 }
 
-long S_SaveGame(long slot_num)
-{
+int32_t S_SaveGame(int32_t slot_num) {
 	size_t bytes;
-	long days, hours, minutes, seconds;
+	int32_t days, hours, minutes, seconds;
 	char buffer[80], counter[16];
 
 	memset(buffer, 0, sizeof(buffer));
@@ -229,22 +195,21 @@ long S_SaveGame(long slot_num)
 
 	FILE* file = fopen(full_path.c_str(), "wb");
 
-	if (file)
-	{
+	if (file) {
 		memset(buffer, 0, sizeof(buffer));
 		sprintf(buffer, "%s", GetCustomStringForTextID(gfLevelNames[gfCurrentLevel]));
 
 		bytes = fwrite(buffer, sizeof(char), 75, file);
-		bytes = fwrite(&SaveCounter, sizeof(long), 1, file);
+		bytes = fwrite(&SaveCounter, sizeof(int32_t), 1, file);
 		days = savegame.Game.Timer / 30 / 86400;
 		hours = savegame.Game.Timer / 30 % 86400 / 3600;
 		minutes = savegame.Game.Timer / 30 / 60 % 60;
 		seconds = savegame.Game.Timer / 30 % 60;
 
-		bytes = fwrite(&days, sizeof(short), 1, file);
-		bytes = fwrite(&hours, sizeof(short), 1, file);
-		bytes = fwrite(&minutes, sizeof(short), 1, file);
-		bytes = fwrite(&seconds, sizeof(short), 1, file);
+		bytes = fwrite(&days, sizeof(int16_t), 1, file);
+		bytes = fwrite(&hours, sizeof(int16_t), 1, file);
+		bytes = fwrite(&minutes, sizeof(int16_t), 1, file);
+		bytes = fwrite(&seconds, sizeof(int16_t), 1, file);
 		bytes = fwrite(&savegame, sizeof(LEGACY_SAVEGAME_INFO), 1, file);
 
 		NGWriteNGSavegameBuffer(file);
@@ -254,8 +219,7 @@ long S_SaveGame(long slot_num)
 		SaveCounter++;
 
 		MOD_GLOBAL_INFO* mod_global_info = get_game_mod_global_info();
-		if (mod_global_info->trep_using_extended_saves)
-		{
+		if (mod_global_info->trep_using_extended_saves) {
 			S_TREPSavegame(slot_num);
 		}
 
@@ -265,9 +229,8 @@ long S_SaveGame(long slot_num)
 	return 0;
 }
 
-long S_LoadGame(long slot_num)
-{
-	long value;
+int32_t S_LoadGame(int32_t slot_num) {
+	int32_t value;
 	char buffer[80];
 
 	sprintf(buffer, "savegame.%d", slot_num);
@@ -278,21 +241,20 @@ long S_LoadGame(long slot_num)
 
 	T4PlusLevelReset();
 
-	if (file)
-	{
+	if (file) {
 		if (fread(buffer, sizeof(char), 75, file) == 0) {
 			fclose(file);
 			return 0;
 		}
-		if (fread(&value, sizeof(long), 1, file) == 0) {
+		if (fread(&value, sizeof(int32_t), 1, file) == 0) {
 			fclose(file);
 			return 0;
 		}
-		if (fread(&value, sizeof(long), 1, file) == 0) {
+		if (fread(&value, sizeof(int32_t), 1, file) == 0) {
 			fclose(file);
 			return 0;
 		}
-		if (fread(&value, sizeof(long), 1, file) == 0) {
+		if (fread(&value, sizeof(int32_t), 1, file) == 0) {
 			fclose(file);
 			return 0;
 		}
@@ -307,8 +269,7 @@ long S_LoadGame(long slot_num)
 		fclose(file);
 
 		MOD_GLOBAL_INFO *mod_global_info = get_game_mod_global_info();
-		if (mod_global_info->trep_using_extended_saves)
-		{
+		if (mod_global_info->trep_using_extended_saves) {
 			S_TREPLoadgame(slot_num);
 		}
 

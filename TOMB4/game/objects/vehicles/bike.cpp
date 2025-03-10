@@ -31,12 +31,11 @@
 #include "../../../specific/file.h"
 
 static ITEM_INFO* GlobalBikeItem;
-static long bikefspeed = 0;
-static short broomies[22];
-static char dont_exit_bike = 0;
+static int32_t bikefspeed = 0;
+static int16_t broomies[22];
+static int8_t dont_exit_bike = 0;
 
-void InitialiseBike(short item_number)
-{
+void InitialiseBike(int16_t item_number) {
 	ITEM_INFO* item;
 	BIKEINFO* bike;
 
@@ -58,8 +57,7 @@ void InitialiseBike(short item_number)
 	GlobalBikeItem = item;
 }
 
-void DrawBikeExtras(ITEM_INFO* item)
-{
+void DrawBikeExtras(ITEM_INFO* item) {
 	if (lara.vehicle != NO_ITEM)
 		DrawBikeSpeedo(phd_winwidth - QUARTER_CLICK_SIZE, phd_winheight - (QUARTER_CLICK_SIZE / 4), ((BIKEINFO*)item->data)->velocity, 0x8000, 0xC000, 32, 0);
 
@@ -68,12 +66,11 @@ void DrawBikeExtras(ITEM_INFO* item)
 		DrawBikeBeam(GlobalBikeItem);
 }
 
-void TriggerBikeBeam(ITEM_INFO* item)
-{
+void TriggerBikeBeam(ITEM_INFO* item) {
 	BIKEINFO* bike;
 	PHD_VECTOR s;
 	PHD_VECTOR d;
-	long intensity;
+	int32_t intensity;
 
 	bike = (BIKEINFO*)item->data;
 	s.x = 0;
@@ -92,11 +89,10 @@ void TriggerBikeBeam(ITEM_INFO* item)
 		bLaraTorch = 0;
 }
 
-long GetOnBike(short item_number, COLL_INFO* coll)
-{
+int32_t GetOnBike(int16_t item_number, COLL_INFO* coll) {
 	ITEM_INFO* item;
-	long dx, dz;
-	short room_number, rot;
+	int32_t dx, dz;
+	int16_t room_number, rot;
 
 	item = &items[item_number];
 
@@ -106,7 +102,7 @@ long GetOnBike(short item_number, COLL_INFO* coll)
 	int16_t nitrous_oxide_feeder_slot = get_game_mod_level_objects_info(gfCurrentLevel)->nitrous_oxide_feeder_slot;
 
 	if (abs(item->pos.y_pos - lara_item->pos.y_pos) > CLICK_SIZE
-		|| !(input & IN_ACTION) && GLOBAL_inventoryitemchosen != nitrous_oxide_feeder_slot)
+	        || !(input & IN_ACTION) && GLOBAL_inventoryitemchosen != nitrous_oxide_feeder_slot)
 		return 0;
 
 	dx = lara_item->pos.x_pos - item->pos.x_pos;
@@ -118,10 +114,10 @@ long GetOnBike(short item_number, COLL_INFO* coll)
 	room_number = item->room_number;
 
 	if (GetHeight(GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number),
-		item->pos.x_pos, item->pos.y_pos, item->pos.z_pos) < -32000)
+	              item->pos.x_pos, item->pos.y_pos, item->pos.z_pos) < -32000)
 		return 0;
 
-	rot = short(phd_atan(item->pos.z_pos - lara_item->pos.z_pos, item->pos.x_pos - lara_item->pos.x_pos) - item->pos.y_rot);
+	rot = int16_t(phd_atan(item->pos.z_pos - lara_item->pos.z_pos, item->pos.x_pos - lara_item->pos.x_pos) - item->pos.y_rot);
 
 	if (rot > -DEGREES_TO_ROTATION(45) && rot < DEGREES_TO_ROTATION(135))
 		return 0;
@@ -134,16 +130,15 @@ long GetOnBike(short item_number, COLL_INFO* coll)
 	return 1;
 }
 
-void DrawBikeBeam(ITEM_INFO* item)
-{
+void DrawBikeBeam(ITEM_INFO* item) {
 	BIKEINFO* bike;
 	OBJECT_INFO* obj;
-	short** meshpp;
-	long* bone;
-	short* frm[2];
-	short* rot;
-	long frac, rate, bounds, r, g, b;
-	short* rot2;
+	int16_t** meshpp;
+	int32_t* bone;
+	int16_t* frm[2];
+	int16_t* rot;
+	int32_t frac, rate, bounds, r, g, b;
+	int16_t* rot2;
 
 	// T4Plus: Animation safety check
 	if (item->anim_number < 0 || item->anim_number >= num_anims) {
@@ -161,8 +156,7 @@ void DrawBikeBeam(ITEM_INFO* item)
 	phd_RotYXZ(item->pos.y_rot, item->pos.x_rot, item->pos.z_rot);
 	bounds = S_GetObjectBounds(frm[0]);
 
-	if (bounds)
-	{
+	if (bounds) {
 		CalculateObjectLighting(item, frm[0]);
 		bounds = 1;
 		obj = &objects[item->object_number];
@@ -170,8 +164,7 @@ void DrawBikeBeam(ITEM_INFO* item)
 		meshpp += 2;
 		bone = &bones[obj->bone_index];
 
-		if (frac)
-		{
+		if (frac) {
 			InitInterpolate(frac, rate);
 			phd_TranslateRel_ID(frm[0][6], frm[0][7], frm[0][8], frm[1][6], frm[1][7], frm[1][8]);
 
@@ -179,8 +172,7 @@ void DrawBikeBeam(ITEM_INFO* item)
 			rot2 = frm[1] + 9;
 			gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-			for (int i = 0; i < obj->nmeshes - 1; i++)
-			{
+			for (int i = 0; i < obj->nmeshes - 1; i++) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix_I();
 
@@ -190,14 +182,12 @@ void DrawBikeBeam(ITEM_INFO* item)
 				phd_TranslateRel_I(bone[1], bone[2], bone[3]);
 				gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-				if (i == 2)
-				{
+				if (i == 2) {
 					r = bike->light_intensity;
 					g = bike->light_intensity;
 					b = bike->light_intensity;
 
-					if (bike->light_intensity >= 127)
-					{
+					if (bike->light_intensity >= 127) {
 						r = bike->light_intensity + (GetRandomDraw() & 0xF) - 32;
 						g = r;
 						b = r;
@@ -210,15 +200,12 @@ void DrawBikeBeam(ITEM_INFO* item)
 				bone += 4;
 				meshpp += 2;
 			}
-		}
-		else
-		{
+		} else {
 			phd_TranslateRel(frm[0][6], frm[0][7], frm[0][8]);
 			rot = frm[0] + 9;
 			gar_RotYXZsuperpack(&rot, 0);
 
-			for (int i = 0; i < obj->nmeshes - 1; i++)
-			{
+			for (int i = 0; i < obj->nmeshes - 1; i++) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix();
 
@@ -228,14 +215,12 @@ void DrawBikeBeam(ITEM_INFO* item)
 				phd_TranslateRel(bone[1], bone[2], bone[3]);
 				gar_RotYXZsuperpack(&rot, 0);
 
-				if (i == 2)
-				{
+				if (i == 2) {
 					r = bike->light_intensity;
 					g = bike->light_intensity;
 					b = bike->light_intensity;
 
-					if (bike->light_intensity >= 127)
-					{
+					if (bike->light_intensity >= 127) {
 						r = bike->light_intensity + (GetRandomDraw() & 0xF) - 32;
 						g = r;
 						b = r;
@@ -254,8 +239,7 @@ void DrawBikeBeam(ITEM_INFO* item)
 	phd_PopMatrix();
 }
 
-static void TriggerExhaustSmoke(long x, long y, long z, short angle, long velocity, long thing)
-{
+static void TriggerExhaustSmoke(int32_t x, int32_t y, int32_t z, int16_t angle, int32_t velocity, int32_t thing) {
 	SPARKS* sptr;
 
 	sptr = &spark[GetFreeSpark()];
@@ -267,20 +251,18 @@ static void TriggerExhaustSmoke(long x, long y, long z, short angle, long veloci
 	sptr->sG = 0;
 	sptr->sB = 0;
 
-	if (thing)
-	{
-		sptr->dR = uchar((96 * velocity) >> 5);
-		sptr->dG = uchar((96 * velocity) >> 5);
-		sptr->dB = uchar((128 * velocity) >> 5);
+	if (thing) {
+		sptr->dR = uint8_t((96 * velocity) >> 5);
+		sptr->dG = uint8_t((96 * velocity) >> 5);
+		sptr->dB = uint8_t((128 * velocity) >> 5);
 	}
 
 	sptr->ColFadeSpeed = 4;
 	sptr->FadeToBlack = 4;
-	sptr->Life = uchar((GetRandomControl() & 3) - (velocity >> 12) + 20);
+	sptr->Life = uint8_t((GetRandomControl() & 3) - (velocity >> 12) + 20);
 	sptr->sLife = sptr->Life;
 
-	if (sptr->Life < 9)
-	{
+	if (sptr->Life < 9) {
 		sptr->Life = 9;
 		sptr->sLife = 9;
 	}
@@ -294,8 +276,7 @@ static void TriggerExhaustSmoke(long x, long y, long z, short angle, long veloci
 	sptr->Zvel = velocity * phd_cos(angle) >> 16;
 	sptr->Friction = 4;
 
-	if (GetRandomControl() & 1)
-	{
+	if (GetRandomControl() & 1) {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 		sptr->RotAng = GetRandomControl() & 0xFFF;
 
@@ -303,25 +284,23 @@ static void TriggerExhaustSmoke(long x, long y, long z, short angle, long veloci
 			sptr->RotAdd = -24 - (GetRandomControl() & 7);
 		else
 			sptr->RotAdd = (GetRandomControl() & 7) + 24;
-	}
-	else
+	} else
 		sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
 
 	sptr->Scalar = 1;
-	sptr->Def = (uchar)objects[T4PlusGetDefaultSpritesSlotID()].mesh_index;
+	sptr->Def = (uint8_t)objects[T4PlusGetDefaultSpritesSlotID()].mesh_index;
 	sptr->Gravity = -4 - (GetRandomControl() & 3);
 	sptr->MaxYvel = -8 - (GetRandomControl() & 7);
-	sptr->dSize = uchar((GetRandomControl() & 7) + (velocity >> 7) + 32);
+	sptr->dSize = uint8_t((GetRandomControl() & 7) + (velocity >> 7) + 32);
 	sptr->sSize = sptr->dSize >> 1;
 	sptr->Size = sptr->dSize >> 1;
 }
 
-static long CanGetOff(short num)	//always called with num = 1
-{
+static int32_t CanGetOff(int16_t num) {	//always called with num = 1
 	ITEM_INFO* item;
 	FLOOR_INFO* floor;
-	long x, y, z, h, c;
-	short yrot, room_number;
+	int32_t x, y, z, h, c;
+	int16_t yrot, room_number;
 
 	item = &items[lara.vehicle];
 	yrot = item->pos.y_rot + 0x4000;	//right side
@@ -363,12 +342,10 @@ static long CanGetOff(short num)	//always called with num = 1
 	return 1;
 }
 
-void BikeExplode(ITEM_INFO* item)
-{
+void BikeExplode(ITEM_INFO* item) {
 	if (room[item->room_number].flags & ROOM_UNDERWATER)
 		TriggerUnderwaterExplosion(item, 1);
-	else
-	{
+	else {
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -2, 0, item->room_number);
 
 		for (int i = 0; i < 3; i++)
@@ -383,16 +360,14 @@ void BikeExplode(ITEM_INFO* item)
 	lara.vehicle = NO_ITEM;
 }
 
-void AnimateBike(ITEM_INFO* item, long hitWall, long killed)
-{
+void AnimateBike(ITEM_INFO* item, int32_t hitWall, int32_t killed) {
 	BIKEINFO* bike;
-	short state, dmg;
+	int16_t state, dmg;
 
 	bike = (BIKEINFO*)item->data;
 	state = lara_item->current_anim_state;
 
-	if (item->pos.y_pos != item->floor && state != 8 && state != 17 && state != 20 && !killed)
-	{
+	if (item->pos.y_pos != item->floor && state != 8 && state != 17 && state != 20 && !killed) {
 		if (bike->velocity < 0)
 			lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 6;
 		else
@@ -401,182 +376,156 @@ void AnimateBike(ITEM_INFO* item, long hitWall, long killed)
 		lara_item->goal_anim_state = 8;
 		lara_item->current_anim_state = 8;
 		lara_item->frame_number = anims[lara_item->anim_number].frame_base;
-	}
-	else if (hitWall && state != 12 && state != 11 && state != 13 && state != 14 && state != 20 && bike->velocity > 10922 && !killed)
-	{
-		switch (hitWall)
-		{
-		case 13:
-			lara_item->goal_anim_state = 12;
-			lara_item->current_anim_state = 12;
-			lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 12;
-			break;
+	} else if (hitWall && state != 12 && state != 11 && state != 13 && state != 14 && state != 20 && bike->velocity > 10922 && !killed) {
+		switch (hitWall) {
+			case 13:
+				lara_item->goal_anim_state = 12;
+				lara_item->current_anim_state = 12;
+				lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 12;
+				break;
 
-		case 14:
-			lara_item->goal_anim_state = 11;
-			lara_item->current_anim_state = 11;
-			lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 11;
-			break;
+			case 14:
+				lara_item->goal_anim_state = 11;
+				lara_item->current_anim_state = 11;
+				lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 11;
+				break;
 
-		case 11:
-			lara_item->goal_anim_state = 13;
-			lara_item->current_anim_state = 13;
-			lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 14;
-			break;
+			case 11:
+				lara_item->goal_anim_state = 13;
+				lara_item->current_anim_state = 13;
+				lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 14;
+				break;
 
-		default:
-			lara_item->goal_anim_state = 14;
-			lara_item->current_anim_state = 14;
-			lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 13;
-			break;
+			default:
+				lara_item->goal_anim_state = 14;
+				lara_item->current_anim_state = 14;
+				lara_item->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 13;
+				break;
 		}
 
 		lara_item->frame_number = anims[lara_item->anim_number].frame_base;
-	}
-	else
-	{
-		switch (lara_item->current_anim_state)
-		{
-		case 1:
+	} else {
+		switch (lara_item->current_anim_state) {
+			case 1:
 
-			if (killed)
-			{
-				if (bike->velocity > 0x4000)
-					lara_item->goal_anim_state = 19;
+				if (killed) {
+					if (bike->velocity > 0x4000)
+						lara_item->goal_anim_state = 19;
+					else
+						lara_item->goal_anim_state = 7;
+				} else {
+					if (bike->velocity & 0xFFFFFF00 || input & (IN_ACTION | IN_JUMP)) {
+						if (input & IN_LEFT)
+							lara_item->goal_anim_state = 2;
+						else if (input & IN_RIGHT)
+							lara_item->goal_anim_state = 22;
+						else if (input & IN_JUMP) {
+							if (bike->velocity > 21844)
+								lara_item->goal_anim_state = 6;
+							else
+								lara_item->goal_anim_state = 5;
+						} else if (input & IN_BACK && bike->velocity <= (BLOCK_SIZE * 2))
+							lara_item->goal_anim_state = 3;
+					} else
+						lara_item->goal_anim_state = 15;
+				}
+
+				break;
+
+			case 2:
+
+				if (bike->velocity & 0xFFFFFF00) {
+					if (input & IN_RIGHT || !(input & IN_LEFT))
+						lara_item->goal_anim_state = 1;
+				} else
+					lara_item->goal_anim_state = 15;
+
+				break;
+
+			case 3:
+
+				if (input & IN_BACK)
+					lara_item->goal_anim_state = 4;
 				else
-					lara_item->goal_anim_state = 7;
-			}
-			else
-			{
-				if (bike->velocity & 0xFFFFFF00 || input & (IN_ACTION | IN_JUMP))
-				{
+					lara_item->goal_anim_state = 15;
+
+				break;
+
+			case 5:
+			case 6:
+			case 18:
+
+				if (bike->velocity & 0xFFFFFF00) {
 					if (input & IN_LEFT)
 						lara_item->goal_anim_state = 2;
 					else if (input & IN_RIGHT)
 						lara_item->goal_anim_state = 22;
-					else if (input & IN_JUMP)
-					{
-						if (bike->velocity > 21844)
-							lara_item->goal_anim_state = 6;
-						else
-							lara_item->goal_anim_state = 5;
-					}
-					else if (input & IN_BACK && bike->velocity <= (BLOCK_SIZE * 2))
-						lara_item->goal_anim_state = 3;
-				}
-				else
+				} else
 					lara_item->goal_anim_state = 15;
-			}
 
-			break;
+				break;
 
-		case 2:
+			case 8:
 
-			if (bike->velocity & 0xFFFFFF00)
-			{
-				if (input & IN_RIGHT || !(input & IN_LEFT))
+				if (item->pos.y_pos == item->floor) {
+					lara_item->goal_anim_state = 17;
+					dmg = int16_t(bikefspeed - 140);
+
+					if (dmg > 0) {
+						if (dmg > 100)
+							lara_item->hit_points = -1;
+						else
+							lara_item->hit_points += -1000 * dmg * dmg / 10000;
+					}
+				} else if (item->fallspeed > 220)
+					bike->flags |= 0x40;
+
+				break;
+
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+
+				if (input & (IN_ACTION | IN_JUMP))
 					lara_item->goal_anim_state = 1;
-			}
-			else
-				lara_item->goal_anim_state = 15;
 
-			break;
+				break;
 
-		case 3:
+			case 15:
 
-			if (input & IN_BACK)
-				lara_item->goal_anim_state = 4;
-			else
-				lara_item->goal_anim_state = 15;
+				if (killed)
+					lara_item->goal_anim_state = 7;
+				else if (((input & (IN_JUMP | IN_RIGHT)) != (IN_JUMP | IN_RIGHT)) || bike->velocity || dont_exit_bike) {
+					if (input & IN_ACTION && !(input & IN_JUMP))
+						lara_item->goal_anim_state = 1;
+					else if (input & IN_BACK)
+						lara_item->goal_anim_state = 3;
+				} else if (CanGetOff(1))
+					lara_item->goal_anim_state = 10;
 
-			break;
+				break;
 
-		case 5:
-		case 6:
-		case 18:
+			case 22:
 
-			if (bike->velocity & 0xFFFFFF00)
-			{
-				if (input & IN_LEFT)
-					lara_item->goal_anim_state = 2;
-				else if (input & IN_RIGHT)
-					lara_item->goal_anim_state = 22;
-			}
-			else
-				lara_item->goal_anim_state = 15;
+				if (bike->velocity & 0xFFFFFF00) {
+					if (input & IN_LEFT || !(input & IN_RIGHT))
+						lara_item->goal_anim_state = 1;
+				} else
+					lara_item->goal_anim_state = 15;
 
-			break;
-
-		case 8:
-
-			if (item->pos.y_pos == item->floor)
-			{
-				lara_item->goal_anim_state = 17;
-				dmg = short(bikefspeed - 140);
-
-				if (dmg > 0)
-				{
-					if (dmg > 100)
-						lara_item->hit_points = -1;
-					else
-						lara_item->hit_points += -1000 * dmg * dmg / 10000;
-				}
-			}
-			else if (item->fallspeed > 220)
-				bike->flags |= 0x40;
-
-			break;
-
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-
-			if (input & (IN_ACTION | IN_JUMP))
-				lara_item->goal_anim_state = 1;
-
-			break;
-
-		case 15:
-
-			if (killed)
-				lara_item->goal_anim_state = 7;
-			else if (((input & (IN_JUMP | IN_RIGHT)) != (IN_JUMP | IN_RIGHT)) || bike->velocity || dont_exit_bike)
-			{
-				if (input & IN_ACTION && !(input & IN_JUMP))
-					lara_item->goal_anim_state = 1;
-				else if (input & IN_BACK)
-					lara_item->goal_anim_state = 3;
-			}
-			else if (CanGetOff(1))
-				lara_item->goal_anim_state = 10;
-
-			break;
-
-		case 22:
-
-			if (bike->velocity & 0xFFFFFF00)
-			{
-				if (input & IN_LEFT || !(input & IN_RIGHT))
-					lara_item->goal_anim_state = 1;
-			}
-			else
-				lara_item->goal_anim_state = 15;
-
-			break;
+				break;
 		}
 	}
 
-	if (room[item->room_number].flags & ROOM_UNDERWATER)
-	{
+	if (room[item->room_number].flags & ROOM_UNDERWATER) {
 		lara_item->goal_anim_state = 20;
 		lara_item->hit_points = 0;
 		BikeExplode(item);
 	}
 }
 
-void BikeStart(ITEM_INFO* item, ITEM_INFO* l)
-{
+void BikeStart(ITEM_INFO* item, ITEM_INFO* l) {
 	BIKEINFO* bike;
 
 	bike = (BIKEINFO*)item->data;
@@ -594,11 +543,10 @@ void BikeStart(ITEM_INFO* item, ITEM_INFO* l)
 	bike->unused1 = 0;
 }
 
-long TestHeight(ITEM_INFO* item, long z, long x, PHD_VECTOR* pos)
-{
+int32_t TestHeight(ITEM_INFO* item, int32_t z, int32_t x, PHD_VECTOR* pos) {
 	FLOOR_INFO* floor;
-	long sx, sz, sy, cy, c, h;
-	short room_number;
+	int32_t sx, sz, sy, cy, c, h;
+	int16_t room_number;
 
 	sz = z * phd_sin(item->pos.x_rot) >> W2V_SHIFT;
 	sx = x * phd_sin(item->pos.z_rot) >> W2V_SHIFT;
@@ -622,19 +570,17 @@ long TestHeight(ITEM_INFO* item, long z, long x, PHD_VECTOR* pos)
 	return h;
 }
 
-static long BikeCheckGetOff()
-{
+static int32_t BikeCheckGetOff() {
 	ITEM_INFO* item;
 	BIKEINFO* bike;
 	PHD_VECTOR pos;
-	short state;
+	int16_t state;
 
 	item = &items[lara.vehicle];
 	bike = (BIKEINFO*)item->data;
 	state = lara_item->current_anim_state;
 
-	if (state == 10 && lara_item->frame_number == anims[lara_item->anim_number].frame_end)
-	{
+	if (state == 10 && lara_item->frame_number == anims[lara_item->anim_number].frame_end) {
 		lara_item->pos.y_rot -= 0x4000;
 		lara_item->anim_number = ANIM_STOP;
 		lara_item->frame_number = anims[ANIM_STOP].frame_base;
@@ -647,11 +593,8 @@ static long BikeCheckGetOff()
 		lara.vehicle = NO_ITEM;
 		lara.gun_status = 0;
 		DashTimer = 120;
-	}
-	else if (lara_item->frame_number == anims[lara_item->anim_number].frame_end)
-	{
-		if (state == 20)
-		{
+	} else if (lara_item->frame_number == anims[lara_item->anim_number].frame_end) {
+		if (state == 20) {
 			lara_item->anim_number = ANIM_FASTFALL;
 			lara_item->frame_number = anims[ANIM_FASTFALL].frame_base;
 			lara_item->current_anim_state = AS_FASTFALL;
@@ -671,9 +614,8 @@ static long BikeCheckGetOff()
 			item->flags |= IFL_INVISIBLE;
 			return 0;
 		}
-		
-		if (state == 19)
-		{
+
+		if (state == 19) {
 			lara_item->goal_anim_state = AS_DEATH;
 			lara_item->fallspeed = 240;
 			lara_item->speed = 0;
@@ -685,16 +627,13 @@ static long BikeCheckGetOff()
 	return 1;
 }
 
-static long DoDynamics(long height, long fallspeed, long* ypos, long zero)
-{
-	long bounce;
+static int32_t DoDynamics(int32_t height, int32_t fallspeed, int32_t* ypos, int32_t zero) {
+	int32_t bounce;
 
-	if (height <= *ypos)
-	{
+	if (height <= *ypos) {
 		if (zero)
 			return fallspeed;
-		else
-		{
+		else {
 			bounce = height - *ypos;
 
 			if (height - *ypos < -80)
@@ -705,20 +644,15 @@ static long DoDynamics(long height, long fallspeed, long* ypos, long zero)
 			if (*ypos > height)
 				*ypos = height;
 		}
-	}
-	else
-	{
+	} else {
 		*ypos += fallspeed;
 
-		if (*ypos <= height - 32)
-		{
+		if (*ypos <= height - 32) {
 			if (zero)
 				fallspeed += zero;
 			else
 				fallspeed += 6;
-		}
-		else
-		{
+		} else {
 			*ypos = height;
 			fallspeed = 0;
 		}
@@ -727,11 +661,10 @@ static long DoDynamics(long height, long fallspeed, long* ypos, long zero)
 	return fallspeed;
 }
 
-void BikeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
-{
+void BikeCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	BIKEINFO* bike;
-	short angle;
+	int16_t angle;
 
 	if (l->hit_points < 0 || lara.vehicle != NO_ITEM)
 		return;
@@ -739,8 +672,7 @@ void BikeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 	item = &items[item_number];
 	bike = (BIKEINFO*)item->data;
 
-	if (bike->light_intensity)
-	{
+	if (bike->light_intensity) {
 		bike->light_intensity = bike->light_intensity - (bike->light_intensity >> 3) - 1;
 
 		MOD_LEVEL_MISC_INFO* misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
@@ -748,12 +680,10 @@ void BikeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 			TriggerBikeBeam(item);
 	}
 
-	if (GetOnBike(item_number, coll))
-	{
+	if (GetOnBike(item_number, coll)) {
 		lara.vehicle = item_number;
 
-		if (lara.gun_type == WEAPON_FLARE)
-		{
+		if (lara.gun_type == WEAPON_FLARE) {
 			CreateFlare(FLARE_ITEM, 0);
 			undraw_flare_meshes();
 			lara.flare_control_left = 0;
@@ -763,19 +693,16 @@ void BikeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 		}
 
 		lara.gun_status = LG_HANDS_BUSY;
-		angle = short(phd_atan(item->pos.z_pos - l->pos.z_pos, item->pos.x_pos - l->pos.x_pos) - item->pos.y_rot);
+		angle = int16_t(phd_atan(item->pos.z_pos - l->pos.z_pos, item->pos.x_pos - l->pos.x_pos) - item->pos.y_rot);
 
 		int16_t nitrous_oxide_feeder_slot = get_game_mod_level_objects_info(gfCurrentLevel)->nitrous_oxide_feeder_slot;
 
-		if (angle <= -DEGREES_TO_ROTATION(45) || angle >= DEGREES_TO_ROTATION(135))
-		{
-			if (GLOBAL_inventoryitemchosen == nitrous_oxide_feeder_slot)
-			{
+		if (angle <= -DEGREES_TO_ROTATION(45) || angle >= DEGREES_TO_ROTATION(135)) {
+			if (GLOBAL_inventoryitemchosen == nitrous_oxide_feeder_slot) {
 				l->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 28;
 				GLOBAL_inventoryitemchosen = NO_ITEM;
 				savegame.HaveBikeBooster = 1;
-			}
-			else
+			} else
 				l->anim_number = objects[T4PlusGetMotorbikeExtraSlotID()].anim_index + 9;
 
 			l->goal_anim_state = 9;
@@ -796,58 +723,47 @@ void BikeCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 		AnimateItem(l);
 		bike->unused1 = 0;
 		item->flags |= IFL_TRIGGERED;
-	}
-	else
+	} else
 		ObjectCollision(item_number, l, coll);
 }
 
-long BikeBaddieCollision(ITEM_INFO* bike)
-{
+int32_t BikeBaddieCollision(ITEM_INFO* bike) {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
-	short* doors;
-	long j, dx, dy, dz;
-	short room_count, item_number;
+	int16_t* doors;
+	int32_t j, dx, dy, dz;
+	int16_t room_count, item_number;
 
 	room_count = 1;
 	broomies[0] = bike->room_number;
 	doors = room[bike->room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16)
-	{
-		for (j = 0; j < room_count; j++)
-		{
+	for (int i = *doors++; i > 0; i--, doors += 16) {
+		for (j = 0; j < room_count; j++) {
 			if (broomies[j] == *doors)
 				break;
 		}
 
-		if (j == room_count)
-		{
+		if (j == room_count) {
 			broomies[room_count] = *doors;
 			room_count++;
 		}
 	}
 
-	for (int i = 0; i < room_count; i++)
-	{
-		for (item_number = room[broomies[i]].item_number; item_number != NO_ITEM; item_number = item->next_item)
-		{
+	for (int i = 0; i < room_count; i++) {
+		for (item_number = room[broomies[i]].item_number; item_number != NO_ITEM; item_number = item->next_item) {
 			item = &items[item_number];
 
-			if (item->collidable && item->status != ITEM_INVISIBLE && item != lara_item && item != bike)
-			{
+			if (item->collidable && item->status != ITEM_INVISIBLE && item != lara_item && item != bike) {
 				obj = &objects[item->object_number];
 
-				if (obj->collision && obj->intelligent)
-				{
+				if (obj->collision && obj->intelligent) {
 					dx = bike->pos.x_pos - item->pos.x_pos;
 					dy = bike->pos.y_pos - item->pos.y_pos;
 					dz = bike->pos.z_pos - item->pos.z_pos;
 
-					if (dx > -(BLOCK_SIZE * 2) && dx < (BLOCK_SIZE * 2) && dz > -(BLOCK_SIZE * 2) && dz < (BLOCK_SIZE * 2) && dy > -(BLOCK_SIZE * 2) && dy < (BLOCK_SIZE * 2))
-					{
-						if (TestBoundsCollide(item, bike, 500))
-						{
+					if (dx > -(BLOCK_SIZE * 2) && dx < (BLOCK_SIZE * 2) && dz > -(BLOCK_SIZE * 2) && dz < (BLOCK_SIZE * 2) && dy > -(BLOCK_SIZE * 2) && dy < (BLOCK_SIZE * 2)) {
+						if (TestBoundsCollide(item, bike, 500)) {
 							if (item->object_number == MUTANT)
 								return 1;
 
@@ -855,7 +771,7 @@ long BikeBaddieCollision(ITEM_INFO* bike)
 								SoundEffect(SFX_BIKE_HIT_ENEMIES, &item->pos, SFX_DEFAULT);
 
 							DoLotsOfBlood(item->pos.x_pos, bike->pos.y_pos - CLICK_SIZE, item->pos.z_pos, (GetRandomControl() & 3) + 8,
-								bike->pos.y_rot, item->room_number, 3);
+							              bike->pos.y_rot, item->room_number, 3);
 							item->hit_points = 0;
 						}
 					}
@@ -867,17 +783,16 @@ long BikeBaddieCollision(ITEM_INFO* bike)
 	return 0;
 }
 
-void BikeCollideStaticObjects(long x, long y, long z, short room_number, long height)
-{
+void BikeCollideStaticObjects(int32_t x, int32_t y, int32_t z, int16_t room_number, int32_t height) {
 	MESH_INFO* mesh;
 	STATIC_INFO* sinfo;
 	ROOM_INFO* r;
 	PHD_VECTOR pos;
-	short* doors;
-	long j;
-	static long BikeBounds[6] = { 0, 0, 0, 0, 0, 0 };
-	static long CollidedStaticBounds[6] = { 0, 0, 0, 0, 0, 0 };
-	short room_count, rn;
+	int16_t* doors;
+	int32_t j;
+	static int32_t BikeBounds[6] = { 0, 0, 0, 0, 0, 0 };
+	static int32_t CollidedStaticBounds[6] = { 0, 0, 0, 0, 0, 0 };
+	int16_t room_count, rn;
 
 	pos.x = x;
 	pos.y = y;
@@ -892,62 +807,48 @@ void BikeCollideStaticObjects(long x, long y, long z, short room_number, long he
 	broomies[0] = room_number;
 	doors = room[room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16)
-	{
-		for (j = 0; j < room_count; j++)
-		{
+	for (int i = *doors++; i > 0; i--, doors += 16) {
+		for (j = 0; j < room_count; j++) {
 			if (broomies[j] == *doors)
 				break;
 		}
 
-		if (j == room_count)
-		{
+		if (j == room_count) {
 			broomies[room_count] = *doors;
 			room_count++;
 		}
 	}
 
-	for (int i = 0; i < room_count; i++)
-	{
+	for (int i = 0; i < room_count; i++) {
 		rn = broomies[i];
 		r = &room[rn];
 		mesh = r->mesh;
 
-		for (j = r->num_meshes; j > 0; j--, mesh++)
-		{
+		for (j = r->num_meshes; j > 0; j--, mesh++) {
 			sinfo = &static_objects[mesh->static_number];
 
-			if (mesh->Flags & 1)
-			{
+			if (mesh->Flags & 1) {
 				MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];
-				if (static_info->large_objects_can_shatter)
-				{
+				if (static_info->large_objects_can_shatter) {
 					CollidedStaticBounds[2] = mesh->y + sinfo->y_maxc;
 					CollidedStaticBounds[3] = mesh->y + sinfo->y_minc;
 
-					if (mesh->y_rot == -0x8000)
-					{
+					if (mesh->y_rot == -0x8000) {
 						CollidedStaticBounds[0] = mesh->x - sinfo->x_minc;
 						CollidedStaticBounds[1] = mesh->x - sinfo->x_maxc;
 						CollidedStaticBounds[4] = mesh->z - sinfo->z_minc;
 						CollidedStaticBounds[5] = mesh->z - sinfo->z_maxc;
-					}
-					else if (mesh->y_rot == -0x4000)
-					{
+					} else if (mesh->y_rot == -0x4000) {
 						CollidedStaticBounds[0] = mesh->x - sinfo->z_minc;
 						CollidedStaticBounds[1] = mesh->x - sinfo->z_maxc;
 						CollidedStaticBounds[4] = mesh->z + sinfo->x_maxc;
 						CollidedStaticBounds[5] = mesh->z + sinfo->x_minc;
-					}
-					else if (mesh->y_rot == 0x4000)
-					{
+					} else if (mesh->y_rot == 0x4000) {
 						CollidedStaticBounds[0] = mesh->x + sinfo->z_maxc;
 						CollidedStaticBounds[1] = mesh->x + sinfo->z_minc;
 						CollidedStaticBounds[4] = mesh->z - sinfo->x_minc;
 						CollidedStaticBounds[5] = mesh->z - sinfo->x_maxc;
-					}
-					else
-					{
+					} else {
 						CollidedStaticBounds[0] = mesh->x + sinfo->x_maxc;
 						CollidedStaticBounds[1] = mesh->x + sinfo->x_minc;
 						CollidedStaticBounds[4] = mesh->z + sinfo->z_maxc;
@@ -955,12 +856,11 @@ void BikeCollideStaticObjects(long x, long y, long z, short room_number, long he
 					}
 
 					if (BikeBounds[0] > CollidedStaticBounds[1] &&
-						BikeBounds[1] < CollidedStaticBounds[0] &&
-						BikeBounds[2] > CollidedStaticBounds[3] &&
-						BikeBounds[3] < CollidedStaticBounds[2] &&
-						BikeBounds[4] > CollidedStaticBounds[5] &&
-						BikeBounds[5] < CollidedStaticBounds[4])
-					{
+					        BikeBounds[1] < CollidedStaticBounds[0] &&
+					        BikeBounds[2] > CollidedStaticBounds[3] &&
+					        BikeBounds[3] < CollidedStaticBounds[2] &&
+					        BikeBounds[4] > CollidedStaticBounds[5] &&
+					        BikeBounds[5] < CollidedStaticBounds[4]) {
 						ShatterObject(0, mesh, -128, rn, 0);
 						if (static_info->shatter_sound_id >= 0) {
 							SoundEffect(static_info->shatter_sound_id, (PHD_3DPOS*)&pos, SFX_DEFAULT);
@@ -976,47 +876,39 @@ void BikeCollideStaticObjects(long x, long y, long z, short room_number, long he
 	}
 }
 
-static long UserControl(ITEM_INFO* item, long height, long* pitch)
-{
+static int32_t UserControl(ITEM_INFO* item, int32_t height, int32_t* pitch) {
 	BIKEINFO* bike;
 	PHD_VECTOR pos;
-	long turn, vel;
-	short frame, base;
+	int32_t turn, vel;
+	int16_t frame, base;
 
 	bike = (BIKEINFO*)item->data;
 
-	if (bike->light_intensity < 127)
-	{
+	if (bike->light_intensity < 127) {
 		bike->light_intensity += (GetRandomControl() & 7) + 3;
 
 		if (bike->light_intensity > 127)
 			bike->light_intensity = 127;
 	}
 
-	if (bike->unused1 > 16)
-	{
+	if (bike->unused1 > 16) {
 		bike->velocity += bike->unused1 >> 4;
 		bike->unused1 -= bike->unused1 >> 3;
-	}
-	else
+	} else
 		bike->unused1 = 0;
 
-	if (input & IN_SPRINT && input & IN_ACTION && DashTimer && savegame.HaveBikeBooster)
-	{
+	if (input & IN_SPRINT && input & IN_ACTION && DashTimer && savegame.HaveBikeBooster) {
 		bike->flags |= 0x100;
 		DashTimer -= 2;
 
-		if (DashTimer < 0)
-		{
+		if (DashTimer < 0) {
 			bike->flags &= ~0x100;
 			DashTimer = 0;
 		}
-	}
-	else
+	} else
 		bike->flags &= ~0x100;
 
-	if (item->pos.y_pos >= height - CLICK_SIZE)
-	{
+	if (item->pos.y_pos >= height - CLICK_SIZE) {
 		if (bike->velocity > 0x4000)
 			turn = DEGREES_TO_ROTATION(5);
 		else
@@ -1025,10 +917,8 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 		if (!bike->velocity && input & IN_LOOK)
 			LookUpDown();
 
-		if (bike->velocity > 0)
-		{
-			if (input & IN_LEFT)
-			{
+		if (bike->velocity > 0) {
+			if (input & IN_LEFT) {
 				if (bike->velocity > 0x4000)
 					bike->bike_turn -= HALF_DEGREES_TO_ROTATION(3);
 				else
@@ -1036,9 +926,7 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 
 				if (bike->bike_turn < -turn)
 					bike->bike_turn = -turn;
-			}
-			else if (input & IN_RIGHT)
-			{
+			} else if (input & IN_RIGHT) {
 				if (bike->velocity > 0x4000)
 					bike->bike_turn += HALF_DEGREES_TO_ROTATION(3);
 				else
@@ -1047,18 +935,13 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 				if (bike->bike_turn > turn)
 					bike->bike_turn = turn;
 			}
-		}
-		else if (bike->velocity < 0)
-		{
-			if (input & IN_RIGHT)
-			{
+		} else if (bike->velocity < 0) {
+			if (input & IN_RIGHT) {
 				bike->bike_turn -= 91;
 
 				if (bike->bike_turn < -DEGREES_TO_ROTATION(5))
 					bike->bike_turn = -DEGREES_TO_ROTATION(5);
-			}
-			else if (input & IN_LEFT)
-			{
+			} else if (input & IN_LEFT) {
 				bike->bike_turn += 91;
 
 				if (bike->bike_turn > DEGREES_TO_ROTATION(5))
@@ -1066,39 +949,30 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 			}
 		}
 
-		if (input & IN_JUMP)
-		{
+		if (input & IN_JUMP) {
 			pos.x = 0;
 			pos.y = -(HALF_CLICK_SIZE + (QUARTER_CLICK_SIZE / 4));
 			pos.z = -BLOCK_SIZE;
 			GetJointAbsPosition(item, &pos, 0);
 			TriggerDynamic(pos.x, pos.y, pos.z, 10, QUARTER_CLICK_SIZE, 0, 0);
 			item->mesh_bits = 0x5F7;
-		}
-		else
+		} else
 			item->mesh_bits = 0x3F7;
 
-		if (input & IN_JUMP)
-		{
-			if (bike->velocity > 0)
-			{
+		if (input & IN_JUMP) {
+			if (bike->velocity > 0) {
 				bike->velocity -= 0x300;
 
 				if (bike->velocity < 0)
 					bike->velocity = 0;
-			}
-			else if (bike->velocity < 0)
-			{
+			} else if (bike->velocity < 0) {
 				bike->velocity += 0x300;
 
 				if (bike->velocity > 0)
 					bike->velocity = 0;
 			}
-		}
-		else if (input & IN_ACTION)
-		{
-			if (bike->velocity < 0xC000)
-			{
+		} else if (input & IN_ACTION) {
+			if (bike->velocity < 0xC000) {
 				if (bike->velocity < 0x4000)
 					bike->velocity += ((0x4800 - bike->velocity) >> 3) + 8;
 				else if (bike->velocity < 0x7000)
@@ -1108,27 +982,23 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 
 				if (bike->flags & 0x100)
 					bike->velocity += 0x100;
-			}
-			else
+			} else
 				bike->velocity = 0xC000;
 
 			bike->velocity -= abs(item->pos.y_rot - bike->move_angle) >> 6;
 		}
 
-		if (lara_item->current_anim_state == 3)
-		{
+		if (lara_item->current_anim_state == 3) {
 			frame = lara_item->frame_number;
 			base = anims[lara_item->anim_number].frame_base;
 
-			if (frame >= base + 24 && frame <= base + 29)
-			{
+			if (frame >= base + 24 && frame <= base + 29) {
 				if (bike->velocity > -0x3000)
 					bike->velocity -= 0x600;
 			}
 		}
 
-		if (!(input & IN_ACTION))
-		{
+		if (!(input & IN_ACTION)) {
 			if (bike->velocity > (CLICK_SIZE + HALF_CLICK_SIZE))
 				bike->velocity -= (CLICK_SIZE + HALF_CLICK_SIZE);
 			else if (bike->velocity < -(CLICK_SIZE + HALF_CLICK_SIZE))
@@ -1137,7 +1007,7 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 				bike->velocity = 0;
 		}
 
-		item->speed = short(bike->velocity >> 8);
+		item->speed = int16_t(bike->velocity >> 8);
 
 		if (bike->pitch1 > 0xC000)
 			bike->pitch1 = (GetRandomControl() & 0x1FF) + 0xBF00;
@@ -1148,23 +1018,21 @@ static long UserControl(ITEM_INFO* item, long height, long* pitch)
 			vel >>= 1;
 
 		bike->pitch1 += (abs(vel) - 0x2000 - bike->pitch1) >> 3;
-	}
-	else if (bike->pitch1 < 0xFFFF)
+	} else if (bike->pitch1 < 0xFFFF)
 		bike->pitch1 += (0xFFFF - bike->pitch1) >> 3;
 
 	*pitch = bike->pitch1;
 	return 0;
 }
 
-long BikeDynamics(ITEM_INFO* item)
-{
+int32_t BikeDynamics(ITEM_INFO* item) {
 	BIKEINFO* bike;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos, newPos;
 	PHD_VECTOR flPos, frPos, blPos, brPos, fmPos, flPos2, frPos2, blPos2, brPos2, fmPos2;
-	long front_left, front_right, back_left, back_right, front_mid, front_left2, front_right2, back_left2, back_right2, front_mid2;
-	long h, speed, shift, shift2, anim, dx, dz;
-	short ang, ang2, vel, room_number;
+	int32_t front_left, front_right, back_left, back_right, front_mid, front_left2, front_right2, back_left2, back_right2, front_mid2;
+	int32_t h, speed, shift, shift2, anim, dx, dz;
+	int16_t ang, ang2, vel, room_number;
 
 	dont_exit_bike = 0;
 	bike = (BIKEINFO*)item->data;
@@ -1192,8 +1060,7 @@ long BikeDynamics(ITEM_INFO* item)
 	if (fmPos.y > front_mid)
 		fmPos.y = front_mid;
 
-	if (item->pos.y_pos <= item->floor - 8)
-	{
+	if (item->pos.y_pos <= item->floor - 8) {
 		if (bike->bike_turn < -91)
 			bike->bike_turn += 91;
 		else if (bike->bike_turn > 91)
@@ -1201,11 +1068,9 @@ long BikeDynamics(ITEM_INFO* item)
 		else
 			bike->bike_turn = 0;
 
-		item->pos.y_rot += short(bike->bike_turn + bike->extra_rotation);
-		bike->move_angle += short(item->pos.y_rot - bike->move_angle) >> 5;
-	}
-	else
-	{
+		item->pos.y_rot += int16_t(bike->bike_turn + bike->extra_rotation);
+		bike->move_angle += int16_t(item->pos.y_rot - bike->move_angle) >> 5;
+	} else {
 		if (bike->bike_turn < -DEGREES_TO_ROTATION(1))
 			bike->bike_turn += DEGREES_TO_ROTATION(1);
 		else if (bike->bike_turn > DEGREES_TO_ROTATION(1))
@@ -1213,28 +1078,24 @@ long BikeDynamics(ITEM_INFO* item)
 		else
 			bike->bike_turn = 0;
 
-		item->pos.y_rot += short(bike->bike_turn + bike->extra_rotation);
+		item->pos.y_rot += int16_t(bike->bike_turn + bike->extra_rotation);
 		ang = item->pos.y_rot - bike->move_angle;
-		vel = short(DEGREES_TO_ROTATION(4) - ((2 * bike->velocity) >> 10));
+		vel = int16_t(DEGREES_TO_ROTATION(4) - ((2 * bike->velocity) >> 10));
 
 		if (!(input & IN_ACTION) && bike->velocity > 0)
 			vel += vel >> 1;
 
-		if (ang < -HALF_DEGREES_TO_ROTATION(3))
-		{
+		if (ang < -HALF_DEGREES_TO_ROTATION(3)) {
 			if (ang < -DEGREES_TO_ROTATION(45))
 				bike->move_angle = item->pos.y_rot + DEGREES_TO_ROTATION(45);
 			else
 				bike->move_angle -= vel;
-		}
-		else if (ang > HALF_DEGREES_TO_ROTATION(3))
-		{
+		} else if (ang > HALF_DEGREES_TO_ROTATION(3)) {
 			if (ang > DEGREES_TO_ROTATION(45))
 				bike->move_angle = item->pos.y_rot - DEGREES_TO_ROTATION(45);
 			else
 				bike->move_angle += vel;
-		}
-		else
+		} else
 			bike->move_angle = item->pos.y_rot;
 	}
 
@@ -1250,12 +1111,10 @@ long BikeDynamics(ITEM_INFO* item)
 	item->pos.x_pos += (speed * phd_sin(bike->move_angle)) >> W2V_SHIFT;
 	item->pos.z_pos += (speed * phd_cos(bike->move_angle)) >> W2V_SHIFT;
 
-	if (item->pos.y_pos >= h)
-	{
+	if (item->pos.y_pos >= h) {
 		ang = (100 * phd_sin(item->pos.x_rot)) >> W2V_SHIFT;
 
-		if (abs(ang) > 16)
-		{
+		if (abs(ang) > 16) {
 			ang2 = (100 * phd_sin(item->pos.x_rot)) >> W2V_SHIFT;
 
 			if (ang < 0)
@@ -1270,8 +1129,7 @@ long BikeDynamics(ITEM_INFO* item)
 
 		ang = (0x80 * phd_sin(item->pos.z_rot)) >> W2V_SHIFT;
 
-		if (abs(ang) > 0x20)
-		{
+		if (abs(ang) > 0x20) {
 			dont_exit_bike = 1;
 
 			if (ang < 0)
@@ -1284,21 +1142,18 @@ long BikeDynamics(ITEM_INFO* item)
 		}
 	}
 
-	if (bike->velocity <= 0x8000 || bike->flags & 0x100)
-	{
+	if (bike->velocity <= 0x8000 || bike->flags & 0x100) {
 		if (bike->velocity > 0xC000)
 			bike->velocity = 0xC000;
 		else if (bike->velocity < -0x3000)
 			bike->velocity = -0x3000;
-	}
-	else
+	} else
 		bike->velocity -= 0x440;
 
 	newPos.x = item->pos.x_pos;
 	newPos.z = item->pos.z_pos;
 
-	if (!(item->flags & 0x100))
-	{
+	if (!(item->flags & 0x100)) {
 		if (BikeBaddieCollision(item))	//this returns = we hit the crocgod, explode her
 			return -888;
 
@@ -1314,8 +1169,7 @@ long BikeDynamics(ITEM_INFO* item)
 
 	back_left2 = TestHeight(item, -500, -350, &blPos2);
 
-	if (back_left2 < blPos.y - CLICK_SIZE)
-	{
+	if (back_left2 < blPos.y - CLICK_SIZE) {
 		if (shift)
 			shift += abs(DoShift(item, &blPos2, &blPos) << 2);
 		else
@@ -1334,8 +1188,7 @@ long BikeDynamics(ITEM_INFO* item)
 
 	back_right2 = TestHeight(item, -500, 128, &brPos2);
 
-	if (back_right2 < brPos.y - CLICK_SIZE)
-	{
+	if (back_right2 < brPos.y - CLICK_SIZE) {
 		if (shift2)
 			shift2 -= abs(DoShift(item, &brPos2, &brPos) << 2);
 		else
@@ -1355,7 +1208,7 @@ long BikeDynamics(ITEM_INFO* item)
 	if (!bike->velocity)
 		shift2 = 0;
 
-	bike->rot_thing = short((bike->rot_thing + shift2) >> 1);
+	bike->rot_thing = int16_t((bike->rot_thing + shift2) >> 1);
 
 	if (abs(bike->rot_thing) < 2)
 		bike->rot_thing = 0;
@@ -1367,16 +1220,14 @@ long BikeDynamics(ITEM_INFO* item)
 
 	anim = GetCollisionAnim(item, &newPos, bike);
 
-	if (anim)
-	{
+	if (anim) {
 		dx = item->pos.x_pos - pos.x;
 		dz = item->pos.z_pos - pos.z;
 		speed = (dx * phd_sin(bike->move_angle) + dz * phd_cos(bike->move_angle)) >> W2V_SHIFT;
 		speed <<= 8;
 
-		if (&items[lara.vehicle] == item && bike->velocity >= 0x8000 && speed < bike->velocity - 10)	//did we just stop randomly (i.e hit a wall)
-		{
-			lara_item->hit_points -= short((bike->velocity - speed) >> 7);
+		if (&items[lara.vehicle] == item && bike->velocity >= 0x8000 && speed < bike->velocity - 10) {	//did we just stop randomly (i.e hit a wall)
+			lara_item->hit_points -= int16_t((bike->velocity - speed) >> 7);
 			lara_item->hit_status = 1;
 		}
 
@@ -1392,17 +1243,16 @@ long BikeDynamics(ITEM_INFO* item)
 	return anim;
 }
 
-void BikeControl(short item_number)
-{
+void BikeControl(int16_t item_number) {
 	ITEM_INFO* item;
 	BIKEINFO* bike;
 	FLOOR_INFO* floor;
 	PHD_VECTOR flPos, frPos, fmPos;
 	PHD_VECTOR pos;
-	long front_left, front_right, front_mid;
-	long hitWall, h, driving, killed, pitch, oldY, hdiff, smokeVel;
-	short room_number, wheelRot, xRot, zRot;
-	static uchar ExhaustSmokeVel;
+	int32_t front_left, front_right, front_mid;
+	int32_t hitWall, h, driving, killed, pitch, oldY, hdiff, smokeVel;
+	int16_t room_number, wheelRot, xRot, zRot;
+	static uint8_t ExhaustSmokeVel;
 
 	driving = -1;
 	killed = 0;
@@ -1411,8 +1261,7 @@ void BikeControl(short item_number)
 	bike = (BIKEINFO*)item->data;
 	hitWall = BikeDynamics(item);
 
-	if (hitWall == -888)	//hit the crocgod
-	{
+	if (hitWall == -888) {	//hit the crocgod
 		ExplodingDeath2(lara.item_number, -1, CLICK_SIZE);
 		lara_item->hit_points = 0;
 		lara_item->flags |= IFL_INVISIBLE;
@@ -1433,31 +1282,27 @@ void BikeControl(short item_number)
 	TestTriggers(trigger_index, false, 0);
 	TestTriggers(trigger_index, true, 0);
 
-	if (lara_item->hit_points <= 0)
-	{
+	if (lara_item->hit_points <= 0) {
 		killed = 1;
 		input &= ~(IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT);	//should be IN_ACTION instead?
 	}
 
 	if (bike->flags & 0xFF)
 		hitWall = 0;
-	else
-	{
+	else {
 		MOD_LEVEL_MISC_INFO *misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
 		if (!misc_info->disable_motorbike_headlights)
 			TriggerBikeBeam(item);
 
 		if (lara_item->current_anim_state < 9 || lara_item->current_anim_state > 10)
 			driving = UserControl(item, h, &pitch);
-		else
-		{
+		else {
 			driving = -1;
 			hitWall = 0;
 		}
 	}
 
-	if (bike->velocity > 0 || bike->unused1)
-	{
+	if (bike->velocity > 0 || bike->unused1) {
 		bike->pitch2 = pitch;
 
 		if (bike->pitch2 < -0x8000)
@@ -1466,11 +1311,8 @@ void BikeControl(short item_number)
 			bike->pitch2 = 0xA000;
 
 		SoundEffect(SFX_BIKE_MOVING, &item->pos, (bike->pitch2 << 8) + (SFX_SETPITCH | 0x1000000));
-	}
-	else
-	{
-		if (driving != -1)
-		{
+	} else {
+		if (driving != -1) {
 			SoundEffect(SFX_BIKE_IDLE, &item->pos, SFX_DEFAULT);
 			SoundEffect(SFX_BIKE_MOVING, &item->pos, (bike->pitch2 << 8) + (SFX_SETPITCH | 0x1000000));
 		}
@@ -1479,38 +1321,33 @@ void BikeControl(short item_number)
 	}
 
 	item->floor = h;
-	wheelRot = short(bike->velocity >> 2);
+	wheelRot = int16_t(bike->velocity >> 2);
 	bike->right_front_wheelrot -= wheelRot;
 	bike->right_back_wheelrot -= wheelRot;
 	bike->left_wheelrot -= wheelRot;
 	bikefspeed = item->fallspeed;
 	oldY = item->pos.y_pos;
-	item->fallspeed = (short)DoDynamics(h, item->fallspeed, &item->pos.y_pos, 0);
+	item->fallspeed = (int16_t)DoDynamics(h, item->fallspeed, &item->pos.y_pos, 0);
 	hdiff = (frPos.y + flPos.y) >> 1;
 
-	if (fmPos.y < front_mid)
-	{
+	if (fmPos.y < front_mid) {
 		if (hdiff < (front_left + front_right) >> 1)
-			xRot = (short)phd_atan(125, oldY - item->pos.y_pos);
+			xRot = (int16_t)phd_atan(125, oldY - item->pos.y_pos);
 		else
-			xRot = (short)phd_atan(500, item->pos.y_pos - hdiff);
-	}
-	else
-	{
+			xRot = (int16_t)phd_atan(500, item->pos.y_pos - hdiff);
+	} else {
 		if (hdiff < (front_left + front_right) >> 1)
-			xRot = (short)phd_atan(500, front_mid - item->pos.y_pos);
+			xRot = (int16_t)phd_atan(500, front_mid - item->pos.y_pos);
 		else
-			xRot = (short)phd_atan(1000, front_mid - hdiff);
+			xRot = (int16_t)phd_atan(1000, front_mid - hdiff);
 	}
 
-	zRot = (short)phd_atan(350, hdiff - flPos.y);
+	zRot = (int16_t)phd_atan(350, hdiff - flPos.y);
 	item->pos.x_rot += (xRot - item->pos.x_rot) >> 2;
 	item->pos.z_rot += (zRot - item->pos.z_rot) >> 2;
 
-	if (!(bike->flags & 0x80))
-	{
-		if (room_number != item->room_number)
-		{
+	if (!(bike->flags & 0x80)) {
+		if (room_number != item->room_number) {
 			ItemNewRoom(lara.vehicle, room_number);
 			ItemNewRoom(lara.item_number, room_number);
 		}
@@ -1527,8 +1364,7 @@ void BikeControl(short item_number)
 		item->frame_number = lara_item->frame_number + anims[item->anim_number].frame_base - anims[lara_item->anim_number].frame_base;
 		camera.target_elevation = -DEGREES_TO_ROTATION(30);
 
-		if (bike->flags & 0x40 && item->pos.y_pos == item->floor)
-		{
+		if (bike->flags & 0x40 && item->pos.y_pos == item->floor) {
 			ExplodingDeath2(lara.item_number, -1, CLICK_SIZE);
 			lara_item->hit_points = 0;
 			lara_item->flags |= IFL_INVISIBLE;
@@ -1539,26 +1375,20 @@ void BikeControl(short item_number)
 
 	if (lara_item->current_anim_state == 9 || lara_item->current_anim_state == 10)
 		ExhaustSmokeVel = 0;
-	else
-	{
+	else {
 		pos.x = 56;
 		pos.y = -144;
 		pos.z = -500;
 		GetJointAbsPosition(item, &pos, 0);
 
-		if (item->speed > (QUARTER_CLICK_SIZE / 2))
-		{
+		if (item->speed > (QUARTER_CLICK_SIZE / 2)) {
 			if (item->speed < QUARTER_CLICK_SIZE)
 				TriggerExhaustSmoke(pos.x, pos.y, pos.z, item->pos.y_rot + 0x8000, QUARTER_CLICK_SIZE - item->speed, 1);
-		}
-		else
-		{
-			if (ExhaustSmokeVel < 16)
-			{
+		} else {
+			if (ExhaustSmokeVel < 16) {
 				smokeVel = ((GetRandomControl() & 7) + (GetRandomControl() & 0x10) + 2 * ExhaustSmokeVel) << 6;
 				ExhaustSmokeVel++;
-			}
-			else if (GetRandomControl() & 3)
+			} else if (GetRandomControl() & 3)
 				smokeVel = 0;
 			else
 				smokeVel = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10)) << 6;

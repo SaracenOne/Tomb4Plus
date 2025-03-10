@@ -34,10 +34,10 @@ bool IsUsingOldCDTriggerMode();
 extern HACMDRIVER hACMDriver;
 #endif
 
-extern uchar* wav_file_buffer;
-extern uchar* ADPCMBuffer;
+extern uint8_t* wav_file_buffer;
+extern uint8_t* ADPCMBuffer;
 extern bool acm_ready;
 
 // Used for Von Croy cutscenes
-extern long LegacyTrack;
-extern long LegacyTrackFlag;
+extern int32_t LegacyTrack;
+extern int32_t LegacyTrackFlag;

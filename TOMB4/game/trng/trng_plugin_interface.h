@@ -22,7 +22,7 @@
 #define CB_ASSIGN_SLOT_MINE 19
 #define CB_FMV_MANAGER 20
 #define CB_INPUT_MANAGER 21
-#define CB_SAVEGAME_MANAGER 22 
+#define CB_SAVEGAME_MANAGER 22
 #define CB_PAUSE_MANAGER 23
 #define CB_STATISTICS_MANAGER 24
 #define CB_TITLE_MENU_MANAGER 25
@@ -58,7 +58,7 @@
 #define CB_STATE_ID_LARA_COLLISION 115
 
 struct TRNGPlugin {
-	//void InitLevel(int newLevel, int oldLevel, unsigned int fil_flags);
+	//void InitLevel(int newLevel, int oldLevel, uint32_t fil_flags);
 	//void PreloadLevel(); // Called before beginning loading of new level
 
 	//int PluginFlipEffect();

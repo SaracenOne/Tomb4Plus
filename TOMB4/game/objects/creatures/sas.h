@@ -1,8 +1,8 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseInjuredSas(short item_number);
-void InjuredSasControl(short item_number);
-void DragSASCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-void InitialiseSas(short item_number);
-void SasControl(short item_number);
+void InitialiseInjuredSas(int16_t item_number);
+void InjuredSasControl(int16_t item_number);
+void DragSASCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
+void InitialiseSas(int16_t item_number);
+void SasControl(int16_t item_number);

@@ -40,26 +40,26 @@ void NGTestAnimation(NG_ANIMATION *animation) {
 				}
 				if (animation->fan_flags & FAN_SET_LARA_PLACE) {
 					switch (animation->environment.extra) {
-					// PLACE_GROUND
-					case 0x0000:
-						lara.water_status = LW_ABOVE_WATER;
-						break;
-					// PLACE_UNDERWATER
-					case 0x0001:
-						lara.water_status = LW_UNDERWATER;
-						break;
-					// PLACE_FLOATING
-					case 0x0002:
-						lara.water_status = LW_SURFACE;
-						break;
-					// PLACE_SPECIAL
-					case 0x0003:
-						lara.water_status = LW_FLYCHEAT;
-						break;
-					// PLACE_LOW_WATER
-					case 0x0004:
-						lara.water_status = LW_WADE;
-						break;
+						// PLACE_GROUND
+						case 0x0000:
+							lara.water_status = LW_ABOVE_WATER;
+							break;
+						// PLACE_UNDERWATER
+						case 0x0001:
+							lara.water_status = LW_UNDERWATER;
+							break;
+						// PLACE_FLOATING
+						case 0x0002:
+							lara.water_status = LW_SURFACE;
+							break;
+						// PLACE_SPECIAL
+						case 0x0003:
+							lara.water_status = LW_FLYCHEAT;
+							break;
+						// PLACE_LOW_WATER
+						case 0x0004:
+							lara.water_status = LW_WADE;
+							break;
 					}
 				}
 				ng_animation_current_animation = -1;
@@ -68,18 +68,18 @@ void NGTestAnimation(NG_ANIMATION *animation) {
 
 		// Add newly support flags here...
 		if (animation->fan_flags & ~(
-			FAN_PERFORM_TRIGGER_GROUP |
-			FAN_ALIGN_TO_ENV_POS |
-			FAN_SET_BUSY_HANDS |
-			FAN_KEEP_NEXT_STATEID |
-			FAN_SET_FREE_HANDS |
-			FAN_SET_FREE_HANDS_TEMP |
-			FAN_SET_NEUTRAL_STATE_ID |
-			FAN_START_FROM_EXTRA_FRAME |
-			FAN_ENABLE_GRAVITY |
-			FAN_DISABLE_GRAVITY | 
-			FAN_SET_LARA_PLACE)
-			) {
+		            FAN_PERFORM_TRIGGER_GROUP |
+		            FAN_ALIGN_TO_ENV_POS |
+		            FAN_SET_BUSY_HANDS |
+		            FAN_KEEP_NEXT_STATEID |
+		            FAN_SET_FREE_HANDS |
+		            FAN_SET_FREE_HANDS_TEMP |
+		            FAN_SET_NEUTRAL_STATE_ID |
+		            FAN_START_FROM_EXTRA_FRAME |
+		            FAN_ENABLE_GRAVITY |
+		            FAN_DISABLE_GRAVITY |
+		            FAN_SET_LARA_PLACE)
+		   ) {
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGTestAnimation: Unsupported FAN_ flags detected: %u!", animation->fan_flags);
 			return;
 		}

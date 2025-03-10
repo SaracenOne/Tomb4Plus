@@ -37,11 +37,10 @@
 
 FX_INFO* effects;
 OBJECT_VECTOR* sound_effects;
-long GlobalFogOff = 0;
-long number_sound_effects;
+int32_t GlobalFogOff = 0;
+int32_t number_sound_effects;
 
-long FogTableColor[FOG_TABLE_SIZE] =
-{
+int32_t FogTableColor[FOG_TABLE_SIZE] = {
 	0,
 	RGBONLY(245,200,60),
 	RGBONLY(120,196,112),
@@ -73,8 +72,7 @@ long FogTableColor[FOG_TABLE_SIZE] =
 };
 
 // Base TR4 has 47 fileeffects, NGLE and TREP extends it
-void(*effect_routines[])(ITEM_INFO* item) =
-{
+void(*effect_routines[])(ITEM_INFO* item) = {
 	turn180_effect,
 	floor_shake_effect,
 	PoseidonSFX,
@@ -590,14 +588,12 @@ void(*effect_routines[])(ITEM_INFO* item) =
 	void_effect,
 };
 
-void SetFog(ITEM_INFO* item)
-{
+void SetFog(ITEM_INFO* item) {
 	GlobalFogOff = 0;
 
 	if (TriggerTimer == 100)
 		GlobalFogOff = 1;
-	else
-	{
+	else {
 		SetVolumetricFogColor(CLRR(FogTableColor[TriggerTimer]), CLRG(FogTableColor[TriggerTimer]), CLRB(FogTableColor[TriggerTimer]));
 		savegame.fog_colour.r = gfVolumetricFog.r;
 		savegame.fog_colour.g = gfVolumetricFog.g;
@@ -607,13 +603,11 @@ void SetFog(ITEM_INFO* item)
 	flipeffect = -1;
 }
 
-void finish_level_effect(ITEM_INFO* item)
-{
+void finish_level_effect(ITEM_INFO* item) {
 	gfLevelComplete = gfCurrentLevel + 1;
 }
 
-void turn180_effect(ITEM_INFO* item)
-{
+void turn180_effect(ITEM_INFO* item) {
 	// TRLE - safety check
 	if (!item)
 		return;
@@ -622,68 +616,58 @@ void turn180_effect(ITEM_INFO* item)
 	item->pos.x_rot = -item->pos.x_rot;
 }
 
-void floor_shake_effect(ITEM_INFO* item)
-{
+void floor_shake_effect(ITEM_INFO* item) {
 	// TRLE - safety check
 	if (!item)
 		return;
 
-	long dx, dy, dz, dist;
+	int32_t dx, dy, dz, dist;
 
 	dx = item->pos.x_pos - camera.pos.x;
 	dy = item->pos.y_pos - camera.pos.y;
 	dz = item->pos.z_pos - camera.pos.z;
 
-	if (abs(dx) < 0x4000 && abs(dy) < 0x4000 && abs(dz) < 0x4000)
-	{
+	if (abs(dx) < 0x4000 && abs(dy) < 0x4000 && abs(dz) < 0x4000) {
 		dist = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
 		camera.bounce = -66 * (0x100000 - dist / 256) / 0x100000;
 	}
 }
 
-void SoundFlipEffect(ITEM_INFO* item)
-{
+void SoundFlipEffect(ITEM_INFO* item) {
 	SoundEffect(TriggerTimer, 0, SFX_DEFAULT);
 	flipeffect = -1;
 }
 
-void RubbleFX(ITEM_INFO* item)
-{
+void RubbleFX(ITEM_INFO* item) {
 	ITEM_INFO* eq;
 
 	eq = find_an_item_with_object_type(EARTHQUAKE);
 
-	if (eq)
-	{
-		AddActiveItem(short(eq - items));
+	if (eq) {
+		AddActiveItem(int16_t(eq - items));
 		eq->status = ITEM_ACTIVE;
 		eq->flags |= IFL_CODEBITS;
-	}
-	else
+	} else
 		camera.bounce = -150;
 
 	flipeffect = -1;
 }
 
-void PoseidonSFX(ITEM_INFO* item)
-{
+void PoseidonSFX(ITEM_INFO* item) {
 	SoundEffect(SFX_WATER_FLUSHES, 0, SFX_DEFAULT);
 	flipeffect = -1;
 }
 
-void ActivateCamera(ITEM_INFO* item)
-{
+void ActivateCamera(ITEM_INFO* item) {
 	KeyTriggerActive = 2;
 }
 
-void ActivateKey(ITEM_INFO* item)
-{
+void ActivateKey(ITEM_INFO* item) {
 	KeyTriggerActive = 1;
 }
 
-void SwapCrowbar(ITEM_INFO* item)
-{
-	short* tmp;
+void SwapCrowbar(ITEM_INFO* item) {
+	int16_t* tmp;
 
 	tmp = meshes[objects[T4PlusGetLaraSlotID()].mesh_index + 2 * LM_RHAND];
 
@@ -693,15 +677,13 @@ void SwapCrowbar(ITEM_INFO* item)
 		lara.mesh_ptrs[LM_RHAND] = tmp;
 }
 
-void ExplosionFX(ITEM_INFO* item)
-{
+void ExplosionFX(ITEM_INFO* item) {
 	SoundEffect(SFX_EXPLOSION1, 0, SFX_DEFAULT);
 	camera.bounce = -75;
 	flipeffect = -1;
 }
 
-void LaraLocation(ITEM_INFO* item)
-{
+void LaraLocation(ITEM_INFO* item) {
 	lara.location = TriggerTimer;
 
 	if (TriggerTimer > lara.highest_location)
@@ -710,29 +692,24 @@ void LaraLocation(ITEM_INFO* item)
 	flipeffect = -1;
 }
 
-void LaraLocationPad(ITEM_INFO* item)
-{
+void LaraLocationPad(ITEM_INFO* item) {
 	flipeffect = -1;
 	lara.locationPad = TriggerTimer;
 	lara.location = TriggerTimer;
 }
 
-void GhostTrap(ITEM_INFO* item)
-{
+void GhostTrap(ITEM_INFO* item) {
 	ITEM_INFO* wraith;
-	short nex;
+	int16_t nex;
 
 	nex = next_item_active;
 
-	if (next_item_active != NO_ITEM)
-	{
-		while (nex != NO_ITEM)
-		{
+	if (next_item_active != NO_ITEM) {
+		while (nex != NO_ITEM) {
 			wraith = &items[nex];
 
-			if (wraith->object_number == WRAITH3 && !wraith->hit_points)
-			{
-				wraith->hit_points = short(item - items);
+			if (wraith->object_number == WRAITH3 && !wraith->hit_points) {
+				wraith->hit_points = int16_t(item - items);
 				break;
 			}
 
@@ -743,21 +720,17 @@ void GhostTrap(ITEM_INFO* item)
 	flipeffect = -1;
 }
 
-void KillActiveBaddies(ITEM_INFO* item)
-{
+void KillActiveBaddies(ITEM_INFO* item) {
 	ITEM_INFO* target_item;
-	short item_num;
+	int16_t item_num;
 
-	for (item_num = next_item_active; item_num != NO_ITEM; item_num = target_item->next_active)
-	{
+	for (item_num = next_item_active; item_num != NO_ITEM; item_num = target_item->next_active) {
 		target_item = &items[item_num];
 
-		if (objects[target_item->object_number].intelligent)
-		{
+		if (objects[target_item->object_number].intelligent) {
 			target_item->status = ITEM_INVISIBLE;
 
-			if (item != ((void*)0xABCDEF))
-			{
+			if (item != ((void*)0xABCDEF)) {
 				RemoveActiveItem(item_num);
 				DisableBaddieAI(item_num);
 				target_item->flags |= IFL_INVISIBLE;
@@ -768,8 +741,7 @@ void KillActiveBaddies(ITEM_INFO* item)
 	flipeffect = -1;
 }
 
-void lara_hands_free(ITEM_INFO* item)
-{
+void lara_hands_free(ITEM_INFO* item) {
 	lara.gun_status = LG_NO_ARMS;
 
 	// T4Plus: Bug fix for weapons getting stuck in perpetual animation loop.
@@ -788,17 +760,15 @@ void lara_hands_free(ITEM_INFO* item)
 		lara.right_arm.lock = 0;
 		lara.left_arm.lock = 0;
 
-		if (lara.weapon_item != NO_ITEM)
-		{
+		if (lara.weapon_item != NO_ITEM) {
 			KillItem(lara.weapon_item);
 			lara.weapon_item = NO_ITEM;
 		}
 	}
 }
 
-void draw_right_gun(ITEM_INFO* item)
-{
-	short* tmp;
+void draw_right_gun(ITEM_INFO* item) {
+	int16_t* tmp;
 
 	tmp = lara.mesh_ptrs[LM_RTHIGH];
 	lara.mesh_ptrs[LM_RTHIGH] = meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_RTHIGH * 2];
@@ -809,9 +779,8 @@ void draw_right_gun(ITEM_INFO* item)
 	meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_RHAND * 2] = tmp;
 }
 
-void draw_left_gun(ITEM_INFO* item)
-{
-	short* tmp;
+void draw_left_gun(ITEM_INFO* item) {
+	int16_t* tmp;
 
 	tmp = lara.mesh_ptrs[LM_LTHIGH];
 	lara.mesh_ptrs[LM_LTHIGH] = meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_LTHIGH * 2];
@@ -822,29 +791,25 @@ void draw_left_gun(ITEM_INFO* item)
 	meshes[objects[T4PlusGetPistolsAnimSlotID()].mesh_index + LM_LHAND * 2] = tmp;
 }
 
-void shoot_right_gun(ITEM_INFO* item)
-{
+void shoot_right_gun(ITEM_INFO* item) {
 	lara.right_arm.flash_gun = 3;
 }
 
-void shoot_left_gun(ITEM_INFO* item)
-{
+void shoot_left_gun(ITEM_INFO* item) {
 	lara.left_arm.flash_gun = 3;
 }
 
-void swap_meshes_with_meshswap1(ITEM_INFO* item)
-{
+void swap_meshes_with_meshswap1(ITEM_INFO* item) {
 	// TRLE - safety check
 	if (!item)
 		return;
 
 	OBJECT_INFO* obj;
-	short* tmp;
+	int16_t* tmp;
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++)
-	{
+	for (int i = 0; i < obj->nmeshes; i++) {
 		// Changed this to only use single index offsets.
 		// Seems to be more compatible with TRLE, but may
 		// require more extensive testing.
@@ -854,19 +819,17 @@ void swap_meshes_with_meshswap1(ITEM_INFO* item)
 	}
 }
 
-void swap_meshes_with_meshswap2(ITEM_INFO* item)
-{
+void swap_meshes_with_meshswap2(ITEM_INFO* item) {
 	// TRLE - safety check
 	if (!item)
 		return;
 
 	OBJECT_INFO* obj;
-	short* tmp;
+	int16_t* tmp;
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++)
-	{
+	for (int i = 0; i < obj->nmeshes; i++) {
 		// Changed this to only use single index offsets.
 		// Seems to be more compatible with TRLE, but may
 		// require more extensive testing.
@@ -876,19 +839,17 @@ void swap_meshes_with_meshswap2(ITEM_INFO* item)
 	}
 }
 
-void swap_meshes_with_meshswap3(ITEM_INFO* item)
-{
+void swap_meshes_with_meshswap3(ITEM_INFO* item) {
 	// TRLE
 	if (!item)
 		return;
 
 	OBJECT_INFO* obj;
-	short* tmp;
+	int16_t* tmp;
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++)
-	{
+	for (int i = 0; i < obj->nmeshes; i++) {
 		tmp = meshes[obj->mesh_index + i * 2];
 		meshes[obj->mesh_index + i] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + i * 2];
 
@@ -899,8 +860,7 @@ void swap_meshes_with_meshswap3(ITEM_INFO* item)
 	}
 }
 
-void invisibility_on(ITEM_INFO* item)
-{
+void invisibility_on(ITEM_INFO* item) {
 	// TRLE
 	if (!item)
 		return;
@@ -908,8 +868,7 @@ void invisibility_on(ITEM_INFO* item)
 	item->status = ITEM_INVISIBLE;
 }
 
-void invisibility_off(ITEM_INFO* item)
-{
+void invisibility_off(ITEM_INFO* item) {
 	if (game_mod_config.global_info.tomo_enable_weather_flipeffect) {
 		switch (TriggerTimer) {
 			case 1: // Rain
@@ -934,49 +893,41 @@ void invisibility_off(ITEM_INFO* item)
 	}
 }
 
-void reset_hair(ITEM_INFO* item)
-{
+void reset_hair(ITEM_INFO* item) {
 	InitialiseHair();
 }
 
-void ClearScarabsPatch(ITEM_INFO* item)
-{
+void ClearScarabsPatch(ITEM_INFO* item) {
 	ClearScarabs();
 }
 
-void MeshSwapToPour(ITEM_INFO* item)
-{
+void MeshSwapToPour(ITEM_INFO* item) {
 	lara.mesh_ptrs[LM_LHAND] = meshes[objects[item->item_flags[2]].mesh_index + LM_LHAND * 2];
 }
 
-void MeshSwapFromPour(ITEM_INFO* item)
-{
+void MeshSwapFromPour(ITEM_INFO* item) {
 	lara.mesh_ptrs[LM_LHAND] = meshes[objects[T4PlusGetLaraSkinSlotID()].mesh_index + LM_LHAND * 2];
 }
 
-void void_effect(ITEM_INFO* item)
-{
+void void_effect(ITEM_INFO* item) {
 	if (flipeffect >= FIRST_FURR_FLIPEFFECT) {
 		furr_execute_furr_flipeffect(flipeffect);
 	}
 }
 
-void WaterFall(short item_number)
-{
+void WaterFall(int16_t item_number) {
 	ITEM_INFO* item;
-	long dx, dy, dz;
+	int32_t dx, dy, dz;
 
 	item = &items[item_number];
 	dx = item->pos.x_pos - lara_item->pos.x_pos;
 	dy = item->pos.y_pos - lara_item->pos.y_pos;
 	dz = item->pos.z_pos - lara_item->pos.z_pos;
 
-	if (dx >= -0x4000 && dx <= 0x4000 && dz >= -0x4000 && dz <= 0x4000 && dy >= -0x4000 && dy <= 0x4000)
-	{
+	if (dx >= -0x4000 && dx <= 0x4000 && dz >= -0x4000 && dz <= 0x4000 && dy >= -0x4000 && dy <= 0x4000) {
 		//empty func call here
 
-		if (!(wibble & 0xC))
-		{
+		if (!(wibble & 0xC)) {
 			dx = (136 * phd_sin(item->pos.y_rot)) >> 12;
 			dz = (136 * phd_cos(item->pos.y_rot)) >> 12;
 			TriggerWaterfallMist(item->pos.x_pos + dx, item->pos.y_pos, item->pos.z_pos + dz, item->pos.y_rot >> 4);
@@ -986,10 +937,9 @@ void WaterFall(short item_number)
 	}
 }
 
-void WadeSplash(ITEM_INFO* item, long water, long depth)
-{
-	short* bounds;
-	short room_number;
+void WadeSplash(ITEM_INFO* item, int32_t water, int32_t depth) {
+	int16_t* bounds;
+	int16_t room_number;
 
 	room_number = item->room_number;
 	GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
@@ -1002,8 +952,7 @@ void WadeSplash(ITEM_INFO* item, long water, long depth)
 	if (item->pos.y_pos + bounds[2] > water || item->pos.y_pos + bounds[3] < water)
 		return;
 
-	if (item->fallspeed > 0 && depth < 474 && !SplashCount)
-	{
+	if (item->fallspeed > 0 && depth < 474 && !SplashCount) {
 		splash_setup.x = item->pos.x_pos;
 		splash_setup.y = water;
 		splash_setup.z = item->pos.z_pos;
@@ -1020,9 +969,7 @@ void WadeSplash(ITEM_INFO* item, long water, long depth)
 		splash_setup.OuterRad = 272;
 		SetupSplash(&splash_setup);
 		SplashCount = 16;
-	}
-	else if (!(wibble & 0xF) && (!(GetRandomControl() & 0xF) || item->current_anim_state != AS_STOP))
-	{
+	} else if (!(wibble & 0xF) && (!(GetRandomControl() & 0xF) || item->current_anim_state != AS_STOP)) {
 		if (item->current_anim_state == AS_STOP)
 			SetupRipple(item->pos.x_pos, water, item->pos.z_pos, (GetRandomControl() & 0xF) + 112, 16);
 		else
@@ -1030,15 +977,13 @@ void WadeSplash(ITEM_INFO* item, long water, long depth)
 	}
 }
 
-void Splash(ITEM_INFO* item)
-{
-	short room_number;
+void Splash(ITEM_INFO* item) {
+	int16_t room_number;
 
 	room_number = item->room_number;
 	GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
 
-	if (room[room_number].flags & ROOM_UNDERWATER)
-	{
+	if (room[room_number].flags & ROOM_UNDERWATER) {
 		splash_setup.x = item->pos.x_pos;
 		splash_setup.y = GetWaterHeight(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, room_number);
 		splash_setup.z = item->pos.z_pos;
@@ -1057,8 +1002,7 @@ void Splash(ITEM_INFO* item)
 	}
 }
 
-short DoBloodSplat(long x, long y, long z, short speed, short ang, short room_number)
-{
+int16_t DoBloodSplat(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t ang, int16_t room_number) {
 	if (room[room_number].flags & ROOM_UNDERWATER)
 		TriggerUnderwaterBlood(x, y, z, speed);
 	else
@@ -1067,12 +1011,10 @@ short DoBloodSplat(long x, long y, long z, short speed, short ang, short room_nu
 	return -1;
 }
 
-void DoLotsOfBlood(long x, long y, long z, short speed, short ang, short room_number, long num)
-{
-	long bx, by, bz;
+void DoLotsOfBlood(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t ang, int16_t room_number, int32_t num) {
+	int32_t bx, by, bz;
 
-	for (; num > 0; num--)
-	{
+	for (; num > 0; num--) {
 		bx = x - (GetRandomControl() << 9) / 0x8000 + CLICK_SIZE;
 		by = y - (GetRandomControl() << 9) / 0x8000 + CLICK_SIZE;
 		bz = z - (GetRandomControl() << 9) / 0x8000 + CLICK_SIZE;
@@ -1080,27 +1022,22 @@ void DoLotsOfBlood(long x, long y, long z, short speed, short ang, short room_nu
 	}
 }
 
-void Richochet(GAME_VECTOR* pos)
-{
+void Richochet(GAME_VECTOR* pos) {
 	TriggerRicochetSpark(pos, mGetAngle(pos->z, pos->x, lara_item->pos.z_pos, lara_item->pos.x_pos) >> 4, 3, 0);
 	SoundEffect(SFX_LARA_RICOCHET, (PHD_3DPOS*)pos, SFX_DEFAULT);
 }
 
-void SoundEffects()
-{
+void SoundEffects() {
 	OBJECT_VECTOR* sfx;
 	SoundSlot* slot;
 
-	for (int i = 0; i < number_sound_effects; i++)
-	{
+	for (int i = 0; i < number_sound_effects; i++) {
 		sfx = &sound_effects[i];
 
-		if (flip_status)
-		{
+		if (flip_status) {
 			if (sfx->flags & 0x40)
 				SoundEffect(sfx->data, (PHD_3DPOS*)sfx, 0);
-		}
-		else if (sfx->flags & 0x80)
+		} else if (sfx->flags & 0x80)
 			SoundEffect(sfx->data, (PHD_3DPOS*)sfx, 0);
 	}
 
@@ -1114,33 +1051,25 @@ void SoundEffects()
 	if (!sound_active)
 		return;
 
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
+	for (int i = 0; i < MAX_VOICES; i++) {
 		slot = &LaSlot[i];
 
 		if (slot->nSampleInfo < 0)
 			continue;
 
-		if ((sample_infos[slot->nSampleInfo].flags & 3) != 3)
-		{
+		if ((sample_infos[slot->nSampleInfo].flags & 3) != 3) {
 			if (!S_SoundSampleIsPlayingOnChannel(i))
 				slot->nSampleInfo = -1;
-			else
-			{
+			else {
 				GetPanVolume(slot);
-				S_SoundSetPanAndVolume(i, (short)slot->nPan, (ushort)slot->nVolume);
+				S_SoundSetPanAndVolume(i, (int16_t)slot->nPan, (uint16_t)slot->nVolume);
 			}
-		}
-		else
-		{
-			if (!slot->nVolume)
-			{
+		} else {
+			if (!slot->nVolume) {
 				S_SoundStopSample(i);
 				slot->nSampleInfo = -1;
-			}
-			else
-			{
-				S_SoundSetPanAndVolume(i, (short)slot->nPan, (ushort)slot->nVolume);
+			} else {
+				S_SoundSetPanAndVolume(i, (int16_t)slot->nPan, (uint16_t)slot->nVolume);
 				S_SoundSetPitch(i, slot->nPitch);
 				slot->nVolume = 0;
 			}
@@ -1148,17 +1077,15 @@ void SoundEffects()
 	}
 }
 
-long ItemNearLara(PHD_3DPOS* pos, long rad)
-{
-	short* bounds;
-	long dx, dy, dz;
+int32_t ItemNearLara(PHD_3DPOS* pos, int32_t rad) {
+	int16_t* bounds;
+	int32_t dx, dy, dz;
 
 	dx = pos->x_pos - lara_item->pos.x_pos;
 	dy = pos->y_pos - lara_item->pos.y_pos;
 	dz = pos->z_pos - lara_item->pos.z_pos;
 
-	if (dx >= -rad && dx <= rad && dz >= -rad && dz <= rad && dy >= -COLLISION_RANGE && dy <= COLLISION_RANGE && SQUARE(dx) + SQUARE(dz) <= SQUARE(rad))
-	{
+	if (dx >= -rad && dx <= rad && dz >= -rad && dz <= rad && dy >= -COLLISION_RANGE && dy <= COLLISION_RANGE && SQUARE(dx) + SQUARE(dz) <= SQUARE(rad)) {
 		bounds = GetBoundsAccurate(lara_item);
 
 		if (dy >= bounds[2] && dy <= bounds[3] + 100)
@@ -1170,35 +1097,26 @@ long ItemNearLara(PHD_3DPOS* pos, long rad)
 
 // TRLE
 
-void LaraBreath(ITEM_INFO* item)
-{
+void LaraBreath(ITEM_INFO* item) {
 	PHD_VECTOR p;
 	PHD_VECTOR v;
 
 	if (lara.water_status == 1 || lara_item->hit_points < 0 || !(T4PlusDoesRoomCauseColdBreath(&room[lara_item->room_number])))
 		return;
 
-	if (lara_item->current_anim_state == AS_STOP)
-	{
+	if (lara_item->current_anim_state == AS_STOP) {
 		if (lara_item->frame_number < anims[ANIM_BREATH].frame_base + 30)
 			return;
-	}
-	else if (lara_item->current_anim_state == AS_SURFSWIM)
-	{
+	} else if (lara_item->current_anim_state == AS_SURFSWIM) {
 		if (lara_item->frame_number < anims[ANIM_SURF].frame_base + 21)
 			return;
-	}
-	else if (lara_item->current_anim_state == AS_DUCK)
-	{
+	} else if (lara_item->current_anim_state == AS_DUCK) {
 		if (lara_item->frame_number < anims[ANIM_DUCKBREATHE].frame_base + 32)
 			return;
-	}
-	else if (lara_item->current_anim_state == AS_ALL4S)
-	{
+	} else if (lara_item->current_anim_state == AS_ALL4S) {
 		if (lara_item->frame_number < anims[ANIM_ALL4S].frame_base + 28)
 			return;
-	}
-	else if (wibble < 80 || wibble > 192)
+	} else if (wibble < 80 || wibble > 192)
 		return;
 
 	p.x = 0;

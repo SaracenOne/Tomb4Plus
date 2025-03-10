@@ -12,8 +12,7 @@
 #include "gameflow.h"
 #include "objects.h"
 
-static short dels_handy_train_map[128] =
-{
+static int16_t dels_handy_train_map[128] = {
 	//36: ARCHITECTURE6
 	//37: ARCHITECTURE7
 	//38: ARCHITECTURE8
@@ -30,8 +29,7 @@ static short dels_handy_train_map[128] =
 	38, 38, 38, 38, 38, 37, 36, 36, 36, 39, 38
 };
 
-static TRAIN_STATIC dels_handy_train_map2[64] =
-{
+static TRAIN_STATIC dels_handy_train_map2[64] = {
 	{ROCK2, (BLOCK_SIZE * 4)}, {NO_ITEM, 0}, {NO_ITEM, 0},
 	{ROCK0, -(BLOCK_SIZE * 3)}, {NO_ITEM, 0}, {NO_ITEM, 0}, {NO_ITEM, 0},
 	{ROCK0, (BLOCK_SIZE * 4)}, {NO_ITEM, 0}, {NO_ITEM, 0}, {NO_ITEM, 0}, {NO_ITEM, 0}, {NO_ITEM, 0},
@@ -54,13 +52,12 @@ static TRAIN_STATIC dels_handy_train_map2[64] =
 	{ROCK3, -(BLOCK_SIZE * 2)}, {NO_ITEM, 0}, {NO_ITEM, 0}, {NO_ITEM, 0}
 };
 
-long trainmappos;
+int32_t trainmappos;
 
-void DrawTrainObjects()
-{
+void DrawTrainObjects() {
 	TRAIN_STATIC* p;
-	short* obj;
-	long x, x2;
+	int16_t* obj;
+	int32_t x, x2;
 
 	trainmappos = (trainmappos + (gfUVRotate << 5)) % 0x60000;
 	obj= &dels_handy_train_map[96 - ((trainmappos / 6144 - lara_item->pos.x_pos / 6144) & 0x1F)];
@@ -68,8 +65,7 @@ void DrawTrainObjects()
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos - lara_item->pos.x_pos % 6144, CLICK_SIZE, 47168);
 
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		phd_PutPolygons_train(meshes[static_objects[obj[0]].mesh_number], x);
 		obj++;
 		x += 6144;
@@ -89,8 +85,7 @@ void DrawTrainObjects()
 	phd_RotY(DEGREES_TO_ROTATION(180));
 	x2 = x + 0xC000;
 
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		phd_PutPolygons_train(meshes[static_objects[obj[0]].mesh_number], -x);
 		obj++;
 		x += 6144;
@@ -108,10 +103,8 @@ void DrawTrainObjects()
 	x = trainmappos % 6144 - 24576;
 	phd_PushMatrix();
 
-	for (int i = 0; i < 8; i++)
-	{
-		if (p->type != NO_ITEM)
-		{
+	for (int i = 0; i < 8; i++) {
+		if (p->type != NO_ITEM) {
 			phd_TranslateAbs(lara_item->pos.x_pos - lara_item->pos.x_pos % 6144, CLICK_SIZE, p->zoff + 52224);
 			phd_PutPolygons_train(meshes[static_objects[p->type].mesh_number], x);
 		}
@@ -120,8 +113,7 @@ void DrawTrainObjects()
 		x += 6144;
 	}
 
-	if (p->type != NO_ITEM)
-	{
+	if (p->type != NO_ITEM) {
 		phd_TranslateAbs(x + lara_item->pos.x_pos - lara_item->pos.x_pos % 6144, CLICK_SIZE, p->zoff + 52224);
 		phd_PutPolygons_train(meshes[static_objects[p->type].mesh_number], 0);
 	}
@@ -129,8 +121,7 @@ void DrawTrainObjects()
 	phd_PopMatrix();
 }
 
-void DrawTrainFloor()
-{
+void DrawTrainFloor() {
 	int32_t x = lara_item->pos.x_pos;
 	lara_item->pos.x_pos = camera.pos.x;
 	phd_PushMatrix();
@@ -142,20 +133,17 @@ void DrawTrainFloor()
 	lara_item->pos.x_pos = x;
 }
 
-void InitialiseTrainJeep(short item_number)
-{
+void InitialiseTrainJeep(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
 
 	item = &items[item_number];
 	item->item_flags[0] = -80;
 
-	for (int i = 0; i < level_items; i++)	//find your baddy
-	{
+	for (int i = 0; i < level_items; i++) {	//find your baddy
 		item2 = &items[i];
 
-		if (item != item2 && item2->trigger_flags == item->trigger_flags)
-		{
+		if (item != item2 && item2->trigger_flags == item->trigger_flags) {
 			item->item_flags[1] = i;
 			item2->item_flags[0] = -80;
 			item2->pos.y_pos = item->pos.y_pos - BLOCK_SIZE;
@@ -164,21 +152,18 @@ void InitialiseTrainJeep(short item_number)
 	}
 }
 
-void TrainJeepControl(short item_number)
-{
+void TrainJeepControl(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* item2;
-	short room_number;
+	int16_t room_number;
 
 	item = &items[item_number];
 	item2 = &items[item->item_flags[1]];
 
-	if (item->item_flags[0] == -80)
-	{
+	if (item->item_flags[0] == -80) {
 		if (item->item_flags[2] < 0x4000)
 			item->item_flags[2] += (QUARTER_CLICK_SIZE / 2);
-	}
-	else if (item->item_flags[2] > BLOCK_SIZE)
+	} else if (item->item_flags[2] > BLOCK_SIZE)
 		item->item_flags[2] -= HALF_BLOCK_SIZE;
 
 	SoundEffect(SFX_JEEP_MOVE, &item->pos, (item->item_flags[2] << 9) + (0x1000000 | SFX_SETPITCH));

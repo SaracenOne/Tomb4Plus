@@ -31,22 +31,22 @@ void ClearScarabsPatch(ITEM_INFO* item);
 void MeshSwapToPour(ITEM_INFO* item);
 void MeshSwapFromPour(ITEM_INFO* item);
 void void_effect(ITEM_INFO* item);
-void WaterFall(short item_number);
-void WadeSplash(ITEM_INFO* item, long water, long depth);
+void WaterFall(int16_t item_number);
+void WadeSplash(ITEM_INFO* item, int32_t water, int32_t depth);
 void Splash(ITEM_INFO* item);
-short DoBloodSplat(long x, long y, long z, short speed, short ang, short room_number);
-void DoLotsOfBlood(long x, long y, long z, short speed, short ang, short room_number, long num);
+int16_t DoBloodSplat(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t ang, int16_t room_number);
+void DoLotsOfBlood(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t ang, int16_t room_number, int32_t num);
 void Richochet(GAME_VECTOR* pos);
 void SoundEffects();
-long ItemNearLara(PHD_3DPOS* pos, long rad);
+int32_t ItemNearLara(PHD_3DPOS* pos, int32_t rad);
 
 #define FOG_TABLE_SIZE 28
 
 extern FX_INFO* effects;
 extern OBJECT_VECTOR* sound_effects;
-extern long GlobalFogOff;
-extern long number_sound_effects;
-extern long FogTableColor[FOG_TABLE_SIZE];
+extern int32_t GlobalFogOff;
+extern int32_t number_sound_effects;
+extern int32_t FogTableColor[FOG_TABLE_SIZE];
 extern void(*effect_routines[])(ITEM_INFO* item);
 
 // TRLE

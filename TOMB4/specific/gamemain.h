@@ -1,28 +1,23 @@
 #pragma once
 #include "../global/types.h"
 
+extern THREAD MainThread;
+
 void GameClose();
-#ifdef USE_SDL
 int GameMain(void* ptr);
-#else
-unsigned int __stdcall GameMain(void* ptr);
-#endif
-ushort GetRandom(WATERTAB* wt, long lp);
+uint16_t GetRandom(WATERTAB* wt, int32_t lp);
 void init_water_table();
 bool GameInitialise();
-long S_SaveGame(long slot_num);
-long S_LoadGame(long slot_num);
+int32_t S_SaveGame(int32_t slot_num);
+int32_t S_LoadGame(int32_t slot_num);
 
 #define WATER_TABLE_COUNT 22
 #define WATER_TABLE_SIZE 64
 #define WIBBLE_TABLE_SIZE 32
 #define UNUSED_WIBBLE_TABLE_SIZE 256
 
-#ifndef USE_BGFX
-extern LPDIRECT3DVERTEXBUFFER DestVB;
-#endif
 extern WATERTAB WaterTable[WATER_TABLE_COUNT][WATER_TABLE_SIZE];
 extern THREAD MainThread;
-extern short* clipflags;
+extern int16_t* clipflags;
 extern float vert_wibble_table[WIBBLE_TABLE_SIZE];
-extern long SaveCounter;
+extern int32_t SaveCounter;

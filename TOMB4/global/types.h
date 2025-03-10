@@ -1,30 +1,65 @@
 #pragma once
+
+#include <cstdint>
+#include <limits>
+#include <stdexcept>
+#include <cstdio>
+#include <string.h>
+#include <stdint.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #include "math_tbls.h"
 
 #pragma pack(push, 1)
 
-#ifdef USE_SDL
-#include <SDL.h>
+#if 1
+#if defined(_MSC_VER)
+#define TR_FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define TR_FORCE_INLINE
+#else
+#define TR_FORCE_INLINE
+#endif
+#else
+#if defined(_MSC_VER)
+#define TR_FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define TR_FORCE_INLINE inline __attribute__((always_inline))
+#else
+#define TR_FORCE_INLINE inline
+#endif
 #endif
 
+#if defined(_MSC_VER)
+#define TR_CDECL __cdecl
+#define TR_GETCWD _getcwd
+#else
+#define TR_CDECL
+#define TR_GETCWD getcwd
+#endif
+
+#include <SDL.h>
+
 /*math*/
-#define SQUARE(x) ((x)*(x))
-#define	TRIGMULT2(a,b)		(((a) * (b)) >> W2V_SHIFT)
-#define	TRIGMULT3(a,b,c)	(TRIGMULT2((TRIGMULT2(a, b)), c))
-#define	FTRIGMULT2(a,b)		((a) * (b))
-#define	FTRIGMULT3(a,b,c)	(FTRIGMULT2((FTRIGMULT2(a, b)), c))
+#define SQUARE(x)				((x)*(x))
+#define	TRIGMULT2(a,b)			(((a) * (b)) >> W2V_SHIFT)
+#define	TRIGMULT3(a,b,c)		(TRIGMULT2((TRIGMULT2(a, b)), c))
+#define	FTRIGMULT2(a,b)			((a) * (b))
+#define	FTRIGMULT3(a,b,c)		(FTRIGMULT2((FTRIGMULT2(a, b)), c))
 
 /*color*/
-#define RGBONLY(r, g, b) ((b) | (((g) | ((r) << 8)) << 8))
-#define RGBA(r, g, b, a) (RGBONLY(r, g, b) | ((a) << 24))
-#define	CLRA(clr)	((clr >> 24) & 0xFF)	//shift r, g, and b out of the way and 0xFF
-#define	CLRR(clr)	((clr >> 16) & 0xFF)	//shift g and b out of the way and 0xFF
-#define	CLRG(clr)	((clr >> 8) & 0xFF)		//shift b out of the way and 0xFF
-#define	CLRB(clr)	((clr) & 0xFF)			//and 0xFF
+#define RGBONLY(r, g, b)		((b) | (((g) | ((r) << 8)) << 8))
+#define RGBA(r, g, b, a)		(RGBONLY(r, g, b) | ((a) << 24))
+#define	CLRA(clr)				((clr >> 24) & 0xFF)	//shift r, g, and b out of the way and 0xFF
+#define	CLRR(clr)				((clr >> 16) & 0xFF)	//shift g and b out of the way and 0xFF
+#define	CLRG(clr)				((clr >> 8) & 0xFF)		//shift b out of the way and 0xFF
+#define	CLRB(clr)				((clr) & 0xFF)			//and 0xFF
 
-#define SetCutPlayed(num)	(CutSceneTriggered |= 1 << (num))
+#define SetCutPlayed(num)		(CutSceneTriggered |= 1 << (num))
 #define SetCutNotPlayed(num)	(CutSceneTriggered &= ~(1 << (num)))
-#define CheckCutPlayed(num)	(CutSceneTriggered & (1 << (num)))
+#define CheckCutPlayed(num)		(CutSceneTriggered & (1 << (num)))
 
 
 #define POP_BONE_FLAG						(1 << 0)
@@ -63,38 +98,12 @@
 #define MALLOC_SIZE	64000000	// TRLE: bumped from 15MB to 64MB 
 #define PARAMETER_MAX_LENGTH 1024
 
-/********************DX defs********************/
-#ifndef USE_BGFX
-#define LPDIRECTDRAWX			LPDIRECTDRAW4
-#define LPDIRECT3DX				LPDIRECT3D3
-#define LPDIRECT3DDEVICEX		LPDIRECT3DDEVICE3
-#define LPDIRECTDRAWSURFACEX	LPDIRECTDRAWSURFACE4
-#define LPDIRECT3DVIEWPORTX		LPDIRECT3DVIEWPORT3
-#define LPDIRECTINPUTX			LPDIRECTINPUT2
-#define LPDIRECTINPUTDEVICEX	LPDIRECTINPUTDEVICE2
-#define DDSURFACEDESCX			DDSURFACEDESC2
-#define LPDDSURFACEDESCX		DDSURFACEDESCX*
-#define LPDIRECT3DMATERIALX		LPDIRECT3DMATERIAL3
-#define LPDIRECT3DTEXTUREX		LPDIRECT3DTEXTURE2
-#define TEXGUID					IID_IDirect3DTexture2
-#define DDGUID					IID_IDirectDraw4
-#define D3DGUID					IID_IDirect3D3
-#define DIGUID					IID_IDirectInput8
-#define DIDGUID					IID_IDirectInputDevice8
-#define DSNGUID					IID_IDirectSoundNotify
-#endif
-/***********************************************/
-
 /*typedefs*/
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned long ulong;
 
 // For legacy savegame backwards compatibility on 64-bit machines.
 #define X32_POINTER uint32_t
 
-enum DX_FLAGS
-{
+enum DX_FLAGS {
 	DXF_NONE = 0x0,
 	DXF_FULLSCREEN = 0x1,
 	DXF_WINDOWED = 0x2,
@@ -104,8 +113,7 @@ enum DX_FLAGS
 	DXF_HWR = 0x80
 };
 
-enum carried_weapon_flags
-{
+enum carried_weapon_flags {
 	W_NONE =		0x0,
 	W_PRESENT =		0x1,
 	W_FLASHLIGHT =	0x2,	//speculation, actually unused
@@ -115,8 +123,7 @@ enum carried_weapon_flags
 	W_AMMO3 =		0x20
 };
 
-enum anim_commands
-{
+enum anim_commands {
 	ACMD_NULL,
 	ACMD_SETPOS,
 	ACMD_JUMPVEL,
@@ -126,8 +133,7 @@ enum anim_commands
 	ACMD_FLIPEFFECT
 };
 
-enum ai_bits
-{
+enum ai_bits {
 	GUARD =		1 << 0,
 	AMBUSH =	1 << 1,
 	PATROL1 =	1 << 2,
@@ -135,8 +141,7 @@ enum ai_bits
 	FOLLOW =	1 << 4
 };
 
-enum spark_flags
-{
+enum spark_flags {
 	SF_NONE = 0x0,
 	SF_FIRE = 0x1,	//burns Lara at contact
 	SF_SCALE = 0x2,	//scale using sptr->Scalar
@@ -154,8 +159,7 @@ enum spark_flags
 	SF_GREEN = 0x2000	//turns the spark into a green-ish blue (for explosions only)
 };
 
-enum languages
-{
+enum languages {
 	ENGLISH,
 	FRENCH,
 	GERMAN,
@@ -167,16 +171,14 @@ enum languages
 	LANGUAGE_COUNT
 };
 
-enum font_flags
-{
+enum font_flags {
 	FF_SMALL =		0x1000,
 	FF_BLINK =		0x2000,
 	FF_RJUSTIFY =	0x4000,
 	FF_CENTER =		0x8000
 };
 
-enum room_flags
-{
+enum room_flags {
 	ROOM_UNDERWATER =	0x1,
 	ROOM_SWAMP =		0x4,
 	ROOM_OUTSIDE =		0x8,
@@ -191,16 +193,14 @@ enum room_flags
 	ROOM_COLD =			0x1000,
 };
 
-enum quadrant_names
-{
+enum quadrant_names {
 	NORTH,
 	EAST,
 	SOUTH,
 	WEST
 };
 
-enum collision_types
-{
+enum collision_types {
 	CT_NONE =			0x0,
 	CT_FRONT =			0x1,
 	CT_LEFT =			0x2,
@@ -210,30 +210,26 @@ enum collision_types
 	CT_CLAMP =			0x20
 };
 
-enum sfx_types
-{
+enum sfx_types {
 	SFX_LANDANDWATER =	0,
 	SFX_LANDONLY =		0x4000,
 	SFX_WATERONLY =		0x8000
 };
 
-enum target_type
-{
+enum target_type {
 	NO_TARGET,
 	PRIME_TARGET,
 	SECONDARY_TARGET
 };
 
-enum mood_type
-{
+enum mood_type {
 	BORED_MOOD,
 	ATTACK_MOOD,
 	ESCAPE_MOOD,
 	STALK_MOOD,
 };
 
-enum zone_type
-{
+enum zone_type {
 	SKELLY_ZONE,
 	BASIC_ZONE,
 	CROC_ZONE,
@@ -241,8 +237,7 @@ enum zone_type
 	FLYER_ZONE,
 };
 
-enum height_types
-{
+enum height_types {
 	WALL,
 	SMALL_SLOPE,
 	BIG_SLOPE,
@@ -250,16 +245,14 @@ enum height_types
 	SPLIT_TRI
 };
 
-enum item_status
-{
+enum item_status {
 	ITEM_INACTIVE,
 	ITEM_ACTIVE,
 	ITEM_DEACTIVATED,
 	ITEM_INVISIBLE
 };
 
-enum floor_types
-{
+enum floor_types {
 	FLOOR_TYPE,
 	DOOR_TYPE,
 	TILT_TYPE,
@@ -284,8 +277,7 @@ enum floor_types
 	MINER_TYPE
 };
 
-enum weapon_types
-{
+enum weapon_types {
 	WEAPON_NONE,
 	WEAPON_PISTOLS,
 	WEAPON_REVOLVER,
@@ -297,8 +289,7 @@ enum weapon_types
 	WEAPON_TORCH
 };
 
-enum lara_water_status
-{
+enum lara_water_status {
 	LW_ABOVE_WATER,
 	LW_UNDERWATER,
 	LW_SURFACE,
@@ -307,8 +298,7 @@ enum lara_water_status
 };
 
 // Imported from Tomb5
-enum LMX
-{
+enum LMX {
 	LMX_HIPS,
 	LMX_THIGH_L,
 	LMX_CALF_L,
@@ -326,8 +316,7 @@ enum LMX
 	LMX_HAND_L
 };
 
-enum lara_mesh
-{
+enum lara_mesh {
 	LM_HIPS,
 	LM_LTHIGH,
 	LM_LSHIN,
@@ -346,8 +335,7 @@ enum lara_mesh
 	NUM_LARA_MESHES
 };
 
-enum trigger_types
-{
+enum trigger_types {
 	TRIGGER,
 	PAD,
 	SWITCH,
@@ -363,8 +351,7 @@ enum trigger_types
 	MONKEY // TRNG - replaces this this with generic conditional triggers
 };
 
-enum trigobj_types
-{
+enum trigobj_types {
 	TO_OBJECT,
 	TO_CAMERA,
 	TO_SINK,
@@ -383,8 +370,7 @@ enum trigobj_types
 	TO_TIMERFIELD
 };
 
-enum matrix_indices
-{
+enum matrix_indices {
 	M00, M01, M02, M03,
 	M10, M11, M12, M13,
 	M20, M21, M22, M23,
@@ -392,8 +378,7 @@ enum matrix_indices
 	indices_count
 };
 
-enum input_buttons
-{
+enum input_buttons {
 	IN_NONE =				0x0,
 	IN_FORWARD =			0x1,
 	IN_BACK =				0x2,
@@ -431,8 +416,7 @@ enum input_buttons
 	IN_ALL =				0xFFFFFFFF
 };
 
-enum ITEM_FLAGS
-{
+enum ITEM_FLAGS {
 	IFL_TRIGGERED =				0x20,
 	IFL_SWITCH_ONESHOT =		0x40,	//oneshot for switch items
 	IFL_ANTITRIGGER_ONESHOT =	0x80,	//oneshot for antitriggers
@@ -442,8 +426,7 @@ enum ITEM_FLAGS
 	IFL_CLEARBODY =				0x8000
 };
 
-enum lara_gun_status
-{
+enum lara_gun_status {
 	LG_NO_ARMS,
 	LG_HANDS_BUSY,
 	LG_DRAW_GUNS,
@@ -452,8 +435,7 @@ enum lara_gun_status
 	LG_FLARE,
 };
 
-enum camera_type
-{
+enum camera_type {
 	CHASE_CAMERA,
 	FIXED_CAMERA,
 	LOOK_CAMERA,
@@ -462,8 +444,7 @@ enum camera_type
 	HEAVY_CAMERA,
 };
 
-enum LightTypes
-{
+enum LightTypes {
 	LIGHT_SUN,
 	LIGHT_POINT,
 	LIGHT_SPOT,
@@ -471,8 +452,7 @@ enum LightTypes
 	LIGHT_FOG
 };
 
-enum gf_level_options
-{
+enum gf_level_options {
 	GF_YOUNGLARA =		0x1,
 	GF_WEATHER =		0x2,
 	GF_HORIZON =		0x4,
@@ -491,81 +471,72 @@ enum gf_level_options
 	GF_NOLEVEL =		0x8000
 };
 
-struct CVECTOR
-{
-	char b;
-	char g;
-	char r;
-	char a;
+struct CVECTOR {
+	int8_t b;
+	int8_t g;
+	int8_t r;
+	int8_t a;
 };
 
-struct SPHERE
-{
-	long x;
-	long y;
-	long z;
-	long r;
+struct SPHERE {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t r;
 };
 
-struct PHD_VECTOR
-{
-	long x;
-	long y;
-	long z;
+struct PHD_VECTOR {
+	int32_t x;
+	int32_t y;
+	int32_t z;
 };
 
-struct PHD_3DPOS
-{
-	long x_pos;
-	long y_pos;
-	long z_pos;
-	short x_rot;
-	short y_rot;
-	short z_rot;
+struct PHD_3DPOS {
+	int32_t x_pos;
+	int32_t y_pos;
+	int32_t z_pos;
+	int16_t x_rot;
+	int16_t y_rot;
+	int16_t z_rot;
 };
 
-struct GAME_VECTOR
-{
-	long x;
-	long y;
-	long z;
-	short room_number;
-	short box_number;
+struct GAME_VECTOR {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t room_number;
+	int16_t box_number;
 };
 
-struct OBJECT_VECTOR
-{
-	long x;
-	long y;
-	long z;
-	short data;
-	short flags;
+struct OBJECT_VECTOR {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t data;
+	int16_t flags;
 };
 
-struct FVECTOR
-{
+struct FVECTOR {
 	float x;
 	float y;
 	float z;
 };
 
-struct SVECTOR
-{
-	short x;
-	short y;
-	short z;
-	short pad;
+struct SVECTOR {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int16_t pad;
 };
 
-struct PCLIGHT
-{
+struct PCLIGHT {
 	float x;
 	float y;
 	float z;
 	float r;
 	float g;
 	float b;
-	long shadow;
+	int32_t shadow;
 	float Inner;
 	float Outer;
 	float InnerAngle;
@@ -574,41 +545,40 @@ struct PCLIGHT
 	float nx;
 	float ny;
 	float nz;
-	long ix;
-	long iy;
-	long iz;
-	long inx;
-	long iny;
-	long inz;
+	int32_t ix;
+	int32_t iy;
+	int32_t iz;
+	int32_t inx;
+	int32_t iny;
+	int32_t inz;
 	float tr;
 	float tg;
 	float tb;
 	float rs;
 	float gs;
 	float bs;
-	long fcnt;
-	uchar Type;
-	uchar Active;
+	int32_t fcnt;
+	uint8_t Type;
+	uint8_t Active;
 	PHD_VECTOR rlp;
-	long Range;
+	int32_t Range;
 };
 
-struct ITEM_LIGHT
-{
-	long r;
-	long g;
-	long b;
-	long ambient;
-	long rs;
-	long gs;
-	long bs;
-	long fcnt;
+struct ITEM_LIGHT {
+	int32_t r;
+	int32_t g;
+	int32_t b;
+	int32_t ambient;
+	int32_t rs;
+	int32_t gs;
+	int32_t bs;
+	int32_t fcnt;
 	PCLIGHT	CurrentLights[21];
 	PCLIGHT	PrevLights[21];
-	long nCurrentLights;
-	long nPrevLights;
-	long room_number;
-	long RoomChange;
+	int32_t nCurrentLights;
+	int32_t nPrevLights;
+	int32_t room_number;
+	int32_t RoomChange;
 	PHD_VECTOR item_pos;
 	void* pCurrentLights;
 	void* pPrevLights;
@@ -616,122 +586,116 @@ struct ITEM_LIGHT
 
 #define TR4_VANILLA_ITEM_STRUCT_SIZE 5622
 
-struct ITEM_INFO
-{
-	long floor;
-	ulong touch_bits;
-	ulong mesh_bits;
-	short object_number;
-	short current_anim_state;
-	short goal_anim_state;
-	short required_anim_state;
-	short anim_number;
-	short frame_number;
-	short room_number;
-	short next_item;
-	short next_active;
-	short speed;
-	short fallspeed;
-	short hit_points;
-	ushort box_number;
-	short timer;
-	short flags;
-	short shade;
-	short trigger_flags;
-	short carried_item;
-	short after_death;
-	ushort fired_weapon;
-	short item_flags[4];
+struct ITEM_INFO {
+	int32_t floor;
+	uint32_t touch_bits;
+	uint32_t mesh_bits;
+	int16_t object_number;
+	int16_t current_anim_state;
+	int16_t goal_anim_state;
+	int16_t required_anim_state;
+	int16_t anim_number;
+	int16_t frame_number;
+	int16_t room_number;
+	int16_t next_item;
+	int16_t next_active;
+	int16_t speed;
+	int16_t fallspeed;
+	int16_t hit_points;
+	uint16_t box_number;
+	int16_t timer;
+	int16_t flags;
+	int16_t shade;
+	int16_t trigger_flags;
+	int16_t carried_item;
+	int16_t after_death;
+	uint16_t fired_weapon;
+	int16_t item_flags[4];
 	void* data;
 	PHD_3DPOS pos;
 	ITEM_LIGHT il;
-	ulong active : 1; // 0x01
-	ulong status : 2; // 0x02, 0x04
-	ulong gravity_status : 1; // 0x08
-	ulong hit_status : 1; // 0x10
-	ulong collidable : 1; // 0x20
-	ulong looked_at : 1; // 0x40
-	ulong dynamic_light : 1; // 0x80
-	ulong poisoned : 1; // 0x100
-	ulong ai_bits : 5; // 0x200, 0x400, 0x800, 0x1000, 0x2000
-	ulong really_active : 1; // 0x4000
-	ulong meshswap_meshbits;
-	short draw_room;
-	short TOSSPAD;
+	uint32_t active : 1; // 0x01
+	uint32_t status : 2; // 0x02, 0x04
+	uint32_t gravity_status : 1; // 0x08
+	uint32_t hit_status : 1; // 0x10
+	uint32_t collidable : 1; // 0x20
+	uint32_t looked_at : 1; // 0x40
+	uint32_t dynamic_light : 1; // 0x80
+	uint32_t poisoned : 1; // 0x100
+	uint32_t ai_bits : 5; // 0x200, 0x400, 0x800, 0x1000, 0x2000
+	uint32_t really_active : 1; // 0x4000
+	uint32_t meshswap_meshbits;
+	int16_t draw_room;
+	int16_t TOSSPAD;
 };
 
-struct BOX_NODE
-{
-	short exit_box;
-	ushort search_number;
-	short next_expansion;
-	short box_number;
+struct BOX_NODE {
+	int16_t exit_box;
+	uint16_t search_number;
+	int16_t next_expansion;
+	int16_t box_number;
 };
 
-struct LOT_INFO
-{
+struct LOT_INFO {
 	BOX_NODE* node;
-	short head;
-	short tail;
-	ushort search_number;
-	ushort block_mask;
-	short step;
-	short drop;
-	short zone_count;
-	short target_box;
-	short required_box;
-	short fly;
-	ushort can_jump : 1;
-	ushort can_monkey : 1;
-	ushort is_amphibious : 1;
-	ushort is_jumping : 1;
-	ushort is_monkeying : 1;
+	int16_t head;
+	int16_t tail;
+	uint16_t search_number;
+	uint16_t block_mask;
+	int16_t step;
+	int16_t drop;
+	int16_t zone_count;
+	int16_t target_box;
+	int16_t required_box;
+	int16_t fly;
+	uint16_t can_jump : 1;
+	uint16_t can_monkey : 1;
+	uint16_t is_amphibious : 1;
+	uint16_t is_jumping : 1;
+	uint16_t is_monkeying : 1;
 	PHD_VECTOR target;
 	zone_type zone;
 };
 
 #define CREATURE_JOINT_ROTATION_COUNT 4
 
-struct CREATURE_INFO
-{
-	short joint_rotation[CREATURE_JOINT_ROTATION_COUNT];
-	short maximum_turn;
-	short flags;
-	ushort alerted : 1;
-	ushort head_left : 1;
-	ushort head_right : 1;
-	ushort reached_goal : 1;
-	ushort hurt_by_lara : 1;
-	ushort patrol2 : 1;
-	ushort jump_ahead : 1;
-	ushort monkey_ahead : 1;
+struct CREATURE_INFO {
+	int16_t joint_rotation[CREATURE_JOINT_ROTATION_COUNT];
+	int16_t maximum_turn;
+	int16_t flags;
+	uint16_t alerted : 1;
+	uint16_t head_left : 1;
+	uint16_t head_right : 1;
+	uint16_t reached_goal : 1;
+	uint16_t hurt_by_lara : 1;
+	uint16_t patrol2 : 1;
+	uint16_t jump_ahead : 1;
+	uint16_t monkey_ahead : 1;
 	mood_type mood;
 	ITEM_INFO* enemy;
 	ITEM_INFO ai_target;
-	short pad;
-	short item_num;
+	int16_t pad;
+	int16_t item_num;
 	PHD_VECTOR target;
 	LOT_INFO LOT;
 };
 
-struct FX_INFO
-{
+struct FX_INFO {
 	PHD_3DPOS pos;
-	short room_number;
-	short object_number;
-	short next_fx;
-	short next_active;
-	short speed;
-	short fallspeed;
-	short frame_number;
-	short counter;
-	short shade;
-	short flag1;
-	short flag2;
+	int16_t room_number;
+	int16_t object_number;
+	int16_t next_fx;
+	int16_t next_active;
+	int16_t speed;
+	int16_t fallspeed;
+	int16_t frame_number;
+	int16_t counter;
+	int16_t shade;
+	int16_t flag1;
+	int16_t flag2;
 };
 
-struct LARA_ARM
-{
+struct LARA_ARM {
 	int16_t* frame_base;
 	int16_t frame_number;
 	int16_t anim_number;
@@ -745,8 +709,7 @@ struct LARA_ARM
 #define LARA_MESH_PTR_COUNT 15
 #define WET_COUNT 15
 
-struct LARA_INFO
-{
+struct LARA_INFO {
 	int16_t item_number;
 	int16_t gun_status;
 	int16_t gun_type;
@@ -873,159 +836,155 @@ struct LARA_INFO
 	int8_t locationPad;
 };
 
-struct GAMEFLOW
-{
-	ulong CheatEnabled : 1;
-	ulong LoadSaveEnabled : 1;
-	ulong TitleEnabled : 1;
-	ulong PlayAnyLevel : 1;
-	ulong Language : 3;
-	ulong DemoDisc : 1;
-	ulong Unused : 24;
-	ulong InputTimeout;
-	uchar SecurityTag;
-	uchar nLevels;
-	uchar nFileNames;
-	uchar Pad;
-	ushort FileNameLen;
-	ushort ScriptLen;
+struct GAMEFLOW {
+	uint32_t CheatEnabled : 1;
+	uint32_t LoadSaveEnabled : 1;
+	uint32_t TitleEnabled : 1;
+	uint32_t PlayAnyLevel : 1;
+	uint32_t Language : 3;
+	uint32_t DemoDisc : 1;
+	uint32_t Unused : 24;
+	uint32_t InputTimeout;
+	uint8_t SecurityTag;
+	uint8_t nLevels;
+	uint8_t nFileNames;
+	uint8_t Pad;
+	uint16_t FileNameLen;
+	uint16_t ScriptLen;
 };
 
-struct CAMERA_INFO
-{
+static_assert(sizeof(GAMEFLOW)==16);
+
+struct CAMERA_INFO {
 	GAME_VECTOR pos;
 	GAME_VECTOR target;
 	camera_type type;
 	camera_type old_type;
-	long shift;
-	long flags;
-	long fixed_camera;
-	long number_frames;
-	long bounce;
-	long underwater;
-	long target_distance;
-	short target_angle;
-	short target_elevation;
-	short actual_elevation;
-	short actual_angle;
-	short lara_node; // T4Plus
-	short number;
-	short last;
-	short timer;
-	short speed;
+	int32_t shift;
+	int32_t flags;
+	int32_t fixed_camera;
+	int32_t number_frames;
+	int32_t bounce;
+	int32_t underwater;
+	int32_t target_distance;
+	int16_t target_angle;
+	int16_t target_elevation;
+	int16_t actual_elevation;
+	int16_t actual_angle;
+	int16_t lara_node; // T4Plus
+	int16_t number;
+	int16_t last;
+	int16_t timer;
+	int16_t speed;
 	ITEM_INFO* item;
 	ITEM_INFO* last_item;
 	OBJECT_VECTOR* fixed;
-	long mike_at_lara;
+	int32_t mike_at_lara;
 	PHD_VECTOR mike_pos;
 };
 
-struct COLL_INFO
-{
-	long mid_floor;
-	long mid_ceiling;
-	long mid_type;
-	long front_floor;
-	long front_ceiling;
-	long front_type;
-	long left_floor;
-	long left_ceiling;
-	long left_type;
-	long right_floor;
-	long right_ceiling;
-	long right_type;
-	long left_floor2;
-	long left_ceiling2;
-	long left_type2;
-	long right_floor2;
-	long right_ceiling2;
-	long right_type2;
-	long radius;
-	long bad_pos;
-	long bad_neg;
-	long bad_ceiling;
+struct COLL_INFO {
+	int32_t mid_floor;
+	int32_t mid_ceiling;
+	int32_t mid_type;
+	int32_t front_floor;
+	int32_t front_ceiling;
+	int32_t front_type;
+	int32_t left_floor;
+	int32_t left_ceiling;
+	int32_t left_type;
+	int32_t right_floor;
+	int32_t right_ceiling;
+	int32_t right_type;
+	int32_t left_floor2;
+	int32_t left_ceiling2;
+	int32_t left_type2;
+	int32_t right_floor2;
+	int32_t right_ceiling2;
+	int32_t right_type2;
+	int32_t radius;
+	int32_t bad_pos;
+	int32_t bad_neg;
+	int32_t bad_ceiling;
 	PHD_VECTOR shift;
 	PHD_VECTOR old;
-	short old_anim_state;
-	short old_anim_number;
-	short old_frame_number;
-	short facing;
-	short quadrant;
-	short coll_type;
-	short *trigger_index;
-	char tilt_x;
-	char tilt_z;
-	char hit_by_baddie;
-	char hit_static;
-	ushort slopes_are_walls : 2;
-	ushort slopes_are_pits : 1;
-	ushort lava_is_pit : 1;
-	ushort enable_baddie_push : 1;
-	ushort enable_spaz : 1;
-	ushort hit_ceiling : 1;
+	int16_t old_anim_state;
+	int16_t old_anim_number;
+	int16_t old_frame_number;
+	int16_t facing;
+	int16_t quadrant;
+	int16_t coll_type;
+	int16_t *trigger_index;
+	int8_t tilt_x;
+	int8_t tilt_z;
+	int8_t hit_by_baddie;
+	int8_t hit_static;
+	uint16_t slopes_are_walls : 2;
+	uint16_t slopes_are_pits : 1;
+	uint16_t lava_is_pit : 1;
+	uint16_t enable_baddie_push : 1;
+	uint16_t enable_spaz : 1;
+	uint16_t hit_ceiling : 1;
 };
 
-struct OBJECT_INFO
-{
-	short nmeshes;
-	short mesh_index;
-	long bone_index;
-	short* frame_base;
-	void (*initialise)(short item_number);
-	void (*control)(short item_number);
-	void (*floor)(ITEM_INFO* item, long x, long y, long z, long* height);
-	void (*ceiling)(ITEM_INFO* item, long x, long y, long z, long* height);
+struct OBJECT_INFO {
+	int16_t nmeshes;
+	int16_t mesh_index;
+	int32_t bone_index;
+	int16_t* frame_base;
+	void (*initialise)(int16_t item_number);
+	void (*control)(int16_t item_number);
+	void (*floor)(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
+	void (*ceiling)(ITEM_INFO* item, int32_t x, int32_t y, int32_t z, int32_t* height);
 	void (*draw_routine)(ITEM_INFO* item);
-	void (*collision)(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll);
-	short object_mip;
-	short anim_index;
-	short hit_points;
-	short pivot_length;
-	short radius;
-	ushort aggression = 0xFFFF;
-	short shadow_size;
-	ushort bite_offset;
-	ushort loaded : 1;
-	ushort intelligent : 1;
-	ushort non_lot : 1;
-	ushort save_position : 1;
-	ushort save_hitpoints : 1;
-	ushort save_flags : 1;
-	ushort save_anim : 1;
-	ushort semi_transparent : 1;
-	ushort water_creature : 1;
-	ushort using_drawanimating_item : 1;
-	ushort HitEffect : 2;
-	ushort undead : 1;
-	ushort save_mesh : 1;
+	void (*collision)(int16_t item_num, ITEM_INFO* laraitem, COLL_INFO* coll);
+	int16_t object_mip;
+	int16_t anim_index;
+	int16_t hit_points;
+	int16_t pivot_length;
+	int16_t radius;
+	uint16_t aggression = 0xFFFF;
+	int16_t shadow_size;
+	uint16_t bite_offset;
+	uint16_t loaded : 1;
+	uint16_t intelligent : 1;
+	uint16_t non_lot : 1;
+	uint16_t save_position : 1;
+	uint16_t save_hitpoints : 1;
+	uint16_t save_flags : 1;
+	uint16_t save_anim : 1;
+	uint16_t semi_transparent : 1;
+	uint16_t water_creature : 1;
+	uint16_t using_drawanimating_item : 1;
+	uint16_t HitEffect : 2;
+	uint16_t undead : 1;
+	uint16_t save_mesh : 1;
 	void (*draw_routine_extra)(ITEM_INFO* item);
-	ulong explodable_meshbits;
-	ulong pad;
-	ushort pad2;
+	uint32_t explodable_meshbits;
+	uint32_t pad;
+	uint16_t pad2;
 };
 
-struct FLOOR_INFO
-{
-	ushort index;
-	ushort fx : 4;
-	ushort box : 11;
-	ushort stopper : 1;
-	uchar pit_room;
-	char floor;
-	uchar sky_room;
-	char ceiling;
+struct FLOOR_INFO {
+	uint16_t index;
+	uint16_t fx : 4;
+	uint16_t box : 11;
+	uint16_t stopper : 1;
+	uint8_t pit_room;
+	int8_t floor;
+	uint8_t sky_room;
+	int8_t ceiling;
 };
 
-struct LIGHTINFO
-{
-	long x;
-	long y;
-	long z;
-	uchar r;
-	uchar g;
-	uchar b;
-	uchar Type;
-	short Intensity;
+struct LIGHTINFO {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t Type;
+	int16_t Intensity;
 	float Inner;
 	float Outer;
 	float Length;
@@ -1035,8 +994,7 @@ struct LIGHTINFO
 	float nz;
 };
 
-struct FOGBULB_STRUCT
-{
+struct FOGBULB_STRUCT {
 	FVECTOR WorldPos;
 	FVECTOR pos;
 	FVECTOR vec;
@@ -1044,37 +1002,35 @@ struct FOGBULB_STRUCT
 	float sqrad;
 	float inv_sqrad;
 	float dist;
-	long density;
-	long inRange;
-	long timer;
-	long active;
-	long FXRad;
-	long room_number;
-	long r;
-	long g;
-	long b;
+	int32_t density;
+	int32_t inRange;
+	int32_t timer;
+	int32_t active;
+	int32_t FXRad;
+	int32_t room_number;
+	int32_t r;
+	int32_t g;
+	int32_t b;
 };
 
-struct MESH_INFO
-{
-	long x;
-	long y;
-	long z;
-	short y_rot;
-	short shade;
-	short Flags;
-	short static_number;
+struct MESH_INFO {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t y_rot;
+	int16_t shade;
+	int16_t Flags;
+	int16_t static_number;
 };
 
-struct PCLIGHT_INFO
-{
+struct PCLIGHT_INFO {
 	float x;
 	float y;
 	float z;
 	float r;
 	float g;
 	float b;
-	long shadow;
+	int32_t shadow;
 	float Inner;
 	float Outer;
 	float InnerAngle;
@@ -1083,19 +1039,19 @@ struct PCLIGHT_INFO
 	float nx;
 	float ny;
 	float nz;
-	long ix;
-	long iy;
-	long iz;
-	long inx;
-	long iny;
-	long inz;
-	uchar Type;
-	uchar Pad;
+	int32_t ix;
+	int32_t iy;
+	int32_t iz;
+	int32_t inx;
+	int32_t iny;
+	int32_t inz;
+	uint8_t Type;
+	uint8_t Pad;
 };
 
 #define GFX_RGBA_SETALPHA(rgba, x) (((x) << 24) | ((rgba) & 0x00ffffff))
 
-typedef unsigned long GFXCOLOR;
+typedef uint32_t GFXCOLOR;
 typedef float GFXVALUE;
 
 struct GFXVECTOR {
@@ -1133,8 +1089,7 @@ struct GFXTLVERTEX {
 	GFXVALUE	tv;
 };
 
-struct GFXTLBUMPVERTEX
-{
+struct GFXTLBUMPVERTEX {
 	GFXVALUE sx;
 	GFXVALUE sy;
 	GFXVALUE sz;
@@ -1147,119 +1102,109 @@ struct GFXTLBUMPVERTEX
 	GFXVALUE ty;
 };
 
-struct ROOM_INFO
-{
-	short* data;
-	short* door;
+struct ROOM_INFO {
+	int16_t* data;
+	int16_t* door;
 	FLOOR_INFO* floor;
 	LIGHTINFO* light;
 	MESH_INFO* mesh;
-	long x;
-	long y;
-	long z;
-	long minfloor;
-	long maxceiling;
-	short x_size;
-	short y_size;
-	long ambient;
-	short num_lights;
-	short num_meshes;
-	uchar ReverbType;
-	uchar FlipNumber;
-	char MeshEffect;
-	char bound_active;
-	short left;
-	short right;
-	short top;
-	short bottom;
-	short test_left;
-	short test_right;
-	short test_top;
-	short test_bottom;
-	short item_number;
-	short fx_number;
-	short flipped_room;
-	ushort flags;
-	long nVerts;
-	long nWaterVerts;
-	long nShoreVerts;
-#ifdef USE_BGFX
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t minfloor;
+	int32_t maxceiling;
+	int16_t x_size;
+	int16_t y_size;
+	int32_t ambient;
+	int16_t num_lights;
+	int16_t num_meshes;
+	uint8_t ReverbType;
+	uint8_t FlipNumber;
+	int8_t MeshEffect;
+	int8_t bound_active;
+	int16_t left;
+	int16_t right;
+	int16_t top;
+	int16_t bottom;
+	int16_t test_left;
+	int16_t test_right;
+	int16_t test_top;
+	int16_t test_bottom;
+	int16_t item_number;
+	int16_t fx_number;
+	int16_t flipped_room;
+	uint16_t flags;
+	int32_t nVerts;
+	int32_t nWaterVerts;
+	int32_t nShoreVerts;
 	GFXVERTEX *Buffer = nullptr;
-#else
-	LPDIRECT3DVERTEXBUFFER SourceVB;
-#endif
-	short* FaceData;
+	int16_t* FaceData;
 	float posx;
 	float posy;
 	float posz;
 	GFXVECTOR *vnormals;
 	GFXVECTOR *fnormals;
-	long *prelight;
-	long *prelightwater;
-	long watercalc;
+	int32_t *prelight;
+	int32_t *prelightwater;
+	int32_t watercalc;
 	GFXVECTOR *verts;
-	long gt3cnt;
-	long gt4cnt;
+	int32_t gt3cnt;
+	int32_t gt4cnt;
 	PCLIGHT_INFO *pclight;
 };
 
-struct ANIM_STRUCT
-{
-	short* frame_ptr;
-	short interpolation;
-	short current_anim_state;
-	long velocity;
-	long acceleration;
-	long Xvelocity;
-	long Xacceleration;
-	short frame_base;
-	short frame_end;
-	short jump_anim_num;
-	short jump_frame_num;
-	short number_changes;
-	short change_index;
-	short number_commands;
-	short command_index;
+struct ANIM_STRUCT {
+	int16_t* frame_ptr;
+	int16_t interpolation;
+	int16_t current_anim_state;
+	int32_t velocity;
+	int32_t acceleration;
+	int32_t Xvelocity;
+	int32_t Xacceleration;
+	int16_t frame_base;
+	int16_t frame_end;
+	int16_t jump_anim_num;
+	int16_t jump_frame_num;
+	int16_t number_changes;
+	int16_t change_index;
+	int16_t number_commands;
+	int16_t command_index;
 };
 
 #define MAX_ROPE_SEGMENTS 24
 #define MAX_ROPE_COORDS 3
 
-struct ROPE_STRUCT
-{
+struct ROPE_STRUCT {
 	PHD_VECTOR Segment[MAX_ROPE_SEGMENTS];
 	PHD_VECTOR Velocity[MAX_ROPE_SEGMENTS];
 	PHD_VECTOR NormalisedSegment[MAX_ROPE_SEGMENTS];
 	PHD_VECTOR MeshSegment[MAX_ROPE_SEGMENTS];
 	PHD_VECTOR Position;
-	long Coords[MAX_ROPE_SEGMENTS][MAX_ROPE_COORDS];
-	long SegmentLength;
-	long Active;
+	int32_t Coords[MAX_ROPE_SEGMENTS][MAX_ROPE_COORDS];
+	int32_t SegmentLength;
+	int32_t Active;
 };
 
-struct PENDULUM
-{
+struct PENDULUM {
 	PHD_VECTOR Position;
 	PHD_VECTOR Velocity;
-	long node;
+	int32_t node;
 	ROPE_STRUCT* Rope;
 };
 
-struct STATS
-{
-	ulong Timer;
-	ulong Distance;
-	ulong AmmoUsed;
-	ulong AmmoHits;
-	ushort Kills;
-	uchar Secrets;
-	uchar HealthUsed;
+struct STATS {
+	uint32_t Timer;
+	uint32_t Distance;
+	uint32_t AmmoUsed;
+	uint32_t AmmoHits;
+	uint16_t Kills;
+	uint8_t Secrets;
+	uint8_t HealthUsed;
 };
 
 #define SAVEGAME_BUFFER_SIZE 15410
 
-struct LEGACY_SAVEGAME_LARA_ARM
-{
+struct LEGACY_SAVEGAME_LARA_ARM {
 	X32_POINTER frame_base; // Pointer
 	int16_t frame_number;
 	int16_t anim_number;
@@ -1270,8 +1215,7 @@ struct LEGACY_SAVEGAME_LARA_ARM
 	int16_t flash_gun;
 };
 
-struct LEGACY_SAVEGAME_LARA_INFO
-{
+struct LEGACY_SAVEGAME_LARA_INFO {
 	int16_t item_number;
 	int16_t gun_status;
 	int16_t gun_type;
@@ -1400,202 +1344,160 @@ struct LEGACY_SAVEGAME_LARA_INFO
 
 #define MAX_HUB_LEVELS 10
 
-struct LEGACY_SAVEGAME_INFO
-{
+struct LEGACY_SAVEGAME_INFO {
 	LEGACY_SAVEGAME_LARA_INFO Lara;
-	long cutscene_triggered;
-	uchar HubLevels[MAX_HUB_LEVELS];	//saved level indices. highest one that isn't 0 is the one we are currently in
-	ushort HubOffsets[MAX_HUB_LEVELS];	//offset of each level's data inside the savegame buffer
-	ushort HubSizes[MAX_HUB_LEVELS];	//size of each level's data inside the savegame buffer
-	char CurrentLevel;
-	char Checksum;
+	int32_t cutscene_triggered;
+	uint8_t HubLevels[MAX_HUB_LEVELS];	//saved level indices. highest one that isn't 0 is the one we are currently in
+	uint16_t HubOffsets[MAX_HUB_LEVELS];	//offset of each level's data inside the savegame buffer
+	uint16_t HubSizes[MAX_HUB_LEVELS];	//size of each level's data inside the savegame buffer
+	int8_t CurrentLevel;
+	int8_t Checksum;
 	STATS Game;
 	STATS Level;
-	short WeaponObject;
-	short WeaponAnim;
-	short WeaponFrame;
-	short WeaponCurrent;
-	short WeaponGoal;
+	int16_t WeaponObject;
+	int16_t WeaponAnim;
+	int16_t WeaponFrame;
+	int16_t WeaponCurrent;
+	int16_t WeaponGoal;
 	CVECTOR fog_colour;
-	uchar HubSavedLara : 1;	//flag that we saved Lara's data when we initialised hub, only set to 1 when InitialiseHub is called with 1
-	uchar AutoTarget : 1;
-	uchar HaveBikeBooster : 1;	//have the bike nitro thing
+	uint8_t HubSavedLara : 1;	//flag that we saved Lara's data when we initialised hub, only set to 1 when InitialiseHub is called with 1
+	uint8_t AutoTarget : 1;
+	uint8_t HaveBikeBooster : 1;	//have the bike nitro thing
 	char buffer[SAVEGAME_BUFFER_SIZE];
 };
 
-struct BIKEINFO
-{
-	short right_front_wheelrot;
-	short right_back_wheelrot;
-	long left_wheelrot;
-	long velocity;
-	long unused1;
-	long pitch1;
-	short move_angle;
-	short extra_rotation;
-	short rot_thing;
-	long bike_turn;
-	long pitch2;
-	short flags;
-	short light_intensity;
+struct BIKEINFO {
+	int16_t right_front_wheelrot;
+	int16_t right_back_wheelrot;
+	int32_t left_wheelrot;
+	int32_t velocity;
+	int32_t unused1;
+	int32_t pitch1;
+	int16_t move_angle;
+	int16_t extra_rotation;
+	int16_t rot_thing;
+	int32_t bike_turn;
+	int32_t pitch2;
+	int16_t flags;
+	int16_t light_intensity;
 };
 
-struct SPARKS
-{
-	long x;
-	long y;
-	long z;
-	short Xvel;
-	short Yvel;
-	short Zvel;
-	short Gravity;
-	short RotAng;
-	short Flags;
-	uchar sSize;
-	uchar dSize;
-	uchar Size;
-	uchar Friction;
-	uchar Scalar;
-	uchar Def;
-	char RotAdd;
-	char MaxYvel;
-	uchar On;
-	uchar sR;
-	uchar sG;
-	uchar sB;
-	uchar dR;
-	uchar dG;
-	uchar dB;
-	uchar R;
-	uchar G;
-	uchar B;
-	uchar ColFadeSpeed;
-	uchar FadeToBlack;
-	uchar sLife;
-	uchar Life;
-	uchar TransType;
-	uchar extras;
-	char Dynamic;
-	uchar FxObj;
-	uchar RoomNumber;
-	uchar NodeNumber;
+struct SPARKS {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t Xvel;
+	int16_t Yvel;
+	int16_t Zvel;
+	int16_t Gravity;
+	int16_t RotAng;
+	int16_t Flags;
+	uint8_t sSize;
+	uint8_t dSize;
+	uint8_t Size;
+	uint8_t Friction;
+	uint8_t Scalar;
+	uint8_t Def;
+	int8_t RotAdd;
+	int8_t MaxYvel;
+	uint8_t On;
+	uint8_t sR;
+	uint8_t sG;
+	uint8_t sB;
+	uint8_t dR;
+	uint8_t dG;
+	uint8_t dB;
+	uint8_t R;
+	uint8_t G;
+	uint8_t B;
+	uint8_t ColFadeSpeed;
+	uint8_t FadeToBlack;
+	uint8_t sLife;
+	uint8_t Life;
+	uint8_t TransType;
+	uint8_t extras;
+	int8_t Dynamic;
+	uint8_t FxObj;
+	uint8_t RoomNumber;
+	uint8_t NodeNumber;
 };
 
-struct STATIC_INFO
-{
-	short mesh_number;
-	short flags;
-	short x_minp;
-	short x_maxp;
-	short y_minp;
-	short y_maxp;
-	short z_minp;
-	short z_maxp;
-	short x_minc;
-	short x_maxc;
-	short y_minc;
-	short y_maxc;
-	short z_minc;
-	short z_maxc;
+struct STATIC_INFO {
+	int16_t mesh_number;
+	int16_t flags;
+	int16_t x_minp;
+	int16_t x_maxp;
+	int16_t y_minp;
+	int16_t y_maxp;
+	int16_t z_minp;
+	int16_t z_maxp;
+	int16_t x_minc;
+	int16_t x_maxc;
+	int16_t y_minc;
+	int16_t y_maxc;
+	int16_t z_minc;
+	int16_t z_maxc;
 };
 
-struct DXPTR
-{
-#ifndef USE_BGFX
-	LPDIRECTDRAWX lpDD;
-	LPDIRECT3DX lpD3D;
-	LPDIRECT3DDEVICEX lpD3DDevice;
-	LPDIRECT3DDEVICEX _lpD3DDevice;
-	LPDIRECTDRAWSURFACEX lpPrimaryBuffer;
-	LPDIRECTDRAWSURFACEX lpBackBuffer;
-	LPDIRECTDRAWSURFACEX lpZBuffer;
-	LPDIRECT3DVIEWPORTX lpViewport;
-#endif
+struct DXPTR {
 #if !defined(MA_AUDIO_SAMPLES) || !defined(MA_AUDIO_ENGINE)
 	LPDIRECTSOUND8 lpDS;
 	IXAudio2* lpXA;
 #endif
-	ulong dwRenderWidth;
-	ulong dwRenderHeight;
-	RECT rViewport;
-	RECT rScreen;
-	long Flags;
-	ulong WindowStyle;
-	long CoopLevel;
-#if !defined(USE_SDL)
-	LPDIRECTINPUTX lpDirectInput;
-	LPDIRECTINPUTDEVICEX Keyboard;
+	uint32_t dwRenderWidth;
+	uint32_t dwRenderHeight;
+	int32_t Flags;
+
+#ifdef _WIN32
+	uint32_t WindowStyle;
 #endif
+
+#ifdef _WIN32
 	HWND hWnd;
-	volatile long InScene;
-	volatile long WaitAtBeginScene;
-	volatile long DoneBlit;
-};
-
-struct DXDISPLAYMODE
-{
-	long w;
-	long h;
-	long bpp;
-	long RefreshRate;
-	long bPalette;
-#ifndef USE_BGFX
-	DDSURFACEDESCX ddsd;
 #endif
-	uchar rbpp;
-	uchar gbpp;
-	uchar bbpp;
-	uchar rshift;
-	uchar gshift;
-	uchar bshift;
+	volatile int32_t InScene;
+	volatile int32_t WaitAtBeginScene;
+	volatile int32_t DoneBlit;
 };
 
-struct DXTEXTUREINFO
-{
-#ifndef USE_BGFX
-	DDPIXELFORMAT ddpf;
-#endif
-	ulong bpp;
-	long bPalette;
-	long bAlpha;
-	uchar rbpp;
-	uchar gbpp;
-	uchar bbpp;
-	uchar abpp;
-	uchar rshift;
-	uchar gshift;
-	uchar bshift;
-	uchar ashift;
+struct DXDISPLAYMODE {
+	int32_t w;
+	int32_t h;
+	int32_t bpp;
+	int32_t RefreshRate;
+	int32_t bPalette;
+	uint8_t rbpp;
+	uint8_t gbpp;
+	uint8_t bbpp;
+	uint8_t rshift;
+	uint8_t gshift;
+	uint8_t bshift;
 };
 
-struct DXZBUFFERINFO
-{
-#ifndef USE_BGFX
-	DDPIXELFORMAT ddpf;
-#endif
-	ulong bpp;
+struct DXTEXTUREINFO {
+	uint32_t bpp;
+	int32_t bPalette;
+	int32_t bAlpha;
+	uint8_t rbpp;
+	uint8_t gbpp;
+	uint8_t bbpp;
+	uint8_t abpp;
+	uint8_t rshift;
+	uint8_t gshift;
+	uint8_t bshift;
+	uint8_t ashift;
 };
 
-struct DXD3DDEVICE
-{
+struct DXZBUFFERINFO {
+	uint32_t bpp;
+};
+
+struct DXD3DDEVICE {
 	char Name[30];
 	char About[80];
-	LPGUID lpGuid;
-	GUID Guid;
-#ifndef USE_BGFX
-	D3DDEVICEDESC DeviceDesc;
-	long bHardware;
-	long nDisplayModes;
-	DXDISPLAYMODE* DisplayModes;
-	long nTextureInfos;
-	DXTEXTUREINFO* TextureInfos;
-	long nZBufferInfos;
-	DXZBUFFERINFO* ZBufferInfos;
-#endif
 };
 
-struct DXDIRECTDRAWINFO
-{
+struct DXDIRECTDRAWINFO {
 #ifdef UNICODE
 	wchar_t Name[30];
 	wchar_t About[80];
@@ -1603,117 +1505,99 @@ struct DXDIRECTDRAWINFO
 	char Name[30];
 	char About[80];
 #endif
-	LPGUID lpGuid;
-	GUID Guid;
-#ifndef USE_BGFX
-	DDCAPS DDCaps;
-	DDDEVICEIDENTIFIER DDIdentifier;
-#endif
-	long nDisplayModes;
+	int32_t nDisplayModes;
 	DXDISPLAYMODE* DisplayModes;
-	long nD3DDevices;
+	int32_t nD3DDevices;
 	DXD3DDEVICE* D3DDevices;
 };
 
-struct DXDIRECTSOUNDINFO
-{
+struct DXDIRECTSOUNDINFO {
 	char Name[30];
 	char About[80];
+#ifdef _WIN32
 	LPGUID lpGuid;
 	GUID Guid;
+#endif
 };
 
-struct DXINFO
-{
-	long nDDInfo;
-	long nDSInfo;
+struct DXINFO {
+	int32_t nDDInfo;
+	int32_t nDSInfo;
 	DXDIRECTDRAWINFO* DDInfo;
 	DXDIRECTSOUNDINFO* DSInfo;
-	long nDD;
-	long nD3D;
-#ifdef USE_BGFX
-	long screenW;
-	long screenH;
-#else
-	long nDisplayMode;
-#endif
-	long nTexture;
-	long nZBuffer;
-	long nDS;
+	int32_t nDD;
+	int32_t nD3D;
+	int32_t screenW;
+	int32_t screenH;
+	int32_t nTexture;
+	int32_t nZBuffer;
+	int32_t nDS;
 	bool bHardware;
 };
 
-struct WINAPP
-{
+struct WINAPP {
+#ifdef _WIN32
 	HINSTANCE hInstance;
 	HWND hWnd;
 	WNDCLASS WindowClass;
+#endif
 	DXINFO DXInfo;
 	DXPTR dx;
+#ifdef _WIN32
 	HANDLE mutex;
-	float fps;
-#ifndef USE_BGFX
-	LPDIRECT3DMATERIALX GlobalMaterial;
-	D3DMATERIALHANDLE GlobalMaterialHandle;
 #endif
+	float fps;
+
+#ifdef _WIN32
 	HACCEL hAccel;
+#endif
 	bool SetupComplete;
 	bool BumpMapping;
-	long TextureSize;
-	long BumpMapSize;
-	bool mmx;
+	int32_t TextureSize;
+	int32_t BumpMapSize;
 	bool Filtering;
 	bool Volumetric;
 	bool SoundDisabled;
-	long StartFlags;
+	int32_t StartFlags;
 	volatile bool fmv;
-	long Desktopbpp;
-	long AutoTarget;
-#ifdef USE_SDL
-	long VideoWidth;
-	long VideoHeight;
-#endif
+	int32_t Desktopbpp;
+	int32_t AutoTarget;
+	int32_t VideoWidth;
+	int32_t VideoHeight;
 };
 
-struct SPRITESTRUCT
-{
-	ushort tpage;
-	ushort offset;
-	ushort width;
-	ushort height;
+struct SPRITESTRUCT {
+	uint16_t tpage;
+	uint16_t offset;
+	uint16_t width;
+	uint16_t height;
 	float x1;	//left
 	float y1;	//top
 	float x2;	//right
 	float y2;	//bottom
 };
 
-struct MESH_DATA
-{
-	short x;
-	short y;
-	short z;
-	short r;
-	short flags;
-	short nVerts;
-	short nNorms;
-	ushort ngt4; // TRLE: Made unsigned, fixes some level loading
-	short* gt4;
-	ushort ngt3; // TRLE: Made unsigned, fixes some level loading
-	short* gt3;
-	long* prelight;
-#ifdef USE_BGFX
+struct MESH_DATA {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int16_t r;
+	int16_t flags;
+	int16_t nVerts;
+	int16_t nNorms;
+	uint16_t ngt4; // TRLE: Made unsigned, fixes some level loading
+	int16_t* gt4;
+	uint16_t ngt3; // TRLE: Made unsigned, fixes some level loading
+	int16_t* gt3;
+	int32_t* prelight;
 	GFXVERTEX *Buffer = nullptr;
-#else
-	LPDIRECT3DVERTEXBUFFER SourceVB;
-#endif
 	GFXVECTOR* Normals;
 };
 
-struct TEXTURESTRUCT
-{
-	ushort drawtype;
-	ushort tpage;
-	ushort flag;
+struct TEXTURESTRUCT {
+	uint16_t drawtype;
+	uint16_t tpage;
+	uint16_t flag;
 	float u1;
 	float v1;
 	float u2;
@@ -1724,869 +1608,781 @@ struct TEXTURESTRUCT
 	float v4;
 };
 
-struct LIGHTNING_STRUCT
-{
+struct LIGHTNING_STRUCT {
 	PHD_VECTOR Point[4];
-	uchar r;
-	uchar g;
-	uchar b;
-	uchar Life;
-	char Xvel1;
-	char Yvel1;
-	char Zvel1;
-	char Xvel2;
-	char Yvel2;
-	char Zvel2;
-	char Xvel3;
-	char Yvel3;
-	char Zvel3;
-	uchar Size;
-	uchar Flags;
-	uchar Rand;
-	uchar Segments;
-	uchar Pad[3];
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t Life;
+	int8_t Xvel1;
+	int8_t Yvel1;
+	int8_t Zvel1;
+	int8_t Xvel2;
+	int8_t Yvel2;
+	int8_t Zvel2;
+	int8_t Xvel3;
+	int8_t Yvel3;
+	int8_t Zvel3;
+	uint8_t Size;
+	uint8_t Flags;
+	uint8_t Rand;
+	uint8_t Segments;
+	uint8_t Pad[3];
 };
 
-typedef struct SNOWFLAKE
-{
-	long x;
-	long y;
-	long z;
-	char xv;
-	uchar yv;
-	char zv;
-	uchar life;
-	short stopped;
-	short room_number;
+typedef struct SNOWFLAKE {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int8_t xv;
+	uint8_t yv;
+	int8_t zv;
+	uint8_t life;
+	int16_t stopped;
+	int16_t room_number;
 } RAINDROPS, UWEFFECTS;
 
-struct DYNAMIC
-{
-	long x;
-	long y;
-	long z;
-	uchar on;
-	uchar r;
-	uchar g;
-	uchar b;
-	ushort falloff;
-	uchar used;
-	uchar pad1[1];
-	long FalloffScale;
+struct DYNAMIC {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	uint8_t on;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint16_t falloff;
+	uint8_t used;
+	uint8_t pad1[1];
+	int32_t FalloffScale;
 };
 
-struct INVOBJ
-{
-	short object_number;
-	short yoff;
-	short scale1;
-	short yrot;
-	short xrot;
-	short zrot;
-	short flags;
-	short objname;
-	ulong meshbits;
+struct INVOBJ {
+	int16_t object_number;
+	int16_t yoff;
+	int16_t scale1;
+	int16_t yrot;
+	int16_t xrot;
+	int16_t zrot;
+	int16_t flags;
+	int16_t objname;
+	uint32_t meshbits;
 };
 
-struct MENUTHANG
-{
-	long type;
+struct MENUTHANG {
+	int32_t type;
 	char* text;
 };
 
-struct AMMOLIST
-{
-	short invitem;
-	short amount;
-	ushort yrot;
+struct AMMOLIST {
+	int16_t invitem;
+	int16_t amount;
+	uint16_t yrot;
 };
 
-struct OBJLIST
-{
-	short invitem;
-	ushort yrot;
-	ushort bright;
+struct OBJLIST {
+	int16_t invitem;
+	uint16_t yrot;
+	uint16_t bright;
 };
 
-struct INVDRAWITEM
-{
-	short xrot;
-	short yrot;
-	short zrot;
-	short object_number;
-	ulong mesh_bits;
+struct INVDRAWITEM {
+	int16_t xrot;
+	int16_t yrot;
+	int16_t zrot;
+	int16_t object_number;
+	uint32_t mesh_bits;
 };
 
-struct RINGME
-{
+struct RINGME {
 	OBJLIST current_object_list[119];
-	long ringactive;
-	long objlistmovement;
-	long curobjinlist;
-	long numobjectsinlist;
+	int32_t ringactive;
+	int32_t objlistmovement;
+	int32_t curobjinlist;
+	int32_t numobjectsinlist;
 };
 
-struct COMBINELIST
-{
-	void(*combine_routine)(long flag);
-	short item1;
-	short item2;
-	short combined_item;
+struct COMBINELIST {
+	void(*combine_routine)(int32_t flag);
+	int16_t item1;
+	int16_t item2;
+	int16_t combined_item;
 };
 
-struct CUTSEQ_ROUTINES
-{
+struct CUTSEQ_ROUTINES {
 	void(*init_func)();
 	void(*control_func)();
 	void(*end_func)();
 };
 
-struct ACTORME
-{
-	long offset;
-	short objslot;
-	short nodes;
+struct ACTORME {
+	int32_t offset;
+	int16_t objslot;
+	int16_t nodes;
 };
 
-struct NEW_CUTSCENE
-{
-	short numactors;
-	short numframes;
-	long orgx;
-	long orgy;
-	long orgz;
-	long audio_track;
-	long camera_offset;
+struct NEW_CUTSCENE {
+	int16_t numactors;
+	int16_t numframes;
+	int32_t orgx;
+	int32_t orgy;
+	int32_t orgz;
+	int32_t audio_track;
+	int32_t camera_offset;
 	ACTORME actor_data[10];
 };
 
-struct RTDECODE
-{
-	ulong length;
-	ulong off;
-	ushort counter;
-	ushort data;
-	uchar decodetype;
-	uchar packmethod;
-	ushort pad;
+struct RTDECODE {
+	uint32_t length;
+	uint32_t off;
+	uint16_t counter;
+	uint16_t data;
+	uint8_t decodetype;
+	uint8_t packmethod;
+	uint16_t pad;
 };
 
-struct PACKNODE
-{
-	short xrot_run;
-	short yrot_run;
-	short zrot_run;
-	short xkey;
-	short ykey;
-	short zkey;
+struct PACKNODE {
+	int16_t xrot_run;
+	int16_t yrot_run;
+	int16_t zrot_run;
+	int16_t xkey;
+	int16_t ykey;
+	int16_t zkey;
 	RTDECODE decode_x;
 	RTDECODE decode_y;
 	RTDECODE decode_z;
-	ulong xlength;
-	ulong ylength;
-	ulong zlength;
+	uint32_t xlength;
+	uint32_t ylength;
+	uint32_t zlength;
 	char* xpacked;
 	char* ypacked;
 	char* zpacked;
 };
 
-struct NODELOADHEADER
-{
-	short xkey;
-	short ykey;
-	short zkey;
-	short packmethod;
-	short xlength;
-	short ylength;
-	short zlength;
+struct NODELOADHEADER {
+	int16_t xkey;
+	int16_t ykey;
+	int16_t zkey;
+	int16_t packmethod;
+	int16_t xlength;
+	int16_t ylength;
+	int16_t zlength;
 };
 
-struct HAIR_STRUCT
-{
+struct HAIR_STRUCT {
 	PHD_3DPOS pos;
 	PHD_VECTOR vel;
 };
 
-struct SORTLIST
-{
+struct SORTLIST {
 	float zVal;
-	short drawtype;
-	short tpage;
-	short nVtx;
-	short polytype;
+	int16_t drawtype;
+	int16_t tpage;
+	int16_t nVtx;
+	int16_t polytype;
 };
 
-struct WATERTAB
-{
-	char shimmer;
-	char choppy;
-	uchar random;
-	uchar abs;
+struct WATERTAB {
+	int8_t shimmer;
+	int8_t choppy;
+	uint8_t random;
+	uint8_t abs;
 };
 
-struct FOOTPRINT
-{
-	long x;
-	long y;
-	long z;
-	short YRot;
-	short Active;
+struct FOOTPRINT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t YRot;
+	int16_t Active;
 };
 
-struct DISPLAYPU
-{
-	short life;
-	short object_number;
+struct DISPLAYPU {
+	int16_t life;
+	int16_t object_number;
 };
 
-struct GUNSHELL_STRUCT
-{
+struct GUNSHELL_STRUCT {
 	PHD_3DPOS pos;
-	short fallspeed;
-	short room_number;
-	short speed;
-	short counter;
-	short DirXrot;
-	short object_number;
+	int16_t fallspeed;
+	int16_t room_number;
+	int16_t speed;
+	int16_t counter;
+	int16_t DirXrot;
+	int16_t object_number;
 };
 
-struct BITE_INFO
-{
-	long x;
-	long y;
-	long z;
-	long mesh_num;
+struct BITE_INFO {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t mesh_num;
 };
 
-struct TEXTURE
-{
-#ifdef USE_BGFX
+struct TEXTURE {
 	bgfx::TextureHandle tex;
-#else
-	LPDIRECT3DTEXTUREX tex;
-	LPDIRECTDRAWSURFACEX surface;
-#endif
-	ulong xoff;
-	ulong yoff;
-	ulong width;
-	ulong height;
-	long tpage;
+	uint32_t xoff;
+	uint32_t yoff;
+	uint32_t width;
+	uint32_t height;
+	int32_t tpage;
 	bool bump;
-	long bumptpage;
+	int32_t bumptpage;
 };
 
-struct TEXTUREBUCKET
-{
-	long tpage;
-	long nVtx;
+struct TEXTUREBUCKET {
+	int32_t tpage;
+	int32_t nVtx;
 	GFXTLBUMPVERTEX vtx[BUCKET_VERT_COUNT]; // TRLE: increased size (256 * 32 + 32)
-#ifdef USE_BGFX
 	bgfx::DynamicVertexBufferHandle handle = BGFX_INVALID_HANDLE;
-#endif
 };
 
-struct THREAD
-{
-	volatile long active;
-	long unk;
-	volatile long ended;
-#ifdef USE_SDL
+struct THREAD {
+	volatile int32_t active;
+	int32_t unk;
+	volatile int32_t ended;
 	SDL_Thread *handle;
-#else
-	ulong handle;
-	ulong address;
-#endif
 };
 
-struct DRIP_STRUCT
-{
-	long x;
-	long y;
-	long z;
-	uchar On;
-	uchar R;
-	uchar G;
-	uchar B;
-	short Yvel;
-	uchar Gravity;
-	uchar Life;
-	short RoomNumber;
-	uchar Outside;
-	uchar Pad;
+struct DRIP_STRUCT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	uint8_t On;
+	uint8_t R;
+	uint8_t G;
+	uint8_t B;
+	int16_t Yvel;
+	uint8_t Gravity;
+	uint8_t Life;
+	int16_t RoomNumber;
+	uint8_t Outside;
+	uint8_t Pad;
 };
 
-struct AI_INFO
-{
-	short zone_number;
-	short enemy_zone;
-	long distance;
-	long ahead;
-	long bite;
-	short angle;
-	short x_angle;
-	short enemy_facing;
+struct AI_INFO {
+	int16_t zone_number;
+	int16_t enemy_zone;
+	int32_t distance;
+	int32_t ahead;
+	int32_t bite;
+	int16_t angle;
+	int16_t x_angle;
+	int16_t enemy_facing;
 };
 
-struct AIOBJECT
-{
-	short object_number;
-	short room_number;
-	long x;
-	long y;
-	long z;
-	short trigger_flags;
-	short flags;
-	short y_rot;
-	short box_number;
+struct AIOBJECT {
+	int16_t object_number;
+	int16_t room_number;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t trigger_flags;
+	int16_t flags;
+	int16_t y_rot;
+	int16_t box_number;
 };
 
-struct OLD_CAMERA
-{
-	short current_anim_state;
-	short goal_anim_state;
-	long target_distance;
-	short target_angle;
-	short target_elevation;
-	short actual_elevation; // T4Plus
+struct OLD_CAMERA {
+	int16_t current_anim_state;
+	int16_t goal_anim_state;
+	int32_t target_distance;
+	int16_t target_angle;
+	int16_t target_elevation;
+	int16_t actual_elevation; // T4Plus
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
 	PHD_VECTOR t;
 };
 
-struct SHATTER_ITEM
-{
+struct SHATTER_ITEM {
 	SPHERE Sphere;
 	ITEM_LIGHT* il;
-	short* meshp;
-	long Bit;
-	short YRot;
-	short Flags;
+	int16_t* meshp;
+	int32_t Bit;
+	int16_t YRot;
+	int16_t Flags;
 };
 
-struct SPOTCAM
-{
-	long x;
-	long y;
-	long z;
-	long tx;
-	long ty;
-	long tz;
-	uchar sequence;
-	uchar camera;
-	short fov;
-	short roll;
-	short timer;
-	short speed;
-	short flags;
-	short room_number;
-	short pad;
+struct SPOTCAM {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t tx;
+	int32_t ty;
+	int32_t tz;
+	uint8_t sequence;
+	uint8_t camera;
+	int16_t fov;
+	int16_t roll;
+	int16_t timer;
+	int16_t speed;
+	int16_t flags;
+	int16_t room_number;
+	int16_t pad;
 };
 
-struct WRAITH_STRUCT
-{
+struct WRAITH_STRUCT {
 	PHD_VECTOR pos;
-	short xv;
-	short yv;
-	short zv;
-	uchar r;
-	uchar g;
-	uchar b;
-	uchar pad[3];
+	int16_t xv;
+	int16_t yv;
+	int16_t zv;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t pad[3];
 };
 
-struct LOCUST_STRUCT
-{
+struct LOCUST_STRUCT {
 	PHD_3DPOS pos;
-	short room_number;
-	short speed;
-	short Counter;
-	short LaraTarget;
-	char XTarget;
-	char ZTarget;
-	uchar On;
-	uchar flags;
+	int16_t room_number;
+	int16_t speed;
+	int16_t Counter;
+	int16_t LaraTarget;
+	int8_t XTarget;
+	int8_t ZTarget;
+	uint8_t On;
+	uint8_t flags;
 };
 
-struct DOORPOS_DATA
-{
+struct DOORPOS_DATA {
 	FLOOR_INFO* floor;
 	FLOOR_INFO data;
-	short block;
+	int16_t block;
 };
 
-struct DOOR_DATA
-{
+struct DOOR_DATA {
 	DOORPOS_DATA d1;
 	DOORPOS_DATA d1flip;
 	DOORPOS_DATA d2;
 	DOORPOS_DATA d2flip;
-	short Opened;
+	int16_t Opened;
 };
 
-struct BOX_INFO
-{
-	uchar left;
-	uchar right;
-	uchar top;
-	uchar bottom;
-	short height;
-	short overlap_index;
+struct BOX_INFO {
+	uint8_t left;
+	uint8_t right;
+	uint8_t top;
+	uint8_t bottom;
+	int16_t height;
+	int16_t overlap_index;
 };
 
-struct SMOKE_SPARKS
-{
-	long x;
-	long y;
-	long z;
-	short Xvel;
-	short Yvel;
-	short Zvel;
-	short Gravity;
-	short RotAng;
-	short Flags;
-	uchar sSize;
-	uchar dSize;
-	uchar Size;
-	uchar Friction;
-	uchar Scalar;
-	uchar Def;
-	char RotAdd;
-	char MaxYvel;
-	uchar On;
-	uchar sShade;
-	uchar dShade;
-	uchar Shade;
-	uchar ColFadeSpeed;
-	uchar FadeToBlack;
-	char sLife;
-	char Life;
-	uchar TransType;
-	uchar FxObj;
-	uchar NodeNumber;
-	uchar mirror;
+struct SMOKE_SPARKS {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t Xvel;
+	int16_t Yvel;
+	int16_t Zvel;
+	int16_t Gravity;
+	int16_t RotAng;
+	int16_t Flags;
+	uint8_t sSize;
+	uint8_t dSize;
+	uint8_t Size;
+	uint8_t Friction;
+	uint8_t Scalar;
+	uint8_t Def;
+	int8_t RotAdd;
+	int8_t MaxYvel;
+	uint8_t On;
+	uint8_t sShade;
+	uint8_t dShade;
+	uint8_t Shade;
+	uint8_t ColFadeSpeed;
+	uint8_t FadeToBlack;
+	int8_t sLife;
+	int8_t Life;
+	uint8_t TransType;
+	uint8_t FxObj;
+	uint8_t NodeNumber;
+	uint8_t mirror;
 };
 
-struct MONOSCREEN_STRUCT
-{
-#ifdef USE_BGFX
+struct MONOSCREEN_STRUCT {
 	bgfx::TextureHandle tex;
-#else
-	LPDIRECT3DTEXTUREX tex;
-	LPDIRECTDRAWSURFACEX surface;
-#endif
 };
 
-struct VonCroyCutData
-{
+struct VonCroyCutData {
 	PHD_VECTOR CameraPos;
 	PHD_VECTOR CameraTarget;
-	long f;
+	int32_t f;
 };
 
-struct DEBRIS_STRUCT
-{
+struct DEBRIS_STRUCT {
 	void* TextInfo;
-	long x;
-	long y;
-	long z;
-	short XYZOffsets1[3];
-	short Dir;
-	short XYZOffsets2[3];
-	short Speed;
-	short XYZOffsets3[3];
-	short Yvel;
-	short Gravity;
-	short RoomNumber;
-	uchar On;
-	uchar XRot;
-	uchar YRot;
-	uchar r;
-	uchar g;
-	uchar b;
-	uchar Pad[2];
-	long color1;
-	long color2;
-	long color3;
-	long ambient;
-	long flags;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t XYZOffsets1[3];
+	int16_t Dir;
+	int16_t XYZOffsets2[3];
+	int16_t Speed;
+	int16_t XYZOffsets3[3];
+	int16_t Yvel;
+	int16_t Gravity;
+	int16_t RoomNumber;
+	uint8_t On;
+	uint8_t XRot;
+	uint8_t YRot;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t Pad[2];
+	int32_t color1;
+	int32_t color2;
+	int32_t color3;
+	int32_t ambient;
+	int32_t flags;
 };
 
-struct JEEPINFO
-{
-	short right_front_wheelrot;
-	short left_front_wheelrot;
-	short left_back_wheelrot;
-	short right_back_wheelrot;
-	long velocity;
-	long unused1;
-	long pitch1;
-	long turn_rate;
-	long camera_angle;
-	short move_angle;
-	short extra_rotation;
-	short rot_thing;
-	long pitch2;
-	short flags;
-	short unused2;
-	short gear;
+struct JEEPINFO {
+	int16_t right_front_wheelrot;
+	int16_t left_front_wheelrot;
+	int16_t left_back_wheelrot;
+	int16_t right_back_wheelrot;
+	int32_t velocity;
+	int32_t unused1;
+	int32_t pitch1;
+	int32_t turn_rate;
+	int32_t camera_angle;
+	int16_t move_angle;
+	int16_t extra_rotation;
+	int16_t rot_thing;
+	int32_t pitch2;
+	int16_t flags;
+	int16_t unused2;
+	int16_t gear;
 };
 
-struct PISTOL_DEF
-{
+struct PISTOL_DEF {
 	int16_t (*ObjectFunc)();
-	char Draw1Anim2;
-	char Draw1Anim;
-	char Draw2Anim;
-	char RecoilAnim;
+	int8_t Draw1Anim2;
+	int8_t Draw1Anim;
+	int8_t Draw2Anim;
+	int8_t RecoilAnim;
 };
 
-struct BINK_STRUCT
-{
-	long first_pad;
-	long num;
-	char second_pad[8];
-	long num2;
+struct BINK_STRUCT {
+	int32_t first_pad;
+	int32_t num;
+	int8_t second_pad[8];
+	int32_t num2;
 };
 
-struct LEGACY_SAVEFILE_INFO
-{
+struct LEGACY_SAVEFILE_INFO {
 	char name[75];
-	char valid;
-	short hours;
-	short minutes;
-	short seconds;
-	short days;
-	long num;
+	int8_t valid;
+	int16_t hours;
+	int16_t minutes;
+	int16_t seconds;
+	int16_t days;
+	int32_t num;
 };
 
-struct COMMANDLINES
-{
+struct COMMANDLINES {
 	char command[20];
 	bool needs_parameter;
 	void (*code)(char*);
 	char parameter[PARAMETER_MAX_LENGTH];
 };
 
-struct CHANGE_STRUCT
-{
-	short goal_anim_state;
-	short number_ranges;
-	short range_index;
+struct CHANGE_STRUCT {
+	int16_t goal_anim_state;
+	int16_t number_ranges;
+	int16_t range_index;
 };
 
-struct RANGE_STRUCT
-{
-	short start_frame;
-	short end_frame;
-	short link_anim_num;
-	short link_frame_num;
+struct RANGE_STRUCT {
+	int16_t start_frame;
+	int16_t end_frame;
+	int16_t link_anim_num;
+	int16_t link_frame_num;
 };
 
-struct PHDSPRITESTRUCT
-{
-	ushort tpage;
-	ushort offset;
-	ushort width;
-	ushort height;
-	short x1;
-	short y1;
-	short x2;
-	short y2;
+struct PHDSPRITESTRUCT {
+	uint16_t tpage;
+	uint16_t offset;
+	uint16_t width;
+	uint16_t height;
+	int16_t x1;
+	int16_t y1;
+	int16_t x2;
+	int16_t y2;
 };
 
-struct PHDTEXTURESTRUCT
-{
-	ushort drawtype;
-	ushort tpage;
-	ushort flag;
-	ushort u1;
-	ushort v1;
-	ushort u2;
-	ushort v2;
-	ushort u3;
-	ushort v3;
-	ushort u4;
-	ushort v4;
-	ulong xoff;
-	ulong yoff;
-	ulong width;
-	ulong height;
+struct PHDTEXTURESTRUCT {
+	uint16_t drawtype;
+	uint16_t tpage;
+	uint16_t flag;
+	uint16_t u1;
+	uint16_t v1;
+	uint16_t u2;
+	uint16_t v2;
+	uint16_t u3;
+	uint16_t v3;
+	uint16_t u4;
+	uint16_t v4;
+	uint32_t xoff;
+	uint32_t yoff;
+	uint32_t width;
+	uint32_t height;
 };
 
-struct SAMPLE_INFO
-{
-	short number;
-	uchar volume;
-	uchar radius;
-	uchar randomness;
-	char pitch;
-	short flags;
+struct SAMPLE_INFO {
+	int16_t number;
+	uint8_t volume;
+	uint8_t radius;
+	uint8_t randomness;
+	int8_t pitch;
+	int16_t flags;
 };
 
 #if !defined(MA_AUDIO_SAMPLES) || !defined(MA_AUDIO_ENGINE)
-struct DS_SAMPLE
-{
+struct DS_SAMPLE {
 	LPDIRECTSOUNDBUFFER buffer;
-	long frequency;
-	long playing;
+	int32_t frequency;
+	int32_t playing;
 };
 #endif
 
-struct BUBBLE_STRUCT
-{
+struct BUBBLE_STRUCT {
 	PHD_VECTOR pos;
-	short room_number;
-	short speed;
-	short size;
-	short dsize;
-	uchar shade;
-	uchar vel;
-	short pad;
+	int16_t room_number;
+	int16_t speed;
+	int16_t size;
+	int16_t dsize;
+	uint8_t shade;
+	uint8_t vel;
+	int16_t pad;
 };
 
-struct SHOCKWAVE_STRUCT
-{
-	long x;
-	long y;
-	long z;
-	short InnerRad;
-	short OuterRad;
-	short XRot;
-	short Flags;
-	uchar r;
-	uchar g;
-	uchar b;
-	uchar life;
-	short Speed;
-	short Temp;
+struct SHOCKWAVE_STRUCT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t InnerRad;
+	int16_t OuterRad;
+	int16_t XRot;
+	int16_t Flags;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t life;
+	int16_t Speed;
+	int16_t Temp;
 };
 
-struct SPLASH_STRUCT
-{
-	long x;
-	long y;
-	long z;
-	short InnerRad;
-	short InnerSize;
-	short InnerRadVel;
-	short InnerYVel;
-	short InnerY;
-	short MiddleRad;
-	short MiddleSize;
-	short MiddleRadVel;
-	short MiddleYVel;
-	short MiddleY;
-	short OuterRad;
-	short OuterSize;
-	short OuterRadVel;
-	char flags;
-	uchar life;
+struct SPLASH_STRUCT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t InnerRad;
+	int16_t InnerSize;
+	int16_t InnerRadVel;
+	int16_t InnerYVel;
+	int16_t InnerY;
+	int16_t MiddleRad;
+	int16_t MiddleSize;
+	int16_t MiddleRadVel;
+	int16_t MiddleYVel;
+	int16_t MiddleY;
+	int16_t OuterRad;
+	int16_t OuterSize;
+	int16_t OuterRadVel;
+	int8_t flags;
+	uint8_t life;
 };
 
-struct RIPPLE_STRUCT
-{
-	long x;
-	long y;
-	long z;
-	char flags;
-	uchar life;
-	uchar size;
-	uchar init;
+struct RIPPLE_STRUCT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int8_t flags;
+	uint8_t life;
+	uint8_t size;
+	uint8_t init;
 };
 
-struct FIRE_SPARKS
-{
-	short x;
-	short y;
-	short z;
-	short Xvel;
-	short Yvel;
-	short Zvel;
-	short Gravity;
-	short RotAng;
-	short Flags;
-	uchar sSize;
-	uchar dSize;
-	uchar Size;
-	uchar Friction;
-	uchar Scalar;
-	uchar Def;
-	char RotAdd;
-	char MaxYvel;
-	uchar On;
-	uchar sR;
-	uchar sG;
-	uchar sB;
-	uchar dR;
-	uchar dG;
-	uchar dB;
-	uchar R;
-	uchar G;
-	uchar B;
-	uchar ColFadeSpeed;
-	uchar FadeToBlack;
-	uchar sLife;
-	uchar Life;
+struct FIRE_SPARKS {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int16_t Xvel;
+	int16_t Yvel;
+	int16_t Zvel;
+	int16_t Gravity;
+	int16_t RotAng;
+	int16_t Flags;
+	uint8_t sSize;
+	uint8_t dSize;
+	uint8_t Size;
+	uint8_t Friction;
+	uint8_t Scalar;
+	uint8_t Def;
+	int8_t RotAdd;
+	int8_t MaxYvel;
+	uint8_t On;
+	uint8_t sR;
+	uint8_t sG;
+	uint8_t sB;
+	uint8_t dR;
+	uint8_t dG;
+	uint8_t dB;
+	uint8_t R;
+	uint8_t G;
+	uint8_t B;
+	uint8_t ColFadeSpeed;
+	uint8_t FadeToBlack;
+	uint8_t sLife;
+	uint8_t Life;
 };
 
-struct BLOOD_STRUCT
-{
-	long x;
-	long y;
-	long z;
-	short Xvel;
-	short Yvel;
-	short Zvel;
-	short Gravity;
-	short RotAng;
-	uchar sSize;
-	uchar dSize;
-	uchar Size;
-	uchar Friction;
-	char RotAdd;
-	uchar On;
-	uchar sShade;
-	uchar dShade;
-	uchar Shade;
-	uchar ColFadeSpeed;
-	uchar FadeToBlack;
-	char sLife;
-	char Life;
-	char Pad;
+struct BLOOD_STRUCT {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t Xvel;
+	int16_t Yvel;
+	int16_t Zvel;
+	int16_t Gravity;
+	int16_t RotAng;
+	uint8_t sSize;
+	uint8_t dSize;
+	uint8_t Size;
+	uint8_t Friction;
+	int8_t RotAdd;
+	uint8_t On;
+	uint8_t sShade;
+	uint8_t dShade;
+	uint8_t Shade;
+	uint8_t ColFadeSpeed;
+	uint8_t FadeToBlack;
+	int8_t sLife;
+	int8_t Life;
+	int8_t Pad;
 };
 
-struct WATER_DUST
-{
+struct WATER_DUST {
 	PHD_VECTOR pos;
-	char xvel;
-	uchar yvel;
-	char zvel;
-	uchar life;
+	int8_t xvel;
+	uint8_t yvel;
+	int8_t zvel;
+	uint8_t life;
 };
 
-struct CHARDEF
-{
+struct CHARDEF {
 	float u;
 	float v;
-	short w;
-	short h;
-	short y_offset;
-	char top_shade;
-	char bottom_shade;
+	int16_t w;
+	int16_t h;
+	int16_t y_offset;
+	int8_t top_shade;
+	int8_t bottom_shade;
 };
 
-struct STRINGHEADER
-{
-	ushort nStrings;
-	ushort nPSXStrings;
-	ushort nPCStrings;
-	ushort StringWadLen;
-	ushort PSXStringWadLen;
-	ushort PCStringWadLen;
+struct STRINGHEADER {
+	uint16_t nStrings;
+	uint16_t nPSXStrings;
+	uint16_t nPCStrings;
+	uint16_t StringWadLen;
+	uint16_t PSXStringWadLen;
+	uint16_t PCStringWadLen;
 };
 
-struct GUNFLASH_STRUCT
-{
+struct GUNFLASH_STRUCT {
 	float mx[12];
-	short on;
+	int16_t on;
 };
 
-struct FIRE_LIST
-{
-	long x;
-	long y;
-	long z;
-	char on;
-	char size;
-	short room_number;
+struct FIRE_LIST {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int8_t on;
+	int8_t size;
+	int16_t room_number;
 };
 
-struct SoundSlot
-{
-	long OrigVolume;
-	long nVolume;
-	long nPan;
-	long nPitch;
-	long nSampleInfo;
-	ulong distance;
+struct SoundSlot {
+	int32_t OrigVolume;
+	int32_t nVolume;
+	int32_t nPan;
+	int32_t nPitch;
+	int32_t nSampleInfo;
+	uint32_t distance;
 	PHD_VECTOR pos;
 };
 
-struct WEAPON_INFO
-{
-	short lock_angles[4];
-	short left_angles[4];
-	short right_angles[4];
-	short aim_speed;
-	short shot_accuracy;
-	short gun_height;
-	short target_dist;
-	char damage;
-	char recoil_frame;
-	char flash_time;
-	char draw_frame;
-	short sample_num;
+struct WEAPON_INFO {
+	int16_t lock_angles[4];
+	int16_t left_angles[4];
+	int16_t right_angles[4];
+	int16_t aim_speed;
+	int16_t shot_accuracy;
+	int16_t gun_height;
+	int16_t target_dist;
+	int8_t damage;
+	int8_t recoil_frame;
+	int8_t flash_time;
+	int8_t draw_frame;
+	int16_t sample_num;
 };
 
-struct SCARAB_STRUCT
-{
+struct SCARAB_STRUCT {
 	PHD_3DPOS pos;
-	short room_number;
-	short speed;
-	short fallspeed;
-	uchar On;
-	uchar flags;
+	int16_t room_number;
+	int16_t speed;
+	int16_t fallspeed;
+	uint8_t On;
+	uint8_t flags;
 };
 
-struct SPLASH_SETUP
-{
-	long x;
-	long y;
-	long z;
-	short InnerRad;
-	short InnerSize;
-	short InnerRadVel;
-	short InnerYVel;
-	short pad1;
-	short MiddleRad;
-	short MiddleSize;
-	short MiddleRadVel;
-	short MiddleYVel;
-	short pad2;
-	short OuterRad;
-	short OuterSize;
-	short OuterRadVel;
-	short pad3;
+struct SPLASH_SETUP {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int16_t InnerRad;
+	int16_t InnerSize;
+	int16_t InnerRadVel;
+	int16_t InnerYVel;
+	int16_t pad1;
+	int16_t MiddleRad;
+	int16_t MiddleSize;
+	int16_t MiddleRadVel;
+	int16_t MiddleYVel;
+	int16_t pad2;
+	int16_t OuterRad;
+	int16_t OuterSize;
+	int16_t OuterRadVel;
+	int16_t pad3;
 };
 
-struct SP_DYNAMIC
-{
-	uchar On;
-	uchar Falloff;
-	uchar R;
-	uchar G;
-	uchar B;
-	uchar Flags;
-	uchar Pad[2];
+struct SP_DYNAMIC {
+	uint8_t On;
+	uint8_t Falloff;
+	uint8_t R;
+	uint8_t G;
+	uint8_t B;
+	uint8_t Flags;
+	uint8_t Pad[2];
 };
 
-struct NODEOFFSET_INFO
-{
-	short x;
-	short y;
-	short z;
-	char mesh_num;
-	uchar GotIt;
+struct NODEOFFSET_INFO {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int8_t mesh_num;
+	uint8_t GotIt;
 };
 
-struct TRAIN_STATIC
-{
-	short type;
-	short zoff;
+struct TRAIN_STATIC {
+	int16_t type;
+	int16_t zoff;
 };
 
-struct ROOM_DYNAMIC
-{
+struct ROOM_DYNAMIC {
 	float x;
 	float y;
 	float z;
@@ -2598,16 +2394,14 @@ struct ROOM_DYNAMIC
 	float inv_falloff;
 };
 
-struct SUNLIGHT_STRUCT
-{
+struct SUNLIGHT_STRUCT {
 	FVECTOR vec;
 	float r;
 	float g;
 	float b;
 };
 
-struct POINTLIGHT_STRUCT
-{
+struct POINTLIGHT_STRUCT {
 	FVECTOR vec;
 	float r;
 	float g;
@@ -2620,30 +2414,28 @@ struct MESH_MAP_TABLE_ENTRY {
 	uint32_t mesh_native_ptr;
 };
 
-struct GouraudBarColourSet
-{
-	uchar abLeftRed[5];
-	uchar abLeftGreen[5];
-	uchar abLeftBlue[5];
-	uchar abRightRed[5];
-	uchar abRightGreen[5];
-	uchar abRightBlue[5];
+struct GouraudBarColourSet {
+	uint8_t abLeftRed[5];
+	uint8_t abLeftGreen[5];
+	uint8_t abLeftBlue[5];
+	uint8_t abRightRed[5];
+	uint8_t abRightGreen[5];
+	uint8_t abRightBlue[5];
 };
 
-struct COLOR_BIT_MASKS
-{
-	ulong dwRBitMask;
-	ulong dwGBitMask;
-	ulong dwBBitMask;
-	ulong dwRGBAlphaBitMask;
-	ulong dwRBitDepth;
-	ulong dwGBitDepth;
-	ulong dwBBitDepth;
-	ulong dwRGBAlphaBitDepth;
-	ulong dwRBitOffset;
-	ulong dwGBitOffset;
-	ulong dwBBitOffset;
-	ulong dwRGBAlphaBitOffset;
+struct COLOR_BIT_MASKS {
+	uint32_t dwRBitMask;
+	uint32_t dwGBitMask;
+	uint32_t dwBBitMask;
+	uint32_t dwRGBAlphaBitMask;
+	uint32_t dwRBitDepth;
+	uint32_t dwGBitDepth;
+	uint32_t dwBBitDepth;
+	uint32_t dwRGBAlphaBitDepth;
+	uint32_t dwRBitOffset;
+	uint32_t dwGBitOffset;
+	uint32_t dwBBitOffset;
+	uint32_t dwRGBAlphaBitOffset;
 };
 
 enum shadow_mode_enum {
@@ -2715,21 +2507,20 @@ enum volumetric_flash_grenades_enum {
 	VOLUMETRIC_FLASH_GRENADES_ENUM_SIZE
 };
 
-struct tomb4_options	//keep this at the bottom of the file, please
-{
+struct tomb4_options {	//keep this at the bottom of the file, please
 	bool footprints;
-	shadow_mode_enum shadow_mode;			//1-> original, 2-> circle, 3-> PSX like circle, 4-> PSX sprite, 5-> dynamic
+	shadow_mode_enum shadow_mode;				//1-> original, 2-> circle, 3-> PSX like circle, 4-> PSX sprite, 5-> dynamic
 	bool crawltilt;
 	bool flexible_crawling;
 	bool fix_climb_up_delay;
 	bool gameover;
-	bar_mode_enum bar_mode;				//1-> original, 2-> TR5, 3-> PSX, 4-> Custom
-	bars_pos_enum bars_pos;				//1-> original, 2-> improved, 3-> PSX, 4-> Custom
+	bar_mode_enum bar_mode;						//1-> original, 2-> TR5, 3-> PSX, 4-> Custom
+	bars_pos_enum bars_pos;						//1-> original, 2-> improved, 3-> PSX, 4-> Custom
 	bool enemy_bars;
 	bool cutseq_skipper;
 	bool cheats;
 	bool loadingtxt;
-	inv_bg_mode_enum inv_bg_mode;			//1-> original, 2->TR5, 3-> clear
+	inv_bg_mode_enum inv_bg_mode;				//1-> original, 2->TR5, 3-> clear
 	bool tr5_loadbar;
 	look_transparency_enum look_transparency;
 	bool ammo_counter;
@@ -2737,8 +2528,8 @@ struct tomb4_options	//keep this at the bottom of the file, please
 	bool combat_cam_tilt;
 	bool hpbar_inv;
 	bool static_lighting;
-	reverb_enum reverb;				//1-> off, 2-> Lara room, 3->camera room
-	ulong minimum_clip_range;	//value in blocks
+	reverb_enum reverb;							//1-> off, 2-> Lara room, 3->camera room
+	uint32_t minimum_clip_range;				//value in blocks
 	float GUI_Scale;
 	bool hang_game_thread;
 	pickup_lighting_enum pickup_lighting;		// Chronicles-style shading for inventory objects.

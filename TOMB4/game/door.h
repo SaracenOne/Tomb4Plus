@@ -3,10 +3,10 @@
 
 void ShutThatDoor(DOORPOS_DATA* d);
 void OpenThatDoor(DOORPOS_DATA* d);
-void DoorControl(short item_number);
-void DoorCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void PushPullKickDoorControl(short item_number);
-void PushPullKickDoorCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void DoubleDoorCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void UnderwaterDoorCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void SequenceDoorControl(short item_number);
+void DoorControl(int16_t item_number);
+void DoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void PushPullKickDoorControl(int16_t item_number);
+void PushPullKickDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void DoubleDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void UnderwaterDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void SequenceDoorControl(int16_t item_number);

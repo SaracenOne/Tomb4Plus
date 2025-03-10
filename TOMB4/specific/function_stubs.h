@@ -1,10 +1,10 @@
 #pragma once
 #include "../global/types.h"
 
-long GetRandomControl();
-void SeedRandomControl(long seed);
-long GetRandomDraw();
-void SeedRandomDraw(long seed);
+int32_t GetRandomControl();
+void SeedRandomControl(int32_t seed);
+int32_t GetRandomDraw();
+void SeedRandomDraw(int32_t seed);
 void init_game_malloc();
 void* game_malloc(size_t size);
 
@@ -28,13 +28,13 @@ void system_free(void* ptr);
 
 void system_report_stray_allocation();
 
-void Log(ulong type, const char* s, ...);
+void Log(uint32_t type, const char* s, ...);
 void GlobalLog(const char* s, ...);
 
 extern FILE* logF;
 extern PHD_VECTOR CamPos;
 extern PHD_VECTOR CamRot;
-extern long nPolyType;
+extern int32_t nPolyType;
 extern char* malloc_buffer;
 extern char* malloc_ptr;
 extern size_t malloc_size;

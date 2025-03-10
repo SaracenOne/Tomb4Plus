@@ -1,6 +1,6 @@
 #pragma once
 #include "../global/types.h"
 
-long ZClipper(long n, GFXTLBUMPVERTEX* in, GFXTLBUMPVERTEX* out);
-long visible_zclip(GFXTLVERTEX* v0, GFXTLVERTEX* v1, GFXTLVERTEX* v2);
-long XYUVGClipper(long n, GFXTLBUMPVERTEX* in);
+int32_t ZClipper(int32_t n, GFXTLBUMPVERTEX *in, GFXTLBUMPVERTEX *out);
+int32_t visible_zclip(GFXTLVERTEX *v0, GFXTLVERTEX *v1, GFXTLVERTEX *v2);
+int32_t XYUVGClipper(int32_t n, GFXTLBUMPVERTEX *in);

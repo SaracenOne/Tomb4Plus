@@ -45,44 +45,44 @@ NGOldTrigger old_flipeffects[NG_MAX_OLD_FLIPEFFECTS];
 void NGAttractLaraInDirection(uint8_t direction, uint8_t speed) {
 	switch (direction) {
 		// West
-	case 0x00:
-		lara_item->pos.x_pos -= speed;
-		break;
+		case 0x00:
+			lara_item->pos.x_pos -= speed;
+			break;
 		// North West
-	case 0x01:
-		lara_item->pos.z_pos += speed;
-		lara_item->pos.x_pos -= speed;
-		break;
+		case 0x01:
+			lara_item->pos.z_pos += speed;
+			lara_item->pos.x_pos -= speed;
+			break;
 		// North
-	case 0x02:
-		lara_item->pos.z_pos += speed;
-		break;
+		case 0x02:
+			lara_item->pos.z_pos += speed;
+			break;
 		// North East
-	case 0x03:
-		lara_item->pos.z_pos += speed;
-		lara_item->pos.x_pos += speed;
-		break;
+		case 0x03:
+			lara_item->pos.z_pos += speed;
+			lara_item->pos.x_pos += speed;
+			break;
 		// East
-	case 0x04:
-		lara_item->pos.x_pos += speed;
-		break;
+		case 0x04:
+			lara_item->pos.x_pos += speed;
+			break;
 		// South East
-	case 0x05:
-		lara_item->pos.x_pos += speed;
-		lara_item->pos.z_pos -= speed;
-		break;
+		case 0x05:
+			lara_item->pos.x_pos += speed;
+			lara_item->pos.z_pos -= speed;
+			break;
 		// South
-	case 0x06:
-		lara_item->pos.z_pos -= speed;
-		break;
+		case 0x06:
+			lara_item->pos.z_pos -= speed;
+			break;
 		// South West
-	case 0x07:
-		lara_item->pos.x_pos -= speed;
-		lara_item->pos.z_pos -= speed;
-		break;
-	default:
-		NGLog(NG_LOG_TYPE_ERROR, "lara_attract_lara_in_direction_on_ground_and_in_air_with_speed: unknown direction!");
-		break;
+		case 0x07:
+			lara_item->pos.x_pos -= speed;
+			lara_item->pos.z_pos -= speed;
+			break;
+		default:
+			NGLog(NG_LOG_TYPE_ERROR, "lara_attract_lara_in_direction_on_ground_and_in_air_with_speed: unknown direction!");
+			break;
 	}
 }
 
@@ -183,7 +183,7 @@ bool disable_input_for_time(uint8_t input, uint8_t timer) {
 	} else {
 		NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
 	}
-	
+
 	return true;
 }
 
@@ -194,7 +194,7 @@ bool keyboard_enable_input(uint8_t input, uint8_t _unused) {
 	} else {
 		NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
 	}
-	
+
 	return true;
 }
 
@@ -203,8 +203,7 @@ bool keyboard_simulate_receivement_of_keyboard_command(uint8_t input, uint8_t ti
 	if (timer < (sizeof(NG_SIMULATION_TIMES) / sizeof(int32_t))) {
 		if (input < (sizeof(NG_INPUT_CODES) / sizeof(int32_t))) {
 			NGSimulateInputForTime(NG_INPUT_CODES[input], NG_SIMULATION_TIMES[timer] / NG_TICKS_PER_SECOND);
-		}
-		else {
+		} else {
 			NGLog(NG_LOG_TYPE_ERROR, "Invalid id for input command!");
 		}
 	} else {
@@ -471,12 +470,10 @@ bool damage_lara_life_by_percentage(uint8_t timer, uint8_t _unused2) {
 		if (timer <= 9) {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 1000);
 			new_hit_points -= (int32_t)(health_multiple * (timer + 1));
-		}
-		else if (timer <= 18) {
+		} else if (timer <= 18) {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 100);
 			new_hit_points -= (int32_t)(health_multiple * (timer - 8));
-		}
-		else {
+		} else {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 10);
 			new_hit_points -= (int32_t)(health_multiple * (timer - 17));
 		}
@@ -500,12 +497,10 @@ bool recharge_lara_life_by_percentage(uint8_t timer, uint8_t _unused2) {
 		if (timer <= 9) {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 1000);
 			new_hit_points += (int32_t)(health_multiple * (timer + 1));
-		}
-		else if (timer <= 18) {
+		} else if (timer <= 18) {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 100);
 			new_hit_points += (int32_t)(health_multiple * (timer - 8));
-		}
-		else {
+		} else {
 			int32_t health_multiple = (MAX_LARA_HEALTH / 10);
 			new_hit_points += (int32_t)(health_multiple * (timer - 17));
 		}
@@ -1155,7 +1150,7 @@ bool moveable_move_moveable_with_data_in_x_parameter_list(uint8_t move_param_id_
 // NGLE - 168
 bool sound_play_sound_single_playback_of_global_sound_map(uint8_t lower_sample_id, uint8_t upper_sample_id) {
 	int32_t indexed_sound_sample = (int32_t)lower_sample_id | ((int32_t)(upper_sample_id) << 8 & 0xff00);
-	
+
 	SoundEffect(indexed_sound_sample, NULL, SFX_ALWAYS);
 	return true;
 }
@@ -1216,7 +1211,7 @@ bool static_explode(uint8_t static_id_lower, uint8_t static_id_upper) {
 			SmashedMesh[SmashedMeshCount] = mesh;
 			SmashedMeshCount++;
 			mesh->Flags &= ~1;
-			
+
 			// TODO: explosion effect is not accurate
 			TriggerExplosionSparks(pos.x_pos, pos.y_pos, pos.z_pos, 3, -2, 0, room_number);
 			for (int32_t i = 0; i < 3; i++)
@@ -1480,7 +1475,7 @@ bool triggergroup_enable_newly_the_oneshot_x_triggergroup_already_performed(uint
 // NGLE - 355
 bool screen_flash_screen_with_light_color_for_duration(uint8_t flash_color, uint8_t duration) {
 	switch (flash_color) {
-		case 0:{
+		case 0: {
 			// Red Light
 			FlashFadeR = 0xff;
 			FlashFadeG = 0x40;
@@ -1626,29 +1621,29 @@ bool trigger_secret(uint8_t secret_number, uint8_t _unused) {
 // NGLE - 407
 bool set_lara_holsters(uint8_t holster_type, uint8_t _unused) {
 	switch (holster_type) {
-	case 0x0d: {
-		lara.holster = T4PlusGetLaraHolstersSlotID();
-		break;
-	};
-	case 0x0e: {
-		lara.holster = T4PlusGetLaraHolstersPistolsSlotID();
-		break;
-	};
-	case 0x10: {
-		lara.holster = T4PlusGetLaraHolstersRevolverSlotID();
-		break;
-	};
-	case 0x0f: {
-		lara.holster = T4PlusGetLaraHolstersUzisSlotID();
-		break;
-	};
-	case 0x00: {
-		lara.holster = T4PlusGetLaraSlotID();
-		break;
-	};
-	default: {
-		lara.holster = holster_type;
-	}
+		case 0x0d: {
+			lara.holster = T4PlusGetLaraHolstersSlotID();
+			break;
+		};
+		case 0x0e: {
+			lara.holster = T4PlusGetLaraHolstersPistolsSlotID();
+			break;
+		};
+		case 0x10: {
+			lara.holster = T4PlusGetLaraHolstersRevolverSlotID();
+			break;
+		};
+		case 0x0f: {
+			lara.holster = T4PlusGetLaraHolstersUzisSlotID();
+			break;
+		};
+		case 0x00: {
+			lara.holster = T4PlusGetLaraSlotID();
+			break;
+		};
+		default: {
+			lara.holster = holster_type;
+		}
 	}
 	return true;
 }
@@ -1659,8 +1654,8 @@ bool lara_set_x_opacity_for_lara_for_seconds(uint8_t opacity, uint8_t seconds) {
 }
 
 int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32_t flags) {
-	char timer = (char)full_timer & 0xff;
-	char extra_timer = (char)(full_timer >> 8) & 0xff;
+	int8_t timer = (int8_t)full_timer & 0xff;
+	int8_t extra_timer = (int8_t)(full_timer >> 8) & 0xff;
 
 	int32_t repeat_type = 1;
 
@@ -2014,7 +2009,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			break;
 		}
 		case SOUND_PLAY_X_IMPORTED_FILE_IN_LOOP_MODE_ON_CHANNEL: {
- 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SOUND_PLAY_X_IMPORTED_FILE_IN_LOOP_MODE_ON_CHANNEL unimplemented!");
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SOUND_PLAY_X_IMPORTED_FILE_IN_LOOP_MODE_ON_CHANNEL unimplemented!");
 			break;
 		}
 		case SOUND_PLAY_X_IMPORTED_FILE_IN_SINGLE_PLAY_MODE_ON_CHANNEL: {
@@ -2564,7 +2559,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			break;
 		}
 		case VARIABLES_INITIALIZE_X_TRNG_TIMER_TO_BIG_NUMBER_SECONDS: {
-			
+
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_INITIALIZE_X_TRNG_TIMER_TO_BIG_NUMBER_SECONDS unimplemented!");
 			break;
 		}
@@ -2823,7 +2818,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 		case SCREEN_FLASH_SCREEN_WITH_LIGHT_COLOR_FOR_DURATION: {
 
 			screen_flash_screen_with_light_color_for_duration(timer, extra_timer);
-			break;		
+			break;
 		}
 		case SCREEN_REMOVE_INFINITE_FLASH_EFFECT: {
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SCREEN_REMOVE_INFINITE_FLASH_EFFECT unimplemented!");
@@ -2837,7 +2832,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "SPRITE_REMOVE_FROM_SCREEN_THE_SPRITE_WITH_DATA_IN_X_PARAMETERS unimplemented!");
 			break;
 		}
-		case WEATHER_PERFORM_A_LIGHTNING_WITH_DATA_IN_X_PARAMETER_FOR_E_DURATE_IN_TICK_FRAMES: {	
+		case WEATHER_PERFORM_A_LIGHTNING_WITH_DATA_IN_X_PARAMETER_FOR_E_DURATE_IN_TICK_FRAMES: {
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "WEATHER_PERFORM_A_LIGHTNING_WITH_DATA_IN_X_PARAMETER_FOR_E_DURATE_IN_TICK_FRAMES unimplemented!");
 			break;
 		}
@@ -3055,7 +3050,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 				{
 					repeat_type = 0;
 
-					char original_trigger_timer = TriggerTimer;
+					int8_t original_trigger_timer = TriggerTimer;
 					TriggerTimer = timer;
 					effect_routines[flip_number](lara_item);
 					TriggerTimer = original_trigger_timer;
@@ -3068,8 +3063,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 						repeat_type = 2;
 					}
 				}
-			}
-			else {
+			} else {
 				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Unimplemented NGFlipEffect %u!", flip_number);
 			}
 		}
@@ -3130,8 +3124,8 @@ void NGExecuteFlipEffects() {
 			} else {
 				if (!NGUsingLegacyNGTriggerBehaviour()) {
 					if (old_flipeffects[j].offset_floor_data != 0 &&
-						old_flipeffects[j].flags & SCANF_TEMP_ONE_SHOT &&
-						(scanned_flipeffects[i].flags & SCANF_HEAVY) == 0) {
+					        old_flipeffects[j].flags & SCANF_TEMP_ONE_SHOT &&
+					        (scanned_flipeffects[i].flags & SCANF_HEAVY) == 0) {
 						if ((old_flipeffects[j].offset_floor_data & 0xFF000000) != (offset_floor_data & 0xFF000000)) {
 							old_flipeffects[j].offset_floor_data = 0;
 						}
@@ -3181,8 +3175,7 @@ void NGCaptureFlipEffect(uint16_t flip_number, uint16_t timer, uint32_t flip_off
 	if (!NGUsingLegacyNGTriggerBehaviour()) {
 		if (is_testing_heavy) {
 			offset_sector = (trigger_index - floor_data) * sizeof(uint16_t); // May not be correct
-		}
-		else {
+		} else {
 			offset_sector = uint32_t((NGGetLastFloorAddress()) - floor_data) * sizeof(uint16_t);
 		}
 

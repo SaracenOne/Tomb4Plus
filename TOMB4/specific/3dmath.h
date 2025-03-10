@@ -3,24 +3,24 @@
 
 void phd_PushMatrix();
 void phd_PushUnitMatrix();
-void phd_SetTrans(long x, long y, long z);
-long phd_TranslateRel(long x, long y, long z);
-void phd_RotX(short angle);
-void phd_RotY(short angle);
-void phd_RotZ(short angle);
-void phd_RotYXZpack(long angles);
-void phd_RotYXZ(short y, short x, short z);
-void phd_TranslateAbs(long x, long y, long z);
-void phd_GetVectorAngles(long x, long y, long z, short* angles);
-ulong mGetAngle(long x, long z, long x1, long z1);
-void AlterFOV(short fov);
-long phd_atan(long x, long y);
-ulong phd_sqrt(ulong num);
+void phd_SetTrans(int32_t x, int32_t y, int32_t z);
+int32_t phd_TranslateRel(int32_t x, int32_t y, int32_t z);
+void phd_RotX(int16_t angle);
+void phd_RotY(int16_t angle);
+void phd_RotZ(int16_t angle);
+void phd_RotYXZpack(int32_t angles);
+void phd_RotYXZ(int16_t y, int16_t x, int16_t z);
+void phd_TranslateAbs(int32_t x, int32_t y, int32_t z);
+void phd_GetVectorAngles(int32_t x, int32_t y, int32_t z, int16_t* angles);
+uint32_t mGetAngle(int32_t x, int32_t z, int32_t x1, int32_t z1);
+void AlterFOV(int16_t fov);
+int32_t phd_atan(int32_t x, int32_t y);
+uint32_t phd_sqrt(uint32_t num);
 void ScaleCurrentMatrix(PHD_VECTOR* vec);
-void SetupZRange(long znear, long zfar);
-void InitWindow(long x, long y, long w, long h, long znear, long zfar, long fov, long a, long b);
+void SetupZRange(int32_t znear, int32_t zfar);
+void InitWindow(int32_t x, int32_t y, int32_t w, int32_t h, int32_t znear, int32_t zfar, int32_t fov, int32_t a, int32_t b);
 void phd_GenerateW2V(PHD_3DPOS* viewPos);
-void phd_LookAt(long sx, long sy, long sz, long tx, long ty, long tz, short roll);
+void phd_LookAt(int32_t sx, int32_t sy, int32_t sz, int32_t tx, int32_t ty, int32_t tz, int16_t roll);
 
 extern float one;
 extern float mone;
@@ -33,9 +33,9 @@ extern float mW2V[indices_count];
 extern float fMXStack[20 * indices_count];
 extern float fcossin_tbl[65536];
 
-extern long* phd_mxptr;
-extern long w2v_matrix[indices_count];
-extern long matrix_stack[20 * indices_count];
+extern int32_t* phd_mxptr;
+extern int32_t w2v_matrix[indices_count];
+extern int32_t matrix_stack[20 * indices_count];
 
 extern float f_centerx;
 extern float f_centery;
@@ -58,51 +58,45 @@ extern float f_a;
 extern float f_b;
 extern float f_boo;
 
-extern long phd_winheight;
-extern long phd_winwidth;
-extern long phd_centerx;
-extern long phd_centery;
-extern long phd_top;
-extern long phd_left;
-extern long phd_bottom;
-extern long phd_right;
-extern long phd_znear;
-extern long phd_zfar;
-extern long phd_persp;
-extern short phd_winxmax;
-extern short phd_winxmin;
-extern short phd_winymax;
-extern short phd_winymin;
+extern int32_t phd_winheight;
+extern int32_t phd_winwidth;
+extern int32_t phd_centerx;
+extern int32_t phd_centery;
+extern int32_t phd_top;
+extern int32_t phd_left;
+extern int32_t phd_bottom;
+extern int32_t phd_right;
+extern int32_t phd_znear;
+extern int32_t phd_zfar;
+extern int32_t phd_persp;
+extern int16_t phd_winxmax;
+extern int16_t phd_winxmin;
+extern int16_t phd_winymax;
+extern int16_t phd_winymin;
 
-__inline short phd_sin(long angle)
-{
+__inline int16_t phd_sin(int32_t angle) {
 	angle >>= 3;
 	return 4 * rcossin_tbl[angle & 0x1FFE];
 }
 
-__inline short phd_cos(long angle)
-{
+__inline int16_t phd_cos(int32_t angle) {
 	angle >>= 3;
 	return 4 * rcossin_tbl[(angle & 0x1FFE) + 1];
 }
 
-__inline float fSin(long angle)
-{
-	return fcossin_tbl[(ushort)angle];
+__inline float fSin(int32_t angle) {
+	return fcossin_tbl[(uint16_t)angle];
 }
 
-__inline float fCos(long angle)
-{
-	return fcossin_tbl[ushort(angle + 0x4000)];
+__inline float fCos(int32_t angle) {
+	return fcossin_tbl[uint16_t(angle + 0x4000)];
 }
 
-__inline void mPopMatrix()
-{
+__inline void mPopMatrix() {
 	mMXPtr -= indices_count;
 }
 
-__inline void phd_PopMatrix()
-{
+__inline void phd_PopMatrix() {
 	phd_mxptr -= indices_count;
 	mPopMatrix();
 }

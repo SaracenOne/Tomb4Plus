@@ -58,8 +58,7 @@ void NGExecuteProgressiveAction(NGProgressiveAction* progressive_action) {
 			ITEM_INFO* item_info = T4PlusGetItemInfoForID(progressive_action->item_index);
 			if (progressive_action->argument2_i32[0] > 0) {
 				item_info->pos.x_rot += progressive_action->argument1_u16;
-			}
-			else {
+			} else {
 				item_info->pos.x_rot -= progressive_action->argument1_u16;
 			}
 

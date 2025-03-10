@@ -3,63 +3,65 @@
 
 #define INFINITE_HEALTH -16384
 
-long ControlPhase(long nframes, long demo_mode);
-void FlipMap(long FlipNumber);
+int32_t ControlPhase(int32_t nframes, int32_t demo_mode);
+void FlipMap(int32_t FlipNumber);
 void RemoveRoomFlipItems(ROOM_INFO* r);
 void AddRoomFlipItems(ROOM_INFO* r);
-void TestTriggers(short* data, bool heavy, long heavy_flags);
-short GetDoor(FLOOR_INFO* floor);
-long CheckNoColFloorTriangle(FLOOR_INFO* floor, long x, long z);
-long CheckNoColCeilingTriangle(FLOOR_INFO* floor, long x, long z);
-FLOOR_INFO* GetFloor(long x, long y, long z, short* room_number);
-long GetWaterHeight(long x, long y, long z, short room_number);
-long GetHeight(FLOOR_INFO* floor, long x, long y, long z);
-long GetCeiling(FLOOR_INFO* floor, long x, long y, long z);
-void AlterFloorHeight(ITEM_INFO* item, long height);
-void InterpolateAngle(short dest, short* src, short* diff, short speed);
-void TranslateItem(ITEM_INFO* item, short x, short y, short z);
-long GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
+void TestTriggers(int16_t* data, bool heavy, int32_t heavy_flags);
+int16_t GetDoor(FLOOR_INFO* floor);
+int32_t CheckNoColFloorTriangle(FLOOR_INFO* floor, int32_t x, int32_t z);
+int32_t CheckNoColCeilingTriangle(FLOOR_INFO* floor, int32_t x, int32_t z);
+FLOOR_INFO* GetFloor(int32_t x, int32_t y, int32_t z, int16_t* room_number);
+int32_t GetWaterHeight(int32_t x, int32_t y, int32_t z, int16_t room_number);
+int32_t GetHeight(FLOOR_INFO* floor, int32_t x, int32_t y, int32_t z);
+int32_t GetCeiling(FLOOR_INFO* floor, int32_t x, int32_t y, int32_t z);
+void AlterFloorHeight(ITEM_INFO* item, int32_t height);
+void InterpolateAngle(int16_t dest, int16_t* src, int16_t* diff, int16_t speed);
+void TranslateItem(ITEM_INFO* item, int16_t x, int16_t y, int16_t z);
+int32_t GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 void UpdateSky();
 void KillMoveEffects();
 void KillMoveItems();
-void RefreshCamera(short type, short* data);
+void RefreshCamera(int16_t type, int16_t* data);
 bool TriggerActive(ITEM_INFO* item);
-void TriggerNormalCDTrack(short value, short flags, short type);
-void TriggerCDTrack(short value, short flags, short type);
-long ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
-long xLOS(GAME_VECTOR* start, GAME_VECTOR* target);
-long zLOS(GAME_VECTOR* start, GAME_VECTOR* target);
-long LOS(GAME_VECTOR* start, GAME_VECTOR* target);
+void TriggerNormalCDTrack(int16_t value, int16_t flags, int16_t type);
+void TriggerCDTrack(int16_t value, int16_t flags, int16_t type);
+int32_t ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
+int32_t xLOS(GAME_VECTOR* start, GAME_VECTOR* target);
+int32_t zLOS(GAME_VECTOR* start, GAME_VECTOR* target);
+int32_t LOS(GAME_VECTOR* start, GAME_VECTOR* target);
 void FireCrossBowFromLaserSight(GAME_VECTOR* start, GAME_VECTOR* target);
-long ExplodeItemNode(ITEM_INFO* item, long Node, long NoXZVel, long bits);
-long IsRoomOutside(long x, long y, long z);
-long ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* target, PHD_VECTOR* Coord, MESH_INFO** StaticMesh);
-long GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, long DrawTarget, long firing);
-void UpdateItemRoom(short item_number, short y_test_offset);
+int32_t ExplodeItemNode(ITEM_INFO* item, int32_t Node, int32_t NoXZVel, int32_t bits);
+int32_t IsRoomOutside(int32_t x, int32_t y, int32_t z);
+int32_t ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* target, PHD_VECTOR* Coord, MESH_INFO** StaticMesh);
+int32_t GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int32_t DrawTarget, int32_t firing);
+void UpdateItemRoom(int16_t item_number, int16_t y_test_offset);
 void ApplyItemGravity(ITEM_INFO* item);
 void AnimateItem(ITEM_INFO* item);
-long RayBoxIntersect(PHD_VECTOR* min, PHD_VECTOR* max, PHD_VECTOR* mid, PHD_VECTOR* dir, PHD_VECTOR* Coord);
-long DoRayBox(GAME_VECTOR* start, GAME_VECTOR* target, short* bounds, PHD_3DPOS* ItemPos, PHD_VECTOR* Coord, short item_number);
-long GetMaximumFloor(FLOOR_INFO* floor, long x, long z);
-long GetMinimumCeiling(FLOOR_INFO* floor, long x, long z);
+int32_t RayBoxIntersect(PHD_VECTOR* min, PHD_VECTOR* max, PHD_VECTOR* mid, PHD_VECTOR* dir, PHD_VECTOR* Coord);
+int32_t DoRayBox(GAME_VECTOR* start, GAME_VECTOR* target, int16_t* bounds, PHD_3DPOS* ItemPos, PHD_VECTOR* Coord, int16_t item_number);
+int32_t GetMaximumFloor(FLOOR_INFO* floor, int32_t x, int32_t z);
+int32_t GetMinimumCeiling(FLOOR_INFO* floor, int32_t x, int32_t z);
+
+#define MAX_ROOMS 256
 
 extern size_t vanilla_item_malloc_offset;
 
 extern ITEM_INFO* items;
 extern ANIM_STRUCT* anims;
 extern ROOM_INFO* room;
-extern short** meshes;
-extern long* bones;
+extern int16_t** meshes;
+extern int32_t* bones;
 extern int32_t level_items;
-extern short number_rooms;
+extern int16_t number_rooms;
 
-extern short* OutsideRoomOffsets;
-extern char* OutsideRoomTable;
-extern short IsRoomOutsideNo;
+extern int16_t* OutsideRoomOffsets;
+extern int8_t* OutsideRoomTable;
+extern int16_t IsRoomOutsideNo;
 
 extern MESH_INFO* SmashedMesh[16];
-extern short SmashedMeshRoom[16];
-extern short SmashedMeshCount;
+extern int16_t SmashedMeshRoom[16];
+extern int16_t SmashedMeshCount;
 
 #define MAX_FLIPMAPS 32 // bumped from 10
 
@@ -76,31 +78,31 @@ extern int32_t OnObject;
 extern int32_t height_type;
 
 extern bool InItemControlLoop;
-extern short ItemNewRooms[256][2];
-extern short ItemNewRoomNo;
+extern int16_t ItemNewRooms[MAX_ROOMS][2];
+extern int16_t ItemNewRoomNo;
 
-extern uchar CurrentAtmosphere;
+extern uint8_t CurrentAtmosphere;
 extern bool IsAtmospherePlaying;
-extern char cd_flags[128];
+extern int8_t cd_flags[128];
 
-extern ulong FmvSceneTriggered;
-extern ulong CutSceneTriggered;
-extern long SetDebounce;
-extern long framecount;
-extern long reset_flag;
-extern long WeaponDelay;
-extern long LaserSightX;
-extern long LaserSightY;
-extern long LaserSightZ;
-extern ushort GlobalCounter;
-extern short XSoff1;
-extern short XSoff2;
-extern short YSoff1;
-extern short YSoff2;
-extern short ZSoff1;
-extern short ZSoff2;
-extern short FXType;
-extern char PoisonFlag;
-extern char TriggerTimer;
-extern char LaserSightActive;
-extern char DeathMenuActive;
+extern uint32_t FmvSceneTriggered;
+extern uint32_t CutSceneTriggered;
+extern int32_t SetDebounce;
+extern int32_t framecount;
+extern int32_t reset_flag;
+extern int32_t WeaponDelay;
+extern int32_t LaserSightX;
+extern int32_t LaserSightY;
+extern int32_t LaserSightZ;
+extern uint16_t GlobalCounter;
+extern int16_t XSoff1;
+extern int16_t XSoff2;
+extern int16_t YSoff1;
+extern int16_t YSoff2;
+extern int16_t ZSoff1;
+extern int16_t ZSoff2;
+extern int16_t FXType;
+extern int8_t PoisonFlag;
+extern int8_t TriggerTimer;
+extern int8_t LaserSightActive;
+extern int8_t DeathMenuActive;

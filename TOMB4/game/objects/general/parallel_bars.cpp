@@ -21,7 +21,7 @@ void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll) {
 
 void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll) {
 	ITEM_INFO* pitem;
-	long Dist;
+	int32_t Dist;
 
 	int item_num = lara.GeneralPtr;
 	pitem = &items[item_num];
@@ -34,8 +34,8 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll) {
 		else
 			Dist = pitem->trigger_flags % 100 - 2;
 
-		item->fallspeed = -(short(20 * Dist + 64));
-		item->speed = short(20 * Dist + 58);
+		item->fallspeed = -(int16_t(20 * Dist + 64));
+		item->speed = int16_t(20 * Dist + 58);
 	}
 
 	if (item->frame_number == anims[item->anim_number].frame_end) {
@@ -49,38 +49,34 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll) {
 	}
 }
 
-static short ParallelBarsBounds[12] = { -640, 640, 704, 832, -96, 96, -1820, 1820, -5460, 5460, -1820, 1820 };
-static short PoleBounds[12] = { -256, 256, 0, 0, -512, 512, -1820, 1820, -5460, 5460, -1820, 1820 };
+static int16_t ParallelBarsBounds[12] = { -640, 640, 704, 832, -96, 96, -1820, 1820, -5460, 5460, -1820, 1820 };
+static int16_t PoleBounds[12] = { -256, 256, 0, 0, -512, 512, -1820, 1820, -5460, 5460, -1820, 1820 };
 static PHD_VECTOR PolePos = { 0, 0, -208 };
 static PHD_VECTOR PolePosR = { 0, 0, 0 };
 
-void ParallelBarsCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll)
-{
+void ParallelBarsCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 	PHD_VECTOR pos2;
-	short pass, pass1;
+	int16_t pass, pass1;
 
 	item = &items[item_num];
 
-	if (!(input & IN_ACTION) || l->current_anim_state != AS_REACH || l->anim_number != ANIM_GRABLOOP)
-	{
+	if (!(input & IN_ACTION) || l->current_anim_state != AS_REACH || l->anim_number != ANIM_GRABLOOP) {
 		if (l->current_anim_state != AS_PBSPIN)
 			ObjectCollision(item_num, l, coll);
 
 		return;
 	}
 
-	pass = (short)TestLaraPosition(ParallelBarsBounds, item, l);
+	pass = (int16_t)TestLaraPosition(ParallelBarsBounds, item, l);
 
-	if (!pass)
-	{
+	if (!pass) {
 		item->pos.y_rot += 0x8000;
-		pass1 = (short)TestLaraPosition(ParallelBarsBounds, item, l);
+		pass1 = (int16_t)TestLaraPosition(ParallelBarsBounds, item, l);
 		item->pos.y_rot += 0x8000;
 
-		if (!pass1)
-		{
+		if (!pass1) {
 			ObjectCollision(item_num, l, coll);
 			return;
 		}

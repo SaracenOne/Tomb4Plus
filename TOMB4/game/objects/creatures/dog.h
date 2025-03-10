@@ -1,5 +1,5 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseDog(short item_number);
-void DogControl(short item_number);
+void InitialiseDog(int16_t item_number);
+void DogControl(int16_t item_number);

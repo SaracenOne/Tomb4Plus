@@ -24,7 +24,7 @@
 #define DEFAULT_FAR_VIEW_VALUE BLOCK_SIZE * DEFAULT_FOG_END_BLOCKS
 
 // This may need increasing...
-#define MAXIMUM_JSON_ALLOCATION_BLOCKS 32768 
+#define MAXIMUM_JSON_ALLOCATION_BLOCKS 32768
 
 #define MAX_EQUIPMENT_MODIFIERS 32
 #define MAX_VAPOR_OCB_CUSTOMIZATIONS 16
@@ -143,7 +143,7 @@ struct MOD_LEVEL_OBJECT_CUSTOMIZATION {
 	uint16_t explode_after_death_animation : 1;
 	uint16_t explosive_death_only : 1;
 	uint16_t hit_type : 2;
-	
+
 	int32_t pivot_length = 0;
 	int32_t radius = 10;
 	int32_t shadow_size = 0;
@@ -215,7 +215,7 @@ struct MOD_LEVEL_OBJECTS_INFO {
 
 	int16_t nitrous_oxide_feeder_slot = PUZZLE_ITEM1;
 	int16_t jeep_key_slot = PUZZLE_ITEM1;
-	
+
 	int16_t rubber_boat_slot = RUBBER_BOAT;
 	int16_t rubber_boat_extra_slot = RUBBER_BOAT_LARA;
 	int16_t motor_boat_slot = MOTOR_BOAT;
@@ -263,9 +263,9 @@ struct MOD_LEVEL_CREATURE_INFO {
 	int32_t small_scorpion_poison_strength = 512;
 
 	bool use_voncroy_racing_behaviour = false;
-	
+
 	bool remove_knights_templar_sparks = false;
-	
+
 	bool remove_ahmet_death_flames = false;
 	bool remove_ahmet_death_loop = false;
 	bool disable_ahmet_heavy_trigger = false;
@@ -287,7 +287,7 @@ struct MOD_LEVEL_VAPOR_CUSTOMIZATION {
 
 struct MOD_LEVEL_GFX_INFO {
 	T4PColdBreath cold_breath = COLD_BREATH_DISABLED;
-	
+
 	int16_t default_envmap_sprite_index = 11;
 	int16_t pickup_envmap_sprite_index = 11;
 
@@ -516,7 +516,7 @@ struct MOD_LEVEL_AMMO_INFO {
 	int16_t damage = 0;
 	int16_t poison_damage = 0;
 	int16_t explosion_damage = 0;
-	
+
 	int16_t speed = 0;
 	int16_t gravity = 0;
 
@@ -527,7 +527,7 @@ struct MOD_LEVEL_AMMO_INFO {
 
 	int16_t weapon_pickup_amount = 0;
 	int16_t ammo_pickup_amount = 0;
-	
+
 	int16_t grenade_timer = 0;
 
 	bool add_pistol_shell = false;
@@ -668,7 +668,7 @@ extern void T4PlusCleanup();
 extern void T4PlusInit();
 
 extern bool is_mod_trng_version_equal_or_greater_than_target(
-	unsigned char target_major_version,
-	unsigned char target_minor_version,
-	unsigned char target_maintainence_version,
-	unsigned char target_build_version);
+    uint8_t target_major_version,
+    uint8_t target_minor_version,
+    uint8_t target_maintainence_version,
+    uint8_t target_build_version);

@@ -7,7 +7,7 @@
 
 #define TREPSAVE_BUFFER_SIZE 0x2ff0
 
-void S_TREPLoadgame(long slot_num) {
+void S_TREPLoadgame(int32_t slot_num) {
 	size_t bytes_read = 0;
 
 	char buffer[TREPSAVE_BUFFER_SIZE];
@@ -23,14 +23,13 @@ void S_TREPLoadgame(long slot_num) {
 	t4p_rain_type = T4P_WEATHER_DISABLED;
 	t4p_snow_type = T4P_WEATHER_DISABLED;
 
-	if (file)
-	{
+	if (file) {
 		bytes_read = fread(buffer, 1, TREPSAVE_BUFFER_SIZE, file);
 		if (bytes_read == TREPSAVE_BUFFER_SIZE) {
 			memcpy(furr_oneshot_buffer, buffer, LAST_FURR_FLIPEFFECT);
 
-			char weather = 0;
-			memcpy(&weather, buffer + (LAST_FURR_FLIPEFFECT + 0x70), sizeof(char));
+			int8_t weather = 0;
+			memcpy(&weather, buffer + (LAST_FURR_FLIPEFFECT + 0x70), sizeof(int8_t));
 			switch (weather) {
 				case 1:
 					t4p_rain_type = T4P_WEATHER_ENABLED_ALL_OUTSIDE;
@@ -52,7 +51,7 @@ void S_TREPLoadgame(long slot_num) {
 	}
 }
 
-void S_TREPSavegame(long slot_num) {
+void S_TREPSavegame(int32_t slot_num) {
 	size_t bytes_written = 0;
 
 	char buffer[TREPSAVE_BUFFER_SIZE];
@@ -63,11 +62,10 @@ void S_TREPSavegame(long slot_num) {
 	std::string full_path = savegame_dir_path + buffer;
 
 	FILE* file = platform_fopen(full_path.c_str(), "wb");
-	if (file)
-	{
+	if (file) {
 		memcpy(buffer, furr_oneshot_buffer, LAST_FURR_FLIPEFFECT);
 
-		char weather = 0;
+		int8_t weather = 0;
 		if (t4p_rain_type == T4P_WEATHER_ENABLED_ALL_OUTSIDE) {
 			weather += 1;
 		}
@@ -75,7 +73,7 @@ void S_TREPSavegame(long slot_num) {
 			weather += 2;
 		}
 
-		memcpy(buffer + 0x270, &weather, sizeof(char));
+		memcpy(buffer + 0x270, &weather, sizeof(int8_t));
 
 		bytes_written = fwrite(buffer, 1, TREPSAVE_BUFFER_SIZE, file);
 

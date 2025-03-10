@@ -19,7 +19,7 @@
 #include "../../tomb4/tomb4plus/t4plus_items.h"
 #include "../../tomb4/tomb4plus/t4plus_objects.h"
 
-char furr_oneshot_buffer[LAST_FURR_FLIPEFFECT];
+int8_t furr_oneshot_buffer[LAST_FURR_FLIPEFFECT];
 FURRFlipeffectTable furr_flipeffect_table[LAST_FURR_FLIPEFFECT - FIRST_FURR_FLIPEFFECT];
 
 int furr_get_state_field(ITEM_INFO *item, int item_state_address_offset) {
@@ -367,8 +367,7 @@ FURRResult furr_cmd_add_questitem(FURRParameters params) {
 	if (params.first_parameter >= QUEST_ITEM1 && params.first_parameter <= QUEST_ITEM6) {
 		T4PlusSetInventoryCount(params.first_parameter, params.second_parameter, false);
 		return FURR_RESULT_OK;
-	}
-	else {
+	} else {
 		return FURR_RESULT_ERROR;
 	}
 
@@ -604,7 +603,7 @@ FURRResult furr_cmd_add_weapon(FURRParameters params) {
 			break;
 		default:
 			return FURR_RESULT_ERROR;
-		}
+	}
 
 	return FURR_RESULT_OK;
 }
@@ -613,26 +612,26 @@ FURRResult furr_cmd_add_weapon(FURRParameters params) {
 // WEAPON_ID
 FURRResult furr_cmd_remove_weapon(FURRParameters params) {
 	switch (params.first_parameter) {
-	case 0x80DFD2: // (Pistol)
-		lara.pistols_type_carried = W_NONE;
-		break;
-	case 0x80DFD3: // (Uzi)
-		lara.uzis_type_carried = W_NONE;
-		break;
-	case 0x80DFD4: // (Shotgun)
-		lara.shotgun_type_carried = W_NONE;
-		break;
-	case 0x80DFD5: // (Crossbow)
-		lara.crossbow_type_carried = W_NONE;
-		break;
-	case 0x80DFD6: // (Grenade Gun)
-		lara.grenade_type_carried = W_NONE;
-		break;
-	case 0x80DFD7: // (Revolver)
-		lara.sixshooter_type_carried = W_NONE;
-		break;
-	default:
-		return FURR_RESULT_ERROR;
+		case 0x80DFD2: // (Pistol)
+			lara.pistols_type_carried = W_NONE;
+			break;
+		case 0x80DFD3: // (Uzi)
+			lara.uzis_type_carried = W_NONE;
+			break;
+		case 0x80DFD4: // (Shotgun)
+			lara.shotgun_type_carried = W_NONE;
+			break;
+		case 0x80DFD5: // (Crossbow)
+			lara.crossbow_type_carried = W_NONE;
+			break;
+		case 0x80DFD6: // (Grenade Gun)
+			lara.grenade_type_carried = W_NONE;
+			break;
+		case 0x80DFD7: // (Revolver)
+			lara.sixshooter_type_carried = W_NONE;
+			break;
+		default:
+			return FURR_RESULT_ERROR;
 	}
 
 	return FURR_RESULT_OK;
@@ -986,7 +985,7 @@ FURRResult furr_cmd_change_weather(FURRParameters params) {
 // Params:
 // LARA_MESH
 FURRResult furr_cmd_swap_lara_mesh(FURRParameters params) {
-	short *temp = lara.mesh_ptrs[params.second_parameter];
+	int16_t *temp = lara.mesh_ptrs[params.second_parameter];
 	lara.mesh_ptrs[params.second_parameter] = meshes[objects[params.first_parameter].mesh_index + params.second_parameter * 2];
 	meshes[objects[params.first_parameter].mesh_index + params.second_parameter * 2] = temp;
 
@@ -1198,7 +1197,7 @@ FURRResult furr_cmd_if_pressed(FURRParameters params) {
 	if (input & params.first_parameter) {
 		return FURR_RESULT_OK;
 	}
-	
+
 	return FURR_RESULT_RET;
 }
 
@@ -1656,7 +1655,7 @@ void furr_clear_oneshot_buffer() {
 	memset(furr_oneshot_buffer, 0, LAST_FURR_FLIPEFFECT);
 }
 
-void furr_execute_furr_flipeffect(int flipeffect_id) {	
+void furr_execute_furr_flipeffect(int flipeffect_id) {
 	if (flipeffect_id < FIRST_FURR_FLIPEFFECT) {
 		Log(1, "Invalid FURR flipeffect id %u!\n", flipeffect_id);
 		return;

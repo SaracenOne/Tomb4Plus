@@ -14,7 +14,7 @@
 #include "../../lara.h"
 #include "../../gameflow.h"
 
-static short DragSASBounds[12] = {
+static int16_t DragSASBounds[12] = {
 	-CLICK_SIZE,
 	CLICK_SIZE,
 	-100,
@@ -31,20 +31,16 @@ static short DragSASBounds[12] = {
 
 static PHD_VECTOR DragSASPos = { 0, 0, -460 };
 
-void DragSASCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
-{
+void DragSASCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	ITEM_INFO* item;
-	long x, z;
+	int32_t x, z;
 
 	item = &items[item_number];
 
 	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && lara.gun_status == LG_NO_ARMS &&
-		!l->gravity_status && !(item->flags & IFL_CODEBITS) || lara.IsMoving && lara.GeneralPtr == item_number)
-	{
-		if (TestLaraPosition(DragSASBounds, item, l))
-		{
-			if (MoveLaraPosition(&DragSASPos, item, l))
-			{
+	        !l->gravity_status && !(item->flags & IFL_CODEBITS) || lara.IsMoving && lara.GeneralPtr == item_number) {
+		if (TestLaraPosition(DragSASBounds, item, l)) {
+			if (MoveLaraPosition(&DragSASPos, item, l)) {
 				l->anim_number = ANIM_DRAGSAS;
 				l->frame_number = anims[ANIM_DRAGSAS].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
@@ -58,17 +54,12 @@ void DragSASCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 				item->flags |= IFL_CODEBITS;
 				item->status = ITEM_ACTIVE;
 				AddActiveItem(item_number);
-			}
-			else
+			} else
 				lara.GeneralPtr = item_number;
 		}
-	}
-	else
-	{
-		if (item->status == ITEM_ACTIVE)
-		{
-			if (item->frame_number == anims[item->anim_number].frame_end)
-			{
+	} else {
+		if (item->status == ITEM_ACTIVE) {
+			if (item->frame_number == anims[item->anim_number].frame_end) {
 				x = (2048 * phd_sin(l->pos.y_rot)) >> W2V_SHIFT;
 				z = (2048 * phd_cos(l->pos.y_rot)) >> W2V_SHIFT;
 				TestTriggersAtXYZ(l->pos.x_pos - x, l->pos.y_pos, l->pos.z_pos - z, l->room_number, 1, 0);

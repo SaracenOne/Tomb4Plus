@@ -12,8 +12,7 @@
 
 static BITE_INFO wildboar_bite = { 0, 0, 0, 14 };
 
-void InitialiseWildboar(short item_number)
-{
+void InitialiseWildboar(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -24,15 +23,14 @@ void InitialiseWildboar(short item_number)
 	item->goal_anim_state = 1;
 }
 
-void WildboarControl(short item_number)
-{
+void WildboarControl(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* target;
 	CREATURE_INFO* boar;
 	CREATURE_INFO* baddie;
 	AI_INFO info;
-	long dx, dz, ldist, dist, max_dist;
-	short angle, neckX, neckY, headX, headY;
+	int32_t dx, dz, ldist, dist, max_dist;
+	int16_t angle, neckX, neckY, headX, headY;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -47,46 +45,37 @@ void WildboarControl(short item_number)
 	item = &items[item_number];
 	boar = (CREATURE_INFO*)item->data;
 
-	if (item->hit_points <= 0)
-	{
+	if (item->hit_points <= 0) {
 		item->hit_points = 0;
 
-		if (item->current_anim_state != 5)
-		{
+		if (item->current_anim_state != 5) {
 			item->anim_number = objects[WILD_BOAR].anim_index + 5;
 			item->frame_number = anims[item->anim_number].frame_base;
 			item->current_anim_state = 5;
 		}
-	}
-	else
-	{
+	} else {
 		dx = lara_item->pos.x_pos - item->pos.x_pos;
 		dz = lara_item->pos.z_pos - item->pos.z_pos;
 		ldist = SQUARE(dx) + SQUARE(dz);
 
 		if (item->ai_bits)
 			GetAITarget(boar);
-		else
-		{
+		else {
 			boar->enemy = lara_item;
 			max_dist = 0x7FFFFFFF;
 
-			for (int i = 0; i < MAXIMUM_BADDIES; i++)
-			{
+			for (int i = 0; i < MAXIMUM_BADDIES; i++) {
 				baddie = &baddie_slots[i];
 
-				if (baddie->item_num != NO_ITEM && baddie->item_num != item_number)
-				{
+				if (baddie->item_num != NO_ITEM && baddie->item_num != item_number) {
 					target = &items[baddie->item_num];
 
-					if (target->object_number != WILD_BOAR)
-					{
+					if (target->object_number != WILD_BOAR) {
 						dx = target->pos.x_pos - item->pos.x_pos;
 						dz = target->pos.z_pos - item->pos.z_pos;
 						dist = SQUARE(dx) + SQUARE(dz);
 
-						if (dist < max_dist && dist < ldist)
-						{
+						if (dist < max_dist && dist < ldist) {
 							boar->enemy = target;
 							max_dist = dist;
 						}
@@ -108,72 +97,63 @@ void WildboarControl(short item_number)
 		dx = abs(item->item_flags[2] - item->pos.x_pos);
 		dz = abs(item->item_flags[3] - item->pos.z_pos);
 
-		if (info.ahead)
-		{
+		if (info.ahead) {
 			neckY = info.angle >> 1;
 			headY = info.angle >> 1;
 		}
 
-		switch (item->current_anim_state)
-		{
-		case 1:
-			boar->maximum_turn = 0;
+		switch (item->current_anim_state) {
+			case 1:
+				boar->maximum_turn = 0;
 
-			if (info.ahead && info.distance || item->flags)
-				item->goal_anim_state = 2;
-			else if ((GetRandomControl() & 0x7F) != 0)
-			{
-				neckY = AIGuard(boar) >> 1;
-				headY = neckY;
-			}
-			else
-				item->goal_anim_state = 3;
+				if (info.ahead && info.distance || item->flags)
+					item->goal_anim_state = 2;
+				else if ((GetRandomControl() & 0x7F) != 0) {
+					neckY = AIGuard(boar) >> 1;
+					headY = neckY;
+				} else
+					item->goal_anim_state = 3;
 
-			break;
+				break;
 
-		case 2:
+			case 2:
 
-			if (info.distance >= 0x400000)
-			{
-				boar->maximum_turn = DEGREES_TO_ROTATION(6);
-				item->flags = 0;
-			}
-			else
-			{
-				boar->maximum_turn = DEGREES_TO_ROTATION(3);
-				neckX = (short)-info.distance;
-				headX = (short)-info.distance;
-			}
-
-			if (!item->flags && (dx < 50 && dz < 50 || info.distance < 0x10000 && info.bite))
-			{
-				item->goal_anim_state = 4;
-
-				if (boar->enemy == lara_item)
-				{
-					lara_item->hit_points -= mod_object_customization->damage_1;
-					lara_item->hit_status = 1;
+				if (info.distance >= 0x400000) {
+					boar->maximum_turn = DEGREES_TO_ROTATION(6);
+					item->flags = 0;
+				} else {
+					boar->maximum_turn = DEGREES_TO_ROTATION(3);
+					neckX = (int16_t)-info.distance;
+					headX = (int16_t)-info.distance;
 				}
 
-				CreatureEffectT(item, &wildboar_bite, 3, item->pos.y_rot, DoBloodSplat);
-				item->flags = 1;
-			}
+				if (!item->flags && (dx < 50 && dz < 50 || info.distance < 0x10000 && info.bite)) {
+					item->goal_anim_state = 4;
 
-			break;
+					if (boar->enemy == lara_item) {
+						lara_item->hit_points -= mod_object_customization->damage_1;
+						lara_item->hit_status = 1;
+					}
 
-		case 3:
-			boar->maximum_turn = 0;
+					CreatureEffectT(item, &wildboar_bite, 3, item->pos.y_rot, DoBloodSplat);
+					item->flags = 1;
+				}
 
-			if (info.ahead && info.distance)
-				item->goal_anim_state = 1;
-			else if (!(GetRandomControl() & 0x7F))
-				item->goal_anim_state = 1;
+				break;
 
-			break;
+			case 3:
+				boar->maximum_turn = 0;
 
-		case 4:
-			boar->maximum_turn = 0;
-			break;
+				if (info.ahead && info.distance)
+					item->goal_anim_state = 1;
+				else if (!(GetRandomControl() & 0x7F))
+					item->goal_anim_state = 1;
+
+				break;
+
+			case 4:
+				boar->maximum_turn = 0;
+				break;
 		}
 	}
 

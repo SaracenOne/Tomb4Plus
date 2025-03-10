@@ -27,140 +27,144 @@ bool NGExecuteSingleGlobalTrigger(int32_t global_trigger_id, int32_t selected_in
 	if (selected_inventory_object_id == NO_ITEM) {
 		// What the difference between GT_CONDITION_GROUP and GT_ALWAYS?
 		switch (global_trigger->type) {
-		case GT_USED_INVENTORY_ITEM: {
-			if (ng_used_inventory_object_for_frame != NO_ITEM) {
-				if (ng_used_inventory_object_for_frame == global_trigger->parameter)
-					global_trigger_condition_passed = true;
-			}
-			break;
-		}
-		case GT_USED_BIG_MEDIPACK: {
-			if (ng_used_large_medipack) {
-				global_trigger_condition_passed = true;
-			}
-			break;
-		}
-		case GT_USED_LITTLE_MEDIPACK: {
-			if (ng_used_small_medipack) {
-				global_trigger_condition_passed = true;
-			}
-			break;
-		}
-		case GT_ENEMY_KILLED: {
-			int32_t enemy_id = ng_script_id_table[global_trigger->parameter].script_index;
-			ITEM_INFO *item = T4PlusGetItemInfoForID(enemy_id);
-			if (item) {
-				if (item->after_death > 0)
-					global_trigger_condition_passed = true;
-			}
-			break;
-		}
-		case GT_LARA_HP_LESS_THAN: {
-			if (lara_item->hit_points < global_trigger->parameter)
-				global_trigger_condition_passed = true;
-			break;
-		}
-		case GT_LARA_HP_HIGHER_THAN: {
-			if (lara_item->hit_points > global_trigger->parameter)
-				global_trigger_condition_passed = true;
-			break;
-		}
-		case GT_LARA_POISONED: {
-			if (lara_item->poisoned > (ulong)global_trigger->parameter)
-				global_trigger_condition_passed = true;
-			break;
-		}
-		case GT_CONDITION_GROUP: {
-			global_trigger_condition_passed = true;
-			break;
-		}
-		case GT_DISTANCE_FROM_ITEM: {
-			if (is_mod_trng_version_equal_or_greater_than_target(1, 2, 2, 4)) {
-				NGScriptIDTableEntry *entry = &ng_script_id_table[global_trigger->parameter  & 0x1fff];
-				int32_t distance = (global_trigger->parameter >> 13) & 0x1ffff;
-				if (entry->script_index != -1) {
-					ITEM_INFO *item = T4PlusGetItemInfoForID(entry->script_index);
-					if (item) {
-						global_trigger_condition_passed = NGIsSourcePositionLessThanDistanceToTargetPosition(&lara_item->pos, &item->pos, distance, global_trigger->parameter & GTD_IGNORE_HEIGHT);
-					}
+			case GT_USED_INVENTORY_ITEM: {
+				if (ng_used_inventory_object_for_frame != NO_ITEM) {
+					if (ng_used_inventory_object_for_frame == global_trigger->parameter)
+						global_trigger_condition_passed = true;
 				}
-			} else {
-				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "GT_DISTANCE_FROM_ITEM for version prior to (1, 2, 2, 4) is unimplemented.");
+				break;
 			}
-			break;
-		}
-		case GT_COLLIDE_ITEM: {
-			ITEM_INFO *item = T4PlusGetItemInfoForID(ng_script_id_table[global_trigger->parameter].script_index);
+			case GT_USED_BIG_MEDIPACK: {
+				if (ng_used_large_medipack) {
+					global_trigger_condition_passed = true;
+				}
+				break;
+			}
+			case GT_USED_LITTLE_MEDIPACK: {
+				if (ng_used_small_medipack) {
+					global_trigger_condition_passed = true;
+				}
+				break;
+			}
+			case GT_ENEMY_KILLED: {
+				int32_t enemy_id = ng_script_id_table[global_trigger->parameter].script_index;
+				ITEM_INFO *item = T4PlusGetItemInfoForID(enemy_id);
+				if (item) {
+					if (item->after_death > 0)
+						global_trigger_condition_passed = true;
+				}
+				break;
+			}
+			case GT_LARA_HP_LESS_THAN: {
+				if (lara_item->hit_points < global_trigger->parameter)
+					global_trigger_condition_passed = true;
+				break;
+			}
+			case GT_LARA_HP_HIGHER_THAN: {
+				if (lara_item->hit_points > global_trigger->parameter)
+					global_trigger_condition_passed = true;
+				break;
+			}
+			case GT_LARA_POISONED: {
+				if (lara_item->poisoned > (uint32_t)global_trigger->parameter)
+					global_trigger_condition_passed = true;
+				break;
+			}
+			case GT_CONDITION_GROUP: {
+				global_trigger_condition_passed = true;
+				break;
+			}
+			case GT_DISTANCE_FROM_ITEM: {
+				if (is_mod_trng_version_equal_or_greater_than_target(1, 2, 2, 4)) {
+					NGScriptIDTableEntry *entry = &ng_script_id_table[global_trigger->parameter  & 0x1fff];
+					int32_t distance = (global_trigger->parameter >> 13) & 0x1ffff;
+					if (entry->script_index != -1) {
+						ITEM_INFO *item = T4PlusGetItemInfoForID(entry->script_index);
+						if (item) {
+							global_trigger_condition_passed = NGIsSourcePositionLessThanDistanceToTargetPosition(&lara_item->pos, &item->pos, distance, global_trigger->parameter & GTD_IGNORE_HEIGHT);
+						}
+					}
+				} else {
+					NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "GT_DISTANCE_FROM_ITEM for version prior to (1, 2, 2, 4) is unimplemented.");
+				}
+				break;
+			}
+			case GT_COLLIDE_ITEM: {
+				ITEM_INFO *item = T4PlusGetItemInfoForID(ng_script_id_table[global_trigger->parameter].script_index);
 
-			ITEM_INFO* collided_item = NGIsLaraCollidingWithItem(item, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
-			if (collided_item) {
-				global_trigger_condition_passed = true;
-				NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+				ITEM_INFO* collided_item = NGIsLaraCollidingWithItem(item, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
+				if (collided_item) {
+					global_trigger_condition_passed = true;
+					NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+				}
+				break;
 			}
-			break;
-		}
-		case GT_COLLIDE_SLOT: {
-			ITEM_INFO *collided_item = NGIsLaraCollidingWithMoveableSlot(global_trigger->parameter, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
-			if (collided_item) {
-				global_trigger_condition_passed = true;
-				NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+			case GT_COLLIDE_SLOT: {
+				ITEM_INFO *collided_item = NGIsLaraCollidingWithMoveableSlot(global_trigger->parameter, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
+				if (collided_item) {
+					global_trigger_condition_passed = true;
+					NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+				}
+				break;
 			}
-			break;
-		}
-		case GT_COLLIDE_CREATURE: {
-			ITEM_INFO *collided_item = NGIsLaraCollidingWithCreature(NG_CREATURE_TYPE_ANY, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
-			if (collided_item) {
-				global_trigger_condition_passed = true;
-				NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+			case GT_COLLIDE_CREATURE: {
+				ITEM_INFO *collided_item = NGIsLaraCollidingWithCreature(NG_CREATURE_TYPE_ANY, global_trigger->flags & FGT_PUSHING_COLLISION ? NG_COLLISION_TYPE_PUSH : NG_COLLISION_TYPE_BOUNDS);
+				if (collided_item) {
+					global_trigger_condition_passed = true;
+					NGStoreItemIndexConditional(T4PlusGetIDForItemInfo(collided_item));
+				}
+				break;
 			}
-			break;
-		}
-		case GT_LOADED_SAVEGAME: {
-			int32_t result = ng_loaded_savegame == true;
-			if (result >= 0) {
-				global_trigger_condition_passed = true;
+			case GT_LOADED_SAVEGAME: {
+				int32_t result = ng_loaded_savegame == true;
+				if (result >= 0) {
+					global_trigger_condition_passed = true;
+				}
+				break;
 			}
-			break;
-		}
-		case GT_COLLIDE_STATIC_SLOT: {
-			int32_t result = NGIsLaraCollidingWithStaticSlot(global_trigger->parameter);
-			if (result >= 0) {
-				global_trigger_condition_passed = true;
+			case GT_COLLIDE_STATIC_SLOT: {
+				int32_t result = NGIsLaraCollidingWithStaticSlot(global_trigger->parameter);
+				if (result >= 0) {
+					global_trigger_condition_passed = true;
+				}
+				break;
 			}
-			break;
-		}
-		case GT_KEYBOARD_CODE: {
-			if (IsKeyPressed(global_trigger->parameter) != 0) {
-				global_trigger_condition_passed = true;
+			case GT_LARA_HOLDS_ITEM: {
+				global_trigger_condition_passed = NGIsLaraHolding(global_trigger->parameter);
+				break;
 			}
-			break;
-		}
-		case GT_ALWAYS:
-			global_trigger_condition_passed = true;
-			break;
-		case GT_TRNG_G_TIMER_EQUALS:
-			// We don't evaluate AT ALL if the timer is inactive
-			if (ng_global_timer_frame_increment == 0)
+			case GT_KEYBOARD_CODE: {
+				if (IsKeyPressed(global_trigger->parameter) != 0) {
+					global_trigger_condition_passed = true;
+				}
+				break;
+			}
+			case GT_ALWAYS:
+				global_trigger_condition_passed = true;
+				break;
+			case GT_TRNG_G_TIMER_EQUALS:
+				// We don't evaluate AT ALL if the timer is inactive
+				if (ng_global_timer_frame_increment == 0)
+					return false;
+
+				if (ng_global_timer == global_trigger->parameter) {
+					global_trigger_condition_passed = true;
+				}
+				break;
+			case GT_TRNG_L_TIMER_EQUALS:
+				// We don't evaluate AT ALL if the timer is inactive
+				if (ng_local_timer_frame_increment == 0)
+					return false;
+
+				if (ng_local_timer == global_trigger->parameter) {
+					global_trigger_condition_passed = true;
+				}
+				break;
+			case GT_SELECTED_INVENTORY_ITEM:
 				return false;
-
-			if (ng_global_timer == global_trigger->parameter) {
-				global_trigger_condition_passed = true;
-			}
-			break;
-		case GT_TRNG_L_TIMER_EQUALS:
-			// We don't evaluate AT ALL if the timer is inactive
-			if (ng_local_timer_frame_increment == 0)
+			default:
+				NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Unimplemented GlobalTrigger type %u!", global_trigger->type);
 				return false;
-
-			if (ng_local_timer == global_trigger->parameter) {
-				global_trigger_condition_passed = true;
-			}
-			break;
-		case GT_SELECTED_INVENTORY_ITEM:
-			return false;
-		default:
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "Unimplemented GlobalTrigger type %u!", global_trigger->type);
-			return false;
 		}
 	} else {
 		switch (global_trigger->type) {

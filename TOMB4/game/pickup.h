@@ -1,18 +1,18 @@
 #pragma once
 #include "../global/types.h"
 
-void SarcophagusCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-void KeyHoleCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-void PuzzleDoneCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
-void PuzzleDone(ITEM_INFO* item, short item_number);
-void AnimatingPickUp(short item_number);
-short* FindPlinth(ITEM_INFO* item);
-long KeyTrigger(short item_num);
-long PickupTrigger(short item_num);
+void SarcophagusCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
+void KeyHoleCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleDoneCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleDone(ITEM_INFO* item, int16_t item_number);
+void AnimatingPickUp(int16_t item_number);
+int16_t* FindPlinth(ITEM_INFO* item);
+int32_t KeyTrigger(int16_t item_num);
+int32_t PickupTrigger(int16_t item_num);
 void RegeneratePickups();
-void PickUpCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-void PuzzleHoleCollision(short item_num, ITEM_INFO* l, COLL_INFO* coll);
+void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleHoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll);
 
-extern uchar NumRPickups;
-extern uchar RPickups[16];
-extern char KeyTriggerActive;
+extern uint8_t NumRPickups;
+extern uint8_t RPickups[16];
+extern int8_t KeyTriggerActive;

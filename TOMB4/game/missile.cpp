@@ -9,9 +9,8 @@
 #include "../specific/3dmath.h"
 #include "camera.h"
 
-long ExplodeFX(FX_INFO* fx, long NoXZVel, short Num)
-{
-	short** meshpp;
+int32_t ExplodeFX(FX_INFO* fx, int32_t NoXZVel, int16_t Num) {
+	int16_t** meshpp;
 
 	meshpp = &meshes[fx->frame_number];
 	ShatterItem.YRot = fx->pos.y_rot;
@@ -25,12 +24,11 @@ long ExplodeFX(FX_INFO* fx, long NoXZVel, short Num)
 	return 1;
 }
 
-void ControlBodyPart(short fx_number)
-{
+void ControlBodyPart(int16_t fx_number) {
 	FX_INFO* fx;
 	FLOOR_INFO* floor;
-	long height, ceiling, ox, oy, oz;
-	short room_number;
+	int32_t height, ceiling, ox, oy, oz;
+	int16_t room_number;
 
 	fx = &effects[fx_number];
 	ox = fx->pos.x_pos;
@@ -49,8 +47,7 @@ void ControlBodyPart(short fx_number)
 	floor = GetFloor(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos, &room_number);
 	ceiling = GetCeiling(floor, fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos);
 
-	if (fx->pos.y_pos < ceiling)
-	{
+	if (fx->pos.y_pos < ceiling) {
 		fx->pos.y_pos = ceiling;
 		fx->fallspeed = -fx->fallspeed;
 		fx->speed -= fx->speed >> 3;
@@ -58,10 +55,8 @@ void ControlBodyPart(short fx_number)
 
 	height = GetHeight(floor, fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos);
 
-	if (fx->pos.y_pos >= height)
-	{
-		if (fx->flag2 & 1)
-		{
+	if (fx->pos.y_pos >= height) {
+		if (fx->flag2 & 1) {
 			fx->pos.x_pos = ox;
 			fx->pos.y_pos = oy;
 			fx->pos.z_pos = oz;
@@ -79,15 +74,12 @@ void ControlBodyPart(short fx_number)
 			return;
 		}
 
-		if (oy <= height)
-		{
+		if (oy <= height) {
 			if (fx->fallspeed <= 32)
 				fx->fallspeed = 0;
 			else
 				fx->fallspeed = -fx->fallspeed >> 2;
-		}
-		else
-		{
+		} else {
 			fx->pos.y_rot += 0x8000;
 			fx->pos.x_pos = ox;
 			fx->pos.z_pos = oz;
@@ -101,12 +93,10 @@ void ControlBodyPart(short fx_number)
 		fx->pos.y_pos = oy;
 	}
 
-	if (!fx->speed)
-	{
+	if (!fx->speed) {
 		fx->flag1++;
 
-		if (fx->flag1 > 32)
-		{
+		if (fx->flag1 > 32) {
 			KillEffect(fx_number);
 			return;
 		}
@@ -114,7 +104,7 @@ void ControlBodyPart(short fx_number)
 
 	if (fx->flag2 & 2 && GetRandomControl() & 1)
 		DoBloodSplat((GetRandomControl() & 0x3F) + fx->pos.x_pos - 32, (GetRandomControl() & 0x1F) + fx->pos.y_pos - 16,
-			(GetRandomControl() & 0x3F) + fx->pos.z_pos - 32, 1, short(GetRandomControl() << 1), fx->room_number);
+		             (GetRandomControl() & 0x3F) + fx->pos.z_pos - 32, 1, int16_t(GetRandomControl() << 1), fx->room_number);
 
 	if (room_number != fx->room_number)
 		EffectNewRoom(fx_number, room_number);

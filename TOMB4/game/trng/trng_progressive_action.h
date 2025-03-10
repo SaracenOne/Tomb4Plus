@@ -1,7 +1,7 @@
 #pragma once
 
 enum NGProgressiveActionType {
-	AZ_NONE, 
+	AZ_NONE,
 	AZ_ROTATE_ITEM_HORIZONTAL,
 	AZ_ROTATE_ITEM_VERTICAL,
 	AZ_RESET_DISABLED_INPUT,

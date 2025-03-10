@@ -17,21 +17,17 @@
 static BITE_INFO stinger{ 0, 0, 0, 8 };
 static BITE_INFO pincer{ 0, 0, 0, 23 };
 
-void InitialiseBigScorpion(short item_number)
-{
+void InitialiseBigScorpion(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
 	InitialiseCreature(item_number);
 
-	if (item->trigger_flags == 1)
-	{
+	if (item->trigger_flags == 1) {
 		item->anim_number = objects[SCORPION].anim_index + 7;
 		item->current_anim_state = 8;
 		item->goal_anim_state = 8;
-	}
-	else
-	{
+	} else {
 		item->anim_number = objects[SCORPION].anim_index + 2;
 		item->current_anim_state = 1;
 		item->goal_anim_state = 1;
@@ -40,15 +36,14 @@ void InitialiseBigScorpion(short item_number)
 	item->frame_number = anims[item->anim_number].frame_base;
 }
 
-void BigScorpionControl(short item_number)
-{
+void BigScorpionControl(int16_t item_number) {
 	ITEM_INFO* item;
 	ITEM_INFO* enemy;
 	FLOOR_INFO* floor;
 	CREATURE_INFO* scorpion;
 	AI_INFO info;
-	long s, c, x, z, h, h2, dist, bestdist;
-	short angle, room_number, xrot, zrot, target_num, hp;
+	int32_t s, c, x, z, h, h2, dist, bestdist;
+	int16_t angle, room_number, xrot, zrot, target_num, hp;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -79,7 +74,7 @@ void BigScorpionControl(short item_number)
 	if (abs(item->pos.y_pos - h2) > HALF_BLOCK_SIZE)
 		h2 = item->pos.y_pos;
 
-	xrot = (short)phd_atan(1364, h2 - h);
+	xrot = (int16_t)phd_atan(1364, h2 - h);
 
 	x = item->pos.x_pos - c;
 	z = item->pos.z_pos + s;
@@ -99,17 +94,14 @@ void BigScorpionControl(short item_number)
 	if (abs(item->pos.y_pos - h2) > HALF_BLOCK_SIZE)
 		h2 = item->pos.y_pos;
 
-	zrot = (short)phd_atan(1364, h2 - h);
+	zrot = (int16_t)phd_atan(1364, h2 - h);
 
-	if (item->hit_points <= 0)
-	{
+	if (item->hit_points <= 0) {
 		item->hit_points = 0;
 		s = 1;
 
-		if (item->current_anim_state != 6)
-		{
-			if (item->trigger_flags > 0 && item->trigger_flags < 7)
-			{
+		if (item->current_anim_state != 6) {
+			if (item->trigger_flags > 0 && item->trigger_flags < 7) {
 				cutseq_num = 4;
 				item->anim_number = objects[SCORPION].anim_index + 5;
 				item->frame_number = anims[item->anim_number].frame_base;
@@ -117,12 +109,10 @@ void BigScorpionControl(short item_number)
 				item->status = ITEM_INVISIBLE;
 				scorpion->maximum_turn = 0;
 
-				for (target_num = room[item->room_number].item_number; target_num != NO_ITEM; target_num = enemy->next_item)
-				{
+				for (target_num = room[item->room_number].item_number; target_num != NO_ITEM; target_num = enemy->next_item) {
 					enemy = &items[target_num];
 
-					if (enemy->object_number == TROOPS && enemy->trigger_flags == 1)
-					{
+					if (enemy->object_number == TROOPS && enemy->trigger_flags == 1) {
 						DisableBaddieAI(target_num);
 						KillItem(target_num);
 						enemy->flags |= IFL_CLEARBODY;
@@ -131,9 +121,7 @@ void BigScorpionControl(short item_number)
 				}
 
 				s = 0;
-			}
-			else if (item->current_anim_state != 7)
-			{
+			} else if (item->current_anim_state != 7) {
 				item->anim_number = objects[SCORPION].anim_index + 5;
 				item->frame_number = anims[item->anim_number].frame_base;
 				item->current_anim_state = 6;
@@ -141,49 +129,37 @@ void BigScorpionControl(short item_number)
 			}
 		}
 
-		if (s)
-		{
-			if (cutseq_num == 4)
-			{
+		if (s) {
+			if (cutseq_num == 4) {
 				item->frame_number = anims[item->anim_number].frame_end - 1;
 				item->status = ITEM_INVISIBLE;
-			}
-			else if (item->current_anim_state == 6)
-			{
+			} else if (item->current_anim_state == 6) {
 				if (item->status == ITEM_INVISIBLE)
 					item->status = ITEM_ACTIVE;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		if (item->ai_bits)
 			GetAITarget(scorpion);
-		else
-		{
+		else {
 			if (scorpion->hurt_by_lara && item->current_anim_state != 8)
 				scorpion->enemy = lara_item;
-			else
-			{
+			else {
 				scorpion->enemy = 0;
 				bestdist = 0x7FFFFFFF;
 
-				for (int i = 0; i < MAXIMUM_BADDIES; i++)
-				{
+				for (int i = 0; i < MAXIMUM_BADDIES; i++) {
 					target_num = baddie_slots[i].item_num;
 
-					if (target_num != NO_ITEM && target_num != item_number)
-					{
+					if (target_num != NO_ITEM && target_num != item_number) {
 						enemy = &items[target_num];
 
-						if (enemy->object_number != T4PlusGetLaraSlotID() && enemy->object_number != SCORPION && (enemy != lara_item || scorpion->hurt_by_lara))
-						{
+						if (enemy->object_number != T4PlusGetLaraSlotID() && enemy->object_number != SCORPION && (enemy != lara_item || scorpion->hurt_by_lara)) {
 							s = enemy->pos.x_pos - item->pos.x_pos;
 							c = enemy->pos.z_pos - item->pos.z_pos;
 							dist = SQUARE(s) + SQUARE(c);
 
-							if (dist < bestdist)
-							{
+							if (dist < bestdist) {
 								scorpion->enemy = enemy;
 								bestdist = dist;
 							}
@@ -203,109 +179,98 @@ void BigScorpionControl(short item_number)
 		CreatureMood(item, &info, true);
 		angle = CreatureTurn(item, scorpion->maximum_turn);
 
-		switch (item->current_anim_state)
-		{
-		case 1:
-			scorpion->maximum_turn = 0;
-			scorpion->flags = 0;
+		switch (item->current_anim_state) {
+			case 1:
+				scorpion->maximum_turn = 0;
+				scorpion->flags = 0;
 
-			if (info.distance > 0x1C6E39)
-				item->goal_anim_state = 2;
-			else if (info.bite)
-			{
+				if (info.distance > 0x1C6E39)
+					item->goal_anim_state = 2;
+				else if (info.bite) {
+					scorpion->maximum_turn = DEGREES_TO_ROTATION(2);
+
+					if (GetRandomControl() & 1 || enemy->object_number == TROOPS && enemy->hit_points <= 15)
+						item->goal_anim_state = 4;
+					else
+						item->goal_anim_state = 5;
+				} else if (!info.ahead)
+					item->goal_anim_state = 2;
+
+				break;
+
+			case 2:
 				scorpion->maximum_turn = DEGREES_TO_ROTATION(2);
 
-				if (GetRandomControl() & 1 || enemy->object_number == TROOPS && enemy->hit_points <= 15)
-					item->goal_anim_state = 4;
+				if (info.distance < 0x1C6E39)
+					item->goal_anim_state = 1;
 				else
-					item->goal_anim_state = 5;
-			}
-			else if (!info.ahead)
-				item->goal_anim_state = 2;
+					item->goal_anim_state = 3;
 
-			break;
+				break;
 
-		case 2:
-			scorpion->maximum_turn = DEGREES_TO_ROTATION(2);
+			case 3:
+				scorpion->maximum_turn = DEGREES_TO_ROTATION(3);
 
-			if (info.distance < 0x1C6E39)
-				item->goal_anim_state = 1;
-			else
-				item->goal_anim_state = 3;
+				if (info.distance < 0x1C6E39)
+					item->goal_anim_state = 1;
 
-			break;
+				break;
 
-		case 3:
-			scorpion->maximum_turn = DEGREES_TO_ROTATION(3);
+			case 4:
+			case 5:
+				hp = lara_item->hit_points;
 
-			if (info.distance < 0x1C6E39)
-				item->goal_anim_state = 1;
+				if (abs(info.angle) < DEGREES_TO_ROTATION(2))
+					item->pos.y_rot += info.angle;
+				else if (info.angle < 0)
+					item->pos.y_rot -= DEGREES_TO_ROTATION(2);
+				else
+					item->pos.y_rot += DEGREES_TO_ROTATION(2);
 
-			break;
+				if (!scorpion->flags && enemy && enemy != lara_item && info.distance < 0x1C6E39) {
+					enemy->hit_points -= 15;
 
-		case 4:
-		case 5:
-			hp = lara_item->hit_points;
+					if (enemy->hit_points <= 0) {
+						item->goal_anim_state = 7;
+						scorpion->maximum_turn = 0;
+					}
 
-			if (abs(info.angle) < DEGREES_TO_ROTATION(2))
-				item->pos.y_rot += info.angle;
-			else if (info.angle < 0)
-				item->pos.y_rot -= DEGREES_TO_ROTATION(2);
-			else
-				item->pos.y_rot += DEGREES_TO_ROTATION(2);
-
-			if (!scorpion->flags && enemy && enemy != lara_item && info.distance < 0x1C6E39)
-			{
-				enemy->hit_points -= 15;
-
-				if (enemy->hit_points <= 0)
-				{
-					item->goal_anim_state = 7;
-					scorpion->maximum_turn = 0;
-				}
-
-				enemy->hit_status = 1;
-				scorpion->flags = 1;
-				CreatureEffectT(item, &stinger, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
-			}
-			else if (!scorpion->flags && item->touch_bits & 0x1B00100)
-			{
-				lara_item->hit_points -= mod_object_customization->damage_1;
-				lara_item->hit_status = 1;
-
-				if (item->current_anim_state == 5)
-				{
-					lara.dpoisoned += 2048;
+					enemy->hit_status = 1;
+					scorpion->flags = 1;
 					CreatureEffectT(item, &stinger, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
+				} else if (!scorpion->flags && item->touch_bits & 0x1B00100) {
+					lara_item->hit_points -= mod_object_customization->damage_1;
+					lara_item->hit_status = 1;
+
+					if (item->current_anim_state == 5) {
+						lara.dpoisoned += 2048;
+						CreatureEffectT(item, &stinger, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
+					} else
+						CreatureEffectT(item, &pincer, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
+
+					scorpion->flags = 1;
+
+					if (hp && lara_item->hit_points <= 0) {
+						CreatureKill(item, 6, 7, 442);
+						scorpion->maximum_turn = 0;
+						return;
+					}
 				}
-				else
-					CreatureEffectT(item, &pincer, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
 
-				scorpion->flags = 1;
+				break;
 
-				if (hp && lara_item->hit_points <= 0)
-				{
-					CreatureKill(item, 6, 7, 442);
-					scorpion->maximum_turn = 0;
-					return;
+			case 8:
+				scorpion->maximum_turn = 0;
+
+				if (item->frame_number == anims[item->anim_number].frame_end)
+					item->trigger_flags++;
+
+				if (enemy && enemy->hit_points <= 0 || item->trigger_flags > 6) {
+					item->goal_anim_state = 7;
+					enemy->hit_points = 0;
 				}
-			}
 
-			break;
-
-		case 8:
-			scorpion->maximum_turn = 0;
-
-			if (item->frame_number == anims[item->anim_number].frame_end)
-				item->trigger_flags++;
-
-			if (enemy && enemy->hit_points <= 0 || item->trigger_flags > 6)
-			{
-				item->goal_anim_state = 7;
-				enemy->hit_points = 0;
-			}
-
-			break;
+				break;
 		}
 	}
 

@@ -1,5 +1,5 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseGuide(short item_number);
-void GuideControl(short item_number);
+void InitialiseGuide(int16_t item_number);
+void GuideControl(int16_t item_number);

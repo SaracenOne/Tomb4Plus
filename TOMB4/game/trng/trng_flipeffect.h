@@ -344,11 +344,12 @@ enum NG_FLIPEFFECTS {
 	LARA_SET_X_OPACITY_LEVEL_OFLARA_FOR_E_SECONDS = 411,
 };
 
-const int32_t NG_INPUT_CODES[] = { IN_ALL, IN_FORWARD, IN_BACK, IN_LEFT, IN_RIGHT,
-		IN_DUCK, IN_SPRINT, IN_WALK, IN_JUMP, IN_ACTION, IN_DRAW,
-		IN_FLARE, IN_LOOK, IN_ROLL, (IN_OPTION | IN_DESELECT), 0x00000480,
-		0x00000880, IN_PAUSE, IN_SAVE, IN_LOAD,
-		0x10000000 };
+const uint32_t NG_INPUT_CODES[] = { (uint32_t)IN_ALL, IN_FORWARD, IN_BACK, IN_LEFT, IN_RIGHT,
+                                    IN_DUCK, IN_SPRINT, IN_WALK, IN_JUMP, IN_ACTION, IN_DRAW,
+                                    IN_FLARE, IN_LOOK, IN_ROLL, (IN_OPTION | IN_DESELECT), 0x00000480,
+                                    0x00000880, IN_PAUSE, IN_SAVE, IN_LOAD,
+                                    0x10000000
+                                  };
 
 const int32_t NG_SIMULATION_TIMES[] = {
 	0,

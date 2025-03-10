@@ -19,7 +19,7 @@
 #define MAX_NG_SAVEGAME_BUFFER_SIZE 0x8000
 
 uint32_t ng_savegame_buffer_size = 0;
-char ng_savegame_buffer[MAX_NG_SAVEGAME_BUFFER_SIZE];
+int8_t ng_savegame_buffer[MAX_NG_SAVEGAME_BUFFER_SIZE];
 
 bool NGIsNGSavegame() {
 	return ng_savegame_buffer_size > 0;
@@ -64,8 +64,7 @@ uint32_t NGWriteOldFMV(uint32_t position) {
 	for (int32_t i = 0; i < old_fmv_size; i++) {
 		if (i < 128) {
 			old_fmv_size += sizeof(uint8_t);
-		}
-		else {
+		} else {
 			NGLog(NG_LOG_TYPE_ERROR, "Old fmv overflow!");
 		}
 	}
@@ -120,16 +119,14 @@ uint32_t NGWriteCoordinates(uint32_t position) {
 				NG_WRITE_16(ng_savegame_buffer, position, item->pos.y_rot);
 				if (item->status & 0x02) {
 					NG_WRITE_16(ng_savegame_buffer, position, 1);
-				}
-				else {
+				} else {
 					NG_WRITE_16(ng_savegame_buffer, position, 0);
 				}
 				NG_WRITE_32(ng_savegame_buffer, position, item->pos.x_pos);
 				NG_WRITE_32(ng_savegame_buffer, position, item->pos.y_pos);
 				NG_WRITE_32(ng_savegame_buffer, position, item->pos.z_pos);
 				NG_WRITE_16(ng_savegame_buffer, position, item->room_number);
-			}
-			else {
+			} else {
 				NG_WRITE_16(ng_savegame_buffer, position, 0);
 				NG_WRITE_16(ng_savegame_buffer, position, 0);
 				NG_WRITE_16(ng_savegame_buffer, position, 0);
@@ -194,8 +191,7 @@ uint32_t NGWriteOldActions(uint32_t position) {
 		if (i < NG_MAX_OLD_ACTIONS) {
 			old_action_size += sizeof(uint16_t);
 			old_action_size += sizeof(uint32_t);
-		}
-		else {
+		} else {
 			NGLog(NG_LOG_TYPE_ERROR, "Old action overflow!");
 		}
 	}
@@ -227,8 +223,7 @@ uint32_t NGWriteOldConditions(uint32_t position) {
 		if (i < NG_MAX_OLD_CONDITIONS) {
 			old_condition_size += sizeof(uint16_t);
 			old_condition_size += sizeof(uint32_t);
-		}
-		else {
+		} else {
 			NGLog(NG_LOG_TYPE_ERROR, "Old condition overflow!");
 		}
 	}
@@ -408,7 +403,7 @@ uint32_t NGWriteGlobalVariables(uint32_t position) {
 	NG_WRITE_FIXED_STRING(ng_savegame_buffer, &ng_string4, sizeof(ng_string4), position);
 
 	for (int32_t i = 0; i < STORE_VARIABLE_COUNT; i++) {
-		NG_READ_32(ng_savegame_buffer, position, ng_store_variables[i]);
+		NG_WRITE_32(ng_savegame_buffer, position, ng_store_variables[i]);
 	}
 
 	NG_WRITE_FIXED_STRING(ng_savegame_buffer, &ng_last_text_input, sizeof(ng_last_text_input), position);
@@ -705,7 +700,7 @@ void NGReadNGSavegameInfo() {
 							progressive_actions[i].type = static_cast<NGProgressiveActionType>(progressive_action_type);
 							progressive_actions[i].item_index = NG_READ_16(ng_savegame_buffer, offset);
 							progressive_actions[i].duration = NG_READ_16(ng_savegame_buffer, offset);
-							
+
 							progressive_actions[i].argument1_u16 = NG_READ_16(ng_savegame_buffer, offset);
 							for (int32_t j = 0; j < NG_PROGRESSIVE_ACTION_ARGUMENT_2_COUNT; j++) {
 								progressive_actions[i].argument2_u32[j] = NG_READ_32(ng_savegame_buffer, offset);
@@ -734,8 +729,7 @@ void NGReadNGSavegameInfo() {
 						if (i < NG_MAX_OLD_CONDITIONS) {
 							old_conditions[i].flags = NG_READ_16(ng_savegame_buffer, offset);
 							old_conditions[i].offset_floor_data = NG_READ_32(ng_savegame_buffer, offset);
-						}
-						else {
+						} else {
 							NGLog(NG_LOG_TYPE_ERROR, "Old condition overflow!");
 						}
 					}
@@ -780,7 +774,7 @@ void NGReadNGSavegameInfo() {
 					}
 
 					if (secondary_single_cd_track != -1) {
-						S_CDPlayExt(secondary_single_cd_track, 1, false , false);
+						S_CDPlayExt(secondary_single_cd_track, 1, false, false);
 					}
 
 					if (secondary_loop_cd_track != -1 || secondary_single_cd_track != -1) {
@@ -830,9 +824,9 @@ void NGReadNGSavegameInfo() {
 					int32_t fog_color = NG_READ_32(ng_savegame_buffer, offset);
 
 					SetDistanceFogColor(
-						((fog_color & 0x00ff0000) >> 16),
-						((fog_color & 0x0000ff00) >> 8),
-						((fog_color & 0x000000ff) >> 0)
+					    ((fog_color & 0x00ff0000) >> 16),
+					    ((fog_color & 0x0000ff00) >> 8),
+					    ((fog_color & 0x000000ff) >> 0)
 					);
 
 					int16_t start_fog_sectors = NG_READ_16(ng_savegame_buffer, offset);
@@ -972,7 +966,7 @@ void NGReadNGSavegameInfo() {
 					uint16_t lara_state_id = NG_READ_16(ng_savegame_buffer, offset);
 					uint16_t lara_hp = NG_READ_16(ng_savegame_buffer, offset);
 
-					char tr4_name[32];
+					int8_t tr4_name[32];
 					for (int32_t i = 0; i < sizeof(tr4_name); i++) {
 						tr4_name[i] = NG_READ_8(ng_savegame_buffer, offset);
 					}
@@ -1030,7 +1024,7 @@ void NGReadNGSavegameInfo() {
 					}
 
 					NG_READ_FIXED_STRING(ng_savegame_buffer, &ng_last_text_input, sizeof(ng_last_text_input), offset);
-					
+
 					ng_last_input_number = NG_READ_32(ng_savegame_buffer, offset);
 					ng_current_value = NG_READ_32(ng_savegame_buffer, offset);
 
@@ -1127,7 +1121,7 @@ void NGReadNGSavegameBuffer(FILE *file) {
 					if (fseek(file, -int32_t(sizeof(uint16_t)), SEEK_CUR) == 0) {
 						uint32_t buffer_size = ngle_buffer_end - ngle_buffer_start;
 						if (buffer_size < MAX_NG_SAVEGAME_BUFFER_SIZE) {
-							if (fread(ng_savegame_buffer, sizeof(char), buffer_size, file) == buffer_size) {
+							if (fread(ng_savegame_buffer, sizeof(int8_t), buffer_size, file) == buffer_size) {
 								ng_savegame_buffer_size = buffer_size;
 							}
 						} else {

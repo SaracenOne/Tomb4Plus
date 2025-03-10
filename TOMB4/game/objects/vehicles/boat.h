@@ -18,22 +18,21 @@
 #define BOAT_OCB_ANCHORED (1 << 6)
 #define BOAT_OCB_SHOW_FUEL_BAR (1 << 7)
 
-struct BOAT_INFO
-{
-	long boat_turn;
-	long left_fallspeed;
-	long right_fallspeed;
-	short tilt_angle;
-	short extra_rotation;
-	long water;
-	long pitch;
-	short prop_rot;
-	short light_intensity;
+struct BOAT_INFO {
+	int32_t boat_turn;
+	int32_t left_fallspeed;
+	int32_t right_fallspeed;
+	int16_t tilt_angle;
+	int16_t extra_rotation;
+	int32_t water;
+	int32_t pitch;
+	int16_t prop_rot;
+	int16_t light_intensity;
 };
 
-extern void InitialiseBoat(short item_num);
-extern void BoatCollision(short item_num, ITEM_INFO *l, COLL_INFO *coll);
+extern void InitialiseBoat(int16_t item_num);
+extern void BoatCollision(int16_t item_num, ITEM_INFO *l, COLL_INFO *coll);
 extern void DrawBoat(ITEM_INFO *item);
 
-extern void RubberBoatControl(short item_num);
-extern void MotorBoatControl(short item_num);
+extern void RubberBoatControl(int16_t item_num);
+extern void MotorBoatControl(int16_t item_num);

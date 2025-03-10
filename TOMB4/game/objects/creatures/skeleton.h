@@ -2,5 +2,5 @@
 #include "../../../global/types.h"
 
 void TriggerRiseEffect(ITEM_INFO* item);
-void InitialiseSkeleton(short item_number);
-void SkeletonControl(short item_number);
+void InitialiseSkeleton(int16_t item_number);
+void SkeletonControl(int16_t item_number);

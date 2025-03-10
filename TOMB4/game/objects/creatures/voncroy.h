@@ -3,13 +3,13 @@
 
 void SetCutSceneCamera(ITEM_INFO* item);
 void ClearCutSceneCamera();
-void GetAIEnemy(CREATURE_INFO* info, long tfl);
+void GetAIEnemy(CREATURE_INFO* info, int32_t tfl);
 void DoVonCroyCutscene(ITEM_INFO* item, CREATURE_INFO* info);
-void InitialiseVoncroy(short item_number);
-void VoncroyRaceControl(short item_number);
-void VoncroyControl(short item_number);
+void InitialiseVoncroy(int16_t item_number);
+void VoncroyRaceControl(int16_t item_number);
+void VoncroyControl(int16_t item_number);
 
 #define MAX_VONCROY_FLAGS 64
 
-extern uchar VonCroyCutFlags[MAX_VONCROY_FLAGS];
-extern char bVoncroyCutScene;
+extern uint8_t VonCroyCutFlags[MAX_VONCROY_FLAGS];
+extern int8_t bVoncroyCutScene;

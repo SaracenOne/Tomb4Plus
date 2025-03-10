@@ -3,10 +3,10 @@
 
 #define MAX_LOCUSTS 64
 
-long GetFreeLocust();
+int32_t GetFreeLocust();
 void TriggerLocust(ITEM_INFO* item);
-void InitialiseLocustEmitter(short item_number);
-void ControlLocustEmitter(short item_number);
+void InitialiseLocustEmitter(int16_t item_number);
+void ControlLocustEmitter(int16_t item_number);
 void DrawLocusts();
 void UpdateLocusts();
 

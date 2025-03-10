@@ -8,13 +8,11 @@
 #include "../../gameflow.h"
 #include "../../../tomb4/mod_config.h"
 
-void InitialiseLaraDouble(short item_number)
-{
+void InitialiseLaraDouble(int16_t item_number) {
 	InitialiseCreature(item_number);
 }
 
-void LaraDoubleControl(short item_number)
-{
+void LaraDoubleControl(int16_t item_number) {
 	ITEM_INFO* item;
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = get_game_mod_level_object_customization_for_slot(gfCurrentLevel, LARA_DOUBLE);

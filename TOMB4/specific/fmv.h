@@ -4,4 +4,4 @@
 bool LoadBinkStuff();
 void FreeBinkStuff();
 void ShowBinkFrame();
-long PlayFmvNow(long num);
+int32_t PlayFmvNow(int32_t num);

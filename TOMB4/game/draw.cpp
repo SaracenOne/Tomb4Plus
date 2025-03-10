@@ -37,73 +37,68 @@
 #include "../specific/file.h"
 #include "../specific/platform.h"
 
-static BITE_INFO EnemyBites[2] =
-{
+static BITE_INFO EnemyBites[2] = {
 	{0, -40, 272, 7},
 	{0, -20, 180, 11}
 };
 
 STATIC_INFO static_objects[NUMBER_STATIC_OBJECTS];
 
-long IM_rate;
-long IM_frac;
+int32_t IM_rate;
+int32_t IM_frac;
 
 float* mIMptr;
 float mIMstack[indices_count * 64];
 
-long current_room;
-short no_rotation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+int32_t current_room;
+int16_t no_rotation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-long outside;
+int32_t outside;
 
-short SkyPos;
-short SkyPos2;
+int16_t SkyPos;
+int16_t SkyPos2;
 
-ushort LightningRGB[3];
-ushort LightningRGBs[3];
-short LightningCount;
-short dLightningRand;
+uint16_t LightningRGB[3];
+uint16_t LightningRGBs[3];
+int16_t LightningCount;
+int16_t dLightningRand;
 
-static short LightningRand;
-static short LightningSFXDelay = 0;
+static int16_t LightningRand;
+static int16_t LightningSFXDelay = 0;
 
-static long outside_top;
-static long outside_left;
-static long outside_right;
-static long outside_bottom;
+static int32_t outside_top;
+static int32_t outside_left;
+static int32_t outside_right;
+static int32_t outside_bottom;
 
-static long draw_room_list[128];
-static long room_list_start = 0;
-static long room_list_end = 0;
-static long number_draw_rooms;
-static short draw_rooms[200];
-static short ClipRoomNum;
+static int32_t draw_room_list[128];
+static int32_t room_list_start = 0;
+static int32_t room_list_end = 0;
+static int32_t number_draw_rooms;
+static int16_t draw_rooms[200];
+static int16_t ClipRoomNum;
 
-static long camera_underwater;
+static int32_t camera_underwater;
 
-void InitInterpolate(long frac, long rate)
-{
+void InitInterpolate(int32_t frac, int32_t rate) {
 	IM_rate = rate;
 	IM_frac = frac;
 	mIMptr = mIMstack;
 	memcpy(mIMstack, mMXPtr, 48);
 }
 
-void phd_PopMatrix_I()
-{
+void phd_PopMatrix_I() {
 	phd_PopMatrix();
 	mIMptr -= indices_count;
 }
 
-void phd_PushMatrix_I()
-{
+void phd_PushMatrix_I() {
 	phd_PushMatrix();
 	memcpy(mIMptr + indices_count, mIMptr, 48);
 	mIMptr += indices_count;
 }
 
-void phd_RotY_I(short ang)
-{
+void phd_RotY_I(int16_t ang) {
 	float* mPtr;
 
 	phd_RotY(ang);
@@ -113,8 +108,7 @@ void phd_RotY_I(short ang)
 	mMXPtr = mPtr;
 }
 
-void phd_RotX_I(short ang)
-{
+void phd_RotX_I(int16_t ang) {
 	float* mPtr;
 
 	phd_RotX(ang);
@@ -124,8 +118,7 @@ void phd_RotX_I(short ang)
 	mMXPtr = mPtr;
 }
 
-void phd_RotZ_I(short ang)
-{
+void phd_RotZ_I(int16_t ang) {
 	float* mPtr;
 
 	phd_RotZ(ang);
@@ -135,8 +128,7 @@ void phd_RotZ_I(short ang)
 	mMXPtr = mPtr;
 }
 
-void phd_TranslateRel_I(long x, long y, long z)
-{
+void phd_TranslateRel_I(int32_t x, int32_t y, int32_t z) {
 	float* mPtr;
 
 	phd_TranslateRel(x, y, z);
@@ -146,8 +138,7 @@ void phd_TranslateRel_I(long x, long y, long z)
 	mMXPtr = mPtr;
 }
 
-void phd_TranslateRel_ID(long x, long y, long z, long x2, long y2, long z2)
-{
+void phd_TranslateRel_ID(int32_t x, int32_t y, int32_t z, int32_t x2, int32_t y2, int32_t z2) {
 	float* mPtr;
 
 	phd_TranslateRel(x, y, z);
@@ -157,8 +148,7 @@ void phd_TranslateRel_ID(long x, long y, long z, long x2, long y2, long z2)
 	mMXPtr = mPtr;
 }
 
-void phd_RotYXZ_I(short y, short x, short z)
-{
+void phd_RotYXZ_I(int16_t y, int16_t x, int16_t z) {
 	float* mPtr;
 
 	phd_RotYXZ(y, x, z);
@@ -168,8 +158,7 @@ void phd_RotYXZ_I(short y, short x, short z)
 	mMXPtr = mPtr;
 }
 
-void gar_RotYXZsuperpack_I(short** pprot1, short** pprot2, long skip)
-{
+void gar_RotYXZsuperpack_I(int16_t** pprot1, int16_t** pprot2, int32_t skip) {
 	float* mPtr;
 
 	gar_RotYXZsuperpack(pprot1, skip);
@@ -179,13 +168,11 @@ void gar_RotYXZsuperpack_I(short** pprot1, short** pprot2, long skip)
 	mMXPtr = mPtr;
 }
 
-void gar_RotYXZsuperpack(short** pprot, long skip)
-{
-	ushort* prot;
+void gar_RotYXZsuperpack(int16_t** pprot, int32_t skip) {
+	uint16_t* prot;
 
-	while (skip)
-	{
-		prot = (ushort*)*pprot;
+	while (skip) {
+		prot = (uint16_t*)*pprot;
 
 		if (prot[0] & 0xC000)
 			*pprot += 1;
@@ -195,42 +182,38 @@ void gar_RotYXZsuperpack(short** pprot, long skip)
 		skip--;
 	}
 
-	prot = (ushort*)*pprot;
+	prot = (uint16_t*)*pprot;
 
-	switch (prot[0] >> W2V_SHIFT)
-	{
-	case 0:
-		phd_RotYXZpack((prot[0] << 16) + prot[1]);
-		++*pprot;
-		break;
-		
-	case 1:
-		phd_RotX(short((prot[0] & 0xFFF) << 4));
-		break;
+	switch (prot[0] >> W2V_SHIFT) {
+		case 0:
+			phd_RotYXZpack((prot[0] << 16) + prot[1]);
+			++*pprot;
+			break;
 
-	case 2:
-		phd_RotY(short((prot[0] & 0xFFF) << 4));
-		break;
+		case 1:
+			phd_RotX(int16_t((prot[0] & 0xFFF) << 4));
+			break;
 
-	default:
-		phd_RotZ(short((prot[0] & 0xFFF) << 4));
+		case 2:
+			phd_RotY(int16_t((prot[0] & 0xFFF) << 4));
+			break;
+
+		default:
+			phd_RotZ(int16_t((prot[0] & 0xFFF) << 4));
 	}
 
 	++*pprot;
 }
 
-void phd_PutPolygons_I(short* ptr, long clip)
-{
+void phd_PutPolygons_I(int16_t* ptr, int32_t clip) {
 	phd_PushMatrix();
 	mInterpolateMatrix();
 	phd_PutPolygons(ptr, clip);
 	phd_PopMatrix();
 }
 
-void mInterpolateMatrix()
-{
-	if (IM_rate == 2 || (IM_frac == 2 && IM_rate == 4))
-	{
+void mInterpolateMatrix() {
+	if (IM_rate == 2 || (IM_frac == 2 && IM_rate == 4)) {
 		mMXPtr[M00] = (mMXPtr[M00] + mIMptr[M00]) * 0.5F;
 		mMXPtr[M01] = (mMXPtr[M01] + mIMptr[M01]) * 0.5F;
 		mMXPtr[M02] = (mMXPtr[M02] + mIMptr[M02]) * 0.5F;
@@ -243,9 +226,7 @@ void mInterpolateMatrix()
 		mMXPtr[M21] = (mMXPtr[M21] + mIMptr[M21]) * 0.5F;
 		mMXPtr[M22] = (mMXPtr[M22] + mIMptr[M22]) * 0.5F;
 		mMXPtr[M23] = (mMXPtr[M23] + mIMptr[M23]) * 0.5F;
-	}
-	else if (IM_frac == 1)
-	{
+	} else if (IM_frac == 1) {
 		mMXPtr[M00] += (mIMptr[M00] - mMXPtr[M00]) * 0.25F;
 		mMXPtr[M01] += (mIMptr[M01] - mMXPtr[M01]) * 0.25F;
 		mMXPtr[M02] += (mIMptr[M02] - mMXPtr[M02]) * 0.25F;
@@ -258,9 +239,7 @@ void mInterpolateMatrix()
 		mMXPtr[M21] += (mIMptr[M21] - mMXPtr[M21]) * 0.25F;
 		mMXPtr[M22] += (mIMptr[M22] - mMXPtr[M22]) * 0.25F;
 		mMXPtr[M23] += (mIMptr[M23] - mMXPtr[M23]) * 0.25F;
-	}
-	else
-	{
+	} else {
 		mMXPtr[M00] = mIMptr[M00] - ((mIMptr[M00] - mMXPtr[M00]) * 0.25F);
 		mMXPtr[M01] = mIMptr[M01] - ((mIMptr[M01] - mMXPtr[M01]) * 0.25F);
 		mMXPtr[M02] = mIMptr[M02] - ((mIMptr[M02] - mMXPtr[M02]) * 0.25F);
@@ -276,8 +255,7 @@ void mInterpolateMatrix()
 	}
 }
 
-void mInterpolateArmMatrix(float* mx)
-{
+void mInterpolateArmMatrix(float* mx) {
 	mMXPtr[M00] = mx[M00];
 	mMXPtr[M01] = mx[M01];
 	mMXPtr[M02] = mx[M02];
@@ -288,28 +266,22 @@ void mInterpolateArmMatrix(float* mx)
 	mMXPtr[M21] = mx[M21];
 	mMXPtr[M22] = mx[M22];
 
-	if (IM_rate == 2 || (IM_frac == 2 && IM_rate == 4))
-	{
+	if (IM_rate == 2 || (IM_frac == 2 && IM_rate == 4)) {
 		mMXPtr[M03] = (mMXPtr[M03] + mIMptr[M03]) * 0.5F;
 		mMXPtr[M13] = (mMXPtr[M13] + mIMptr[M13]) * 0.5F;
 		mMXPtr[M23] = (mMXPtr[M23] + mIMptr[M23]) * 0.5F;
-	}
-	else if (IM_frac == 1)
-	{
+	} else if (IM_frac == 1) {
 		mMXPtr[M03] += (mIMptr[M03] - mMXPtr[M03]) * 0.25F;
 		mMXPtr[M13] += (mIMptr[M13] - mMXPtr[M13]) * 0.25F;
 		mMXPtr[M23] += (mIMptr[M23] - mMXPtr[M23]) * 0.25F;
-	}
-	else
-	{
+	} else {
 		mMXPtr[M03] = mIMptr[M03] - ((mIMptr[M03] - mMXPtr[M03]) * 0.25F);
 		mMXPtr[M13] = mIMptr[M13] - ((mIMptr[M13] - mMXPtr[M13]) * 0.25F);
 		mMXPtr[M23] = mIMptr[M23] - ((mIMptr[M23] - mMXPtr[M23]) * 0.25F);
 	}
 }
 
-void S_InsertRoom(short room_number)
-{
+void S_InsertRoom(int16_t room_number) {
 	ROOM_INFO* r;
 
 	current_room = room_number;
@@ -322,21 +294,19 @@ void S_InsertRoom(short room_number)
 	_InsertRoom(r);
 }
 
-void CalculateObjectLighting(ITEM_INFO* item, short* frame)
-{
-	long x, y, z;
+void CalculateObjectLighting(ITEM_INFO* item, int16_t* frame) {
+	int32_t x, y, z;
 
 	if (item->shade >= 0)
 		S_CalculateStaticMeshLight(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, item->shade & 0x7FFF, &room[item->room_number]);
-	else
-	{
+	else {
 		phd_PushUnitMatrix();
 		phd_SetTrans(0, 0, 0);
 		phd_RotYXZ(item->pos.y_rot, item->pos.x_rot, item->pos.z_rot);
 		phd_TranslateRel((frame[0] + frame[1]) >> 1, (frame[2] + frame[3]) >> 1, (frame[4] + frame[5]) >> 1);
-		x = item->pos.x_pos + (long)mMXPtr[M03];
-		y = item->pos.y_pos + (long)mMXPtr[M13];
-		z = item->pos.z_pos + (long)mMXPtr[M23];
+		x = item->pos.x_pos + (int32_t)mMXPtr[M03];
+		y = item->pos.y_pos + (int32_t)mMXPtr[M13];
+		z = item->pos.z_pos + (int32_t)mMXPtr[M23];
 		phd_PopMatrix();
 		current_item = item;
 		item->il.item_pos.x = x;
@@ -347,21 +317,18 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame)
 	}
 }
 
-void CalculateObjectLightingLara()
-{
+void CalculateObjectLightingLara() {
 	PHD_VECTOR pos;
-	short room_no;
+	int16_t room_no;
 
 	if (GLOBAL_playing_cutseq)
 		CalculateObjectLightingLaraCutSeq();
-	else
-	{
+	else {
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;
 
-		if (lara_item->anim_number == ANIM_DUCKBREATHE || lara_item->anim_number == ANIM_ALL4S || lara_item->anim_number == ANIM_BREATH)
-		{
+		if (lara_item->anim_number == ANIM_DUCKBREATHE || lara_item->anim_number == ANIM_ALL4S || lara_item->anim_number == ANIM_BREATH) {
 			pos.x = lara_item->pos.x_pos;
 
 			if (lara_item->anim_number == ANIM_BREATH)
@@ -372,9 +339,7 @@ void CalculateObjectLightingLara()
 			pos.z = lara_item->pos.z_pos;
 			room_no = lara_item->room_number;
 			GetFloor(pos.x, pos.y, pos.z, &room_no);
-		}
-		else
-		{
+		} else {
 			GetLaraJointPos(&pos, LMX_TORSO);
 			room_no = lara_item->room_number;
 			GetFloor(pos.x, pos.y, pos.z, &room_no);
@@ -389,17 +354,16 @@ void CalculateObjectLightingLara()
 	}
 }
 
-void DrawAnimatingItem(ITEM_INFO* item)
-{
+void DrawAnimatingItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj;
 	BITE_INFO* bite;
-	short** meshpp;
-	long* bone;
-	short* frm[2];
-	short* data;
-	short* rot;
-	short* rot2;
-	long frac, rate, clip, bit, rnd;
+	int16_t** meshpp;
+	int32_t* bone;
+	int16_t* frm[2];
+	int16_t* data;
+	int16_t* rot;
+	int16_t* rot2;
+	int32_t frac, rate, clip, bit, rnd;
 
 	// T4Plus: Animation safety check
 	if (item->anim_number < 0 || item->anim_number >= num_anims) {
@@ -422,8 +386,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 
 	if (item->object_number < ENEMY_JEEP || item->object_number > SETHA_MIP)
 		calc_animating_item_clip_window(item, frm[0]);
-	else
-	{
+	else {
 		phd_left = 0;
 		phd_right = phd_winwidth;
 		phd_top = 0;
@@ -432,29 +395,26 @@ void DrawAnimatingItem(ITEM_INFO* item)
 
 	clip = S_GetObjectBounds(frm[0]);
 
-	if (clip)
-	{
+	if (clip) {
 		CalculateObjectLighting(item, frm[0]);
 
 		if (!item->data)
 			data = no_rotation;
 		else
-			data = (short*)item->data;
+			data = (int16_t*)item->data;
 
 		bit = 1;
 		meshpp = &meshes[obj->mesh_index];
 		bone = &bones[obj->bone_index];
 
-		if (frac)
-		{
+		if (frac) {
 			InitInterpolate(frac, rate);
 			phd_TranslateRel_ID(frm[0][6], frm[0][7], frm[0][8], frm[1][6], frm[1][7], frm[1][8]);
 			rot = frm[0] + 9;
 			rot2 = frm[1] + 9;
 			gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-			if (item->mesh_bits & 1)
-			{
+			if (item->mesh_bits & 1) {
 				if (item->meshswap_meshbits & 1)
 					phd_PutPolygons_I(meshpp[1], clip);
 				else
@@ -463,8 +423,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 
 			meshpp += 2;
 
-			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2)
-			{
+			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix_I();
 
@@ -474,8 +433,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 				phd_TranslateRel_I(bone[1], bone[2], bone[3]);
 				gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-				if (bone[0] & (X_ROTATION_FLAG | Y_ROTATION_FLAG | Z_ROTATION_FLAG))
-				{
+				if (bone[0] & (X_ROTATION_FLAG | Y_ROTATION_FLAG | Z_ROTATION_FLAG)) {
 					if (bone[0] & Y_ROTATION_FLAG)
 						phd_RotY_I(*data++);
 
@@ -489,20 +447,18 @@ void DrawAnimatingItem(ITEM_INFO* item)
 				bit <<= 1;
 
 
-				if (bit & item->mesh_bits)
-				{
+				if (bit & item->mesh_bits) {
 					if (bit & item->meshswap_meshbits)
 						phd_PutPolygons_I(meshpp[1], clip);
 					else
 						phd_PutPolygons_I(meshpp[0], clip);
 				}
 
-				if (item->fired_weapon && i == bite->mesh_num - 1)
-				{
+				if (item->fired_weapon && i == bite->mesh_num - 1) {
 					rnd = GetRandomDraw();
 					phd_PushMatrix_I();
 					phd_TranslateRel_I(bite->x, bite->y, bite->z);
-					phd_RotYXZ_I(0, -0x3FFC, short((rnd << W2V_SHIFT) + (rnd >> 2) - 4096));
+					phd_RotYXZ_I(0, -0x3FFC, int16_t((rnd << W2V_SHIFT) + (rnd >> 2) - 4096));
 					mInterpolateMatrix();
 					//empty func call here
 					phd_PutPolygons(meshes[objects[GUN_FLASH].mesh_index], clip);
@@ -510,15 +466,12 @@ void DrawAnimatingItem(ITEM_INFO* item)
 					item->fired_weapon--;
 				}
 			}
-		}
-		else
-		{
+		} else {
 			phd_TranslateRel(frm[0][6], frm[0][7], frm[0][8]);
 			rot = frm[0] + 9;
 			gar_RotYXZsuperpack(&rot, 0);
 
-			if (item->mesh_bits & 1)
-			{
+			if (item->mesh_bits & 1) {
 				if (item->meshswap_meshbits & 1)
 					phd_PutPolygons(meshpp[1], clip);
 				else
@@ -527,8 +480,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 
 			meshpp += 2;
 
-			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2)
-			{
+			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix();
 
@@ -538,8 +490,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 				phd_TranslateRel(bone[1], bone[2], bone[3]);
 				gar_RotYXZsuperpack(&rot, 0);
 
-				if (bone[0] & (X_ROTATION_FLAG | Y_ROTATION_FLAG | Z_ROTATION_FLAG))
-				{
+				if (bone[0] & (X_ROTATION_FLAG | Y_ROTATION_FLAG | Z_ROTATION_FLAG)) {
 					if (bone[0] & Y_ROTATION_FLAG)
 						phd_RotY(*data++);
 
@@ -552,16 +503,14 @@ void DrawAnimatingItem(ITEM_INFO* item)
 
 				bit <<= 1;
 
-				if (bit & item->mesh_bits)
-				{
+				if (bit & item->mesh_bits) {
 					if (bit & item->meshswap_meshbits)
 						phd_PutPolygons(meshpp[1], clip);
 					else
 						phd_PutPolygons(meshpp[0], clip);
 				}
 
-				if (item->fired_weapon && i == bite->mesh_num - 1)
-				{
+				if (item->fired_weapon && i == bite->mesh_num - 1) {
 					phd_PushMatrix();
 					phd_RotX(-16380);
 					phd_TranslateRel(bite->x, bite->y, bite->z);
@@ -581,32 +530,27 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	phd_PopMatrix();
 }
 
-static void DoMirrorStuff(int mirror_id)
-{
+static void DoMirrorStuff(int mirror_id) {
 	LARA_ARM larm;
 	LARA_ARM rarm;
-	short old_anim, old_frame;
+	int16_t old_anim, old_frame;
 
 	larm = lara.left_arm;
 	rarm = lara.right_arm;
 	old_anim = lara_item->anim_number;
 	old_frame = lara_item->frame_number;
 
-	if (BinocularRange)
-	{
-		if (LaserSight)
-		{
-			if (lara.gun_type == WEAPON_REVOLVER)
-			{
+	if (BinocularRange) {
+		if (LaserSight) {
+			if (lara.gun_type == WEAPON_REVOLVER) {
 				lara.left_arm.anim_number = objects[SIXSHOOTER_ANIM].anim_index + 3;
 				lara.right_arm.anim_number = objects[SIXSHOOTER_ANIM].anim_index + 3;
 				lara.left_arm.frame_number = anims[lara.left_arm.anim_number].frame_base;
 				lara.right_arm.frame_number = anims[lara.right_arm.anim_number].frame_base;
 			}
 
-			if (lara.gun_type == WEAPON_CROSSBOW)
-			{
-				lara.left_arm.anim_number = objects[CROSSBOW_ANIM].anim_index + 2;			
+			if (lara.gun_type == WEAPON_CROSSBOW) {
+				lara.left_arm.anim_number = objects[CROSSBOW_ANIM].anim_index + 2;
 				lara.right_arm.anim_number = objects[CROSSBOW_ANIM].anim_index + 2;
 				lara.left_arm.frame_number = 0;
 				lara.right_arm.frame_number = 0;
@@ -614,24 +558,20 @@ static void DoMirrorStuff(int mirror_id)
 
 			lara.left_arm.frame_base = anims[lara.left_arm.anim_number].frame_ptr;
 			lara.right_arm.frame_base = anims[lara.right_arm.anim_number].frame_ptr;
-		}
-		else
-		{
+		} else {
 			lara_item->anim_number = ANIM_BINOCS;
 			lara_item->frame_number = anims[ANIM_BINOCS].frame_base;
 			lara.mesh_ptrs[LM_RHAND] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 2 * LM_RHAND];
 		}
 	}
-	
+
 	Draw_Mirror_Lara(mirror_id);
 
-	if (BinocularRange)
-	{
+	if (BinocularRange) {
 		lara.left_arm = larm;
 		lara.right_arm = rarm;
 
-		if (!LaserSight)
-		{
+		if (!LaserSight) {
 			lara_item->anim_number = old_anim;
 			lara_item->frame_number = old_frame;
 			lara.mesh_ptrs[LM_RHAND] = meshes[objects[T4PlusGetLaraSkinSlotID()].mesh_index + 2 * LM_RHAND];
@@ -639,11 +579,10 @@ static void DoMirrorStuff(int mirror_id)
 	}
 }
 
-void DrawRooms(short CurrentRoom)
-{
+void DrawRooms(int16_t CurrentRoom) {
 	ROOM_INFO* r;
-	long lx, ly, lz;
-	short lr;
+	int32_t lx, ly, lz;
+	int16_t lr;
 
 	current_room = CurrentRoom;
 	r = &room[CurrentRoom];
@@ -665,15 +604,12 @@ void DrawRooms(short CurrentRoom)
 	room_list_end = 1;
 	number_draw_rooms = 0;
 
-	if (outside)
-	{
+	if (outside) {
 		outside_top = 0;
 		outside_left = 0;
 		outside_right = phd_winxmax;
 		outside_bottom = phd_winymax;
-	}
-	else
-	{
+	} else {
 		outside_left = phd_winxmax;
 		outside_top = phd_winymax;
 		outside_bottom = 0;
@@ -684,33 +620,26 @@ void DrawRooms(short CurrentRoom)
 	InitialiseFogBulbs();
 	CreateFXBulbs();
 
-	if (outside)	//inlined SkyDrawPhase? did it exist?
-	{
+	if (outside) {	//inlined SkyDrawPhase? did it exist?
 		int16_t horizon_slot = T4PlusGetHorizonSlotID();
 
 		if (horizon_slot < 0 || !objects[horizon_slot].loaded)
 			outside = -1;
-		else
-		{
+		else {
 			if (BinocularRange)
-				AlterFOV(DEGREES_TO_ROTATION(DEFAULT_FOV) - (short)BinocularRange);
+				AlterFOV(DEGREES_TO_ROTATION(DEFAULT_FOV) - (int16_t)BinocularRange);
 
 			phd_PushMatrix();
 			phd_TranslateAbs(camera.pos.x, camera.pos.y, camera.pos.z);
 
-			if (gfLevelFlags & GF_LIGHTNING)
-			{
-				if (!LightningCount && !LightningRand)
-				{
-					if (!(GetRandomDraw() & 127))
-					{
+			if (gfLevelFlags & GF_LIGHTNING) {
+				if (!LightningCount && !LightningRand) {
+					if (!(GetRandomDraw() & 127)) {
 						LightningCount = (GetRandomDraw() & 0x1F) + 16;
 						dLightningRand = (GetRandomDraw() & 0xFF) + 256;
 						LightningSFXDelay = (GetRandomDraw() & 3) + 12;
 					}
-				}
-				else
-				{
+				} else {
 					UpdateSkyLightning();
 
 					if (LightningSFXDelay > -1)
@@ -724,26 +653,24 @@ void DrawRooms(short CurrentRoom)
 			nPolyType = 6;
 			phd_PushMatrix();
 
-			if (gfLevelFlags & GF_LAYER1)
-			{
+			if (gfLevelFlags & GF_LAYER1) {
 				phd_RotY(32760);
 
 				if (gfLevelFlags & GF_LIGHTNING)
 					DrawFlatSky(RGBA(LightningRGB[0], LightningRGB[1], LightningRGB[2], 44), SkyPos, -1536, 4);
 				else
-					DrawFlatSky(*(ulong*)&gfLayer1Col, SkyPos, -1536, 4);
+					DrawFlatSky(*(uint32_t*)&gfLayer1Col, SkyPos, -1536, 4);
 			}
 
 			if (gfLevelFlags & GF_LAYER2)
-				DrawFlatSky(0xFF000000 | *(ulong*)&gfLayer2Col, SkyPos2, -1536, 2);
+				DrawFlatSky(0xFF000000 | *(uint32_t*)&gfLayer2Col, SkyPos2, -1536, 2);
 
 			if (gfLevelFlags & GF_LAYER1 || gfLevelFlags & GF_LAYER2)
 				OutputSky();
 
 			phd_PopMatrix();
 
-			if (gfLevelFlags & GF_HORIZON)
-			{
+			if (gfLevelFlags & GF_HORIZON) {
 				phd_PutPolygonSkyMesh(meshes[objects[horizon_slot].mesh_index], -1);
 				OutputSky();
 			}
@@ -751,23 +678,19 @@ void DrawRooms(short CurrentRoom)
 			phd_PopMatrix();
 
 			if (BinocularRange)
-				AlterFOV(7 * (2080 - (short)BinocularRange));
+				AlterFOV(7 * (2080 - (int16_t)BinocularRange));
 		}
 	}
 
-	if (objects[T4PlusGetLaraSlotID()].loaded)
-	{
-		if (!(lara_item->flags & IFL_INVISIBLE))
-		{
+	if (objects[T4PlusGetLaraSlotID()].loaded) {
+		if (!(lara_item->flags & IFL_INVISIBLE)) {
 			nPolyType = 4;
 
-			if (lara_item->mesh_bits)
-			{
+			if (lara_item->mesh_bits) {
 				DrawLara(lara_item, false);
 				phd_PushMatrix();
 
-				if (lara.right_arm.flash_gun)
-				{
+				if (lara.right_arm.flash_gun) {
 					mMXPtr[M00] = lara_matrices[132 + M00];
 					mMXPtr[M01] = lara_matrices[132 + M01];
 					mMXPtr[M02] = lara_matrices[132 + M02];
@@ -783,8 +706,7 @@ void DrawRooms(short CurrentRoom)
 					SetGunFlash(lara.gun_type);
 				}
 
-				if (lara.left_arm.flash_gun)
-				{
+				if (lara.left_arm.flash_gun) {
 					mMXPtr[M00] = lara_matrices[168 + M00];
 					mMXPtr[M01] = lara_matrices[168 + M01];
 					mMXPtr[M02] = lara_matrices[168 + M02];
@@ -814,10 +736,8 @@ void DrawRooms(short CurrentRoom)
 
 	nPolyType = 0;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++)
-	{
-		if (dynamics[i].on)
-		{
+	for (int i = 0; i < MAX_DYNAMICS; i++) {
+		if (dynamics[i].on) {
 			if (dynamics[i].x < 0)
 				dynamics[i].x = 0;
 
@@ -879,8 +799,7 @@ void DrawRooms(short CurrentRoom)
 		PrintObjects(draw_rooms[i]);
 }
 
-void RenderIt(short CurrentRoom)
-{
+void RenderIt(int16_t CurrentRoom) {
 	ROOM_INFO* r;
 
 	current_room = CurrentRoom;
@@ -902,15 +821,12 @@ void RenderIt(short CurrentRoom)
 	room_list_end = 1;
 	number_draw_rooms = 0;
 
-	if (outside)
-	{
+	if (outside) {
 		outside_top = 0;
 		outside_left = 0;
 		outside_right = phd_winxmax;
 		outside_bottom = phd_winymax;
-	}
-	else
-	{
+	} else {
 		outside_left = phd_winxmax;
 		outside_top = phd_winymax;
 		outside_bottom = 0;
@@ -921,42 +837,38 @@ void RenderIt(short CurrentRoom)
 	InitialiseFogBulbs();
 	CreateFXBulbs();
 
-	if (outside)
-	{
+	if (outside) {
 		int16_t horizon_slot = T4PlusGetHorizonSlotID();
 
 		if (horizon_slot < 0 || !objects[horizon_slot].loaded)
 			outside = -1;
-		else
-		{
+		else {
 			if (BinocularRange)
-				AlterFOV(DEGREES_TO_ROTATION(DEFAULT_FOV) - (short)BinocularRange);
+				AlterFOV(DEGREES_TO_ROTATION(DEFAULT_FOV) - (int16_t)BinocularRange);
 
 			phd_PushMatrix();
 			phd_TranslateAbs(camera.pos.x, camera.pos.y, camera.pos.z);
 			nPolyType = 6;
 			phd_PushMatrix();
 
-			if (gfLevelFlags & GF_LAYER1)
-			{
+			if (gfLevelFlags & GF_LAYER1) {
 				phd_RotY(32760);
 
 				if (gfLevelFlags & GF_LIGHTNING)
 					DrawFlatSky(RGBA(LightningRGB[0], LightningRGB[1], LightningRGB[2], 44), SkyPos, -1536, 4);
 				else
-					DrawFlatSky(*(ulong*)&gfLayer1Col, SkyPos, -1536, 4);
+					DrawFlatSky(*(uint32_t*)&gfLayer1Col, SkyPos, -1536, 4);
 			}
 
 			if (gfLevelFlags & GF_LAYER2)
-				DrawFlatSky(0xFF000000 | *(ulong*)&gfLayer2Col, SkyPos2, -1536, 2);
+				DrawFlatSky(0xFF000000 | *(uint32_t*)&gfLayer2Col, SkyPos2, -1536, 2);
 
 			if (gfLevelFlags & GF_LAYER1 || gfLevelFlags & GF_LAYER2)
 				OutputSky();
 
 			phd_PopMatrix();
 
-			if (gfLevelFlags & GF_HORIZON)
-			{
+			if (gfLevelFlags & GF_HORIZON) {
 				phd_PutPolygonSkyMesh(meshes[objects[horizon_slot].mesh_index], -1);
 				OutputSky();
 			}
@@ -977,7 +889,7 @@ void RenderIt(short CurrentRoom)
 		PrintObjects(draw_rooms[i]);
 }
 
-long DrawPhaseGame() {
+int32_t DrawPhaseGame() {
 	CalcLaraMatrices(0);
 	phd_PushUnitMatrix();
 	CalcLaraMatrices(1);
@@ -1002,14 +914,12 @@ long DrawPhaseGame() {
 	return camera.number_frames;
 }
 
-void GetRoomBounds()
-{
+void GetRoomBounds() {
 	ROOM_INFO* r;
-	short* door;
-	long rn, drn;
+	int16_t* door;
+	int32_t rn, drn;
 
-	while (room_list_start != room_list_end)
-	{
+	while (room_list_start != room_list_end) {
 		rn = draw_room_list[room_list_start % 128];
 		room_list_start++;
 		r = &room[rn];
@@ -1027,9 +937,8 @@ void GetRoomBounds()
 		if (r->test_bottom > r->bottom)
 			r->bottom = r->test_bottom;
 
-		if (!(r->bound_active & 1))
-		{
-			draw_rooms[number_draw_rooms] = (short)rn;
+		if (!(r->bound_active & 1)) {
+			draw_rooms[number_draw_rooms] = (int16_t)rn;
 			number_draw_rooms++;
 			r->bound_active |= 1;
 
@@ -1040,8 +949,7 @@ void GetRoomBounds()
 				rain_outside = 1;
 		}
 
-		if (r->flags & ROOM_OUTSIDE)
-		{
+		if (r->flags & ROOM_OUTSIDE) {
 			if (r->left < outside_left)
 				outside_left = r->left;
 
@@ -1059,19 +967,17 @@ void GetRoomBounds()
 		phd_TranslateAbs(r->x, r->y, r->z);
 		door = r->door;
 
-		if (door)
-		{
-			for (drn = *door++; drn > 0; drn--)
-			{
+		if (door) {
+			for (drn = *door++; drn > 0; drn--) {
 				rn = *door++;
 
 				// T4Plus
 				if ((t4p_snow_type == T4P_WEATHER_ENABLED_IN_SPECIFIC_ROOMS && (r->flags & ROOM_SNOW) || t4p_snow_type == T4P_WEATHER_ENABLED_ALL_OUTSIDE) && room[rn].flags & ROOM_OUTSIDE) // T4Plus
 					snow_outside = 1; // T4Plus
 
-				if (door[0] * long(r->x + door[3] - mW2V[M03]) +
-					door[1] * long(r->y + door[4] - mW2V[M13]) +
-					door[2] * long(r->z + door[5] - mW2V[M23]) < 0)
+				if (door[0] * int32_t(r->x + door[3] - mW2V[M03]) +
+				        door[1] * int32_t(r->y + door[4] - mW2V[M13]) +
+				        door[2] * int32_t(r->z + door[5] - mW2V[M23]) < 0)
 					SetRoomBounds(door, rn, r);
 
 				door += 15;
@@ -1082,8 +988,7 @@ void GetRoomBounds()
 	}
 }
 
-void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
-{
+void SetRoomBounds(int16_t* door, int32_t rn, ROOM_INFO* actualRoom) {
 	ROOM_INFO* r;
 	FVECTOR* v;
 	FVECTOR* lastV;
@@ -1094,7 +999,7 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 
 	if (r->left <= actualRoom->test_left && r->right >= actualRoom->test_right && r->top <= actualRoom->test_top && r->bottom >= actualRoom->test_bottom)
 		return;
-	
+
 	tL = (float)actualRoom->test_right;
 	tR = (float)actualRoom->test_left;
 	tB = (float)actualRoom->test_top;
@@ -1104,8 +1009,7 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 	tooNear = 0;
 	tooFar = 0;
 
-	for (int i = 0; i < 4; i++, v++, door += 3)
-	{
+	for (int i = 0; i < 4; i++, v++, door += 3) {
 		v->x = mMXPtr[M00] * door[0] + mMXPtr[M01] * door[1] + mMXPtr[M02] * door[2] + mMXPtr[M03];
 		v->y = mMXPtr[M10] * door[0] + mMXPtr[M11] * door[1] + mMXPtr[M12] * door[2] + mMXPtr[M13];
 		v->z = mMXPtr[M20] * door[0] + mMXPtr[M21] * door[1] + mMXPtr[M22] * door[2] + mMXPtr[M23];
@@ -1115,20 +1019,16 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 
 		if (z <= 0)
 			tooNear++;
-		else
-		{
+		else {
 			if (z > f_zfar)
 				tooFar++;
 
 			z /= f_mpersp;
 
-			if (z)
-			{
+			if (z) {
 				x = x / z + f_centerx;
 				y = y / z + f_centery;
-			}
-			else
-			{
+			} else {
 				if (x < 0)
 					x = (float)phd_left;
 				else
@@ -1157,13 +1057,11 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 	if (tooNear == 4 || (tooFar == 4 && !outside))
 		return;
 
-	if (tooNear > 0)
-	{
+	if (tooNear > 0) {
 		v = vbuf;
 		lastV = &vbuf[3];
 
-		for (int i = 0; i < 4; i++, lastV = v, v++)
-		{
+		for (int i = 0; i < 4; i++, lastV = v, v++) {
 			if (lastV->z <= 0 == v->z <= 0)
 				continue;
 
@@ -1171,8 +1069,7 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 				tL = 0;
 			else if (v->x > 0 && lastV->x > 0)
 				tR = phd_winxmax;
-			else
-			{
+			else {
 				tL = 0;
 				tR = phd_winxmax;
 			}
@@ -1181,8 +1078,7 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 				tT = 0;
 			else if (v->y > 0 && lastV->y > 0)
 				tB = phd_winymax;
-			else
-			{
+			else {
 				tT = 0;
 				tB = phd_winymax;
 			}
@@ -1204,50 +1100,44 @@ void SetRoomBounds(short* door, long rn, ROOM_INFO* actualRoom)
 	if (tL >= tR || tT >= tB)
 		return;
 
-	if (r->bound_active & 2)
-	{
+	if (r->bound_active & 2) {
 		if (tL < r->test_left)
-			r->test_left = (short)tL;
+			r->test_left = (int16_t)tL;
 
 		if (tT < r->test_top)
-			r->test_top = (short)tT;
+			r->test_top = (int16_t)tT;
 
 		if (tR > r->test_right)
-			r->test_right = (short)tR;
+			r->test_right = (int16_t)tR;
 
 		if (tB > r->test_bottom)
-			r->test_bottom = (short)tB;
-	}
-	else
-	{
+			r->test_bottom = (int16_t)tB;
+	} else {
 		draw_room_list[room_list_end % 128] = rn;
 		room_list_end++;
 		r->bound_active |= 2;
-		r->test_left = (short)tL;
-		r->test_right = (short)tR;
-		r->test_top = (short)tT;
-		r->test_bottom = (short)tB;
+		r->test_left = (int16_t)tL;
+		r->test_right = (int16_t)tR;
+		r->test_top = (int16_t)tT;
+		r->test_bottom = (int16_t)tB;
 	}
 }
 
-void DrawEffect(short fx_num)
-{
+void DrawEffect(int16_t fx_num) {
 	FX_INFO* fx;
 	OBJECT_INFO* obj;
-	short* meshp;
+	int16_t* meshp;
 
 	fx = &effects[fx_num];
 	obj = &objects[fx->object_number];
 
-	if (obj->draw_routine && obj->loaded)
-	{
+	if (obj->draw_routine && obj->loaded) {
 		phd_PushMatrix();
 		phd_TranslateAbs(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos);
 
-		if (mMXPtr[M23] > f_mznear && mMXPtr[M23] < f_mzfar)
-		{
+		if (mMXPtr[M23] > f_mznear && mMXPtr[M23] < f_mzfar) {
 			phd_RotYXZ(fx->pos.y_rot, fx->pos.x_rot, fx->pos.z_rot);
-			
+
 			if (obj->nmeshes)
 				meshp = meshes[obj->mesh_index];
 			else
@@ -1261,16 +1151,15 @@ void DrawEffect(short fx_num)
 	}
 }
 
-void PrintObjects(short room_number)
-{
+void PrintObjects(int16_t room_number) {
 	ROOM_INFO* r;
 	MESH_INFO* mesh;
 	STATIC_INFO* sinfo;
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
 	FX_INFO* fx;
-	long clip;
-	short item_number, fx_number;
+	int32_t clip;
+	int16_t item_number, fx_number;
 
 	current_room = room_number;
 	nPolyType = 1;
@@ -1279,15 +1168,12 @@ void PrintObjects(short room_number)
 	phd_PushMatrix();
 	phd_TranslateAbs(r->x, r->y, r->z);
 
-	if (gfLevelFlags & GF_TRAIN)
-	{
+	if (gfLevelFlags & GF_TRAIN) {
 		phd_left = 0;
 		phd_top = 0;
 		phd_right = phd_winxmax + 1;
 		phd_bottom = phd_winymax + 1;
-	}
-	else
-	{
+	} else {
 		phd_left = r->left;
 		phd_right = r->right;
 		phd_top = r->top;
@@ -1296,18 +1182,15 @@ void PrintObjects(short room_number)
 
 	mesh = r->mesh;
 
-	for (int i = r->num_meshes; i > 0; i--, mesh++)
-	{
-		if (mesh->Flags & 1)
-		{
+	for (int i = r->num_meshes; i > 0; i--, mesh++) {
+		if (mesh->Flags & 1) {
 			phd_PushMatrix();
 			phd_TranslateAbs(mesh->x, mesh->y, mesh->z);
 			phd_RotY(mesh->y_rot);
 			sinfo = &static_objects[mesh->static_number];
 			clip = S_GetObjectBounds(&sinfo->x_minp);
 
-			if (clip)
-			{
+			if (clip) {
 				S_CalculateStaticMeshLight(mesh->x, mesh->y, mesh->z, mesh->shade, r);
 				phd_PutPolygons(meshes[sinfo->mesh_number], clip);
 			}
@@ -1322,20 +1205,18 @@ void PrintObjects(short room_number)
 	phd_right = phd_winxmax + 1;
 	phd_bottom = phd_winymax + 1;
 
-	for (item_number = r->item_number; item_number != NO_ITEM; item_number = item->next_item)
-	{
+	for (item_number = r->item_number; item_number != NO_ITEM; item_number = item->next_item) {
 		ClipRoomNum = room_number;
 		item = &items[item_number];
 		obj = &objects[item->object_number];
 
 		// NGLE
-		short fade_override = NGGetFadeOverride(item_number);
+		int16_t fade_override = NGGetFadeOverride(item_number);
 		if (fade_override != 0)
 			item->after_death = fade_override;
 
 
-		if (item->status != ITEM_INVISIBLE)
-		{
+		if (item->status != ITEM_INVISIBLE) {
 			if (get_game_mod_level_creature_info(gfCurrentLevel)->fade_dead_enemies || fade_override != 0) {
 				if (item->after_death) {
 					GlobalAlpha = 0xFE000000 * item->after_death;
@@ -1365,8 +1246,7 @@ void PrintObjects(short room_number)
 
 	nPolyType = 3;
 
-	for (fx_number = r->fx_number; fx_number != NO_ITEM; fx_number = fx->next_fx)
-	{
+	for (fx_number = r->fx_number; fx_number != NO_ITEM; fx_number = fx->next_fx) {
 		fx = &effects[fx_number];
 		DrawEffect(fx_number);
 	}
@@ -1378,10 +1258,9 @@ void PrintObjects(short room_number)
 	r->bottom = 0;
 }
 
-long GetFrames(ITEM_INFO* item, short* frm[], long* rate)
-{
+int32_t GetFrames(ITEM_INFO* item, int16_t* frm[], int32_t* rate) {
 	ANIM_STRUCT* anim;
-	long frame, size, frac, num;
+	int32_t frame, size, frac, num;
 
 	// T4Plus: Animation safety check
 	if (item->anim_number < 0 || item->anim_number >= num_anims) {
@@ -1410,12 +1289,11 @@ long GetFrames(ITEM_INFO* item, short* frm[], long* rate)
 	return frac;
 }
 
-short* GetBoundsAccurate(ITEM_INFO* item)
-{
-	short* bptr;
-	short* frmptr[2];
-	long rate, frac;
-	static short interpolated_bounds[6];
+int16_t* GetBoundsAccurate(ITEM_INFO* item) {
+	int16_t* bptr;
+	int16_t* frmptr[2];
+	int32_t rate, frac;
+	static int16_t interpolated_bounds[6];
 
 	// T4Plus: Animation safety check
 	if (item->anim_number < 0 || item->anim_number >= num_anims) {
@@ -1430,9 +1308,8 @@ short* GetBoundsAccurate(ITEM_INFO* item)
 
 	bptr = interpolated_bounds;
 
-	for (int i = 0; i < 6; i++)
-	{
-		bptr[i] = short(*frmptr[0] + (*frmptr[1] - *frmptr[0]) * frac / rate);
+	for (int i = 0; i < 6; i++) {
+		bptr[i] = int16_t(*frmptr[0] + (*frmptr[1] - *frmptr[0]) * frac / rate);
 		frmptr[0]++;
 		frmptr[1]++;
 	}
@@ -1440,10 +1317,9 @@ short* GetBoundsAccurate(ITEM_INFO* item)
 	return interpolated_bounds;
 }
 
-short* GetBestFrame(ITEM_INFO* item)
-{
-	short* frm[2];
-	long rate, frac;
+int16_t* GetBestFrame(ITEM_INFO* item) {
+	int16_t* frm[2];
+	int32_t rate, frac;
 
 	frac = GetFrames(item, frm, &rate);
 
@@ -1453,33 +1329,25 @@ short* GetBestFrame(ITEM_INFO* item)
 		return frm[0];
 }
 
-void UpdateSkyLightning()
-{
-	if (LightningCount <= 0)
-	{
+void UpdateSkyLightning() {
+	if (LightningCount <= 0) {
 		if (LightningRand < 4)
 			LightningRand = 0;
 		else
 			LightningRand -= LightningRand >> 2;
-	}
-	else
-	{
+	} else {
 		LightningCount--;
 
-		if (LightningCount)
-		{
+		if (LightningCount) {
 			dLightningRand = GetRandomDraw() & 0x1FF;
 			LightningRand += (dLightningRand - LightningRand) >> 1;
-		}
-		else
-		{
+		} else {
 			dLightningRand = 0;
 			LightningRand = (GetRandomDraw() & 0x7F) + 400;
 		}
 	}
 
-	for (int i = 0; i < 3; i++)
-	{
+	for (int i = 0; i < 3; i++) {
 		LightningRGB[i] = LightningRGBs[i] + ((LightningRGBs[i] * LightningRand) >> 8);
 
 		if (LightningRGB[i] > 255)
@@ -1487,11 +1355,10 @@ void UpdateSkyLightning()
 	}
 }
 
-__forceinline void mRotBoundingBoxNoPerspExt(short* bounds, short* rotatedBounds, bool legacy)
-{
+TR_FORCE_INLINE void mRotBoundingBoxNoPerspExt(int16_t* bounds, int16_t* rotatedBounds, bool legacy) {
 	PHD_VECTOR pos[8];
-	long x, y, z;
-	short xMin, xMax, yMin, yMax, zMin, zMax;
+	int32_t x, y, z;
+	int16_t xMin, xMax, yMin, yMax, zMin, zMax;
 
 	xMin = bounds[0];
 	xMax = bounds[1];
@@ -1539,8 +1406,7 @@ __forceinline void mRotBoundingBoxNoPerspExt(short* bounds, short* rotatedBounds
 	yMax = -0x7FFF;
 	zMax = -0x7FFF;
 
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		if (!legacy) {
 			x = (pos[i].x * phd_mxptr[M00] + pos[i].y * phd_mxptr[M01] + pos[i].z * phd_mxptr[M02]) >> W2V_SHIFT;
 			y = (pos[i].x * phd_mxptr[M10] + pos[i].y * phd_mxptr[M11] + pos[i].z * phd_mxptr[M12]) >> W2V_SHIFT;
@@ -1552,22 +1418,22 @@ __forceinline void mRotBoundingBoxNoPerspExt(short* bounds, short* rotatedBounds
 		}
 
 		if (x < xMin)
-			xMin = (short)x;
+			xMin = (int16_t)x;
 
 		if (x > xMax)
-			xMax = (short)x;
+			xMax = (int16_t)x;
 
 		if (y < yMin)
-			yMin = (short)y;
+			yMin = (int16_t)y;
 
 		if (y > yMax)
-			yMax = (short)y;
+			yMax = (int16_t)y;
 
 		if (z < zMin)
-			zMin = (short)z;
+			zMin = (int16_t)z;
 
 		if (z > zMax)
-			zMax = (short)z;
+			zMax = (int16_t)z;
 	}
 
 	rotatedBounds[0] = xMin;
@@ -1578,31 +1444,27 @@ __forceinline void mRotBoundingBoxNoPerspExt(short* bounds, short* rotatedBounds
 	rotatedBounds[5] = zMax;
 }
 
-void mRotBoundingBoxNoPerspLegacy(short* bounds, short* rotatedBounds)
-{
+void mRotBoundingBoxNoPerspLegacy(int16_t* bounds, int16_t* rotatedBounds) {
 	mRotBoundingBoxNoPerspExt(bounds, rotatedBounds, true);
 }
 
-void mRotBoundingBoxNoPersp(short* bounds, short* rotatedBounds)
-{
+void mRotBoundingBoxNoPersp(int16_t* bounds, int16_t* rotatedBounds) {
 	mRotBoundingBoxNoPerspExt(bounds, rotatedBounds, false);
 }
 
-void calc_animating_item_clip_window(ITEM_INFO* item, short* bounds)
-{
+void calc_animating_item_clip_window(ITEM_INFO* item, int16_t* bounds) {
 	ROOM_INFO* r;
-	short* door;
-	long xMin, xMax, yMin, yMax, zMin, zMax;		//object bounds
-	long xMinR, xMaxR, yMinR, yMaxR, zMinR, zMaxR;	//room bounds
-	long xMinD, xMaxD, yMinD, yMaxD, zMinD, zMaxD;	//door bounds
-	short rotatedBounds[6];
-	short nDoors;
+	int16_t* door;
+	int32_t xMin, xMax, yMin, yMax, zMin, zMax;		//object bounds
+	int32_t xMinR, xMaxR, yMinR, yMaxR, zMinR, zMaxR;	//room bounds
+	int32_t xMinD, xMaxD, yMinD, yMaxD, zMinD, zMaxD;	//door bounds
+	int16_t rotatedBounds[6];
+	int16_t nDoors;
 
 	r = &room[ClipRoomNum];
 
 	if (item->object_number >= ANIMATING1 && item->object_number <= ANIMATING16 ||
-		item->object_number >= DOOR_TYPE1 && item->object_number <= DOOR_TYPE8)
-	{
+	        item->object_number >= DOOR_TYPE1 && item->object_number <= DOOR_TYPE8) {
 		phd_left = r->left;
 		phd_right = r->right;
 		phd_top = r->top;
@@ -1630,8 +1492,7 @@ void calc_animating_item_clip_window(ITEM_INFO* item, short* bounds)
 	zMinR = r->z + BLOCK_SIZE;
 	zMaxR = zMinR + ((r->x_size - 2) << 10);
 
-	if (xMin >= xMinR && xMax <= xMaxR && yMin >= yMinR && yMax <= yMaxR && zMin >= zMinR && zMax <= zMaxR)
-	{
+	if (xMin >= xMinR && xMax <= xMaxR && yMin >= yMinR && yMax <= yMaxR && zMin >= zMinR && zMax <= zMaxR) {
 		phd_left = r->left;
 		phd_right = r->right;
 		phd_top = r->top;
@@ -1639,13 +1500,11 @@ void calc_animating_item_clip_window(ITEM_INFO* item, short* bounds)
 		return;
 	}
 
-	if (camera.pos.room_number != item->room_number && camera.pos.room_number != ClipRoomNum)
-	{
+	if (camera.pos.room_number != item->room_number && camera.pos.room_number != ClipRoomNum) {
 		door = r->door;
 		nDoors = *door++;
 
-		for (; nDoors > 0; nDoors--, door += 16)
-		{
+		for (; nDoors > 0; nDoors--, door += 16) {
 			if (door[0] != camera.pos.room_number)
 				continue;
 
@@ -1712,8 +1571,7 @@ void calc_animating_item_clip_window(ITEM_INFO* item, short* bounds)
 				break;
 		}
 
-		if (!nDoors)
-		{
+		if (!nDoors) {
 			phd_left = r->left;
 			phd_right = r->right;
 			phd_top = r->top;

@@ -8,8 +8,7 @@ GFXMATRIX D3DMView;
 GFXMATRIX D3DLightMatrix;
 GFXMATRIX D3DInvCameraMatrix;
 
-GFXMATRIX* D3DIdentityMatrix(GFXMATRIX* mx)
-{
+GFXMATRIX* D3DIdentityMatrix(GFXMATRIX* mx) {
 	mx->_11 = 1;
 	mx->_12 = 0;
 	mx->_13 = 0;
@@ -32,8 +31,7 @@ GFXMATRIX* D3DIdentityMatrix(GFXMATRIX* mx)
 	return mx;
 }
 
-void SetD3DMatrix(GFXMATRIX* mx, float* imx)
-{
+void SetD3DMatrix(GFXMATRIX* mx, float* imx) {
 	D3DIdentityMatrix(mx);
 	mx->_11 = imx[M00];
 	mx->_12 = imx[M10];
@@ -49,13 +47,11 @@ void SetD3DMatrix(GFXMATRIX* mx, float* imx)
 	mx->_43 = imx[M23];
 }
 
-void SetD3DViewMatrix()
-{
+void SetD3DViewMatrix() {
 	SetD3DMatrix(&D3DMView, mMXPtr);
 }
 
-void D3DTransform(GFXVECTOR* vec, GFXMATRIX* mx)
-{
+void D3DTransform(GFXVECTOR* vec, GFXMATRIX* mx) {
 	float x, y, z;
 
 	x = mx->_11 * vec->x + mx->_21 * vec->y + mx->_31 * vec->z;
@@ -66,12 +62,10 @@ void D3DTransform(GFXVECTOR* vec, GFXMATRIX* mx)
 	vec->z = z;
 }
 
-GFXVECTOR* D3DNormalise(GFXVECTOR* vec)
-{
+GFXVECTOR* D3DNormalise(GFXVECTOR* vec) {
 	float val;
 
-	if (vec->x != 0 || vec->y != 0 || vec->z != 0)
-	{
+	if (vec->x != 0 || vec->y != 0 || vec->z != 0) {
 		val = 1.0F / sqrt(SQUARE(vec->x) + SQUARE(vec->y) + SQUARE(vec->z));
 		vec->x = val * vec->x;
 		vec->y = val * vec->y;
@@ -81,8 +75,7 @@ GFXVECTOR* D3DNormalise(GFXVECTOR* vec)
 	return vec;
 }
 
-GFXMATRIX *D3DMultMatrix(GFXMATRIX *d, GFXMATRIX *a, GFXMATRIX*b)
-{
+GFXMATRIX *D3DMultMatrix(GFXMATRIX *d, GFXMATRIX *a, GFXMATRIX*b) {
 	d->_11 = a->_11 * b->_11;
 	d->_11 += a->_12 * b->_21;
 	d->_11 += a->_13 * b->_31;

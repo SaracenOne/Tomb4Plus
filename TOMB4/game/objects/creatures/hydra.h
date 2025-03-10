@@ -1,8 +1,8 @@
 #pragma once
 #include "../../../global/types.h"
 
-void InitialiseHydra(short item_number);
-void HydraControl(short item_number);
-void TriggerHydraMissile(PHD_3DPOS* pos, short room_number, short num);
-void TriggerHydraMissileFlame(PHD_VECTOR* pos, long xv, long yv, long zv);
-void TriggerHydraPowerupFlames(short item_number, long shade);
+void InitialiseHydra(int16_t item_number);
+void HydraControl(int16_t item_number);
+void TriggerHydraMissile(PHD_3DPOS* pos, int16_t room_number, int16_t num);
+void TriggerHydraMissileFlame(PHD_VECTOR* pos, int32_t xv, int32_t yv, int32_t zv);
+void TriggerHydraPowerupFlames(int16_t item_number, int32_t shade);

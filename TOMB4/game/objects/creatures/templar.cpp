@@ -18,8 +18,7 @@
 
 static BITE_INFO templar_hit{ 0, 0, 0, 11 };
 
-void InitialiseTemplar(short item_number)
-{
+void InitialiseTemplar(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -31,8 +30,7 @@ void InitialiseTemplar(short item_number)
 	item->mesh_bits &= ~0x800;
 }
 
-void TemplarControl(short item_number)
-{
+void TemplarControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* knight;
 	ROOM_INFO* r;
@@ -40,7 +38,7 @@ void TemplarControl(short item_number)
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos;
 	AI_INFO info;
-	short anim, head, torso_x, torso_y, angle;
+	int16_t anim, head, torso_x, torso_y, angle;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -50,8 +48,7 @@ void TemplarControl(short item_number)
 	item = &items[item_number];
 	anim = item->anim_number - objects[KNIGHTS_TEMPLAR].anim_index;
 
-	if ((!anim || anim == 1 || anim == 11 || anim == 12) && (GetRandomControl() & 1) != 0)
-	{
+	if ((!anim || anim == 1 || anim == 11 || anim == 12) && (GetRandomControl() & 1) != 0) {
 		MOD_LEVEL_CREATURE_INFO *creature_info = get_game_mod_level_creature_info(gfCurrentLevel);
 
 		if (!creature_info->remove_knights_templar_sparks) {
@@ -85,121 +82,109 @@ void TemplarControl(short item_number)
 	CreatureMood(item, &info, true);
 	angle = CreatureTurn(item, knight->maximum_turn);
 
-	if (info.ahead)
-	{
+	if (info.ahead) {
 		head = info.angle >> 1;
 		torso_y = info.angle >> 1;
 		torso_x = info.x_angle;
 	}
 
-	switch (item->current_anim_state)
-	{
-	case 1:
-		knight->flags = 0;
-		knight->maximum_turn = DEGREES_TO_ROTATION(2);
+	switch (item->current_anim_state) {
+		case 1:
+			knight->flags = 0;
+			knight->maximum_turn = DEGREES_TO_ROTATION(2);
 
-		if (info.distance > 0x718E4)
-		{
-			if (lara.target == item)
-				item->goal_anim_state = 6;
+			if (info.distance > 0x718E4) {
+				if (lara.target == item)
+					item->goal_anim_state = 6;
+				else
+					item->goal_anim_state = 2;
+			} else if (GetRandomControl() & 1)
+				item->goal_anim_state = 4;
+			else if (GetRandomControl() & 1)
+				item->goal_anim_state = 3;
 			else
-				item->goal_anim_state = 2;
-		}
-		else if (GetRandomControl() & 1)
-			item->goal_anim_state = 4;
-		else if (GetRandomControl() & 1)
-			item->goal_anim_state = 3;
-		else
-			item->goal_anim_state = 5;
+				item->goal_anim_state = 5;
 
-		break;
+			break;
 
-	case 2:
-		knight->maximum_turn = DEGREES_TO_ROTATION(7);
+		case 2:
+			knight->maximum_turn = DEGREES_TO_ROTATION(7);
 
-		if (lara.target == item || info.distance <= 0x718E4)
-			item->goal_anim_state = 1;
+			if (lara.target == item || info.distance <= 0x718E4)
+				item->goal_anim_state = 1;
 
-		break;
+			break;
 
-	case 3:
-	case 4:
-	case 5:
-		knight->maximum_turn = 0;
+		case 3:
+		case 4:
+		case 5:
+			knight->maximum_turn = 0;
 
-		if (abs(info.angle) < DEGREES_TO_ROTATION(1))
-			item->pos.y_rot += info.angle;
-		else if (info.angle < 0)
-			item->pos.y_rot -= DEGREES_TO_ROTATION(1);
-		else
-			item->pos.y_rot += DEGREES_TO_ROTATION(1);
+			if (abs(info.angle) < DEGREES_TO_ROTATION(1))
+				item->pos.y_rot += info.angle;
+			else if (info.angle < 0)
+				item->pos.y_rot -= DEGREES_TO_ROTATION(1);
+			else
+				item->pos.y_rot += DEGREES_TO_ROTATION(1);
 
-		if (item->frame_number > anims[item->anim_number].frame_base + 42 && item->frame_number < anims[item->anim_number].frame_base + 51)
-		{
-			r = &room[item->room_number];
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
-			GetJointAbsPosition(item, &pos, 11);
+			if (item->frame_number > anims[item->anim_number].frame_base + 42 && item->frame_number < anims[item->anim_number].frame_base + 51) {
+				r = &room[item->room_number];
+				pos.x = 0;
+				pos.y = 0;
+				pos.z = 0;
+				GetJointAbsPosition(item, &pos, 11);
 
-			floor = &r->floor[((pos.z - r->z) >> 10) + r->x_size * ((pos.x - r->x) >> 10)];
+				floor = &r->floor[((pos.z - r->z) >> 10) + r->x_size * ((pos.x - r->x) >> 10)];
 
-			if (floor->stopper)
-			{
-				for (int i = 0; i < r->num_meshes; i++)
-				{
-					mesh = &r->mesh[i];
+				if (floor->stopper) {
+					for (int i = 0; i < r->num_meshes; i++) {
+						mesh = &r->mesh[i];
 
-					MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];
-					if (!((pos.z ^ mesh->z) & ~0x3FF) && !((pos.x ^ mesh->x) & ~0x3FF) && static_info->creatures_can_shatter)
-					{
-						ShatterObject(0, mesh, -64, lara_item->room_number, 0);
-						if (static_info->shatter_sound_id >= 0)
-						{
-							SoundEffect(static_info->shatter_sound_id, &item->pos, SFX_DEFAULT);
+						MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];
+						if (!((pos.z ^ mesh->z) & ~0x3FF) && !((pos.x ^ mesh->x) & ~0x3FF) && static_info->creatures_can_shatter) {
+							ShatterObject(0, mesh, -64, lara_item->room_number, 0);
+							if (static_info->shatter_sound_id >= 0) {
+								SoundEffect(static_info->shatter_sound_id, &item->pos, SFX_DEFAULT);
+							}
+							mesh->Flags &= ~1;
+							floor->stopper = 0;
+							GetHeight(floor, pos.x, pos.y, pos.z);
+							TestTriggers(trigger_index, true, 0);
 						}
-						mesh->Flags &= ~1;
-						floor->stopper = 0;
-						GetHeight(floor, pos.x, pos.y, pos.z);
-						TestTriggers(trigger_index, true, 0);
 					}
+				}
+
+				if (!knight->flags && item->touch_bits & 0xC00) {
+					lara_item->hit_points -= mod_object_customization->damage_1;
+					lara_item->hit_status = 1;
+					CreatureEffectT(item, &templar_hit, 20, -1, DoBloodSplat);
+					knight->flags = 1;
 				}
 			}
 
-			if (!knight->flags && item->touch_bits & 0xC00)
-			{
-				lara_item->hit_points -= mod_object_customization->damage_1;
-				lara_item->hit_status = 1;
-				CreatureEffectT(item, &templar_hit, 20, -1, DoBloodSplat);
-				knight->flags = 1;
-			}
-		}
+			break;
 
-		break;
+		case 6:
+			knight->maximum_turn = 0;
 
-	case 6:
-		knight->maximum_turn = 0;
-
-		if (abs(info.angle) < DEGREES_TO_ROTATION(1))
-			item->pos.y_rot += info.angle;
-		else if (info.angle < 0)
-			item->pos.y_rot -= DEGREES_TO_ROTATION(1);
-		else
-			item->pos.y_rot += DEGREES_TO_ROTATION(1);
-
-		if (item->hit_status)
-		{
-			if (GetRandomControl() & 1)
-				item->goal_anim_state = 7;
+			if (abs(info.angle) < DEGREES_TO_ROTATION(1))
+				item->pos.y_rot += info.angle;
+			else if (info.angle < 0)
+				item->pos.y_rot -= DEGREES_TO_ROTATION(1);
 			else
-				item->goal_anim_state = 8;
-		}
-		else if (info.distance > 465124 && lara.target == item)
-			item->goal_anim_state = 6;
-		else
-			item->goal_anim_state = 1;
+				item->pos.y_rot += DEGREES_TO_ROTATION(1);
 
-		break;
+			if (item->hit_status) {
+				if (GetRandomControl() & 1)
+					item->goal_anim_state = 7;
+				else
+					item->goal_anim_state = 8;
+			} else if (info.distance > 465124 && lara.target == item)
+				item->goal_anim_state = 6;
+			else
+				item->goal_anim_state = 1;
+
+			break;
 	}
 
 	CreatureTilt(item, 0);

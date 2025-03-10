@@ -46,9 +46,9 @@ void NGHurtEnemy(uint16_t item_id, uint16_t damage) {
 int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t flags) {
 	static uint16_t degrees_table[] = { 0x2000,0x4000,0x6000,0x8000,0xA000,0xC000,0xE000,0x0000 };
 	const int32_t DEGREES_TABLE_COUNT = sizeof(degrees_table) / sizeof(uint16_t);
-	
-	unsigned char action_type = (unsigned char)action_timer & 0xff;
-	unsigned char extra_timer = (unsigned char)(action_timer >> 8) & 0xff;
+
+	uint8_t action_type = (uint8_t)action_timer & 0xff;
+	uint8_t extra_timer = (uint8_t)(action_timer >> 8) & 0xff;
 
 	int32_t repeat_type = 1;
 
@@ -64,7 +64,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 
 	switch (action_type) {
 		// TODO: values are estimated and may not be accurate.
-		// Also need to check the behaviour when an action is already 
+		// Also need to check the behaviour when an action is already
 		case TURN_X_ANIMATING_MOVING_SLOWLY_IN_CLOCKWISE_OF_DEGREES:
 		case TURN_X_ANIMATING_MOVING_SLOWLY_IN_INVERSE_CLOCKWISE_OF_DEGREES:
 		case TURN_X_ANIMATING_MOVING_FASTLY_IN_CLOCKWISE_OF_DEGREES:
@@ -77,7 +77,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			for (int32_t i = 0; i < progressive_action_count; i++) {
 				NGProgressiveAction* progressive_action = &progressive_actions[i];
 				if (progressive_action->item_index == item_id &&
-					progressive_action->type == action_type) {
+				        progressive_action->type == action_type) {
 					test_abort = true;
 					break;
 				}
@@ -95,7 +95,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 
 			int32_t speed = 352;
 			if (action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_CLOCKWISE_OF_DEGREES ||
-				action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_INVERSE_CLOCKWISE_OF_DEGREES) {
+			        action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_INVERSE_CLOCKWISE_OF_DEGREES) {
 				speed = 160;
 			}
 
@@ -110,7 +110,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 
 			progressive_action->item_index = item_id;
 			if (action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_CLOCKWISE_OF_DEGREES ||
-				action_type == TURN_X_ANIMATING_MOVING_FASTLY_IN_CLOCKWISE_OF_DEGREES) {
+			        action_type == TURN_X_ANIMATING_MOVING_FASTLY_IN_CLOCKWISE_OF_DEGREES) {
 				progressive_action->argument2_i32[0] = 1;
 			} else {
 				progressive_action->argument2_i32[0] = -1;
@@ -124,7 +124,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			NGProgressiveAction *progressive_action = nullptr;
 			for (int32_t i = 0; i < progressive_action_count; i++) {
 				if (progressive_actions[i].item_index == item_id &&
-					(progressive_actions[i].type == AZ_ROTATE_ITEM_HORIZONTAL || progressive_actions[i].type == AZ_TURN_FACING_HORIZONTAL)) {
+				        (progressive_actions[i].type == AZ_ROTATE_ITEM_HORIZONTAL || progressive_actions[i].type == AZ_TURN_FACING_HORIZONTAL)) {
 					progressive_action = &progressive_actions[i];
 					break;
 				}
@@ -167,7 +167,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			NGProgressiveAction* progressive_action = nullptr;
 			for (int32_t i = 0; i < progressive_action_count; i++) {
 				if (progressive_actions[i].item_index == item_id &&
-					(progressive_actions[i].type == AZ_ROTATE_ITEM_VERTICAL || progressive_actions[i].type == AZ_TURN_FACING_VERTICAL)) {
+				        (progressive_actions[i].type == AZ_ROTATE_ITEM_VERTICAL || progressive_actions[i].type == AZ_TURN_FACING_VERTICAL)) {
 					progressive_action = &progressive_actions[i];
 					break;
 				}
@@ -183,7 +183,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			// Huh?
 			int32_t speed = 352;
 			if (action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_CLOCKWISE_OF_DEGREES ||
-				action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_INVERSE_CLOCKWISE_OF_DEGREES) {
+			        action_type == TURN_X_ANIMATING_MOVING_SLOWLY_IN_INVERSE_CLOCKWISE_OF_DEGREES) {
 				speed = 160;
 			}
 
@@ -198,10 +198,9 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 
 			progressive_action->item_index = item_id;
 			if (action_type == TURN_VERTICALLY_X_ANIMATING_MOVING_SLOWLY_IN_CLOCKWISE_OF_DEGREES ||
-				action_type == TURN_VERTICALLY_X_ANIMATING_MOVING_FASTLY_IN_CLOCKWISE_OF_DEGREES) {
+			        action_type == TURN_VERTICALLY_X_ANIMATING_MOVING_FASTLY_IN_CLOCKWISE_OF_DEGREES) {
 				progressive_action->argument2_i32[0] = 1;
-			}
-			else {
+			} else {
 				progressive_action->argument2_i32[0] = -1;
 			}
 
@@ -213,7 +212,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			NGProgressiveAction* progressive_action = nullptr;
 			for (int32_t i = 0; i < progressive_action_count; i++) {
 				if (progressive_actions[i].item_index == item_id &&
-					(progressive_actions[i].type == AZ_ROTATE_ITEM_VERTICAL || progressive_actions[i].type == AZ_TURN_FACING_VERTICAL)) {
+				        (progressive_actions[i].type == AZ_ROTATE_ITEM_VERTICAL || progressive_actions[i].type == AZ_TURN_FACING_VERTICAL)) {
 					progressive_action = &progressive_actions[i];
 					break;
 				}
@@ -286,8 +285,8 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			ITEM_INFO *item = T4PlusGetItemInfoForID(item_id);
 			if (item) {
 				if (item->object_number != get_game_mod_level_objects_info(gfCurrentLevel)->lara_slot
-					&& !item->active
-					&& item->status == ITEM_ACTIVE) {
+				        && !item->active
+				        && item->status == ITEM_ACTIVE) {
 
 					if (item->collidable) {
 						repeat_type = 0;
@@ -433,8 +432,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 						item->flags |= IFL_CODEBITS;
 						item->timer = (int16_t)(NGGetLastTriggerTimer() & 0xffff) * NG_TICKS_PER_SECOND;
 					}
-				}
-				else {
+				} else {
 					if (reverse) {
 						item->flags |= IFL_CODEBITS;
 						item->timer = (int16_t)(NGGetLastTriggerTimer() & 0xffff) * NG_TICKS_PER_SECOND;
@@ -447,9 +445,9 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 		}
 		case MOVE_CONTINUOUSLY_FORWARD_BACKWARD_X_ANIMATING_FOR_CLICKS:
 			NGLog(NG_LOG_TYPE_POSSIBLE_INACCURACY, "NGAction: MOVE_CONTINUOUSLY_FORWARD_BACKWARD_X_ANIMATING_FOR_CLICKS may not be accurate.");
-			
+
 			NGAddItemMoved(item_id);
-			
+
 			if (!NGGetItemHorizontalMovementRemainingUnits(item_id)) {
 				ITEM_INFO *item = T4PlusGetItemInfoForID(item_id);
 				if (item) {
@@ -615,7 +613,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			if (ng_camera_target_id == NO_ITEM) {
 				ng_camera_target_id = lara.item_number;
 			}
-			
+
 			ITEM_INFO *camera_item = T4PlusGetItemInfoForID(ng_camera_target_id);
 			if (camera_item) {
 				camera.item = camera_item;
@@ -626,8 +624,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			}
 			if (flags & SCANF_HEAVY) {
 				camera.type = HEAVY_CAMERA;
-			}
-			else {
+			} else {
 				camera.type = FIXED_CAMERA;
 			}
 
@@ -675,7 +672,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 
 					InitialiseSpotCam(item_id);
 				}
-			} else if (extra_timer == 1){
+			} else if (extra_timer == 1) {
 				if (bUseSpotCam) {
 					SpotcamResetFOV();
 					bUseSpotCam = 0;
@@ -719,8 +716,7 @@ int32_t NGPerformTRNGAction(uint16_t action_timer, uint16_t item_id, int32_t fla
 			if (!NGIsItemFrozen(item_id)) {
 				if (extra_timer == 0) {
 					NGSetItemFreezeTimer(item_id, 0xffff);
-				}
-				else {
+				} else {
 					NGSetItemFreezeTimer(item_id, extra_timer * NG_TICKS_PER_SECOND);
 				}
 			}
@@ -949,8 +945,8 @@ void NGProcessScannedActions() {
 			} else {
 				if (!NGUsingLegacyNGTriggerBehaviour()) {
 					if (old_actions[j].offset_floor_data != 0 &&
-						old_actions[j].flags & SCANF_TEMP_ONE_SHOT &&
-						(scanned_actions[i].flags & SCANF_HEAVY) == 0) {
+					        old_actions[j].flags & SCANF_TEMP_ONE_SHOT &&
+					        (scanned_actions[i].flags & SCANF_HEAVY) == 0) {
 						if ((old_actions[j].offset_floor_data & 0xff000000) != (offset_floor & 0xff000000)) {
 							old_actions[j].offset_floor_data = 0;
 						}

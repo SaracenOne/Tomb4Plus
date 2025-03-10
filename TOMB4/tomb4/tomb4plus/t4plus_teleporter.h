@@ -1,3 +1,3 @@
 #pragma once
 
-extern void ControlTeleporterLight(short item_number);
+extern void ControlTeleporterLight(int16_t item_number);

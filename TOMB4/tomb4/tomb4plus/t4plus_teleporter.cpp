@@ -9,7 +9,7 @@
 #include "../mod_config.h"
 #include "../../game/gameflow.h"
 
-void ControlTeleporterLight(short item_number) {
+void ControlTeleporterLight(int16_t item_number) {
 	ITEM_INFO *item = &items[item_number];
 
 	// Special teleport trigger

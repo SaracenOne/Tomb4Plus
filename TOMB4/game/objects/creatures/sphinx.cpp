@@ -14,8 +14,7 @@
 
 static BITE_INFO sphinx_bite = { 0, 0, 0, 6 };
 
-void InitialiseSphinx(short item_number)
-{
+void InitialiseSphinx(int16_t item_number) {
 	ITEM_INFO* item;
 
 	item = &items[item_number];
@@ -26,16 +25,15 @@ void InitialiseSphinx(short item_number)
 	item->goal_anim_state = 1;
 }
 
-void SphinxControl(short item_number)
-{
+void SphinxControl(int16_t item_number) {
 	ITEM_INFO* item;
 	CREATURE_INFO* sphinx;
 	FLOOR_INFO* floor;
 	ROOM_INFO* r;
 	MESH_INFO* mesh;
 	AI_INFO info;
-	long s, c, x, z, h1, h2;
-	short room_number, angle;
+	int32_t s, c, x, z, h1, h2;
+	int16_t room_number, angle;
 
 	if (!CreatureActive(item_number))
 		return;
@@ -52,20 +50,16 @@ void SphinxControl(short item_number)
 	floor = GetFloor(x, item->pos.y_pos, z, &room_number);
 	h1 = GetHeight(floor, x, item->pos.y_pos, z);
 
-	if (item->current_anim_state == 5 && floor->stopper)
-	{
+	if (item->current_anim_state == 5 && floor->stopper) {
 		r = &room[item->room_number];
 
-		for (int i = 0; i < r->num_meshes; i++)
-		{
+		for (int i = 0; i < r->num_meshes; i++) {
 			mesh = &r->mesh[i];
 
 			MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];
-			if (mesh->z >> 10 == z >> 10 && mesh->x >> 10 == x >> 10 && static_info->creatures_can_shatter)
-			{
+			if (mesh->z >> 10 == z >> 10 && mesh->x >> 10 == x >> 10 && static_info->creatures_can_shatter) {
 				ShatterObject(0, mesh, -64, item->room_number, 0);
-				if (static_info->shatter_sound_id >= 0)
-				{
+				if (static_info->shatter_sound_id >= 0) {
 					SoundEffect(static_info->shatter_sound_id, &item->pos, SFX_DEFAULT);
 				}
 				mesh->Flags &= ~1;
@@ -94,107 +88,99 @@ void SphinxControl(short item_number)
 	GetCreatureMood(item, &info, true);
 	CreatureMood(item, &info, true);
 	angle = CreatureTurn(item, sphinx->maximum_turn);
-	x = abs(item->item_flags[2] - (short)item->pos.x_pos);
-	z = abs(item->item_flags[3] - (short)item->pos.z_pos);
+	x = abs(item->item_flags[2] - (int16_t)item->pos.x_pos);
+	z = abs(item->item_flags[3] - (int16_t)item->pos.z_pos);
 
-	switch (item->current_anim_state)
-	{
-	case 1:
-		sphinx->maximum_turn = 0;
-
-		if (info.distance < 0x100000 || item->trigger_flags)
-			item->goal_anim_state = 3;
-		else if (!GetRandomControl())
-			item->goal_anim_state = 2;
-
-		break;
-
-	case 2:
-		sphinx->maximum_turn = 0;
-
-		if (info.distance < 0x100000 || item->trigger_flags)
-			item->goal_anim_state = 3;
-		else if (!GetRandomControl())
-			item->goal_anim_state = 1;
-
-		break;
-
-	case 4:
-		sphinx->maximum_turn = DEGREES_TO_ROTATION(3);
-
-		if (info.distance > 0x400000 && abs(info.angle) <= HALF_BLOCK_SIZE || item->required_anim_state == 5)
-			item->goal_anim_state = 5;
-		else if (info.distance < 0x400000 && item->goal_anim_state != 5 &&
-			h2 <= item->pos.y_pos + CLICK_SIZE && h2 >= item->pos.y_pos - CLICK_SIZE)
-		{
-			item->goal_anim_state = 9;
-			item->required_anim_state = 6;
-		}
-
-		break;
-
-	case 5:
-		sphinx->maximum_turn = 60;
-
-		if (!sphinx->flags && item->touch_bits & 0x40)
-		{
-			CreatureEffectT(item, &sphinx_bite, 20, -1, DoBloodSplat);
-			lara_item->hit_points -= mod_object_customization->damage_1;
-			sphinx->flags = 1;
-		}
-
-		if (x < 50 && z < 50 && item->anim_number == objects[SPHINX].anim_index)
-		{
-			item->goal_anim_state = 7;
-			item->required_anim_state = 6;
+	switch (item->current_anim_state) {
+		case 1:
 			sphinx->maximum_turn = 0;
-		}
-		else if (info.distance > 0x400000 && abs(info.angle) > HALF_BLOCK_SIZE)
-			item->goal_anim_state = 9;
 
-		break;
+			if (info.distance < 0x100000 || item->trigger_flags)
+				item->goal_anim_state = 3;
+			else if (!GetRandomControl())
+				item->goal_anim_state = 2;
 
-	case 6:
-		sphinx->maximum_turn = DEGREES_TO_ROTATION(3);
+			break;
 
-		if (info.distance > 0x400000 || h2 > item->pos.y_pos + 256 || h2 < item->pos.y_pos - 256)
-		{
-			item->goal_anim_state = 9;
-			item->required_anim_state = 5;
-		}
+		case 2:
+			sphinx->maximum_turn = 0;
 
-		break;
+			if (info.distance < 0x100000 || item->trigger_flags)
+				item->goal_anim_state = 3;
+			else if (!GetRandomControl())
+				item->goal_anim_state = 1;
 
-	case 7:
-		room_number = item->room_number;
-		floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
-		GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
+			break;
 
-		if (item->frame_number == anims[item->anim_number].frame_base)
-		{
-			TestTriggers(trigger_index, true, 0);
+		case 4:
+			sphinx->maximum_turn = DEGREES_TO_ROTATION(3);
 
-			if (item->touch_bits & 0x40)
-			{
-				CreatureEffectT(item, &sphinx_bite, 50, -1, DoBloodSplat);
-				lara_item->hit_points = 0;
+			if (info.distance > 0x400000 && abs(info.angle) <= HALF_BLOCK_SIZE || item->required_anim_state == 5)
+				item->goal_anim_state = 5;
+			else if (info.distance < 0x400000 && item->goal_anim_state != 5 &&
+			         h2 <= item->pos.y_pos + CLICK_SIZE && h2 >= item->pos.y_pos - CLICK_SIZE) {
+				item->goal_anim_state = 9;
+				item->required_anim_state = 6;
 			}
-		}
 
-		break;
+			break;
 
-	case 9:
-		sphinx->flags = 0;
+		case 5:
+			sphinx->maximum_turn = 60;
 
-		if (item->required_anim_state == 6)
-			item->goal_anim_state = 6;
-		else
-			item->goal_anim_state = 4;
+			if (!sphinx->flags && item->touch_bits & 0x40) {
+				CreatureEffectT(item, &sphinx_bite, 20, -1, DoBloodSplat);
+				lara_item->hit_points -= mod_object_customization->damage_1;
+				sphinx->flags = 1;
+			}
 
-		break;
+			if (x < 50 && z < 50 && item->anim_number == objects[SPHINX].anim_index) {
+				item->goal_anim_state = 7;
+				item->required_anim_state = 6;
+				sphinx->maximum_turn = 0;
+			} else if (info.distance > 0x400000 && abs(info.angle) > HALF_BLOCK_SIZE)
+				item->goal_anim_state = 9;
+
+			break;
+
+		case 6:
+			sphinx->maximum_turn = DEGREES_TO_ROTATION(3);
+
+			if (info.distance > 0x400000 || h2 > item->pos.y_pos + 256 || h2 < item->pos.y_pos - 256) {
+				item->goal_anim_state = 9;
+				item->required_anim_state = 5;
+			}
+
+			break;
+
+		case 7:
+			room_number = item->room_number;
+			floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
+			GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
+
+			if (item->frame_number == anims[item->anim_number].frame_base) {
+				TestTriggers(trigger_index, true, 0);
+
+				if (item->touch_bits & 0x40) {
+					CreatureEffectT(item, &sphinx_bite, 50, -1, DoBloodSplat);
+					lara_item->hit_points = 0;
+				}
+			}
+
+			break;
+
+		case 9:
+			sphinx->flags = 0;
+
+			if (item->required_anim_state == 6)
+				item->goal_anim_state = 6;
+			else
+				item->goal_anim_state = 4;
+
+			break;
 	}
 
-	item->item_flags[2] = (short)item->pos.x_pos;
-	item->item_flags[3] = (short)item->pos.z_pos;
+	item->item_flags[2] = (int16_t)item->pos.x_pos;
+	item->item_flags[3] = (int16_t)item->pos.z_pos;
 	CreatureAnimation(item_number, angle, 0);
 }

@@ -36,8 +36,7 @@
 #include "../specific/bgfx.h"
 #include "../tomb4/tomb4plus/t4plus_mirror.h"
 
-short CreditGroups[18] =
-{
+int16_t CreditGroups[18] = {
 	0,
 	TXT_PC_Programmer,
 	TXT_PSX_Programmers,
@@ -58,8 +57,7 @@ short CreditGroups[18] =
 	0
 };
 
-const char* CreditsTable[]
-{
+const char* CreditsTable[] {
 	"%01",
 	"Richard Flower", "0",
 
@@ -117,58 +115,58 @@ const char* CreditsTable[]
 GAMEFLOW* Gameflow;
 PHD_VECTOR gfLoadCam;
 PHD_VECTOR gfLoadTarget;
-uchar gfLoadRoom = 255;
+uint8_t gfLoadRoom = 255;
 PHD_VECTOR gfLensFlare;
 CVECTOR gfLensFlareColour;
 CVECTOR gfDistanceFog = { 0, 0, 0, 0 };
 CVECTOR gfVolumetricFog = { 0, 0, 0, 0 };
 CVECTOR gfLayer1Col;
 CVECTOR gfLayer2Col;
-ushort* gfStringOffset;
-ushort* gfFilenameOffset;
-uchar* gfScriptFile;
-uchar* gfLanguageFile;
+uint16_t* gfStringOffset;
+uint16_t* gfFilenameOffset;
+uint8_t* gfScriptFile;
+uint8_t* gfLanguageFile;
 char* gfStringWad;
 char* gfFilenameWad;
-long gfMirrorZPlane;
-long gfStatus = 0;
-ushort gfLevelFlags;
-uchar gfCurrentLevel;
-uchar gfLevelComplete;
+int32_t gfMirrorZPlane;
+int32_t gfStatus = 0;
+uint16_t gfLevelFlags;
+uint8_t gfCurrentLevel;
+uint8_t gfLevelComplete;
 GameFlowGameMode gfGameMode = GF_GAME_MODE_TITLE;
-uchar gfMirrorRoom;
-uchar gfNumMips = 0;
-uchar gfRequiredStartPos;
-uchar gfMips[8];
-uchar gfLevelNames[255];
+uint8_t gfMirrorRoom;
+uint8_t gfNumMips = 0;
+uint8_t gfRequiredStartPos;
+uint8_t gfMips[8];
+uint8_t gfLevelNames[255];
 int16_t gfLevelFilenames[255];
-char gfUVRotate;
-char gfLayer1Vel;
-char gfLayer2Vel;
+int8_t gfUVRotate;
+int8_t gfLayer1Vel;
+int8_t gfLayer2Vel;
 
-ulong GameTimer;
-uchar bDoCredits = 0;
+uint32_t GameTimer;
+uint8_t bDoCredits = 0;
 bool JustLoaded = 0;
 
-char DEL_playingamefmv = 0;
-char skipped_level = 0;
-char Chris_Menu = 0;
-char title_controls_locked_out;
+int8_t DEL_playingamefmv = 0;
+int8_t skipped_level = 0;
+int8_t Chris_Menu = 0;
+int8_t title_controls_locked_out;
 
 uint8_t gfLegend;
 int32_t gfLegendTime = 0;
 
-static ushort* gfScriptOffset;
-static uchar* gfScriptWad = 0;
+static uint16_t* gfScriptOffset;
+static uint8_t* gfScriptWad = 0;
 static char* gfExtensions = 0;
-static long nFrames = 1;
-static uchar gfInitialiseGame = 1;
-static uchar gfResetHubDest;
-static uchar gfCutNumber = 0;
-static uchar gfResidentCut[4];
+static int32_t nFrames = 1;
+static uint8_t gfInitialiseGame = 1;
+static uint8_t gfResetHubDest;
+static uint8_t gfCutNumber = 0;
+static uint8_t gfResidentCut[4];
 
-static char fmv_to_play[2] = { 0, 0 };
-static char num_fmvs = 0;
+static int8_t fmv_to_play[2] = { 0, 0 };
+static int8_t num_fmvs = 0;
 
 /*misc*/
 
@@ -200,13 +198,11 @@ int CalculateTextIDForPuzzleItemName(int id) {
 	return off_id;
 }
 
-void DoGameflow()
-{
-	uchar* gf;
-	uchar n;
+void DoGameflow() {
+	uint8_t* gf;
+	uint8_t n;
 
-	if (!get_game_mod_global_info()->tr_times_exclusive)
-	{
+	if (!get_game_mod_global_info()->tr_times_exclusive) {
 		PlayFmvNow(0);
 	}
 	do_boot_screen(Gameflow->Language);
@@ -216,281 +212,270 @@ void DoGameflow()
 	gfCurrentLevel = Gameflow->TitleEnabled ? 0 : 1;
 	gf = &gfScriptWad[gfScriptOffset[gfCurrentLevel]];
 
-	while (1)
-	{
-		switch (n = *gf++)
-		{
-		case CMD_FMV:
-			if (!get_game_mod_global_info()->tr_times_exclusive)
-			{
-				fmv_to_play[num_fmvs] = gf[0];
-				num_fmvs++;
-			}
-			gf++;
-			break;
-
-		case CMD_LEVEL:
-			gfLevelFlags = gf[1] | (gf[2] << 8);
-
-			// Tomb4Plus
-			InitFont();
-
-			if (!(gfLevelFlags & GF_NOLEVEL))
-				DoLevel(gf[3], gf[4]);
-			else
-			{
-				gfStatus = 999;
-				gfCurrentLevel++;
-			}
-
-			gfLegendTime = 0;
-			LaserSight = 0;
-			BinocularRange = 0;
-			gfResidentCut[0] = 0;
-			gfResidentCut[1] = 0;
-			gfResidentCut[2] = 0;
-			gfResidentCut[3] = 0;
-			gfUVRotate = 0;
-			gfNumMips = 0;
-			gfMirrorRoom = -1;
-			SetDistanceFogColor(0, 0, 0);
-			SetVolumetricFogColor(0, 0, 0);
-
-			switch (gfStatus)
-			{
-			case 1:
-				gfInitialiseGame = 1;
-				gfCurrentLevel = Gameflow->TitleEnabled ? 0 : 1;
-				break;
-
-			case 2:
-				gfGameMode = GF_GAME_MODE_SAVEGAME;
-				gfCurrentLevel = savegame.CurrentLevel & 0x7F;
-				break;
-
-			case 3:
-
-				if (gfLevelFlags & GF_RESETHUB && gfLevelComplete == gfResetHubDest || skipped_level)
-				{
-					sgInitialiseHub(0);
-					skipped_level = 0;
+	while (1) {
+		switch (n = *gf++) {
+			case CMD_FMV:
+				if (!get_game_mod_global_info()->tr_times_exclusive) {
+					fmv_to_play[num_fmvs] = gf[0];
+					num_fmvs++;
 				}
-				else
-					sgSaveLevel();
+				gf++;
+				break;
 
-				if (Gameflow->DemoDisc || Gameflow->nLevels == 2)
-					gfCurrentLevel = 0;
-				else
-				{
-					if (gfLevelComplete > Gameflow->nLevels)
-						gfCurrentLevel = 0;
-					else
+			case CMD_LEVEL:
+				gfLevelFlags = gf[1] | (gf[2] << 8);
+
+				// Tomb4Plus
+				InitFont();
+
+				if (!(gfLevelFlags & GF_NOLEVEL))
+					DoLevel(gf[3], gf[4]);
+				else {
+					gfStatus = 999;
+					gfCurrentLevel++;
+				}
+
+				gfLegendTime = 0;
+				LaserSight = 0;
+				BinocularRange = 0;
+				gfResidentCut[0] = 0;
+				gfResidentCut[1] = 0;
+				gfResidentCut[2] = 0;
+				gfResidentCut[3] = 0;
+				gfUVRotate = 0;
+				gfNumMips = 0;
+				gfMirrorRoom = -1;
+				SetDistanceFogColor(0, 0, 0);
+				SetVolumetricFogColor(0, 0, 0);
+
+				switch (gfStatus) {
+					case 1:
+						gfInitialiseGame = 1;
+						gfCurrentLevel = Gameflow->TitleEnabled ? 0 : 1;
+						break;
+
+					case 2:
+						gfGameMode = GF_GAME_MODE_SAVEGAME;
+						gfCurrentLevel = savegame.CurrentLevel & 0x7F;
+						break;
+
+					case 3:
+
+						if (gfLevelFlags & GF_RESETHUB && gfLevelComplete == gfResetHubDest || skipped_level) {
+							sgInitialiseHub(0);
+							skipped_level = 0;
+						} else
+							sgSaveLevel();
+
+						if (Gameflow->DemoDisc || Gameflow->nLevels == 2)
+							gfCurrentLevel = 0;
+						else {
+							if (gfLevelComplete > Gameflow->nLevels)
+								gfCurrentLevel = 0;
+							else
+								gfCurrentLevel = gfLevelComplete;
+						}
+
+						break;
+
+					case 4:
+						return;
+				}
+
+				gf = &gfScriptWad[gfScriptOffset[gfCurrentLevel]];
+				break;
+
+			case CMD_TITLE:
+				gfLevelFlags = gf[0] | (gf[1] << 8);
+
+				// Tomb4Plus
+				InitFont();
+
+				DoTitle(gf[2], gf[3]);
+				gfResidentCut[0] = 0;
+				gfResidentCut[1] = 0;
+				gfResidentCut[2] = 0;
+				gfResidentCut[3] = 0;
+				gfUVRotate = 0;
+				gfNumMips = 0;
+				gfMirrorRoom = -1;
+
+				switch (gfStatus) {
+					case 2:
+						gfGameMode = GF_GAME_MODE_SAVEGAME;
+						gfCurrentLevel = savegame.CurrentLevel & 0x7F;
+						break;
+
+					case 3:
+						gfGameMode = GF_GAME_MODE_LEVEL;
 						gfCurrentLevel = gfLevelComplete;
+						gfInitialiseGame = 1;
+						break;
+
+					case 4:
+						return;
 				}
 
+				gf = &gfScriptWad[gfScriptOffset[gfCurrentLevel]];
 				break;
 
-			case 4:
-				return;
-			}
+			case CMD_ENDSEQ:
+				continue;
 
-			gf = &gfScriptWad[gfScriptOffset[gfCurrentLevel]];
-			break;
-
-		case CMD_TITLE:
-			gfLevelFlags = gf[0] | (gf[1] << 8);
-
-			// Tomb4Plus
-			InitFont();
-
-			DoTitle(gf[2], gf[3]);
-			gfResidentCut[0] = 0;
-			gfResidentCut[1] = 0;
-			gfResidentCut[2] = 0;
-			gfResidentCut[3] = 0;
-			gfUVRotate = 0;
-			gfNumMips = 0;
-			gfMirrorRoom = -1;
-
-			switch (gfStatus)
-			{
-			case 2:
-				gfGameMode = GF_GAME_MODE_SAVEGAME;
-				gfCurrentLevel = savegame.CurrentLevel & 0x7F;
+			case CMD_PLAYCUT:
+				gfCutNumber = gf[0];
+				gf++;
 				break;
 
-			case 3:
-				gfGameMode = GF_GAME_MODE_LEVEL;
-				gfCurrentLevel = gfLevelComplete;
-				gfInitialiseGame = 1;
+			case CMD_CUT1:
+				gfResidentCut[0] = gf[0];
+				gf++;
 				break;
 
-			case 4:
-				return;
-			}
+			case CMD_CUT2:
+				gfResidentCut[1] = gf[0];
+				gf++;
+				break;
 
-			gf = &gfScriptWad[gfScriptOffset[gfCurrentLevel]];
-			break;
+			case CMD_CUT3:
+				gfResidentCut[2] = gf[0];
+				gf++;
+				break;
 
-		case CMD_ENDSEQ:
-			continue;
+			case CMD_CUT4:
+				gfResidentCut[3] = gf[0];
+				gf++;
+				break;
 
-		case CMD_PLAYCUT:
-			gfCutNumber = gf[0];
-			gf++;
-			break;
+			case CMD_LAYER1:
+				LightningRGB[0] = gf[0];
+				LightningRGBs[0] = gf[0];
+				gfLayer1Col.r = gf[0];
 
-		case CMD_CUT1:
-			gfResidentCut[0] = gf[0];
-			gf++;
-			break;
+				LightningRGB[1] = gf[1];
+				LightningRGBs[1] = gf[1];
+				gfLayer1Col.g = gf[1];
 
-		case CMD_CUT2:
-			gfResidentCut[1] = gf[0];
-			gf++;
-			break;
+				LightningRGB[2] = gf[2];
+				LightningRGBs[2] = gf[2];
+				gfLayer1Col.b = gf[2];
 
-		case CMD_CUT3:
-			gfResidentCut[2] = gf[0];
-			gf++;
-			break;
+				gfLayer1Vel = gf[3];
+				gf += 4;
+				break;
 
-		case CMD_CUT4:
-			gfResidentCut[3] = gf[0];
-			gf++;
-			break;
+			case CMD_LAYER2:
+				LightningRGB[0] = gf[0];
+				LightningRGBs[0] = gf[0];
+				gfLayer2Col.r = gf[0];
 
-		case CMD_LAYER1:
-			LightningRGB[0] = gf[0];
-			LightningRGBs[0] = gf[0];
-			gfLayer1Col.r = gf[0];
+				LightningRGB[1] = gf[1];
+				LightningRGBs[1] = gf[1];
+				gfLayer2Col.g = gf[1];
 
-			LightningRGB[1] = gf[1];
-			LightningRGBs[1] = gf[1];
-			gfLayer1Col.g = gf[1];
+				LightningRGB[2] = gf[2];
+				LightningRGBs[2] = gf[2];
+				gfLayer2Col.b = gf[2];
 
-			LightningRGB[2] = gf[2];
-			LightningRGBs[2] = gf[2];
-			gfLayer1Col.b = gf[2];
+				gfLayer2Vel = gf[3];
+				gf += 4;
+				break;
 
-			gfLayer1Vel = gf[3];
-			gf += 4;
-			break;
+			case CMD_UVROT:
+				gfUVRotate = gf[0];
+				gf++;
+				break;
 
-		case CMD_LAYER2:
-			LightningRGB[0] = gf[0];
-			LightningRGBs[0] = gf[0];
-			gfLayer2Col.r = gf[0];
+			case CMD_LEGEND:
+				gfLegend = gf[0];
+				gf++;
 
-			LightningRGB[1] = gf[1];
-			LightningRGBs[1] = gf[1];
-			gfLayer2Col.g = gf[1];
+				if (gfGameMode != GF_GAME_MODE_SAVEGAME)
+					gfLegendTime = get_game_mod_level_misc_info(gfCurrentLevel)->legend_timer;
 
-			LightningRGB[2] = gf[2];
-			LightningRGBs[2] = gf[2];
-			gfLayer2Col.b = gf[2];
+				break;
 
-			gfLayer2Vel = gf[3];
-			gf += 4;
-			break;
+			case CMD_LENSFLARE:
+				gfLensFlare.x = ((gf[1] << 8) | gf[0]) << 8;
+				gfLensFlare.y = int16_t((gf[3] << 8) | gf[2]) << 8;
+				gfLensFlare.z = ((gf[5] << 8) | gf[4]) << 8;
+				gfLensFlareColour.r = gf[6];
+				gfLensFlareColour.g = gf[7];
+				gfLensFlareColour.b = gf[8];
+				gf += 9;
+				break;
 
-		case CMD_UVROT:
-			gfUVRotate = gf[0];
-			gf++;
-			break;
+			case CMD_MIRROR:
+				gfMirrorRoom = gf[0];
+				gfMirrorZPlane = (gf[4] << 24) | (gf[3] << 16) | (gf[2] << 8) | gf[1];
+				gf += 5;
+				break;
 
-		case CMD_LEGEND:
-			gfLegend = gf[0];
-			gf++;
+			case CMD_FOG:
+				SetDistanceFogColor(gf[0], gf[1], gf[2]);
+				SetVolumetricFogColor(gf[0], gf[1], gf[2]);
 
-			if (gfGameMode != GF_GAME_MODE_SAVEGAME)
-				gfLegendTime = get_game_mod_level_misc_info(gfCurrentLevel)->legend_timer;
+				gf += 3;
+				break;
 
-			break;
+			case CMD_ANIMATINGMIP:
+				gfMips[gfNumMips] = gf[0];
+				gfNumMips++;
+				gf++;
+				break;
 
-		case CMD_LENSFLARE:
-			gfLensFlare.x = ((gf[1] << 8) | gf[0]) << 8;
-			gfLensFlare.y = short((gf[3] << 8) | gf[2]) << 8;
-			gfLensFlare.z = ((gf[5] << 8) | gf[4]) << 8;
-			gfLensFlareColour.r = gf[6];
-			gfLensFlareColour.g = gf[7];
-			gfLensFlareColour.b = gf[8];
-			gf += 9;
-			break;
+			case CMD_CAMERA:
+				gfLoadCam.x = (gf[3] << 24) | (gf[2] << 16) | (gf[1] << 8) | gf[0];
+				gfLoadCam.y = (gf[7] << 24) | (gf[6] << 16) | (gf[5] << 8) | gf[4];
+				gfLoadCam.z = (gf[11] << 24) | (gf[10] << 16) | (gf[9] << 8) | gf[8];
+				gfLoadTarget.x = (gf[15] << 24) | (gf[14] << 16) | (gf[13] << 8) | gf[12];
+				gfLoadTarget.y = (gf[19] << 24) | (gf[18] << 16) | (gf[17] << 8) | gf[16];
+				gfLoadTarget.z = (gf[23] << 24) | (gf[22] << 16) | (gf[21] << 8) | gf[20];
+				gfLoadRoom = gf[24];
+				gf += 25;
+				break;
 
-		case CMD_MIRROR:
-			gfMirrorRoom = gf[0];
-			gfMirrorZPlane = (gf[4] << 24) | (gf[3] << 16) | (gf[2] << 8) | gf[1];
-			gf += 5;
-			break;
+			case CMD_RESETHUB:
+				gfResetHubDest = gf[0];
+				gf++;
+				break;
 
-		case CMD_FOG:
-			SetDistanceFogColor(gf[0], gf[1], gf[2]);
-			SetVolumetricFogColor(gf[0], gf[1], gf[2]);
+			default:
+				if (n >= CMD_KEY1 && n <= CMD_KEY12)
+					n -= 82;
+				else if (n >= CMD_PUZZLE1 && n <= CMD_PUZZLE12)
+					n -= 122;
+				else if (n >= CMD_PICKUP1 && n <= CMD_PICKUP4)
+					n -= 78;
+				else if (n >= CMD_EXAMINE1 && n <= CMD_EXAMINE3)
+					n -= 59;
+				else if (n >= CMD_KEYCOMBO1_1 && n <= CMD_KEYCOMBO8_2)
+					n -= 101;
+				else if (n >= CMD_PUZZLECOMBO1_1 && n <= CMD_PUZZLECOMBO8_2)
+					n += 111;
+				else if (n >= CMD_PICKUPCOMBO1_1 && n <= CMD_PICKUPCOMBO4_2)
+					n -= 113;
 
-			gf += 3;
-			break;
-
-		case CMD_ANIMATINGMIP:
-			gfMips[gfNumMips] = gf[0];
-			gfNumMips++;
-			gf++;
-			break;
-
-		case CMD_CAMERA:
-			gfLoadCam.x = (gf[3] << 24) | (gf[2] << 16) | (gf[1] << 8) | gf[0];
-			gfLoadCam.y = (gf[7] << 24) | (gf[6] << 16) | (gf[5] << 8) | gf[4];
-			gfLoadCam.z = (gf[11] << 24) | (gf[10] << 16) | (gf[9] << 8) | gf[8];
-			gfLoadTarget.x = (gf[15] << 24) | (gf[14] << 16) | (gf[13] << 8) | gf[12];
-			gfLoadTarget.y = (gf[19] << 24) | (gf[18] << 16) | (gf[17] << 8) | gf[16];
-			gfLoadTarget.z = (gf[23] << 24) | (gf[22] << 16) | (gf[21] << 8) | gf[20];
-			gfLoadRoom = gf[24];
-			gf += 25;
-			break;
-
-		case CMD_RESETHUB:
-			gfResetHubDest = gf[0];
-			gf++;
-			break;
-
-		default:
-			if (n >= CMD_KEY1 && n <= CMD_KEY12)
-				n -= 82;
-			else if (n >= CMD_PUZZLE1 && n <= CMD_PUZZLE12)
-				n -= 122;
-			else if (n >= CMD_PICKUP1 && n <= CMD_PICKUP4)
-				n -= 78;
-			else if (n >= CMD_EXAMINE1 && n <= CMD_EXAMINE3)
-				n -= 59;
-			else if (n >= CMD_KEYCOMBO1_1 && n <= CMD_KEYCOMBO8_2)
-				n -= 101;
-			else if (n >= CMD_PUZZLECOMBO1_1 && n <= CMD_PUZZLECOMBO8_2)
-				n += 111;
-			else if (n >= CMD_PICKUPCOMBO1_1 && n <= CMD_PICKUPCOMBO4_2)
-				n -= 113;
-
-			inventry_objects_list[n].objname = CalculateTextIDForPuzzleItemName(gf[0] | (gf[1] << 8));
-			inventry_objects_list[n].yoff = gf[2] | (gf[3] << 8);
-			inventry_objects_list[n].scale1 = gf[4] | (gf[5] << 8);
-			inventry_objects_list[n].yrot = gf[6] | (gf[7] << 8);
-			inventry_objects_list[n].xrot = gf[8] | (gf[9] << 8);
-			inventry_objects_list[n].zrot = gf[10] | (gf[11] << 8);
-			inventry_objects_list[n].flags = gf[12] | (gf[13] << 8);
-			gf += 14;
-			break;
+				inventry_objects_list[n].objname = CalculateTextIDForPuzzleItemName(gf[0] | (gf[1] << 8));
+				inventry_objects_list[n].yoff = gf[2] | (gf[3] << 8);
+				inventry_objects_list[n].scale1 = gf[4] | (gf[5] << 8);
+				inventry_objects_list[n].yrot = gf[6] | (gf[7] << 8);
+				inventry_objects_list[n].xrot = gf[8] | (gf[9] << 8);
+				inventry_objects_list[n].zrot = gf[10] | (gf[11] << 8);
+				inventry_objects_list[n].flags = gf[12] | (gf[13] << 8);
+				gf += 14;
+				break;
 		}
 	}
 }
 
-void DoLevel(uchar Name, uchar Audio)
-{
-	long gamestatus;
+void DoLevel(uint8_t Name, uint8_t Audio) {
+	int32_t gamestatus;
 
 	gamestatus = 0;
 	SetFade(255, 0);
 
-	if (gfGameMode != GF_GAME_MODE_SAVEGAME)
-	{
+	if (gfGameMode != GF_GAME_MODE_SAVEGAME) {
 		savegame.Level.Timer = 0;
 		savegame.Level.Distance = 0;
 		savegame.Level.AmmoUsed = 0;
@@ -576,8 +561,7 @@ void DoLevel(uchar Name, uchar Audio)
 	dbinput = 0;
 	JustLoaded = false;
 
-	while (!gfStatus)
-	{
+	while (!gfStatus) {
 		S_AudioUpdate();
 
 		S_InitialisePolyList();
@@ -636,10 +620,8 @@ void DoLevel(uchar Name, uchar Audio)
 	S_CDStop();
 
 #ifndef TIMES_LEVEL
-	if (gfStatus == 3)
-	{
-		if (fmv_to_play[0] & 0x80)
-		{
+	if (gfStatus == 3) {
+		if (fmv_to_play[0] & 0x80) {
 			if ((fmv_to_play[0] & 0x7F) == 9 && gfLevelComplete != 10)
 				fmv_to_play[0] = 0;
 
@@ -647,8 +629,7 @@ void DoLevel(uchar Name, uchar Audio)
 				fmv_to_play[0] = 0;
 		}
 
-		if (!fmv_to_play[0] || PlayFmvNow(fmv_to_play[0] & 0x7F) != 2)
-		{
+		if (!fmv_to_play[0] || PlayFmvNow(fmv_to_play[0] & 0x7F) != 2) {
 			if (fmv_to_play[1])
 				PlayFmvNow(fmv_to_play[1] & 0x7F);
 		}
@@ -663,10 +644,8 @@ void DoLevel(uchar Name, uchar Audio)
 	lara.examine3 = 0;
 	RenderLoadPic(0);
 
-	if (gfStatus == 3)
-	{
-		if (gfLevelComplete == 39)
-		{
+	if (gfStatus == 3) {
+		if (gfLevelComplete == 39) {
 			input = 0;
 			reset_flag = 0;
 			gfStatus = 1;
@@ -682,25 +661,22 @@ void DoLevel(uchar Name, uchar Audio)
 	reset_flag = 0;
 }
 
-long TitleOptions()
-{
-	static __int64 selection = 1;
-	static __int64 selection_bak = 0;
-	__int64 flag, sel;
-	long nLevels, nFirst, lp;
-	long ret, n, load, y;
-	static long load_or_new;
-	static long goto_level;
-	static long menu = 0;	//0 main menu, 1 level select, 2 the reload menu, 3 the options menu
+int32_t TitleOptions() {
+	static int64_t selection = 1;
+	static int64_t selection_bak = 0;
+	int64_t flag, sel;
+	int32_t nLevels, nFirst, lp;
+	int32_t ret, n, load, y;
+	static int32_t load_or_new;
+	static int32_t goto_level;
+	static int32_t menu = 0;	//0 main menu, 1 level select, 2 the reload menu, 3 the options menu
 
 	ret = 0;
 
-	if (load_or_new)
-	{
-		if (DoFade == 2)
-		{
+	if (load_or_new) {
+		if (DoFade == 2) {
 			ret = load_or_new;
-			gfLevelComplete = (uchar)goto_level;
+			gfLevelComplete = (uint8_t)goto_level;
 			goto_level = 0;
 			load_or_new = 0;
 			return ret;
@@ -710,106 +686,92 @@ long TitleOptions()
 		dbinput = 0;
 	}
 
-	if (bDoCredits)
-	{
+	if (bDoCredits) {
 		if (DoCredits())
 			return 0;
 
 		bDoCredits = 0;
 	}
 
-	switch (menu)
-	{
-	case 1:
-		PrintString(phd_centerx, font_height + phd_winymin, 6, GetFixedStringForTextID(TXT_Select_Level), FF_CENTER);
+	switch (menu) {
+		case 1:
+			PrintString(phd_centerx, font_height + phd_winymin, 6, GetFixedStringForTextID(TXT_Select_Level), FF_CENTER);
 
-		if (Gameflow->nLevels < 10)
-		{
-			nFirst = 1;
-			nLevels = Gameflow->nLevels - 1;
-		}
-		else
-		{
-			sel = selection;
-			n = 0;
-			nLevels = 10;
-
-			while (sel)
-			{
-				sel >>= 1;
-				n++;
-			}
-
-			nFirst = n - 9;
-
-			if (nFirst < 1)
+			if (Gameflow->nLevels < 10) {
 				nFirst = 1;
-			else if (nFirst > 1)
-			{
-				PrintString(32, 3 * font_height + phd_winymin, 6, "\x18", 0);
-				PrintString(phd_winxmax - 48, 3 * font_height + phd_winymin, 6, "\x18", 0);
+				nLevels = Gameflow->nLevels - 1;
+			} else {
+				sel = selection;
+				n = 0;
+				nLevels = 10;
+
+				while (sel) {
+					sel >>= 1;
+					n++;
+				}
+
+				nFirst = n - 9;
+
+				if (nFirst < 1)
+					nFirst = 1;
+				else if (nFirst > 1) {
+					PrintString(32, 3 * font_height + phd_winymin, 6, "\x18", 0);
+					PrintString(phd_winxmax - 48, 3 * font_height + phd_winymin, 6, "\x18", 0);
+				}
+
+				if (n != Gameflow->nLevels - 1) {
+					PrintString(32, 12 * font_height + phd_winymin, 6, "\x1a", 0);
+					PrintString(phd_winxmax - 48, 12 * font_height + phd_winymin, 6, "\x1a", 0);
+				}
 			}
 
-			if (n != Gameflow->nLevels - 1)
-			{
-				PrintString(32, 12 * font_height + phd_winymin, 6, "\x1a", 0);
-				PrintString(phd_winxmax - 48, 12 * font_height + phd_winymin, 6, "\x1a", 0);
-			}
-		}
+			y = 2 * font_height;
 
-		y = 2 * font_height;
-
-		for (lp = nFirst; lp < nLevels + nFirst; lp++)
-		{
-			y += font_height;
-			PrintString(phd_centerx, y, selection & (1i64 << (lp - 1)) ? 1 : 2, GetCustomStringForTextID(gfLevelNames[lp]), FF_CENTER);
-		}
-
-		flag = 1i64 << (Gameflow->nLevels - 2);
-		break;
-	case 2:
-		if (Gameflow->LoadSaveEnabled)
-		{
-			load = DoLoadSave(IN_LOAD);
-
-			if (load >= 0)
-			{
-				S_LoadGame(load);
-				ret = 2;
+			for (lp = nFirst; lp < nLevels + nFirst; lp++) {
+				y += font_height;
+				PrintString(phd_centerx, y, selection & ((int64_t)1 << (lp - 1)) ? 1 : 2, GetCustomStringForTextID(gfLevelNames[lp]), FF_CENTER);
 			}
 
+			flag = (int64_t)1 << (Gameflow->nLevels - 2);
 			break;
-		}
+		case 2:
+			if (Gameflow->LoadSaveEnabled) {
+				load = DoLoadSave(IN_LOAD);
 
-		SoundEffect(SFX_LARA_NO, 0, SFX_ALWAYS);
-		menu = 0;
-		break;
-	case 0:
-		ShowTitle();
-		Chris_Menu = 0;
-		PrintString(phd_centerx, phd_winymax - 4 * font_height, (selection & 1) ? 1 : 2, GetFixedStringForTextID(TXT_New_Game), FF_CENTER);
-		PrintString(phd_centerx, phd_winymax - 3 * font_height, (selection & 2) ? 1 : 2, GetFixedStringForTextID(TXT_Load_Game), FF_CENTER);
-		PrintString(phd_centerx, phd_winymax - 2 * font_height, (selection & 4) ? 1 : 2, GetFixedStringForTextID(TXT_Options), FF_CENTER);
-		PrintString(phd_centerx, phd_winymax - 1 * font_height, (selection & 8) ? 1 : 2, GetFixedStringForTextID(TXT_Exit), FF_CENTER);
-		flag = 8;
-		break;
-	case 3:
-		DoOptions();
-		break;
+				if (load >= 0) {
+					S_LoadGame(load);
+					ret = 2;
+				}
+
+				break;
+			}
+
+			SoundEffect(SFX_LARA_NO, 0, SFX_ALWAYS);
+			menu = 0;
+			break;
+		case 0:
+			ShowTitle();
+			Chris_Menu = 0;
+			PrintString(phd_centerx, phd_winymax - 4 * font_height, (selection & 1) ? 1 : 2, GetFixedStringForTextID(TXT_New_Game), FF_CENTER);
+			PrintString(phd_centerx, phd_winymax - 3 * font_height, (selection & 2) ? 1 : 2, GetFixedStringForTextID(TXT_Load_Game), FF_CENTER);
+			PrintString(phd_centerx, phd_winymax - 2 * font_height, (selection & 4) ? 1 : 2, GetFixedStringForTextID(TXT_Options), FF_CENTER);
+			PrintString(phd_centerx, phd_winymax - 1 * font_height, (selection & 8) ? 1 : 2, GetFixedStringForTextID(TXT_Exit), FF_CENTER);
+			flag = 8;
+			break;
+		case 3:
+			DoOptions();
+			break;
 	}
 
-	if (menu < 2)
-	{
-		if (dbinput & IN_FORWARD)
-		{
+	if (menu < 2) {
+		if (dbinput & IN_FORWARD) {
 			if (selection > 1)
 				selection >>= 1;
 
 			SoundEffect(SFX_MENU_CHOOSE, 0, SFX_ALWAYS);
 		}
 
-		if (dbinput & IN_BACK)
-		{
+		if (dbinput & IN_BACK) {
 			if (selection < flag)
 				selection <<= 1;
 
@@ -817,68 +779,57 @@ long TitleOptions()
 		}
 	}
 
-	if (dbinput & IN_DESELECT && menu > 0)
-	{
+	if (dbinput & IN_DESELECT && menu > 0) {
 		menu = 0;
 		selection = selection_bak;
 		S_SoundStopAllSamples();
 		SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 	}
 
-	if (dbinput & IN_SELECT && !IsKeyPressed(T4P_KEY_LALT) && menu < 2)
-	{
+	if (dbinput & IN_SELECT && !IsKeyPressed(T4P_KEY_LALT) && menu < 2) {
 		SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
 
-		if (!menu)
-		{
-			if (selection > 0 && selection <= 8)
-			{
-				switch (selection)
-				{
-				case 1:
-					if (Gameflow->PlayAnyLevel || tomb4.cheats)
-					{
+		if (!menu) {
+			if (selection > 0 && selection <= 8) {
+				switch (selection) {
+					case 1:
+						if (Gameflow->PlayAnyLevel || tomb4.cheats) {
+							selection_bak = selection;
+							menu = 1;
+						} else {
+							gfLevelComplete = 1;
+							ret = 3;
+						}
+
+						break;
+
+					case 2:
+						GetSaveLoadFiles();
 						selection_bak = selection;
-						menu = 1;
-					}
-					else
-					{
-						gfLevelComplete = 1;
-						ret = 3;
-					}
+						menu = 2;
+						break;
 
-					break;
+					case 3:
+					case 5:
+					case 6:
+					case 7:
+						break;
 
-				case 2:
-					GetSaveLoadFiles();
-					selection_bak = selection;
-					menu = 2;
-					break;
+					case 4:
+						selection_bak = selection;
+						menu = 3;
+						break;
 
-				case 3:
-				case 5:
-				case 6:
-				case 7:
-					break;
-
-				case 4:
-					selection_bak = selection;
-					menu = 3;
-					break;
-
-				case 8:
-					ret = 4;
-					break;
+					case 8:
+						ret = 4;
+						break;
 				}
 			}
-		}
-		else if (menu == 1)
-		{
+		} else if (menu == 1) {
 			gfLevelComplete = 0;
 			sel = selection;
 
-			while (sel)
-			{
+			while (sel) {
 				sel >>= 1;
 				gfLevelComplete++;
 			}
@@ -890,8 +841,7 @@ long TitleOptions()
 	if (MainThread.ended)
 		return 4;
 
-	if (ret)
-	{
+	if (ret) {
 		load_or_new = ret;
 		goto_level = gfLevelComplete;
 		gfLevelComplete = 0;
@@ -902,8 +852,7 @@ long TitleOptions()
 	return ret;
 }
 
-void DoTitle(uchar Name, uchar Audio)
-{
+void DoTitle(uint8_t Name, uint8_t Audio) {
 	SetFade(255, 0);
 	num_fmvs = 0;
 	fmv_to_play[1] = 0;
@@ -944,17 +893,14 @@ void DoTitle(uchar Name, uchar Audio)
 	T4PlusLevelReset();
 	T4PlusEnterLevel(gfCurrentLevel, true);
 
-	if (bDoCredits)
-	{
+	if (bDoCredits) {
 		cutseq_num = 28;
 		SetFadeClip(32, 1);
 		ScreenFadedOut = 1;
 		ScreenFade = 255;
 		dScreenFade = 255;
 		S_CDPlay(98, 1);
-	}
-	else
-	{
+	} else {
 		InitialiseSpotCam(1);
 		ScreenFadedOut = 0;
 		ScreenFade = 0;
@@ -982,8 +928,7 @@ void DoTitle(uchar Name, uchar Audio)
 	gfStatus = ControlPhase(2, 0);
 	JustLoaded = false;
 
-	while (!gfStatus)
-	{
+	while (!gfStatus) {
 		S_AudioUpdate();
 
 		S_InitialisePolyList();
@@ -1002,8 +947,7 @@ void DoTitle(uchar Name, uchar Audio)
 	bUseSpotCam = 0;
 	bDisableLaraControl = 0;
 
-	if (!get_game_mod_global_info()->tr_level_editor && !get_game_mod_global_info()->tr_times_exclusive)
-	{
+	if (!get_game_mod_global_info()->tr_level_editor && !get_game_mod_global_info()->tr_times_exclusive) {
 		if (gfLevelComplete == 1 && gfStatus != 2)
 			PlayFmvNow(12);
 	}
@@ -1014,50 +958,48 @@ void DoTitle(uchar Name, uchar Audio)
 	input = 0;
 }
 
-void LoadGameflow()
-{
+void LoadGameflow() {
 	STRINGHEADER sh;
-	uchar* n;
+	uint8_t* n;
 	char* s;
 	char* d;
 	int l;
-	long end;
+	int32_t end;
 
 	s = 0;
-	size_t gameflow_len = LoadFile("SCRIPT.DAT", &s);
+	size_t gameflow_len = T4PLoadFileAtRelativePath("SCRIPT.DAT", &s);
 	if (gameflow_len == 0) {
 		platform_fatal_error("Failed to load SCRIPT.DAT");
 		return;
 	}
 
-	NGScriptInit(s, gameflow_len - (sizeof(unsigned int) * 2), gameflow_len);
+	NGScriptInit(s, gameflow_len - (sizeof(uint32_t) * 2), gameflow_len);
 
-	gfScriptFile = (uchar*)s;
+	gfScriptFile = (uint8_t*)s;
 
 	Gameflow = (GAMEFLOW*)s;
+
 	s += sizeof(GAMEFLOW);
 
 	gfExtensions = s;	//"[PCExtensions]"
 	s += 40;
 
-	gfFilenameOffset = (ushort*)s;
-	s += sizeof(ushort) * Gameflow->nFileNames;
+	gfFilenameOffset = (uint16_t*)s;
+	s += sizeof(uint16_t) * Gameflow->nFileNames;
 
 	gfFilenameWad = s;
 	s += Gameflow->FileNameLen;
 
-	gfScriptOffset = (ushort*)s;
-	s += sizeof(ushort) * Gameflow->nLevels;
+	gfScriptOffset = (uint16_t*)s;
+	s += sizeof(uint16_t) * Gameflow->nLevels;
 
-	gfScriptWad = (uchar*)s;
+	gfScriptWad = (uint8_t*)s;
 	s += Gameflow->ScriptLen;
 
 	size_t language_len = 0;
-	for (l = 0; l < LANGUAGE_COUNT; l++)
-	{
+	for (l = 0; l < LANGUAGE_COUNT; l++) {
 		d = 0;
-
-		language_len = LoadFile(s, &d);
+		language_len = T4PLoadFileAtRelativePath(s, &d);
 		if (language_len > 0)
 			break;
 
@@ -1069,10 +1011,10 @@ void LoadGameflow()
 		return;
 	}
 
-	NGReadNGExtraStrings((char*)d, language_len - (sizeof(unsigned int) * 2), language_len);
+	NGReadNGExtraStrings((char*)d, language_len - (sizeof(uint32_t) * 2), language_len);
 
-	gfStringOffset = (ushort*)d;
-	gfLanguageFile = (uchar*)d;
+	gfStringOffset = (uint16_t*)d;
+	gfLanguageFile = (uint8_t*)d;
 	Gameflow->Language = l;
 
 	int NumberOfStrings = TXT_NUM_STRINGS;
@@ -1084,16 +1026,15 @@ void LoadGameflow()
 	}
 
 	memcpy(&sh, gfStringOffset, sizeof(STRINGHEADER));
-	memcpy(gfStringOffset, gfStringOffset + (sizeof(STRINGHEADER) / sizeof(ushort)), NumberOfStrings * sizeof(ushort));
+	memcpy(gfStringOffset, gfStringOffset + (sizeof(STRINGHEADER) / sizeof(uint16_t)), NumberOfStrings * sizeof(uint16_t));
 
 
 	gfStringWad = (char*)(gfStringOffset + NumberOfStrings);
 	memcpy(gfStringOffset + NumberOfStrings,
-		gfStringOffset + NumberOfStrings + (sizeof(STRINGHEADER) / sizeof(ushort)),
-		sh.StringWadLen + sh.PCStringWadLen + sh.PSXStringWadLen);
+	       gfStringOffset + NumberOfStrings + (sizeof(STRINGHEADER) / sizeof(uint16_t)),
+	       sh.StringWadLen + sh.PCStringWadLen + sh.PSXStringWadLen);
 
-	for (int i = 0; i < NumberOfStrings - 1; i++)
-	{
+	for (int i = 0; i < NumberOfStrings - 1; i++) {
 		s = &gfStringWad[gfStringOffset[i]];
 		d = &gfStringWad[gfStringOffset[i + 1]];
 		l = int(d - s - 1);
@@ -1104,106 +1045,99 @@ void LoadGameflow()
 
 	uint32_t detected_level_count = 0;
 
-	for (int i = 0; i < Gameflow->nLevels; i++)
-	{
+	for (int i = 0; i < Gameflow->nLevels; i++) {
 		end = 0;
 		n = &gfScriptWad[gfScriptOffset[i]];
 
-		while (!end)
-		{
-			switch (*n++)
-			{
-			case CMD_FMV:
-			case CMD_PLAYCUT:
-			case CMD_CUT1:
-			case CMD_CUT2:
-			case CMD_CUT3:
-			case CMD_CUT4:
-			case CMD_UVROT:
-			case CMD_LEGEND:
-			case CMD_ANIMATINGMIP:
-			case CMD_RESETHUB:
-				n++;
-				break;
+		while (!end) {
+			switch (*n++) {
+				case CMD_FMV:
+				case CMD_PLAYCUT:
+				case CMD_CUT1:
+				case CMD_CUT2:
+				case CMD_CUT3:
+				case CMD_CUT4:
+				case CMD_UVROT:
+				case CMD_LEGEND:
+				case CMD_ANIMATINGMIP:
+				case CMD_RESETHUB:
+					n++;
+					break;
 
-			case CMD_FOG:
-				n += 3;
-				break;
+				case CMD_FOG:
+					n += 3;
+					break;
 
-			case CMD_TITLE:
-				gfLevelFilenames[i] = *(n + 2);
-				detected_level_count++;
-				n += 4;
-				break;
-			case CMD_LAYER1:
-			case CMD_LAYER2:
-				n += 4;
-				break;
+				case CMD_TITLE:
+					gfLevelFilenames[i] = *(n + 2);
+					detected_level_count++;
+					n += 4;
+					break;
+				case CMD_LAYER1:
+				case CMD_LAYER2:
+					n += 4;
+					break;
 
-			case CMD_MIRROR:
-				n += 5;
-				break;
+				case CMD_MIRROR:
+					n += 5;
+					break;
 
-			case CMD_LENSFLARE:
-				n += 9;
-				break;
+				case CMD_LENSFLARE:
+					n += 9;
+					break;
 
-			case CMD_CAMERA:
-				n += 25;
-				break;
+				case CMD_CAMERA:
+					n += 25;
+					break;
 
-			case CMD_LEVEL: {
-				ushort level_flags = *(n + 1) | (*(n + 2) << 8);
-				
-				gfLevelNames[i] = *n;
-				if (!(level_flags & GF_NOLEVEL))
-					gfLevelFilenames[i] = *(n + 3);
-				else
-					gfLevelFilenames[i] = -1;
+				case CMD_LEVEL: {
+					uint16_t level_flags = *(n + 1) | (*(n + 2) << 8);
 
-				detected_level_count++;
-				n += 5;
-				break;
-			}
-			case CMD_ENDSEQ:
-				end = 1;
-				break;
+					gfLevelNames[i] = *n;
+					if (!(level_flags & GF_NOLEVEL))
+						gfLevelFilenames[i] = *(n + 3);
+					else
+						gfLevelFilenames[i] = -1;
 
-			default:
-				n += 2;
-				break;
+					detected_level_count++;
+					n += 5;
+					break;
+				}
+				case CMD_ENDSEQ:
+					end = 1;
+					break;
+
+				default:
+					n += 2;
+					break;
 			}
 		}
 		s = (char *)n;
 	}
 
 	NGPreloadAllLevelInfo(detected_level_count);
-	NGReadNGGameflowInfo((char*)gfScriptFile, gameflow_len - (sizeof(unsigned int) * 2), gameflow_len);
+	NGReadNGGameflowInfo((char*)gfScriptFile, gameflow_len - (sizeof(uint32_t) * 2), gameflow_len);
 }
 
-long DoCredits()
-{
+int32_t DoCredits() {
 	const char* s;
-	static ulong StartPos = 0;
-	static long init = 0;
-	long y, num_drawn;
+	static uint32_t StartPos = 0;
+	static int32_t init = 0;
+	int32_t y, num_drawn;
 
 	num_drawn = 0;
 
-	if (!init)
-	{
+	if (!init) {
 		StartPos = font_height + phd_winheight;
 		init = 1;
 	}
 
 	y = StartPos;
 
-	for (int i = 0; i < sizeof(CreditsTable) / 4; i++)
-	{
+	for (int i = 0; i < sizeof(CreditsTable) / 4; i++) {
 		s = CreditsTable[i];
 
-		if (y < font_height + phd_winheight + 1 && y > -font_height)
-		{
+		if (y < font_height + phd_winheight + 1 && y > -font_height) {
 			if (*s == '%')
 				PrintString(phd_winwidth >> 1, y, 6, GetFixedStringForTextID(CreditGroups[atoi(s + 1)]), FF_CENTER);
 			else if (*s != '0')
