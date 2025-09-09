@@ -69,8 +69,8 @@ int8_t AccentTable[46][2] = {
 	{'~', ' '}
 };
 
-int custom_glyph_scale_width = 512;
-int custom_glyph_scale_height = 240;
+int32_t custom_glyph_scale_width = 512;
+int32_t custom_glyph_scale_height = 240;
 
 #pragma warning(push)
 #pragma warning(disable : 4838)
@@ -138,7 +138,7 @@ void InitFont() {
 	int16_t h, w, yoff;
 	uint8_t fr, fg, fb, tr, tg, tb;
 
-	for (int i = 0; i < 10; i++) {
+	for (int32_t i = 0; i < 10; i++) {
 		fr = ShadeFromTo[i][0].r;
 		fg = ShadeFromTo[i][0].g;
 		fb = ShadeFromTo[i][0].b;
@@ -146,7 +146,7 @@ void InitFont() {
 		tg = ShadeFromTo[i][1].g;
 		tb = ShadeFromTo[i][1].b;
 
-		for (int j = 0; j < 16; j++) {
+		for (int32_t j = 0; j < 16; j++) {
 			r = ((tr * j) >> 4) + ((fr * (16 - j)) >> 4);
 			g = ((tg * j) >> 4) + ((fg * (16 - j)) >> 4);
 			b = ((tb * j) >> 4) + ((fb * (16 - j)) >> 4);
@@ -181,7 +181,7 @@ void InitFont() {
 	}
 
 	if (init) {
-		for (int i = 0; i < 106; i++) {
+		for (int32_t i = 0; i < 106; i++) {
 			copy[i].h = CharDef[i].h;
 			copy[i].w = CharDef[i].w;
 			copy[i].y_offset = CharDef[i].y_offset;
@@ -190,7 +190,7 @@ void InitFont() {
 		init = 0;
 	}
 
-	for (int i = 0; i < 106; i++) {
+	for (int32_t i = 0; i < 106; i++) {
 		h = int16_t((float)copy[i].h * float(phd_winymax / 240.0F));
 		w = int16_t((float)copy[i].w * float(phd_winxmax / 512.0F));
 		yoff = int16_t((float)copy[i].y_offset * float(phd_winymax / 240.0F));
@@ -220,7 +220,7 @@ void UpdatePulseColour() {
 	c <<= 3;
 	CalcColorSplit(RGBONLY(c, c, c), &v.color);
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < 16; i++) {
 		r = CLRR(v.color);
 		g = CLRG(v.color);
 		b = CLRB(v.color);

@@ -200,7 +200,7 @@ void DoHarpyEffects(ITEM_INFO* item, int16_t item_number) {
 	GetJointAbsPosition(item, &lh, left_hand.mesh_num);
 
 	if (item->item_flags[0] >= 24 && item->item_flags[0] <= 47 && (GetRandomControl() & 0x1F) < item->item_flags[0]) {
-		for (int i = 0; i < 2; i++) {
+		for (int32_t i = 0; i < 2; i++) {
 			pos.x = (GetRandomControl() & 0x7FF) + rh.x - BLOCK_SIZE;
 			pos.y = (GetRandomControl() & 0x7FF) + rh.y - BLOCK_SIZE;
 			pos.z = (GetRandomControl() & 0x7FF) + rh.z - BLOCK_SIZE;
@@ -327,7 +327,7 @@ void HarpyControl(int16_t item_number) {
 		harpy->enemy = 0;
 		max_dist = 0x7FFFFFFF;
 
-		for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+		for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 			baddie = &baddie_slots[i];
 
 			if (baddie->item_num != NO_ITEM && baddie->item_num != item_number) {

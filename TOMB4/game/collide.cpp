@@ -81,7 +81,7 @@ int32_t GetCollidedObjects(ITEM_INFO* item, int32_t rad, int32_t noInvisible, IT
 	items_count = 0;
 
 	if (doors) {
-		for (int i = *doors++; i > 0; i--, doors += 16) {
+		for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 			for (j = 0; j < room_count; j++)
 				if (rooms[j] == *doors)
 					break;
@@ -94,7 +94,7 @@ int32_t GetCollidedObjects(ITEM_INFO* item, int32_t rad, int32_t noInvisible, IT
 	}
 
 	if (StoredStatics) {
-		for (int i = 0; i < room_count; i++) {
+		for (int32_t i = 0; i < room_count; i++) {
 			r = &room[rooms[i]];
 			mesh = r->mesh;
 
@@ -130,7 +130,7 @@ int32_t GetCollidedObjects(ITEM_INFO* item, int32_t rad, int32_t noInvisible, IT
 		StoredStatics[statics_count] = 0;
 	}
 
-	for (int i = 0; i < room_count; i++) {
+	for (int32_t i = 0; i < room_count; i++) {
 		item_number = room[rooms[i]].item_number;
 
 		while (item_number != NO_ITEM) {
@@ -349,8 +349,8 @@ void CreatureCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 int32_t FindGridShift(int32_t src, int32_t dst) {
 	int32_t srcw, dstw;
 
-	srcw = src >> 10;
-	dstw = dst >> 10;
+	srcw = src >> WALL_SHIFT;
+	dstw = dst >> WALL_SHIFT;
 
 	if (srcw == dstw)
 		return 0;
@@ -373,7 +373,7 @@ int16_t GetTiltType(FLOOR_INFO* floor, int32_t x, int32_t y, int32_t z) {
 			break;
 
 		r = &room[floor->pit_room];
-		floor = &r->floor[((z - r->z) >> 10) + (((x - r->x) >> 10) * r->x_size)];
+		floor = &r->floor[((z - r->z) >> WALL_SHIFT) + (((x - r->x) >> WALL_SHIFT) * r->x_size)];
 	}
 
 	if (y + 512 < floor->floor << 8)
@@ -872,7 +872,7 @@ bool ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int32_t spaz, 
 	coll->bad_ceiling = 0;
 	facing = coll->facing;
 	coll->facing = (int16_t)phd_atan(l->pos.z_pos - coll->old.z, l->pos.x_pos - coll->old.x);
-	GetCollisionInfo(coll, l->pos.x_pos, l->pos.y_pos, l->pos.z_pos, l->room_number, ((HALF_BLOCK_SIZE + CLICK_SIZE) - 6));
+	GetCollisionInfo(coll, l->pos.x_pos, l->pos.y_pos, l->pos.z_pos, l->room_number, LARA_STANDARD_HEIGHT);
 	coll->facing = facing;
 
 	if (coll->coll_type == CT_NONE) {
@@ -981,7 +981,7 @@ int32_t ItemPushLaraStatic(ITEM_INFO* l, int16_t* bounds, PHD_3DPOS* pos, COLL_I
 	coll->bad_ceiling = 0;
 	facing = coll->facing;
 	coll->facing = (int16_t)phd_atan(l->pos.z_pos - coll->old.z, l->pos.x_pos - coll->old.x);
-	GetCollisionInfo(coll, l->pos.x_pos, l->pos.y_pos, l->pos.z_pos, l->room_number, ((HALF_BLOCK_SIZE + CLICK_SIZE) - 6));
+	GetCollisionInfo(coll, l->pos.x_pos, l->pos.y_pos, l->pos.z_pos, l->room_number, LARA_STANDARD_HEIGHT);
 	coll->facing = facing;
 
 	if (coll->coll_type == CT_NONE) {
@@ -1071,28 +1071,28 @@ int32_t Move3DPosTo3DPos(PHD_3DPOS* pos, PHD_3DPOS* dest, int32_t speed, int16_t
 		if (lara.water_status != LW_UNDERWATER) {
 			switch (((uint32_t(mGetAngle(dest->x_pos, dest->z_pos, pos->x_pos, pos->z_pos) + (BLOCK_SIZE * 8)) >> W2V_SHIFT) - (uint16_t(dest->y_rot + (BLOCK_SIZE * 8)) >> W2V_SHIFT)) & 3) {
 				case 0:
-					lara_item->anim_number = 65;
+					lara_item->anim_number = LARA_ANIM_STEPLEFT;
 					lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 					lara_item->current_anim_state = AS_STEPLEFT;
 					lara_item->goal_anim_state = AS_STEPLEFT;
 					break;
 
 				case 1:
-					lara_item->anim_number = 1;
+					lara_item->anim_number = LARA_ANIM_WALK_FORWARD;
 					lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 					lara_item->current_anim_state = AS_WALK;
 					lara_item->goal_anim_state = AS_WALK;
 					break;
 
 				case 2:
-					lara_item->anim_number = 67;
+					lara_item->anim_number = LARA_ANIM_STEPRIGHT;
 					lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 					lara_item->current_anim_state = AS_STEPRIGHT;
 					lara_item->goal_anim_state = AS_STEPRIGHT;
 					break;
 
 				default:
-					lara_item->anim_number = 40;
+					lara_item->anim_number = LARA_ANIM_WALK_BACKWARDS;
 					lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 					lara_item->current_anim_state = AS_BACK;
 					lara_item->goal_anim_state = AS_BACK;
@@ -1208,7 +1208,7 @@ void StargateCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 #define STARGATE_PUSH_COUNT 4
 
-	for (int i = 0; i < STARGATE_PUSH_COUNT; i++) {
+	for (int32_t i = 0; i < STARGATE_PUSH_COUNT; i++) {
 		GlobalCollisionBounds[0] = bounds[0];
 		GlobalCollisionBounds[1] = bounds[1];
 		GlobalCollisionBounds[2] = bounds[2];

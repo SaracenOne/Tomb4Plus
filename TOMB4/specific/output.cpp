@@ -173,7 +173,7 @@ void ProcessObjectMeshVertices(MESH_DATA* mesh) {
 
 	v = (float *)mesh->Buffer;
 
-	for (int i = 0; i < mesh->nVerts; i++) {
+	for (int32_t i = 0; i < mesh->nVerts; i++) {
 		vtx.x = *v++;
 		vtx.y = *v++;
 		vtx.z = *v++;
@@ -368,7 +368,7 @@ void ProcessStaticMeshVertices(MESH_DATA* mesh) {
 	pB = ((StaticMeshShade >> 10) & 0x1F) << 3;
 	v = (float*)mesh->Buffer;
 
-	for (int i = 0; i < mesh->nVerts; i++) {
+	for (int32_t i = 0; i < mesh->nVerts; i++) {
 		vtx.x = *v++;
 		vtx.y = *v++;
 		vtx.z = *v++;
@@ -393,7 +393,7 @@ void ProcessStaticMeshVertices(MESH_DATA* mesh) {
 		sB = 0;
 
 		if (tomb4.static_lighting) {
-			for (int j = 0; j < MAX_DYNAMICS; j++) {
+			for (int32_t j = 0; j < MAX_DYNAMICS; j++) {
 				l = &dynamics[j];
 
 				if (!l->on)
@@ -502,7 +502,7 @@ void ProcessTrainMeshVertices(MESH_DATA* mesh) {
 	num = 255.0F / DistanceFogStart;
 	v = (float*)mesh->Buffer;
 
-	for (int i = 0; i < mesh->nVerts; i++) {
+	for (int32_t i = 0; i < mesh->nVerts; i++) {
 		vtx.x = *v++;
 		vtx.y = *v++;
 		vtx.z = *v++;
@@ -627,7 +627,7 @@ void ProcessPickupMeshVertices(MESH_DATA* mesh) {
 	clip = clipflags;
 	v = (float*)mesh->Buffer;
 
-	for (int i = 0; i < mesh->nVerts; i++) {
+	for (int32_t i = 0; i < mesh->nVerts; i++) {
 		vtx.x = *v++;
 		vtx.y = *v++;
 		vtx.z = *v++;
@@ -810,7 +810,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 
 	quad = mesh->gt4;
 
-	for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+	for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 		pTex = &textinfo[quad[4] & 0x7FFF];
 		envmap = 0;
 		drawbak = pTex->drawtype;
@@ -832,7 +832,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 				D3DTransform(&normals[2], &D3DMView);
 				D3DTransform(&normals[3], &D3DMView);
 
-				for (int i = 0; i < 4; i++) {
+				for (int32_t i = 0; i < 4; i++) {
 					normals[i].x *= 0.125F;
 					normals[i].y *= 0.125F;
 					normals[i].z *= 0.125F;
@@ -857,9 +857,9 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 				AddQuadZBuffer(MyVertexBuffer, quad[0], quad[1], quad[2], quad[3], pTex, 0);
 			else if (pTex->drawtype <= 2) {
 				if (pTex->drawtype == 2) {
-					for (int j = 0; j < 4; j++) {
-						int clr_a = (MyVertexBuffer[quad[j]].color & 0xFF000000) >> 24;
-						int spc_a = (MyVertexBuffer[quad[j]].specular & 0xFF000000) >> 24;
+					for (int32_t j = 0; j < 4; j++) {
+						int32_t clr_a = (MyVertexBuffer[quad[j]].color & 0xFF000000) >> 24;
+						int32_t spc_a = (MyVertexBuffer[quad[j]].specular & 0xFF000000) >> 24;
 
 						spc_a += (0xFF - clr_a);
 						if (spc_a > 0xFF)
@@ -880,7 +880,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 
 	tri = mesh->gt3;
 
-	for (int i = 0; i < mesh->ngt3; i++, tri += 5) {
+	for (int32_t i = 0; i < mesh->ngt3; i++, tri += 5) {
 		pTex = &textinfo[tri[3] & 0x7FFF];
 		envmap = 0;
 		drawbak = pTex->drawtype;
@@ -900,7 +900,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 				D3DTransform(&normals[1], &D3DMView);
 				D3DTransform(&normals[2], &D3DMView);
 
-				for (int i = 0; i < 3; i++) {
+				for (int32_t i = 0; i < 3; i++) {
 					normals[i].x *= 0.125F;
 					normals[i].y *= 0.125F;
 					normals[i].z *= 0.125F;
@@ -923,9 +923,9 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 				AddTriZBuffer(MyVertexBuffer, tri[0], tri[1], tri[2], pTex, 0);
 			else if (pTex->drawtype <= 2) {
 				if (pTex->drawtype == 2) {
-					for (int j = 0; j < 3; j++) {
-						int clr_a = (MyVertexBuffer[tri[j]].color & 0xFF000000) >> 24;
-						int spc_a = (MyVertexBuffer[tri[j]].specular & 0xFF000000) >> 24;
+					for (int32_t j = 0; j < 3; j++) {
+						int32_t clr_a = (MyVertexBuffer[tri[j]].color & 0xFF000000) >> 24;
+						int32_t spc_a = (MyVertexBuffer[tri[j]].specular & 0xFF000000) >> 24;
 
 						spc_a += (0xFF - clr_a);
 						if (spc_a > 0xFF)
@@ -940,7 +940,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 
 			if (envmap) {
 				// TRLE: modified to fade the environment map out into the colored fog
-				for (int i = 0; i < 3; i++) {
+				for (int32_t i = 0; i < 3; i++) {
 					clrbak[i] = MyVertexBuffer[tri[i]].color;
 					spcbak[i] = MyVertexBuffer[tri[i]].specular;
 
@@ -948,7 +948,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 					uint8_t spc_alpha = (MyVertexBuffer[tri[i]].color >> 24) & 0xff;
 
 					// Copy it to a 32 bit in integer
-					int spc_alpha_32 = spc_alpha;
+					int32_t spc_alpha_32 = spc_alpha;
 
 					// Invert the specular alpha
 					uint8_t spc_alpha_inverted = 0xff - spc_alpha;
@@ -967,7 +967,7 @@ void phd_PutPolygons(int16_t* objptr, int32_t clip) {
 					MyVertexBuffer[tri[i]].specular |= (spc_alpha_32 << 24);
 				}
 				AddTriSorted(MyVertexBuffer, tri[0], tri[1], tri[2], &envmap_texture, 0);
-				for (int i = 0; i < 3; i++) {
+				for (int32_t i = 0; i < 3; i++) {
 					MyVertexBuffer[tri[i]].color = clrbak[i];
 					MyVertexBuffer[tri[i]].specular = spcbak[i];
 				}
@@ -1010,7 +1010,7 @@ void phd_PutPolygons_train(int16_t* objptr, int32_t x) {
 	ProcessTrainMeshVertices(mesh);
 	quad = mesh->gt4;
 
-	for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+	for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 		pTex = &textinfo[quad[4] & 0x7FFF];
 		drawbak = pTex->drawtype;
 
@@ -1027,7 +1027,7 @@ void phd_PutPolygons_train(int16_t* objptr, int32_t x) {
 
 	tri = mesh->gt3;
 
-	for (int i = 0; i < mesh->ngt3; i++, tri += 5) {
+	for (int32_t i = 0; i < mesh->ngt3; i++, tri += 5) {
 		pTex = &textinfo[tri[3] & 0x7FFF];
 
 		drawbak = pTex->drawtype;
@@ -1202,7 +1202,7 @@ void phd_PutPolygonsPickup(int16_t* objptr, float x, float y, int32_t color) {
 	f_centery = fcy;
 	quad = mesh->gt4;
 
-	for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+	for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 		pTex = &textinfo[quad[4] & 0x7FFF];
 		envmap = 0;
 		drawbak = pTex->drawtype;
@@ -1223,7 +1223,7 @@ void phd_PutPolygonsPickup(int16_t* objptr, float x, float y, int32_t color) {
 			D3DTransform(&normals[2], &D3DMView);
 			D3DTransform(&normals[3], &D3DMView);
 
-			for (int i = 0; i < 4; i++) {
+			for (int32_t i = 0; i < 4; i++) {
 				normals[i].x *= 0.125F;
 				normals[i].y *= 0.125F;
 				normals[i].z *= 0.125F;
@@ -1280,7 +1280,7 @@ void phd_PutPolygonsPickup(int16_t* objptr, float x, float y, int32_t color) {
 
 	tri = mesh->gt3;
 
-	for (int i = 0; i < mesh->ngt3; i++, tri += 5) {
+	for (int32_t i = 0; i < mesh->ngt3; i++, tri += 5) {
 		pTex = &textinfo[tri[3] & 0x7FFF];
 		envmap = 0;
 		drawbak = pTex->drawtype;
@@ -1299,7 +1299,7 @@ void phd_PutPolygonsPickup(int16_t* objptr, float x, float y, int32_t color) {
 			D3DTransform(&normals[1], &D3DMView);
 			D3DTransform(&normals[2], &D3DMView);
 
-			for (int i = 0; i < 3; i++) {
+			for (int32_t i = 0; i < 3; i++) {
 				normals[i].x *= 0.125F;
 				normals[i].y *= 0.125F;
 				normals[i].z *= 0.125F;
@@ -1368,7 +1368,7 @@ void phd_PutPolygonSkyMesh(int16_t* objptr, int32_t clipstatus) {
 	ProcessObjectMeshVertices(mesh);
 	quad = mesh->gt4;
 
-	for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+	for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 		pTex = &textinfo[quad[4] & 0x7FFF];
 		drawbak = pTex->drawtype;
 
@@ -1413,7 +1413,7 @@ void phd_PutPolygonSkyMesh(int16_t* objptr, int32_t clipstatus) {
 
 	tri = mesh->gt3;
 
-	for (int i = 0; i < mesh->ngt3; i++, tri += 5) {
+	for (int32_t i = 0; i < mesh->ngt3; i++, tri += 5) {
 		pTex = &textinfo[tri[3] & 0x7FFF];
 		drawbak = pTex->drawtype;
 		pTex->drawtype = 4;
@@ -1485,7 +1485,7 @@ int32_t S_GetObjectBounds(int16_t* bounds) {
 	yMax = (float)-0x3FFFFFFF;
 	numZ = 0;
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		zv = vtx[i].x * mMXPtr[M20] + vtx[i].y * mMXPtr[M21] + vtx[i].z * mMXPtr[M22] + mMXPtr[M23];
 
 		if (zv > f_mznear && zv < f_mzfar) {
@@ -1548,7 +1548,7 @@ void S_AnimateTextures(int32_t n) {
 		nRanges = *aranges;
 		range = aranges + 1;
 
-		for (int i = 0; i < nRanges; i++) {
+		for (int32_t i = 0; i < nRanges; i++) {
 			nRangeFrames = *range++;
 
 			if (i < nAnimUVRanges && gfUVRotate) {
@@ -1574,7 +1574,7 @@ void S_AnimateTextures(int32_t n) {
 		range = aranges + 1;
 		AnimatingTexturesVOffset = (AnimatingTexturesVOffset - gfUVRotate * (n >> 1)) & 0x1F;
 
-		for (int i = 0; i < nAnimUVRanges; i++) {
+		for (int32_t i = 0; i < nAnimUVRanges; i++) {
 			nRangeFrames = *range++;
 
 			while (nRangeFrames >= 0) {

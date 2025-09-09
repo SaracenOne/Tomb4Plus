@@ -16,7 +16,7 @@ bool DXSetOutputFormat();
 bool DXDSCreate();
 bool InitSampleDecompress();
 bool FreeSampleDecompress();
-bool DXCreateSample(char* data, int32_t size, int samples_per_second, int32_t num);
+bool DXCreateSample(char* data, int32_t size, int32_t samples_per_second, int32_t num);
 bool DXCreateSampleADPCM(char* data, int32_t comp_size, int32_t uncomp_size, int32_t num);
 void DXStopSample(int32_t num);
 bool DSIsChannelPlaying(int32_t num);

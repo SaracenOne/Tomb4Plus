@@ -170,12 +170,12 @@ static int8_t num_fmvs = 0;
 
 /*misc*/
 
-char *GetCustomStringForTextID(int id) {
+char *GetCustomStringForTextID(int32_t id) {
 	return &gfStringWad[gfStringOffset[id]];
 }
 
-char *GetFixedStringForTextID(int id) {
-	int off_id = id;
+char *GetFixedStringForTextID(int32_t id) {
+	int32_t off_id = id;
 	if (!get_game_mod_global_info()->tr_times_exclusive && off_id > TXT_The_Gold_Mask) {
 		off_id -= 3;
 	}
@@ -186,8 +186,8 @@ char *GetFixedStringForTextID(int id) {
 	return GetCustomStringForTextID(off_id);
 }
 
-int CalculateTextIDForPuzzleItemName(int id) {
-	int off_id = id;
+int32_t CalculateTextIDForPuzzleItemName(int32_t id) {
+	int32_t off_id = id;
 	if (!get_game_mod_global_info()->tr_times_exclusive && off_id > TXT_The_Gold_Mask) {
 		off_id += 3;
 	}
@@ -487,8 +487,8 @@ void DoLevel(uint8_t Name, uint8_t Audio) {
 
 	S_LoadLevelFile(Name);
 	SetDistanceFogColor(gfDistanceFog.r, gfDistanceFog.g, gfDistanceFog.b);
-	InitialiseFXArray(1);
-	InitialiseLOTarray(1);
+	InitialiseFXArray(true);
+	InitialiseLOTarray(true);
 	ClearFXFogBulbs();
 	InitSpotCamSequences();
 	InitialisePickUpDisplay();
@@ -517,8 +517,9 @@ void DoLevel(uint8_t Name, uint8_t Audio) {
 			sgRestoreLevel();
 		}
 
-		if (gfLevelFlags & GF_REMOVEAMULET)
+		if (gfLevelFlags & GF_REMOVEAMULET) {
 			lara.questitems &= ~1;
+		}
 
 		savegame.Level.Timer = 0;
 		CurrentAtmosphere = Audio;
@@ -877,8 +878,8 @@ void DoTitle(uint8_t Name, uint8_t Audio) {
 	GLOBAL_lastinvitem = -1;
 	InitSpotCamSequences();
 	title_controls_locked_out = 0;
-	InitialiseFXArray(1);
-	InitialiseLOTarray(1);
+	InitialiseFXArray(true);
+	InitialiseLOTarray(true);
 	SetDistanceFogColor(gfDistanceFog.r, gfDistanceFog.g, gfDistanceFog.b);
 	ClearFXFogBulbs();
 	InitialisePickUpDisplay();
@@ -963,7 +964,7 @@ void LoadGameflow() {
 	uint8_t* n;
 	char* s;
 	char* d;
-	int l;
+	int32_t l;
 	int32_t end;
 
 	s = 0;
@@ -1017,7 +1018,7 @@ void LoadGameflow() {
 	gfLanguageFile = (uint8_t*)d;
 	Gameflow->Language = l;
 
-	int NumberOfStrings = TXT_NUM_STRINGS;
+	int32_t NumberOfStrings = TXT_NUM_STRINGS;
 	if (!get_game_mod_global_info()->tr_level_editor) {
 		NumberOfStrings -= 1;
 	}
@@ -1034,18 +1035,19 @@ void LoadGameflow() {
 	       gfStringOffset + NumberOfStrings + (sizeof(STRINGHEADER) / sizeof(uint16_t)),
 	       sh.StringWadLen + sh.PCStringWadLen + sh.PSXStringWadLen);
 
-	for (int i = 0; i < NumberOfStrings - 1; i++) {
+	for (int32_t i = 0; i < NumberOfStrings - 1; i++) {
 		s = &gfStringWad[gfStringOffset[i]];
 		d = &gfStringWad[gfStringOffset[i + 1]];
-		l = int(d - s - 1);
+		l = int32_t(d - s - 1);
 
-		for (int j = 0; j < l; j++)
+		for (int32_t j = 0; j < l; j++) {
 			s[j] ^= 0xA5;
+		}
 	}
 
 	uint32_t detected_level_count = 0;
 
-	for (int i = 0; i < Gameflow->nLevels; i++) {
+	for (int32_t i = 0; i < Gameflow->nLevels; i++) {
 		end = 0;
 		n = &gfScriptWad[gfScriptOffset[i]];
 
@@ -1134,7 +1136,7 @@ int32_t DoCredits() {
 
 	y = StartPos;
 
-	for (int i = 0; i < sizeof(CreditsTable) / 4; i++) {
+	for (int32_t i = 0; i < sizeof(CreditsTable) / 4; i++) {
 		s = CreditsTable[i];
 
 		if (y < font_height + phd_winheight + 1 && y > -font_height) {

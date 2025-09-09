@@ -44,12 +44,12 @@ void SarcophagusCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_number];
 
-	if (input & IN_ACTION && item->status != ITEM_ACTIVE && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH &&
+	if (input & IN_ACTION && item->status != ITEM_ACTIVE && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH &&
 	        lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_number) {
 		if (TestLaraPosition(SarcophagusBounds, item, l)) {
 			if (MoveLaraPosition(&SarcophagusPos, item, l)) {
-				l->anim_number = ANIM_SARCOPHAGUS;
-				l->frame_number = anims[ANIM_SARCOPHAGUS].frame_base;
+				l->anim_number = LARA_ANIM_SARCOPHAGUS;
+				l->frame_number = anims[LARA_ANIM_SARCOPHAGUS].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
 				item->flags |= IFL_CODEBITS;
 				item->status = ITEM_ACTIVE;
@@ -66,7 +66,7 @@ void SarcophagusCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 			lara.IsMoving = 0;
 			lara.gun_status = LG_NO_ARMS;
 		}
-	} else if (l->anim_number == ANIM_SARCOPHAGUS && l->frame_number == anims[ANIM_SARCOPHAGUS].frame_base + 113) {
+	} else if (l->anim_number == LARA_ANIM_SARCOPHAGUS && l->frame_number == anims[LARA_ANIM_SARCOPHAGUS].frame_base + 113) {
 		for (pickup_num = room[item->room_number].item_number; pickup_num != NO_ITEM; pickup_num = pickup->next_item) {
 			pickup = &items[pickup_num];
 
@@ -89,7 +89,7 @@ void KeyHoleCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	item = &items[item_number];
 
 	if ((input & IN_ACTION || GLOBAL_inventoryitemchosen != NO_ITEM) && !BinocularRange && lara.gun_status == LG_NO_ARMS &&
-	        l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH || lara.IsMoving && lara.GeneralPtr == item_number) {
+	        l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH || lara.IsMoving && lara.GeneralPtr == item_number) {
 		key = int16_t(GLOBAL_inventoryitemchosen - KEY_ITEM1);
 		hole = item->object_number - KEY_HOLE1;
 
@@ -111,7 +111,7 @@ void KeyHoleCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 			if (MoveLaraPosition(&KeyHolePosition, item, l)) {
 				remove_inventory_item(hole + KEY_ITEM1);
-				l->anim_number = ANIM_USEKEY;
+				l->anim_number = LARA_ANIM_USEKEY;
 				l->frame_number = anims[l->anim_number].frame_base;
 				l->current_anim_state = AS_USEKEY;
 				lara.IsMoving = 0;
@@ -236,7 +236,7 @@ void RegeneratePickups() {
 	int16_t* ammo;
 	int16_t objnum;
 
-	for (int i = 0; i < NumRPickups; i++) {
+	for (int32_t i = 0; i < NumRPickups; i++) {
 		item = &items[RPickups[i]];
 
 		if (item->status == ITEM_INVISIBLE) {
@@ -289,9 +289,9 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 	if (lara.water_status == LW_ABOVE_WATER || lara.water_status == LW_WADE) {
 		if ((input & IN_ACTION || (GLOBAL_inventoryitemchosen != NO_ITEM && ocb == 2)) && !BinocularRange &&
-		        ((l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && lara.gun_status == LG_NO_ARMS) ||
-		         (l->current_anim_state == AS_DUCK && l->anim_number == ANIM_DUCKBREATHE && lara.gun_status == LG_NO_ARMS) ||
-		         (l->current_anim_state == AS_ALL4S && l->anim_number == ANIM_ALL4S)) || lara.IsMoving && lara.GeneralPtr == item_number) {
+		        ((l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && lara.gun_status == LG_NO_ARMS) ||
+		         (l->current_anim_state == AS_DUCK && l->anim_number == LARA_ANIM_DUCKBREATHE && lara.gun_status == LG_NO_ARMS) ||
+		         (l->current_anim_state == AS_ALL4S && l->anim_number == LARA_ANIM_ALL4S)) || lara.IsMoving && lara.GeneralPtr == item_number) {
 			flag = 0;
 			item->pos.x_rot = 0;
 
@@ -301,7 +301,7 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 					if (!lara.IsDucked && TestLaraPosition(HiddenPickUpBounds, item, l)) {
 						if (MoveLaraPosition(&HiddenPickUpPosition, item, l)) {
-							l->anim_number = ANIM_HIDDENPICKUP;
+							l->anim_number = LARA_ANIM_HIDDENPICKUP;
 							l->current_anim_state = AS_HIDDENPICKUP;
 							flag = 1;
 						}
@@ -333,7 +333,7 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 						}
 
 						if (MoveLaraPosition(&CrowbarPickUpPosition, item, l)) {
-							l->anim_number = ANIM_CROWBAR;
+							l->anim_number = LARA_ANIM_CROWBAR;
 							l->current_anim_state = AS_PICKUP;
 							item->status = ITEM_ACTIVE;
 							AddActiveItem(item_number);
@@ -370,9 +370,9 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 						if (MoveLaraPosition(&PlinthPickUpPosition, item, l)) {
 							if (ocb == 3)
-								l->anim_number = ANIM_PLINTHHI;
+								l->anim_number = LARA_ANIM_PLINTHHI;
 							else
-								l->anim_number = ANIM_PLINTHLO;
+								l->anim_number = LARA_ANIM_PLINTHLO;
 
 							l->current_anim_state = AS_PICKUP;
 							flag = 1;
@@ -395,10 +395,10 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 							AlignLaraPosition(&PickUpPosition, item, l);
 
 							if (item->object_number == FLARE_ITEM) {
-								l->anim_number = ANIM_DUCKPICKUPF;
+								l->anim_number = LARA_ANIM_DUCKPICKUPF;
 								l->current_anim_state = AS_FLAREPICKUP;
 							} else {
-								l->anim_number = ANIM_DUCKPICKUP;
+								l->anim_number = LARA_ANIM_DUCKPICKUP;
 								l->current_anim_state = AS_PICKUP;
 							}
 
@@ -407,10 +407,10 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 							l->goal_anim_state = AS_DUCK;
 						else if (MoveLaraPosition(&PickUpPosition, item, l)) {
 							if (item->object_number == FLARE_ITEM) {
-								l->anim_number = ANIM_PICKUPF;
+								l->anim_number = LARA_ANIM_PICKUPF;
 								l->current_anim_state = AS_FLAREPICKUP;
 							} else {
-								l->anim_number = ANIM_PICKUP;
+								l->anim_number = LARA_ANIM_PICKUP;
 								l->current_anim_state = AS_PICKUP;
 							}
 
@@ -436,13 +436,13 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 				lara.gun_status = LG_HANDS_BUSY;
 			}
 		} else if (lara.GeneralPtr == item_number && (l->current_anim_state == AS_PICKUP || l->current_anim_state == AS_HIDDENPICKUP)) {
-			if (l->frame_number == anims[ANIM_PICKUP].frame_base + 15 ||
-			        l->frame_number == anims[ANIM_DUCKPICKUP].frame_base + 22 ||
-			        l->frame_number == anims[ANIM_DUCKPICKUP].frame_base + 20 ||
-			        l->frame_number == anims[ANIM_PLINTHLO].frame_base + 29 ||
-			        l->frame_number == anims[ANIM_PLINTHHI].frame_base + 45 ||
-			        l->frame_number == anims[ANIM_HIDDENPICKUP].frame_base + 42 ||
-			        (l->anim_number == ANIM_CROWBAR && l->frame_number == anims[ANIM_CROWBAR].frame_base + 123)) {
+			if (l->frame_number == anims[LARA_ANIM_PICKUP].frame_base + 15 ||
+			        l->frame_number == anims[LARA_ANIM_DUCKPICKUP].frame_base + 22 ||
+			        l->frame_number == anims[LARA_ANIM_DUCKPICKUP].frame_base + 20 ||
+			        l->frame_number == anims[LARA_ANIM_PLINTHLO].frame_base + 29 ||
+			        l->frame_number == anims[LARA_ANIM_PLINTHHI].frame_base + 45 ||
+			        l->frame_number == anims[LARA_ANIM_HIDDENPICKUP].frame_base + 42 ||
+			        (l->anim_number == LARA_ANIM_CROWBAR && l->frame_number == anims[LARA_ANIM_CROWBAR].frame_base + 123)) {
 				if (item->object_number == BURNING_TORCH_ITEM) {
 					AddDisplayPickup(BURNING_TORCH_ITEM);
 					GetFlameTorch();
@@ -453,7 +453,7 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 						AddDisplayPickup(item->object_number);
 
 						if (item->trigger_flags & 0x100) {
-							for (int i = 0; i < level_items; i++) {
+							for (int32_t i = 0; i < level_items; i++) {
 								itemme = &items[i];
 
 								if (itemme->object_number == item->object_number)
@@ -472,8 +472,8 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 				}
 			}
 		} else if (lara.GeneralPtr == item_number && l->current_anim_state == AS_FLAREPICKUP) {
-			if ((l->anim_number == ANIM_DUCKPICKUPF && l->frame_number == anims[ANIM_DUCKPICKUPF].frame_base + 22) ||
-			        l->frame_number == anims[ANIM_PICKUPF].frame_base + 58) {
+			if ((l->anim_number == LARA_ANIM_DUCKPICKUPF && l->frame_number == anims[LARA_ANIM_DUCKPICKUPF].frame_base + 22) ||
+			        l->frame_number == anims[LARA_ANIM_PICKUPF].frame_base + 58) {
 				lara.request_gun_type = WEAPON_FLARE;
 				lara.gun_type = WEAPON_FLARE;
 				InitialiseNewWeapon();
@@ -491,11 +491,11 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 			if (TestLaraPosition(PickUpBoundsUW, item, l)) {
 				if (MoveLaraPosition(&PickUpPositionUW, item, l)) {
 					if (item->object_number == FLARE_ITEM) {
-						l->anim_number = ANIM_PICKUPF_UW;
+						l->anim_number = LARA_ANIM_PICKUPF_UW;
 						l->current_anim_state = AS_FLAREPICKUP;
 						l->fallspeed = 0;
 					} else {
-						l->anim_number = ANIM_PICKUP_UW;
+						l->anim_number = LARA_ANIM_PICKUP_UW;
 						l->current_anim_state = AS_PICKUP;
 					}
 
@@ -511,7 +511,7 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 				lara.gun_status = LG_NO_ARMS;
 			}
 		} else if (lara.GeneralPtr == item_number && l->current_anim_state == AS_PICKUP &&
-		           l->frame_number == anims[ANIM_PICKUP_UW].frame_base + 18) {
+		           l->frame_number == anims[LARA_ANIM_PICKUP_UW].frame_base + 18) {
 			AddDisplayPickup(item->object_number);
 
 			if (!(item->trigger_flags & 0xC0))
@@ -522,7 +522,7 @@ void PickUpCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 				item->status = ITEM_INVISIBLE;
 			}
 		} else if (lara.GeneralPtr == item_number && l->current_anim_state == AS_FLAREPICKUP &&
-		           l->frame_number == anims[ANIM_PICKUPF_UW].frame_base + 20) {
+		           l->frame_number == anims[LARA_ANIM_PICKUPF_UW].frame_base + 20) {
 			lara.request_gun_type = WEAPON_FLARE;
 			lara.gun_type = WEAPON_FLARE;
 			InitialiseNewWeapon();
@@ -556,7 +556,7 @@ void PuzzleHoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 		PuzzleType = 3;
 
 	if (((input & IN_ACTION || GLOBAL_inventoryitemchosen != NO_ITEM) &&
-	        (!BinocularRange && lara.gun_status == LG_NO_ARMS && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH)) ||
+	        (!BinocularRange && lara.gun_status == LG_NO_ARMS && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH)) ||
 	        (lara.IsMoving && lara.GeneralPtr == item_num)) {
 		bounds = GetBoundsAccurate(item);
 		yrot = item->pos.y_rot;
@@ -610,7 +610,7 @@ void PuzzleHoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 					cutseq_num = item->trigger_flags - 1024;
 					PuzzleDone(item, item_num);
 				} else {
-					l->anim_number = ANIM_USEPUZZLE;
+					l->anim_number = LARA_ANIM_USEPUZZLE;
 					l->current_anim_state = AS_USEPUZZLE;
 					item->item_flags[0] = 1;
 				}
@@ -635,7 +635,7 @@ void PuzzleHoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 		item->pos.y_rot = yrot;
 	} else {
 		if (lara.GeneralPtr == item_num && l->current_anim_state == AS_USEPUZZLE &&
-		        l->frame_number == anims[ANIM_USEPUZZLE].frame_base + 80 && item->item_flags[0]) {
+		        l->frame_number == anims[LARA_ANIM_USEPUZZLE].frame_base + 80 && item->item_flags[0]) {
 			if (PuzzleType == 3)
 				l->item_flags[0] = item->trigger_flags;
 			else

@@ -49,7 +49,7 @@ void ProcessRoomDynamics(ROOM_INFO* r) {
 	nRoomDynamics = 0;
 	l = RoomDynamics;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++) {
+	for (int32_t i = 0; i < MAX_DYNAMICS; i++) {
 		d = &dynamics[i];
 
 		if (!d->on)
@@ -110,7 +110,7 @@ void ProcessRoomVertices(ROOM_INFO* r) {
 		}
 	};
 
-	for (int i = 0; i < r->nVerts; i++) {
+	for (int32_t i = 0; i < r->nVerts; i++) {
 		vtx.x = r->x + r->verts[i].x;
 		vtx.y = r->y + r->verts[i].y;
 		vtx.z = r->z + r->verts[i].z;
@@ -190,7 +190,7 @@ void ProcessRoomVertices(ROOM_INFO* r) {
 		fG = 0;
 		fB = 0;
 
-		for (int j = 0; j < nRoomDynamics; j++) {
+		for (int32_t j = 0; j < nRoomDynamics; j++) {
 			l = &RoomDynamics[j];
 
 			lPos.x = vtx.x - r->posx - l->x;
@@ -279,7 +279,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	data_ptr = r->data + 1;	//go to vert data
 	nWaterVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++) {	//get water verts
+	for (int32_t i = 0; i < r->nVerts; i++) {	//get water verts
 		if (data_ptr[4] & 0x2000) {
 			r->verts[nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nWaterVerts].y = (float)data_ptr[1];
@@ -295,7 +295,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	data_ptr = r->data + 1;
 	nShoreVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++) {	//again for shore verts
+	for (int32_t i = 0; i < r->nVerts; i++) {	//again for shore verts
 		if (data_ptr[4] & 0x4000 && !(data_ptr[4] & 0x2000)) {
 			r->verts[nShoreVerts + nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nShoreVerts + nWaterVerts].y = (float)data_ptr[1];
@@ -312,7 +312,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	data_ptr = r->data + 1;
 	nRestOfVerts = 0;
 
-	for (int i = 0; i < r->nVerts; i++) {	//one more for everything else
+	for (int32_t i = 0; i < r->nVerts; i++) {	//one more for everything else
 		if (!(data_ptr[4] & 0x4000) && !(data_ptr[4] & 0x2000)) {
 			r->verts[nRestOfVerts + nShoreVerts + nWaterVerts].x = (float)data_ptr[0];
 			r->verts[nRestOfVerts + nShoreVerts + nWaterVerts].y = (float)data_ptr[1];
@@ -329,7 +329,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	r->nWaterVerts = nWaterVerts;
 	r->nShoreVerts = nShoreVerts;
 
-	for (int i = 0; i < r->gt4cnt; i++) {	//get quad data
+	for (int32_t i = 0; i < r->gt4cnt; i++) {	//get quad data
 		if (faces[data_ptr[0]] & 0x8000 || faces[data_ptr[1]] & 0x8000 || faces[data_ptr[2]] & 0x8000 || faces[data_ptr[3]] & 0x8000)
 			data_ptr[4] |= 0x4000;
 
@@ -351,7 +351,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 
 	data_ptr++;//skip over tri count
 
-	for (int i = 0; i < r->gt3cnt; i++) {	//tris
+	for (int32_t i = 0; i < r->gt3cnt; i++) {	//tris
 		data_ptr[0] = faces[data_ptr[0]] & 0x7FFF;
 		data_ptr[1] = faces[data_ptr[1]] & 0x7FFF;
 		data_ptr[2] = faces[data_ptr[2]] & 0x7FFF;
@@ -379,7 +379,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 	r->posz = (float)r->z;
 	data_ptr = r->data + 1;
 
-	for (int i = 0; i < r->nVerts; i++) {
+	for (int32_t i = 0; i < r->nVerts; i++) {
 		vptr->x = r->verts[i].x + (float)r->x;
 		vptr->y = r->verts[i].y + (float)r->y;
 		vptr->z = r->verts[i].z + (float)r->z;
@@ -408,7 +408,7 @@ void ProcessRoomData(ROOM_INFO* r, bool multi_colour_fog) {
 		nLights = 0;
 		nBulbs = NumLevelFogBulbs;
 
-		for (int i = 0; i < r->num_lights; i++) {
+		for (int32_t i = 0; i < r->num_lights; i++) {
 			light = &r->light[i];
 
 			if (light->Type == LIGHT_FOG) {
@@ -508,7 +508,7 @@ void InsertRoom(ROOM_INFO* r) {
 		data = r->FaceData;
 		numQuads = *data++;
 
-		for (int i = 0; i < numQuads; i++, data += 5) {
+		for (int32_t i = 0; i < numQuads; i++, data += 5) {
 			// TRNG: use full textinfo mask range.
 			pTex = &textinfo[data[4] & 0x7FFF];
 			doublesided = (data[4] >> 15) & 1;
@@ -521,7 +521,7 @@ void InsertRoom(ROOM_INFO* r) {
 
 		numTris = *data++;
 
-		for (int i = 0; i < numTris; i++, data += 4) {
+		for (int32_t i = 0; i < numTris; i++, data += 4) {
 			// TRNG: use full textinfo mask range.
 			pTex = &textinfo[data[3] & 0x7FFF];
 			doublesided = (data[3] >> 15) & 1;
@@ -573,7 +573,7 @@ void ProcessMeshData(int32_t num_meshes) {
 	mesh_mapping_table_count = num_meshes;
 	mesh_mapping_table = (MESH_MAP_TABLE_ENTRY *)SYSTEM_REALLOC(mesh_mapping_table, num_meshes * sizeof(MESH_MAP_TABLE_ENTRY));
 
-	for (int i = 0; i < num_meshes; i++) {
+	for (int32_t i = 0; i < num_meshes; i++) {
 		mesh_ptr = meshes[i];
 
 		mesh_mapping_table[i].mesh_x32_ptr = original_mesh_table_ptr_32x;
@@ -617,7 +617,7 @@ void ProcessMeshData(int32_t num_meshes) {
 				uint32_t numVertices = mesh->nVerts;
 				mesh->Buffer = (GFXVERTEX*)SYSTEM_MALLOC(sizeof(GFXVERTEX) * numVertices);
 				vtx = mesh->Buffer;
-				for (int j = 0; j < mesh->nVerts; j++) {
+				for (int32_t j = 0; j < mesh->nVerts; j++) {
 					vtx[j].x = mesh_ptr[0];
 					vtx[j].y = mesh_ptr[1];
 					vtx[j].z = mesh_ptr[2];
@@ -635,7 +635,7 @@ void ProcessMeshData(int32_t num_meshes) {
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, mesh->nNorms * sizeof(GFXVECTOR));
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, mesh->nNorms * sizeof(GFXVECTOR));
 
-					for (int j = 0; j < mesh->nVerts; j++) {
+					for (int32_t j = 0; j < mesh->nVerts; j++) {
 						vtx[j].nx = mesh_ptr[0];
 						vtx[j].ny = mesh_ptr[1];
 						vtx[j].nz = mesh_ptr[2];
@@ -654,7 +654,7 @@ void ProcessMeshData(int32_t num_meshes) {
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_32x, mesh->nVerts * sizeof(X32_POINTER));
 					ACCUMULATE_ORIGINAL_MESH_TABLE_PTR(original_mesh_table_ptr_native, mesh->nVerts * sizeof(int32_t*));
 
-					for (int j = 0; j < mesh->nVerts; j++) {
+					for (int32_t j = 0; j < mesh->nVerts; j++) {
 						c = 255 - (mesh_ptr[0] >> 5);
 						mesh->prelight[j] = RGBONLY(c, c, c);
 						mesh_ptr++;
@@ -675,7 +675,7 @@ void ProcessMeshData(int32_t num_meshes) {
 
 				lp = 6 * mesh->ngt4;
 
-				for (int j = 0; j < lp; j++)
+				for (int32_t j = 0; j < lp; j++)
 					mesh->gt4[j] = mesh_ptr[j];
 
 				mesh_ptr += lp;
@@ -691,7 +691,7 @@ void ProcessMeshData(int32_t num_meshes) {
 
 				lp = 5 * mesh->ngt3;
 
-				for (int j = 0; j < lp; j++)
+				for (int32_t j = 0; j < lp; j++)
 					mesh->gt3[j] = mesh_ptr[j];
 			}
 		}
@@ -703,7 +703,7 @@ void ProcessMeshData(int32_t num_meshes) {
 void InitBuckets() {
 	TEXTUREBUCKET *bucket;
 
-	for (int i = 0; i < MAX_BUCKETS; i++) {
+	for (int32_t i = 0; i < MAX_BUCKETS; i++) {
 		bucket = &Bucket[i];
 		bucket->tpage = -1;
 		bucket->nVtx = 0;
@@ -760,7 +760,7 @@ void CreateVertexNormals(ROOM_INFO* r) {
 	r->fnormals = (GFXVECTOR*)game_malloc(sizeof(GFXVECTOR) * (r->gt3cnt + r->gt4cnt));
 	nQuads = *data++;
 
-	for (int i = 0; i < nQuads; i++) {
+	for (int32_t i = 0; i < nQuads; i++) {
 		p1 = r->verts[data[0]];
 		p2 = r->verts[data[1]];
 		p3 = r->verts[data[2]];
@@ -781,7 +781,7 @@ void CreateVertexNormals(ROOM_INFO* r) {
 
 	nTris = *data++;
 
-	for (int i = 0; i < nTris; i++) {
+	for (int32_t i = 0; i < nTris; i++) {
 		p1 = r->verts[data[0]];
 		p2 = r->verts[data[1]];
 		p3 = r->verts[data[2]];
@@ -799,14 +799,14 @@ void CreateVertexNormals(ROOM_INFO* r) {
 	data += nQuads * 5;
 	nTris = *data;
 
-	for (int i = 0; i < r->nVerts; i++) {
+	for (int32_t i = 0; i < r->nVerts; i++) {
 		n1.x = 0;
 		n1.y = 0;
 		n1.z = 0;
 
 		data = r->FaceData + 1;
 
-		for (int j = 0; j < nQuads; j++) {
+		for (int32_t j = 0; j < nQuads; j++) {
 			if (data[0] == i || data[1] == i || data[2] == i || data[3] == i) {
 				n1.x += r->fnormals[j].x;
 				n1.y += r->fnormals[j].y;
@@ -818,7 +818,7 @@ void CreateVertexNormals(ROOM_INFO* r) {
 
 		data++;
 
-		for (int j = 0; j < nTris; j++) {
+		for (int32_t j = 0; j < nTris; j++) {
 			if (data[0] == i || data[1] == i || data[2] == i) {
 				n1.x += r->fnormals[nQuads + j].x;
 				n1.y += r->fnormals[nQuads + j].y;

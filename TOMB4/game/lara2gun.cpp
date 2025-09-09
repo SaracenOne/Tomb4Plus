@@ -434,7 +434,7 @@ void PistolHandler(int32_t weapon_type) {
 
 		TriggerDynamic(pos.x, pos.y, pos.z, 10, r, g, b);
 
-		for (int i = 0; i < t4p_mirror_count; i++) {
+		for (int32_t i = 0; i < t4p_mirror_count; i++) {
 			if (lara_item->room_number == t4p_mirror_info[i].mirror_room) {
 				PHD_VECTOR mirrored_pos = T4PMirrorVectorOnPlane(&t4p_mirror_info[i], pos);
 

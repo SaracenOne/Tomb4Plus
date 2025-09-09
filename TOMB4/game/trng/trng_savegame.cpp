@@ -249,7 +249,7 @@ uint32_t NGWriteOldConditions(uint32_t position) {
 uint32_t NGWriteVariableData(uint32_t position) {
 	uint32_t variable_data_size = 248;
 
-	int start_pos = position;
+	int32_t start_pos = position;
 
 	NG_WRITE_16(ng_savegame_buffer, position, variable_data_size);
 	NG_WRITE_16(ng_savegame_buffer, position, 0x800F);
@@ -351,9 +351,9 @@ uint32_t NGWriteVariableData(uint32_t position) {
 		NG_WRITE_32(ng_savegame_buffer, position, 0); // TODO: Unused
 	}
 
-	int end_pos = position;
+	int32_t end_pos = position;
 
-	int total_pos = end_pos - start_pos;
+	int32_t total_pos = end_pos - start_pos;
 
 	return position;
 }
@@ -535,7 +535,7 @@ uint32_t NGWriteLocalVariables(uint32_t position) {
 uint32_t NGWriteFrozenItems(uint32_t position) {
 	uint32_t frozen_items_size = 0;
 	uint16_t frozen_item_count = 0;
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		if (NGIsItemFrozen(i)) {
 			frozen_item_count++;
 		}
@@ -545,7 +545,7 @@ uint32_t NGWriteFrozenItems(uint32_t position) {
 	frozen_items_size += sizeof(uint16_t);
 	frozen_items_size += sizeof(uint16_t);
 
-	for (int i = 0; i < frozen_item_count; i++) {
+	for (int32_t i = 0; i < frozen_item_count; i++) {
 		frozen_items_size += sizeof(uint16_t);
 		frozen_items_size += sizeof(uint16_t);
 	}
@@ -556,7 +556,7 @@ uint32_t NGWriteFrozenItems(uint32_t position) {
 	NG_WRITE_16(ng_savegame_buffer, position, 0x803A);
 	NG_WRITE_16(ng_savegame_buffer, position, frozen_item_count);
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		if (NGIsItemFrozen(i)) {
 			NG_WRITE_16(ng_savegame_buffer, position, i);
 			NG_WRITE_16(ng_savegame_buffer, position, NGGetItemFrozenTimer(i));

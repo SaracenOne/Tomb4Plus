@@ -81,7 +81,7 @@ LIGHTNING_STRUCT* TriggerLightning(PHD_VECTOR* s, PHD_VECTOR* d, int8_t variatio
 	LIGHTNING_STRUCT* lptr;
 	int8_t* vptr;
 
-	for (int i = 0; i < MAX_LIGHTNING; i++) {
+	for (int32_t i = 0; i < MAX_LIGHTNING; i++) {
 		lptr = &Lightning[i];
 
 		if (!lptr->Life) {
@@ -99,10 +99,10 @@ LIGHTNING_STRUCT* TriggerLightning(PHD_VECTOR* s, PHD_VECTOR* d, int8_t variatio
 			lptr->Point[3].z = d->z;
 			vptr = &lptr->Xvel1;
 
-			for (int j = 0; j < 6; j++)
+			for (int32_t j = 0; j < 6; j++)
 				*vptr++ = (GetRandomControl() % variation) - (variation >> 1);
 
-			for (int j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++) {
 				if (flags & 2)
 					*vptr++ = (GetRandomControl() % variation) - (variation >> 1);
 				else
@@ -187,7 +187,7 @@ int32_t ExplodingDeath2(int16_t item_number, int32_t mesh_bits, int16_t Flags) {
 		}
 	}
 
-	for (int i = 1; i < obj->nmeshes; i++, bone += 4) {
+	for (int32_t i = 1; i < obj->nmeshes; i++, bone += 4) {
 		poppush = bone[0];
 
 		if (poppush & 1)
@@ -267,7 +267,7 @@ void DrawGunshells() {
 	phd_top = 0;
 	phd_bottom = phd_winheight;
 
-	for (int i = 0; i < 24; i++) {
+	for (int32_t i = 0; i < 24; i++) {
 		p = &Gunshells[i];
 
 		if (p->counter) {
@@ -358,10 +358,10 @@ void LaraBubbles(ITEM_INFO* item) {
 	pos.z = 64;
 	GetLaraJointPos(&pos, LMX_HEAD);
 
-	for (int i = (GetRandomControl() & 1) + 2; i > 0; i--) {
+	for (int32_t i = (GetRandomControl() & 1) + 2; i > 0; i--) {
 		CreateBubble((PHD_3DPOS*)&pos, item->room_number, 8, 7);
 
-		for (int i = 0; i < t4p_mirror_count; i++) {
+		for (int32_t i = 0; i < t4p_mirror_count; i++) {
 			if (item->room_number == t4p_mirror_info[i].mirror_room) {
 				pos = T4PMirrorVectorOnPlane(&t4p_mirror_info[i], pos);
 				CreateBubble((PHD_3DPOS*)&pos, item->room_number, 8, 7);
@@ -376,7 +376,7 @@ void UpdateDrips() {
 	FLOOR_INFO* floor;
 	int32_t h;
 
-	for (int i = 0; i < MAX_DRIPS; i++) {
+	for (int32_t i = 0; i < MAX_DRIPS; i++) {
 		drip = &Drips[i];
 
 		if (!drip->On)
@@ -419,7 +419,7 @@ int32_t GetFreeFireSpark() {
 	min_life = 4095;
 	min_life_num = 0;
 
-	for (int free = next_fire_spark, i = 0; i < MAX_FIRE_SPARKS; i++) {
+	for (int32_t free = next_fire_spark, i = 0; i < MAX_FIRE_SPARKS; i++) {
 		if (sptr->On) {
 			if (sptr->Life < min_life) {
 				min_life_num = free;
@@ -579,7 +579,7 @@ void UpdateFireSparks() {
 
 	keep_those_fires_burning();
 
-	for (int i = 0; i < MAX_FIRE_SPARKS; i++) {
+	for (int32_t i = 0; i < MAX_FIRE_SPARKS; i++) {
 		sptr = &fire_spark[i];
 
 		if (!sptr->On)
@@ -646,7 +646,7 @@ void UpdateFireSparks() {
 void ClearFires() {
 	FIRE_LIST* fire;
 
-	for (int i = 0; i < MAX_FIRES; i++) {
+	for (int32_t i = 0; i < MAX_FIRES; i++) {
 		fire = &fires[i];
 		fire->on = 0;
 	}
@@ -655,7 +655,7 @@ void ClearFires() {
 void AddFire(int32_t x, int32_t y, int32_t z, int32_t size, int16_t room_number, int16_t fade) {
 	FIRE_LIST* fire;
 
-	for (int i = 0; i < MAX_FIRES; i++) {
+	for (int32_t i = 0; i < MAX_FIRES; i++) {
 		fire = &fires[i];
 
 		if (fire->on)
@@ -683,7 +683,7 @@ void S_DrawFires() {
 
 	bounds = (int16_t*)&tsv_buffer[0];
 
-	for (int i = 0; i < MAX_FIRES; i++) {
+	for (int32_t i = 0; i < MAX_FIRES; i++) {
 		fire = &fires[i];
 
 		if (!fire->on)
@@ -734,7 +734,7 @@ int32_t GetFreeSmokeSpark() {
 	min_life = 4095;
 	min_life_num = 0;
 
-	for (int free = next_smoke_spark, i = 0; i < MAX_SMOKE_SPARKS; i++) {
+	for (int32_t free = next_smoke_spark, i = 0; i < MAX_SMOKE_SPARKS; i++) {
 		if (sptr->On) {
 			if (sptr->Life < min_life) {
 				min_life_num = free;
@@ -762,7 +762,7 @@ void UpdateSmokeSparks() {
 	SMOKE_SPARKS* sptr;
 	int32_t fade;
 
-	for (int i = 0; i < MAX_SMOKE_SPARKS; i++) {
+	for (int32_t i = 0; i < MAX_SMOKE_SPARKS; i++) {
 		sptr = &smoke_spark[i];
 
 		if (!sptr->On)
@@ -902,7 +902,7 @@ int32_t GetFreeGunshell() {
 	min_life = 4095;
 	min_life_num = 0;
 
-	for (int free = next_gunshell, i = 0; i < MAX_GUNSHELLS; i++) {
+	for (int32_t free = next_gunshell, i = 0; i < MAX_GUNSHELLS; i++) {
 		if (shell->counter) {
 			if (shell->counter < min_life) {
 				min_life_num = free;
@@ -1020,7 +1020,7 @@ void UpdateGunShells() {
 	int32_t ox, oy, oz, c, h;
 	int16_t oroom;
 
-	for (int i = 0; i < 24; i++) {
+	for (int32_t i = 0; i < 24; i++) {
 		shell = &Gunshells[i];
 
 		if (!shell->counter)
@@ -1210,7 +1210,7 @@ void DrawGunflashes() {
 	GetRandomDraw();
 	GetRandomDraw();
 
-	for (int i = 0; i < MAX_GUN_FLASHES; i++) {
+	for (int32_t i = 0; i < MAX_GUN_FLASHES; i++) {
 		flash = &Gunflashes[i];
 
 		if (!flash->on)
@@ -1246,7 +1246,7 @@ int32_t GetFreeBlood() {
 	min_life = 4095;
 	min_life_num = 0;
 
-	for (int i = 0; i < MAX_BLOOD; i++) {
+	for (int32_t i = 0; i < MAX_BLOOD; i++) {
 		if (bptr->On) {
 			if (bptr->Life < min_life) {
 				min_life_num = free;
@@ -1291,7 +1291,7 @@ void UpdateBlood() {
 	BLOOD_STRUCT* bptr;
 	int32_t fade;
 
-	for (int i = 0; i < MAX_BLOOD; i++) {
+	for (int32_t i = 0; i < MAX_BLOOD; i++) {
 		bptr = &blood[i];
 
 		if (!bptr->On)
@@ -1341,7 +1341,7 @@ void TriggerBlood(int32_t x, int32_t y, int32_t z, int32_t angle, int32_t num) {
 	int16_t ang, speed;
 	uint8_t size;
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		bptr = &blood[GetFreeBlood()];
 		bptr->On = 1;
 		bptr->sShade = 0;
@@ -1387,7 +1387,7 @@ int32_t GetFreeBubble() {
 	free = next_bubble;
 	bubble = &Bubbles[next_bubble];
 
-	for (int i = 0; i < MAX_BUBBLES; i++) {
+	for (int32_t i = 0; i < MAX_BUBBLES; i++) {
 		if (bubble->size) {
 			if (free == MAX_BUBBLES - 1) {
 				bubble = &Bubbles[0];
@@ -1444,7 +1444,7 @@ void UpdateBubbles() {
 	int32_t h, c;
 	int16_t room_number;
 
-	for (int i = 0; i < MAX_BUBBLES; i++) {
+	for (int32_t i = 0; i < MAX_BUBBLES; i++) {
 		bubble = &Bubbles[i];
 
 		if (!bubble->size)
@@ -1497,7 +1497,7 @@ int32_t GetFreeDrip() {
 	min_life = 4095;
 	min_life_num = 0;
 
-	for (int i = 0; i < MAX_DRIPS; i++) {
+	for (int32_t i = 0; i < MAX_DRIPS; i++) {
 		if (drip->On) {
 			if (drip->Life < min_life) {
 				min_life_num = free;
@@ -1528,7 +1528,7 @@ void TriggerLaraDrips() {
 	if (wibble & 0xF)
 		return;
 
-	for (int i = 14; i > 0; i--) {
+	for (int32_t i = 14; i > 0; i--) {
 		if (lara.wet[i] && !LaraNodeUnderwater[i] && (GetRandomControl() & 0x1FF) < lara.wet[i]) {
 			pos.x = (GetRandomControl() & 0x1F) - 16;
 			pos.y = (GetRandomControl() & 0xF) + 16;
@@ -1553,7 +1553,7 @@ void TriggerLaraDrips() {
 }
 
 int32_t GetFreeShockwave() {
-	for (int i = 0; i < MAX_SHOCKWAVES; i++) {
+	for (int32_t i = 0; i < MAX_SHOCKWAVES; i++) {
 		if (!ShockWaves[i].life)
 			return i;
 	}
@@ -1650,7 +1650,7 @@ void UpdateShockwaves() {
 	int32_t dx, dz, dist;
 	int16_t dir;
 
-	for (int i = 0; i < MAX_SHOCKWAVES; i++) {
+	for (int32_t i = 0; i < MAX_SHOCKWAVES; i++) {
 		sw = &ShockWaves[i];
 
 		if (!sw->life)
@@ -1687,7 +1687,7 @@ void UpdateLightning() {
 	int32_t* pPoint;
 	int8_t* pVel;
 
-	for (int i = 0; i < MAX_LIGHTNING; i++) {
+	for (int32_t i = 0; i < MAX_LIGHTNING; i++) {
 		lptr = &Lightning[i];
 
 		if (!lptr->Life)
@@ -1701,7 +1701,7 @@ void UpdateLightning() {
 		pPoint = &lptr->Point[1].x;
 		pVel = &lptr->Xvel1;
 
-		for (int j = 0; j < 9; j++) {
+		for (int32_t j = 0; j < 9; j++) {
 			*pPoint++ += *pVel << 1;
 			*pVel -= *pVel >> 4;
 			pVel++;
@@ -1743,7 +1743,7 @@ void CalcLightningSpline(PHD_VECTOR* pos, SVECTOR* dest, LIGHTNING_STRUCT* lptr)
 		xadd = 0x10000 / (segments - 1);
 		x = xadd;
 
-		for (int i = 0; i < segments - 2; i++) {
+		for (int32_t i = 0; i < segments - 2; i++) {
 			dest->x = int16_t(LSpline(x, &pos->x, 6) + (GetRandomControl() & 0xF) - 8);
 			dest->y = int16_t(LSpline(x, &pos->y, 6) + (GetRandomControl() & 0xF) - 8);
 			dest->z = int16_t(LSpline(x, &pos->z, 6) + (GetRandomControl() & 0xF) - 8);
@@ -1758,7 +1758,7 @@ void CalcLightningSpline(PHD_VECTOR* pos, SVECTOR* dest, LIGHTNING_STRUCT* lptr)
 		y = yadd + pos->y + GetRandomControl() % (lptr->Rand << 1) - lptr->Rand;
 		z = zadd + pos->z + GetRandomControl() % (lptr->Rand << 1) - lptr->Rand;
 
-		for (int i = 0; i < segments - 2; i++) {
+		for (int32_t i = 0; i < segments - 2; i++) {
 			dest->x = (int16_t)x;
 			dest->y = (int16_t)y;
 			dest->z = (int16_t)z;
@@ -1883,7 +1883,7 @@ void S_DrawSparks() {
 
 	smallest_size = 0;
 
-	for (int i = 0; i < MAX_NODE_OFFSETS; i++)
+	for (int32_t i = 0; i < MAX_NODE_OFFSETS; i++)
 		NodeOffsets[i].GotIt = 0;
 
 	phd_PushMatrix();
@@ -1892,9 +1892,9 @@ void S_DrawSparks() {
 	Z = (int32_t*)&tsv_buffer[512];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	int max_sparks = get_game_mod_global_info()->max_particles;
+	int32_t max_sparks = get_game_mod_global_info()->max_particles;
 
-	for (int i = 0; i < max_sparks; i++) {
+	for (int32_t i = 0; i < max_sparks; i++) {
 		sptr = &spark[i];
 
 		if (!sptr->On)

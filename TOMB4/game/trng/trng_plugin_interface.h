@@ -58,15 +58,15 @@
 #define CB_STATE_ID_LARA_COLLISION 115
 
 struct TRNGPlugin {
-	//void InitLevel(int newLevel, int oldLevel, uint32_t fil_flags);
+	//void InitLevel(int32_t newLevel, int32_t oldLevel, uint32_t fil_flags);
 	//void PreloadLevel(); // Called before beginning loading of new level
 
-	//int PluginFlipEffect();
-	//int PluginAction();
-	//int PluginCondition();
-	//int PluginCustomize();
-	//int PluginParameters();
-	//int PluginAssignSlot();
+	//int32_t PluginFlipEffect();
+	//int32_t PluginAction();
+	//int32_t PluginCondition();
+	//int32_t PluginCustomize();
+	//int32_t PluginParameters();
+	//int32_t PluginAssignSlot();
 
 	//void CycleBegin();
 };

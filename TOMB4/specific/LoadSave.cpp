@@ -116,7 +116,7 @@ void DoOptions() {
 		i = 1;
 
 		for (lp = 0; lp < 16; lp++) {
-			int dik = keyboard_layout[1][lp];
+			int32_t dik = keyboard_layout[1][lp];
 
 			txt = (waiting_for_key && sel2 & (1 << i)) ? GetFixedStringForTextID(TXT_Waiting) : keyboard_buttons[dik];
 			if (txt)
@@ -499,7 +499,7 @@ int32_t DoLoadSave(int32_t LoadSave) {
 
 	PrintString(phd_centerx, savegame_font_height, 6, GetFixedStringForTextID(txt), FF_CENTER);
 
-	for (int i = 0; i < MAX_SAVEGAMES; i++) {
+	for (int32_t i = 0; i < MAX_SAVEGAMES; i++) {
 		pSave = &SaveGames[i];
 		color = 2;
 
@@ -576,7 +576,7 @@ int32_t S_LoadSave(int32_t load_or_save, int32_t mono, int32_t inv_active) {
 		else
 			S_UpdateInput();
 
-		SetDebounce = 1;
+		SetDebounce = true;
 		S_DisplayMonoScreen();
 		ret = DoLoadSave(load_or_save);
 		UpdatePulseColour();
@@ -670,11 +670,11 @@ static void BitMaskGetNumberOfBits(uint32_t bitMask, uint32_t& bitDepth, uint32_
 void CheckKeyConflicts() {
 	int16_t key;
 
-	for (int i = 0; i < 18; i++) {
+	for (int32_t i = 0; i < INPUT_ACTION_COUNT - 1; i++) {
 		key = keyboard_layout[0][i];
 		conflict[i] = 0;
 
-		for (int j = 0; j < 18; j++) {
+		for (int32_t j = 0; j < INPUT_ACTION_COUNT - 1; j++) {
 			if (key == keyboard_layout[1][j]) {
 				conflict[i] = 1;
 				break;
@@ -700,7 +700,7 @@ int32_t S_PauseMenu(int32_t force_menu) {
 		else
 			S_UpdateInput();
 
-		SetDebounce = 1;
+		SetDebounce = true;
 		S_DisplayMonoScreen();
 		ret = S_DisplayPauseMenu(0);
 		UpdatePulseColour();
@@ -738,7 +738,7 @@ int32_t GetSaveLoadFiles() {
 
 	SaveCounter = 0;
 
-	for (int i = 0; i < MAX_SAVEGAMES; i++) {
+	for (int32_t i = 0; i < MAX_SAVEGAMES; i++) {
 		pSave = &SaveGames[i];
 		sprintf(name, "savegame.%d", i);
 

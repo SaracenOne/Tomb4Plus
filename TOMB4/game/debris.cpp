@@ -25,7 +25,7 @@ void UpdateDebris() {
 	FLOOR_INFO* floor;
 	int32_t height, ceiling;
 
-	for (int i = 0; i < MAX_DEBRIS; i++) {
+	for (int32_t i = 0; i < MAX_DEBRIS; i++) {
 		dptr = &debris[i];
 
 		if (dptr->On) {
@@ -148,7 +148,7 @@ int32_t GetFreeDebris() {
 	eldestage = -0x4000;
 	dptr = &debris[next_debris];
 
-	for (int i = 0; i < MAX_DEBRIS; i++) {
+	for (int32_t i = 0; i < MAX_DEBRIS; i++) {
 		if (!dptr->On) {
 			next_debris = (free + 1) & 0xFF;
 			return free;

@@ -22,7 +22,7 @@ void S_UnpauseAudio();
 
 void S_Reset();
 
-void S_CDSeek(int channel_id, int64_t frame);
+void S_CDSeek(int32_t channel_id, int64_t frame);
 
 void SetUsingNewAudioSystem(bool enabled);
 void SetUsingOldTriggerMode(bool enabled);

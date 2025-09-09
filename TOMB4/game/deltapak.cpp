@@ -173,8 +173,8 @@ void handle_cutseq_triggering(int32_t name) {
 					lara.left_arm.lock = 0;
 					lara_item->goal_anim_state = AS_STOP;
 					lara_item->current_anim_state = AS_STOP;
-					lara_item->frame_number = anims[ANIM_STOP].frame_base;
-					lara_item->anim_number = ANIM_STOP;
+					lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
+					lara_item->anim_number = LARA_ANIM_STOP;
 					lara_item->speed = 0;
 					lara_item->fallspeed = 0;
 					lara_item->gravity_status = 0;
@@ -319,7 +319,7 @@ void do_new_cutscene_camera() {
 	phd_LookAt(camera.pos.x, camera.pos.y, camera.pos.z, camera.target.x, camera.target.y, camera.target.z, 0);
 	DecodeAnim(actor_pnodes[0], 16, GLOBAL_cutseq_frame, 1023);
 
-	for (int i = 1; i < GLOBAL_cutme->numactors; i++)
+	for (int32_t i = 1; i < GLOBAL_cutme->numactors; i++)
 		DecodeAnim(actor_pnodes[i], GLOBAL_cutme->actor_data[i].nodes + 1, GLOBAL_cutseq_frame, 1023);
 
 	GLOBAL_cutseq_frame++;
@@ -336,7 +336,7 @@ void InitPackNodes(NODELOADHEADER* lnode, PACKNODE* pnode, char* packed, int32_t
 
 	offset = ((numnodes << 3) - numnodes) << 1;
 
-	for (int i = 0; i < numnodes; i++) {
+	for (int32_t i = 0; i < numnodes; i++) {
 		pnode->xkey = (uint16_t)lnode->xkey;
 		pnode->ykey = (uint16_t)lnode->ykey;
 		pnode->zkey = (uint16_t)lnode->zkey;
@@ -365,7 +365,7 @@ void DecodeAnim(PACKNODE* node, int32_t num_nodes, int32_t frame, int32_t flags)
 		node->zrot_run += DecodeTrack(node->zpacked, &node->decode_z);
 		node++;
 
-		for (int i = 1; i < num_nodes; i++, node++) {
+		for (int32_t i = 1; i < num_nodes; i++, node++) {
 			node->xrot_run += DecodeTrack(node->xpacked, &node->decode_x);
 			node->yrot_run += DecodeTrack(node->ypacked, &node->decode_y);
 			node->zrot_run += DecodeTrack(node->zpacked, &node->decode_z);
@@ -374,7 +374,7 @@ void DecodeAnim(PACKNODE* node, int32_t num_nodes, int32_t frame, int32_t flags)
 			node->zrot_run &= flags;
 		}
 	} else {
-		for (int i = num_nodes; i; i--, node++) {
+		for (int32_t i = num_nodes; i; i--, node++) {
 			node->decode_x.off = 0;
 			node->decode_x.counter = 0;
 			node->decode_x.data = 0;
@@ -507,7 +507,7 @@ void fix_lara_for_cutseq() {
 		GLaraShadowframe = cutseq_shadow_bbox;
 }
 
-void updateAnimFrame(PACKNODE* node, int flags, int16_t* frame) {
+void updateAnimFrame(PACKNODE* node, int32_t flags, int16_t* frame) {
 	int16_t* nex;
 
 	frame[6] = 3 * node->xrot_run;
@@ -515,7 +515,7 @@ void updateAnimFrame(PACKNODE* node, int flags, int16_t* frame) {
 	frame[8] = 3 * node->zrot_run;
 	nex = frame + 9;
 
-	for (int i = 1; i < flags; i++, nex += 2) {
+	for (int32_t i = 1; i < flags; i++, nex += 2) {
 		nex[0] = (node[i].zrot_run | ((node[i].yrot_run | (node[i].xrot_run << 10)) << 10)) >> 16;
 		nex[1] = node[i].zrot_run | ((node[i].yrot_run | (node[i].xrot_run << 10)) << 10);
 	}
@@ -539,7 +539,7 @@ void DrawCutSeqActors() {
 
 	phd_PushMatrix();
 
-	for (int i = 1; i < GLOBAL_cutme->numactors; i++) {
+	for (int32_t i = 1; i < GLOBAL_cutme->numactors; i++) {
 		phd_PushMatrix();
 
 		if (cutseq_meshbits[i] & 0x80000000) {
@@ -563,7 +563,7 @@ void DrawCutSeqActors() {
 
 			mesh += 2;
 
-			for (int j = 0; j < obj->nmeshes - 1; j++, bone += 4, mesh += 2) {
+			for (int32_t j = 0; j < obj->nmeshes - 1; j++, bone += 4, mesh += 2) {
 				if (*bone & 1)
 					phd_PopMatrix();
 
@@ -1330,7 +1330,7 @@ void deal_with_pistols() {
 void cutseq_kill_item(int32_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == num) {
@@ -1344,7 +1344,7 @@ void cutseq_kill_item(int32_t num) {
 ITEM_INFO* cutseq_restore_item(int32_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == num) {
@@ -1379,7 +1379,7 @@ int32_t Load_and_Init_Cutseq(int32_t num) {
 	Log(5, "OrgX=%d,OrgY=%d,OrgZ=%d\n", GLOBAL_cutme->orgx, GLOBAL_cutme->orgy, GLOBAL_cutme->orgz);
 	Log(5, "CameraOffset=%d\n", GLOBAL_cutme->camera_offset);
 
-	for (int i = 0; i < GLOBAL_cutme->numactors; i++) {
+	for (int32_t i = 0; i < GLOBAL_cutme->numactors; i++) {
 		actor = &GLOBAL_cutme->actor_data[i];
 		Log(5, "Actor %d --- offset=%d,slot=%d,nodes=%d\n", i, actor->offset, actor->objslot, actor->nodes);
 	}
@@ -1399,7 +1399,7 @@ void init_cutseq_actors(char* data, int32_t resident) {
 	GLOBAL_playing_cutseq = 0;
 	GLOBAL_numcutseq_frames = GLOBAL_cutme->numframes;
 
-	for (int i = 0; i < GLOBAL_cutme->numactors; i++) {
+	for (int32_t i = 0; i < GLOBAL_cutme->numactors; i++) {
 		item = &duff_item[i];
 		offset = GLOBAL_cutme->actor_data[i].offset;
 		packed = &data[offset];
@@ -1471,8 +1471,8 @@ void DelsHandyTeleportLara(int32_t x, int32_t y, int32_t z, int32_t yrot) {
 
 	lara_item->current_anim_state = AS_STOP;
 	lara_item->goal_anim_state = AS_STOP;
-	lara_item->anim_number = ANIM_STOP;
-	lara_item->frame_number = anims[ANIM_STOP].frame_base;
+	lara_item->anim_number = LARA_ANIM_STOP;
+	lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 	lara_item->speed = 0;
 	lara_item->fallspeed = 0;
 	lara_item->gravity_status = 0;
@@ -1483,7 +1483,7 @@ void DelsHandyTeleportLara(int32_t x, int32_t y, int32_t z, int32_t yrot) {
 void nail_intelligent_object(int16_t num) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == num) {
@@ -1585,7 +1585,7 @@ void untrigger_item_in_room(int32_t room_number, int32_t object_number) {
 ITEM_INFO *find_an_item_with_object_type(int32_t object_number) {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == object_number)
@@ -1629,7 +1629,7 @@ void special3_control() {
 void special1_init() {
 	ITEM_INFO* item;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (item->object_number == ANIMATING6) {

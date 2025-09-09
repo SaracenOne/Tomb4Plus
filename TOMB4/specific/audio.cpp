@@ -712,7 +712,7 @@ struct ma_audio_stream_channel {
 };
 
 struct ma_callback_userdata {
-	int channel_id = -1;
+	int32_t channel_id = -1;
 };
 
 ma_audio_stream_channel channels[MA_AUDIO_STREAM_COUNT];
@@ -720,7 +720,7 @@ ma_callback_userdata callback_userdata[MA_AUDIO_STREAM_COUNT];
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 	ma_callback_userdata *userdata = (ma_callback_userdata *)pDevice->pUserData;
-	int channel_id = userdata->channel_id;
+	int32_t channel_id = userdata->channel_id;
 
 	ma_decoder* pDecoder = &channels[channel_id].decoder;
 	if (pDecoder == NULL) {
@@ -886,7 +886,7 @@ void track_complete_callback(int32_t channel_id) {
 			stop_track_on_stream_channel(channel_id);
 
 			if (channels[channel_id].restore_track != -1) {
-				int next_track = channels[channel_id].restore_track;
+				int32_t next_track = channels[channel_id].restore_track;
 				StreamMode next_stream_mode = channels[channel_id].restore_stream_mode;
 
 				channels[channel_id].restore_track = -1;
@@ -1005,7 +1005,7 @@ uint64_t S_CDGetChannelPosition(uint8_t channel_id) {
 }
 
 void S_CDStop() {
-	for (int i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
+	for (int32_t i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
 		channels[i].current_stream_active = false;
 		stop_track_on_stream_channel(i);
 	}
@@ -1028,7 +1028,7 @@ void S_Reset() {
 	new_audio_system = false;
 	old_cd_trigger_mode = true;
 
-	for (int i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
+	for (int32_t i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
 		channels[i].current_stream_length = 0;
 		channels[i].current_stream_loops = false;
 		channels[i].current_stream_paused = false;
@@ -1079,7 +1079,7 @@ void S_CDSetChannelVolume(uint8_t volume, uint8_t channel) {
 }
 
 void S_UnpauseAudio() {
-	for (int i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
+	for (int32_t i = 0; i < MA_AUDIO_STREAM_COUNT; i++) {
 		if (channels[i].device.pContext) {
 			ma_mutex_lock(&channels[i].device.startStopLock);
 			{
@@ -1092,7 +1092,7 @@ void S_UnpauseAudio() {
 	}
 }
 
-void S_CDSeek(int channel_id, int64_t frame) {
+void S_CDSeek(int32_t channel_id, int64_t frame) {
 	ma_decoder* pDecoder = &channels[channel_id].decoder;
 	if (pDecoder == NULL) {
 		return;

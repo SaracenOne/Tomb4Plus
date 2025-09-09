@@ -25,7 +25,7 @@ bgfx::TextureHandle CreateTexturePage(int32_t w, int32_t h, int32_t MipMapCount,
 		MipMapCount = 0;
 	}
 
-	const bgfx::Memory* texture_buffer = bgfx::alloc(((buffer_width * buffer_height) * sizeof(int)));
+	const bgfx::Memory* texture_buffer = bgfx::alloc(((buffer_width * buffer_height) * sizeof(int32_t)));
 
 	if (!format) {
 		lS = pSrc;
@@ -48,7 +48,7 @@ bgfx::TextureHandle CreateTexturePage(int32_t w, int32_t h, int32_t MipMapCount,
 				ao = a << 24;
 				o = ro | go | bo | ao;
 
-				for (int i = 32; i > 0; i -= 8) {
+				for (int32_t i = 32; i > 0; i -= 8) {
 					*cD++ = (int8_t)o;
 					o >>= 8;
 				}
@@ -87,7 +87,7 @@ bgfx::TextureHandle CreateTexturePage(int32_t w, int32_t h, int32_t MipMapCount,
 void FreeTextures() {
 	TEXTURE* tex;
 
-	for (int i = 0; i < nTextures; i++) {
+	for (int32_t i = 0; i < nTextures; i++) {
 		tex = &Textures[i];
 
 		if (bgfx::isValid(tex->tex)) {

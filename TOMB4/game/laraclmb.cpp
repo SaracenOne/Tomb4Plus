@@ -29,7 +29,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll) {
 		item->goal_anim_state = AS_CLIMBRIGHT;
 		lara.move_angle = item->pos.y_rot + 0x4000;
 	} else if (input & IN_JUMP) {
-		if (item->anim_number == ANIM_CLIMBSTNC) {
+		if (item->anim_number == LARA_ANIM_CLIMBSTNC) {
 			item->goal_anim_state = AS_BACKJUMP;
 			lara.gun_status = LG_NO_ARMS;
 			lara.move_angle = item->pos.y_rot + 0x8000;
@@ -99,7 +99,7 @@ void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll) {
 void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) {
 	int32_t result_r, result_l, shift_r, shift_l, ledge_r, ledge_l;
 
-	if (LaraCheckForLetGo(item, coll) || item->anim_number != ANIM_CLIMBSTNC)
+	if (LaraCheckForLetGo(item, coll) || item->anim_number != LARA_ANIM_CLIMBSTNC)
 		return;
 
 	if (input & IN_FORWARD) {
@@ -171,10 +171,10 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll) {
 	if (LaraCheckForLetGo(item, coll))
 		return;
 
-	if (item->anim_number != ANIM_CLIMBING)
+	if (item->anim_number != LARA_ANIM_CLIMBING)
 		return;
 
-	frame = item->frame_number - anims[ANIM_CLIMBING].frame_base;
+	frame = item->frame_number - anims[LARA_ANIM_CLIMBING].frame_base;
 
 	if (!frame)
 		yshift = 0;
@@ -217,10 +217,10 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll) {
 	if (LaraCheckForLetGo(item, coll))
 		return;
 
-	if (item->anim_number != ANIM_CLIMBDOWN)
+	if (item->anim_number != LARA_ANIM_CLIMBDOWN)
 		return;
 
-	frame = item->frame_number - anims[ANIM_CLIMBDOWN].frame_base;
+	frame = item->frame_number - anims[LARA_ANIM_CLIMBDOWN].frame_base;
 
 	if (!frame)
 		yshift = 0;
@@ -241,8 +241,8 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll) {
 			item->goal_anim_state = AS_CLIMBSTNC;
 			AnimateLara(item);
 		} else if (result_r == -1 || result_l == -1) {
-			item->anim_number = ANIM_CLIMBSTNC;
-			item->frame_number = anims[ANIM_CLIMBSTNC].frame_base;
+			item->anim_number = LARA_ANIM_CLIMBSTNC;
+			item->frame_number = anims[LARA_ANIM_CLIMBSTNC].frame_base;
 			item->current_anim_state = AS_CLIMBSTNC;
 			item->goal_anim_state = AS_HANG;
 			AnimateLara(item);
@@ -503,7 +503,7 @@ int32_t LaraTestClimbUpPos(ITEM_INFO* item, int32_t front, int32_t right, int32_
 		if (c >= HALF_BLOCK_SIZE)
 			return 1;
 
-		if (h - c > ((HALF_BLOCK_SIZE + CLICK_SIZE) - 6)) {
+		if (h - c > LARA_STANDARD_HEIGHT) {
 			*shift = h;
 			return -1;
 		}
@@ -539,8 +539,8 @@ int32_t LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll) {
 		lara.torso_y_rot = 0;
 		lara.head_x_rot = 0;
 		lara.head_y_rot = 0;
-		item->anim_number = ANIM_FALLDOWN;
-		item->frame_number = anims[ANIM_FALLDOWN].frame_base;
+		item->anim_number = LARA_ANIM_FALLDOWN;
+		item->frame_number = anims[LARA_ANIM_FALLDOWN].frame_base;
 		item->current_anim_state = AS_FORWARDJUMP;
 		item->goal_anim_state = AS_FORWARDJUMP;
 		item->speed = 2;
@@ -753,8 +753,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int32_t result, int3
 		item->goal_anim_state = AS_CLIMBSTNC;
 
 		if (coll->old_anim_state != AS_CLIMBSTNC) {
-			item->anim_number = ANIM_CLIMBSTNC;
-			item->frame_number = anims[ANIM_CLIMBSTNC].frame_base;
+			item->anim_number = LARA_ANIM_CLIMBSTNC;
+			item->frame_number = anims[LARA_ANIM_CLIMBSTNC].frame_base;
 			return;
 		}
 
@@ -763,13 +763,13 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int32_t result, int3
 
 			if (flag) {
 				if (flag > 0) {
-					item->anim_number = ANIM_EXTCLIMBL;
-					item->frame_number = anims[ANIM_EXTCLIMBL].frame_base;
+					item->anim_number = LARA_ANIM_EXTCLIMBL;
+					item->frame_number = anims[LARA_ANIM_EXTCLIMBL].frame_base;
 					item->current_anim_state = AS_CORNEREXTL;
 					item->goal_anim_state = AS_CORNEREXTL;
 				} else {
-					item->anim_number = ANIM_INTCLIMBL;
-					item->frame_number = anims[ANIM_INTCLIMBL].frame_base;
+					item->anim_number = LARA_ANIM_INTCLIMBL;
+					item->frame_number = anims[LARA_ANIM_INTCLIMBL].frame_base;
 					item->current_anim_state = AS_CORNERINTL;
 					item->goal_anim_state = AS_CORNERINTL;
 				}
@@ -781,13 +781,13 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int32_t result, int3
 
 			if (flag) {
 				if (flag > 0) {
-					item->anim_number = ANIM_EXTCLIMBR;
-					item->frame_number = anims[ANIM_EXTCLIMBR].frame_base;
+					item->anim_number = LARA_ANIM_EXTCLIMBR;
+					item->frame_number = anims[LARA_ANIM_EXTCLIMBR].frame_base;
 					item->current_anim_state = AS_CORNEREXTR;
 					item->goal_anim_state = AS_CORNEREXTR;
 				} else {
-					item->anim_number = ANIM_INTCLIMBR;
-					item->frame_number = anims[ANIM_INTCLIMBR].frame_base;
+					item->anim_number = LARA_ANIM_INTCLIMBR;
+					item->frame_number = anims[LARA_ANIM_INTCLIMBR].frame_base;
 					item->current_anim_state = AS_CORNERINTR;
 					item->goal_anim_state = AS_CORNERINTR;
 				}

@@ -146,15 +146,15 @@
 #define	T4P_KEY_MAIL						0xEC
 #define	T4P_KEY_MEDIASELECT					0xED
 
-extern int convert_sdl_scancode_to_tomb_keycode(int scancode);
-extern int convert_tomb_keycode_to_sdl_scancode(int tomb_keycode);
+extern int32_t convert_sdl_scancode_to_tomb_keycode(int32_t scancode);
+extern int32_t convert_tomb_keycode_to_sdl_scancode(int32_t tomb_keycode);
 
 extern void UpdateGamepad();
 
 extern void InputInit();
 extern void InputShutdown();
 
-extern bool IsKeyPressed(int t4p_key);
+extern bool IsKeyPressed(int32_t t4p_key);
 
 enum InputAction {
 	INPUT_ACTION_FORWARD = 0,

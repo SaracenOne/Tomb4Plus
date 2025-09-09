@@ -172,7 +172,7 @@ void DrawBikeBeam(ITEM_INFO* item) {
 			rot2 = frm[1] + 9;
 			gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-			for (int i = 0; i < obj->nmeshes - 1; i++) {
+			for (int32_t i = 0; i < obj->nmeshes - 1; i++) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix_I();
 
@@ -205,7 +205,7 @@ void DrawBikeBeam(ITEM_INFO* item) {
 			rot = frm[0] + 9;
 			gar_RotYXZsuperpack(&rot, 0);
 
-			for (int i = 0; i < obj->nmeshes - 1; i++) {
+			for (int32_t i = 0; i < obj->nmeshes - 1; i++) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix();
 
@@ -348,7 +348,7 @@ void BikeExplode(ITEM_INFO* item) {
 	else {
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -2, 0, item->room_number);
 
-		for (int i = 0; i < 3; i++)
+		for (int32_t i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -1, 0, item->room_number);
 	}
 
@@ -582,8 +582,8 @@ static int32_t BikeCheckGetOff() {
 
 	if (state == 10 && lara_item->frame_number == anims[lara_item->anim_number].frame_end) {
 		lara_item->pos.y_rot -= 0x4000;
-		lara_item->anim_number = ANIM_STOP;
-		lara_item->frame_number = anims[ANIM_STOP].frame_base;
+		lara_item->anim_number = LARA_ANIM_STOP;
+		lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 		lara_item->goal_anim_state = AS_STOP;
 		lara_item->current_anim_state = AS_STOP;
 		lara_item->pos.x_pos -= HALF_BLOCK_SIZE * phd_sin(lara_item->pos.y_rot) >> W2V_SHIFT;
@@ -595,8 +595,8 @@ static int32_t BikeCheckGetOff() {
 		DashTimer = 120;
 	} else if (lara_item->frame_number == anims[lara_item->anim_number].frame_end) {
 		if (state == 20) {
-			lara_item->anim_number = ANIM_FASTFALL;
-			lara_item->frame_number = anims[ANIM_FASTFALL].frame_base;
+			lara_item->anim_number = LARA_ANIM_FASTFALL;
+			lara_item->frame_number = anims[LARA_ANIM_FASTFALL].frame_base;
 			lara_item->current_anim_state = AS_FASTFALL;
 			pos.x = 0;
 			pos.y = 0;
@@ -738,7 +738,7 @@ int32_t BikeBaddieCollision(ITEM_INFO* bike) {
 	broomies[0] = bike->room_number;
 	doors = room[bike->room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16) {
+	for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 		for (j = 0; j < room_count; j++) {
 			if (broomies[j] == *doors)
 				break;
@@ -750,7 +750,7 @@ int32_t BikeBaddieCollision(ITEM_INFO* bike) {
 		}
 	}
 
-	for (int i = 0; i < room_count; i++) {
+	for (int32_t i = 0; i < room_count; i++) {
 		for (item_number = room[broomies[i]].item_number; item_number != NO_ITEM; item_number = item->next_item) {
 			item = &items[item_number];
 
@@ -807,7 +807,7 @@ void BikeCollideStaticObjects(int32_t x, int32_t y, int32_t z, int16_t room_numb
 	broomies[0] = room_number;
 	doors = room[room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16) {
+	for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 		for (j = 0; j < room_count; j++) {
 			if (broomies[j] == *doors)
 				break;
@@ -819,7 +819,7 @@ void BikeCollideStaticObjects(int32_t x, int32_t y, int32_t z, int16_t room_numb
 		}
 	}
 
-	for (int i = 0; i < room_count; i++) {
+	for (int32_t i = 0; i < room_count; i++) {
 		rn = broomies[i];
 		r = &room[rn];
 		mesh = r->mesh;
@@ -1080,7 +1080,7 @@ int32_t BikeDynamics(ITEM_INFO* item) {
 
 		item->pos.y_rot += int16_t(bike->bike_turn + bike->extra_rotation);
 		ang = item->pos.y_rot - bike->move_angle;
-		vel = int16_t(DEGREES_TO_ROTATION(4) - ((2 * bike->velocity) >> 10));
+		vel = int16_t(DEGREES_TO_ROTATION(4) - ((2 * bike->velocity) >> WALL_SHIFT));
 
 		if (!(input & IN_ACTION) && bike->velocity > 0)
 			vel += vel >> 1;

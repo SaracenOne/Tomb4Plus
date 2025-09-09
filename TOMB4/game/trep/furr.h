@@ -192,27 +192,27 @@ enum FURRResult {
 struct FURRParameters {
 	FURRResult previous_result;
 
-	int first_parameter = 0;
-	int second_parameter = 0;
+	int32_t first_parameter = 0;
+	int32_t second_parameter = 0;
 };
 
 struct FURRDataTable {
-	const int arg_count;
+	const int32_t arg_count;
 	FURRResult (*func_ptr)(FURRParameters);
 };
 
 extern FURRDataTable furr_data_table[];
 
 struct FURRFlipeffectTable {
-	int size = 0;
-	int *tokens = nullptr;
+	int32_t size = 0;
+	int32_t *tokens = nullptr;
 };
 
-extern int furr_get_arg_count_for_opcode(const FURROpcode opcode);
-extern int furr_get_opcode_for_command_string(const char* command_name);
+extern int32_t furr_get_arg_count_for_opcode(const FURROpcode opcode);
+extern int32_t furr_get_opcode_for_command_string(const char* command_name);
 
 extern void furr_clear_oneshot_buffer();
-extern void furr_execute_furr_flipeffect(int id);
-extern void furr_allocate_flipeffect_buffer(int flipeffect_id, int size);
+extern void furr_execute_furr_flipeffect(int32_t id);
+extern void furr_allocate_flipeffect_buffer(int32_t flipeffect_id, int32_t size);
 extern void furr_free_all_flipeffect_buffers();
-extern void furr_add_flipeffect_token(int flipeffect_id, int token);
+extern void furr_add_flipeffect_token(int32_t flipeffect_id, int32_t token);

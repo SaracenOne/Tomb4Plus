@@ -100,7 +100,7 @@ void ObjectObjects() {
 	obj->save_position = 1;
 	obj->save_flags = 1;
 
-	for (int i = SMASH_OBJECT1; i <= SMASH_OBJECT8; i++) {
+	for (int32_t i = SMASH_OBJECT1; i <= SMASH_OBJECT8; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseSmashObject;
 		obj->control = SmashObjectControl;
@@ -121,7 +121,7 @@ void ObjectObjects() {
 	obj->floor = BridgeTilt2Floor;
 	obj->ceiling = BridgeTilt2Ceiling;
 
-	for (int i = SWITCH_TYPE1; i <= SWITCH_TYPE6; i++) {
+	for (int32_t i = SWITCH_TYPE1; i <= SWITCH_TYPE6; i++) {
 		obj = &objects[i];
 		obj->control = SwitchControl;
 		obj->collision = SwitchCollision;
@@ -129,7 +129,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = SEQUENCE_SWITCH1; i <= SEQUENCE_SWITCH3; i++) {
+	for (int32_t i = SEQUENCE_SWITCH1; i <= SEQUENCE_SWITCH3; i++) {
 		obj = &objects[i];
 		obj->control = FullBlockSwitchControl;
 		obj->collision = FullBlockSwitchCollision;
@@ -186,7 +186,7 @@ void ObjectObjects() {
 	obj->save_flags = 1;
 	obj->save_anim = 1;
 
-	for (int i = DOOR_TYPE1; i <= DOOR_TYPE8; i++) {
+	for (int32_t i = DOOR_TYPE1; i <= DOOR_TYPE8; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
@@ -216,7 +216,7 @@ void ObjectObjects() {
 	obj->save_flags = 1;
 	obj->save_anim = 1;
 
-	for (int i = PUSHPULL_DOOR1; i <= KICK_DOOR2; i++) {
+	for (int32_t i = PUSHPULL_DOOR1; i <= KICK_DOOR2; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseDoor;
 		obj->control = PushPullKickDoorControl;
@@ -225,7 +225,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = FLOOR_TRAPDOOR1; i <= FLOOR_TRAPDOOR2; i++) {
+	for (int32_t i = FLOOR_TRAPDOOR1; i <= FLOOR_TRAPDOOR2; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseTrapDoor;
 		obj->control = TrapDoorControl;
@@ -234,7 +234,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = CEILING_TRAPDOOR1; i <= CEILING_TRAPDOOR2; i++) {
+	for (int32_t i = CEILING_TRAPDOOR1; i <= CEILING_TRAPDOOR2; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseTrapDoor;
 		obj->control = TrapDoorControl;
@@ -243,7 +243,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = TRAPDOOR1; i <= TRAPDOOR3; i++) {
+	for (int32_t i = TRAPDOOR1; i <= TRAPDOOR3; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseTrapDoor;
 		obj->control = TrapDoorControl;
@@ -251,7 +251,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = PUZZLE_ITEM1; i <= SECRET_MAP; i++) {
+	for (int32_t i = PUZZLE_ITEM1; i <= SECRET_MAP; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialisePickUp;
 		obj->control = AnimatingPickUp;
@@ -260,7 +260,7 @@ void ObjectObjects() {
 		obj->save_flags = 1;
 	}
 
-	for (int i = PISTOLS_ITEM; i <= BINOCULARS_ITEM; i++) {
+	for (int32_t i = PISTOLS_ITEM; i <= BINOCULARS_ITEM; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialisePickUp;
 		obj->control = AnimatingPickUp;
@@ -317,13 +317,13 @@ void ObjectObjects() {
 	obj->save_position = 1;
 	obj->save_flags = 1;
 
-	for (int i = KEY_HOLE1; i <= KEY_HOLE12; i++) {
+	for (int32_t i = KEY_HOLE1; i <= KEY_HOLE12; i++) {
 		obj = &objects[i];
 		obj->collision = KeyHoleCollision;
 		obj->save_flags = 1;
 	}
 
-	for (int i = PUZZLE_HOLE1; i <= PUZZLE_HOLE12; i++) {
+	for (int32_t i = PUZZLE_HOLE1; i <= PUZZLE_HOLE12; i++) {
 		obj = &objects[i];
 		obj->control = ControlAnimatingSlots;
 		obj->collision = PuzzleHoleCollision;
@@ -331,7 +331,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = PUZZLE_DONE1; i <= PUZZLE_DONE12; i++) {
+	for (int32_t i = PUZZLE_DONE1; i <= PUZZLE_DONE12; i++) {
 		obj = &objects[i];
 		obj->control = ControlAnimatingSlots;
 		obj->collision = PuzzleDoneCollision;
@@ -345,7 +345,7 @@ void ObjectObjects() {
 	obj->save_flags = 1;
 	obj->save_anim = 1;
 
-	for (int i = ANIMATING1; i <= ANIMATING12; i++) {
+	for (int32_t i = ANIMATING1; i <= ANIMATING12; i++) {
 		obj = &objects[i];
 		obj->control = ControlAnimatingSlots;
 		obj->collision = ObjectCollision;
@@ -353,7 +353,7 @@ void ObjectObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = ANIMATING13; i <= ANIMATING16_MIP; i++) {
+	for (int32_t i = ANIMATING13; i <= ANIMATING16_MIP; i++) {
 		obj = &objects[i];
 		obj->control = ControlAnimatingSlots;
 		obj->save_flags = 1;
@@ -412,7 +412,7 @@ void ObjectObjects() {
 	obj->save_flags = 1;
 	obj->save_mesh = 1;
 
-	for (int i = SWITCH_TYPE7; i <= SWITCH_TYPE8; i++) {
+	for (int32_t i = SWITCH_TYPE7; i <= SWITCH_TYPE8; i++) {
 		obj = &objects[i];
 		obj->control = ControlAnimatingSlots;
 		obj->collision = SwitchType78Collision;
@@ -457,7 +457,7 @@ void ObjectObjects() {
 	obj->collision = ObjectCollision;
 	obj->save_mesh = 1;
 
-	for (int i = RAISING_BLOCK1; i <= RAISING_BLOCK2; i++) {
+	for (int32_t i = RAISING_BLOCK1; i <= RAISING_BLOCK2; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseRaisingBlock;
 		obj->control = ControlRaisingBlock;
@@ -467,7 +467,7 @@ void ObjectObjects() {
 		obj->save_flags = 1;
 	}
 
-	for (int i = SMOKE_EMITTER_WHITE; i <= STEAM_EMITTER; i++) {
+	for (int32_t i = SMOKE_EMITTER_WHITE; i <= STEAM_EMITTER; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = ControlSmokeEmitter;
@@ -476,7 +476,7 @@ void ObjectObjects() {
 		obj->save_flags = 1;
 	}
 
-	for (int i = RED_LIGHT; i <= BLUE_LIGHT; i++) {
+	for (int32_t i = RED_LIGHT; i <= BLUE_LIGHT; i++) {
 		obj = &objects[i];
 		obj->control = ControlColouredLights;
 		obj->draw_routine = 0;
@@ -526,7 +526,7 @@ void ObjectObjects() {
 	obj->draw_routine = DrawLensFlares;
 	obj->using_drawanimating_item = 0;
 
-	for (int i = WATERFALL1; i <= WATERFALL3; i++) {
+	for (int32_t i = WATERFALL1; i <= WATERFALL3; i++) {
 		obj = &objects[i];
 		obj->control = ControlWaterfall;
 		obj->save_flags = 1;
@@ -673,7 +673,7 @@ void TrapObjects() {
 	obj->save_flags = 1;
 	obj->save_anim = 1;
 
-	for (int i = FALLING_BLOCK; i <= FALLING_BLOCK2; i++) {
+	for (int32_t i = FALLING_BLOCK; i <= FALLING_BLOCK2; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseFallingBlock2;
 		obj->control = FallingBlock;
@@ -708,7 +708,7 @@ void TrapObjects() {
 	obj->save_flags = 1;
 	obj->save_anim = 1;
 
-	for (int i = PUSHABLE_OBJECT1; i <= PUSHABLE_OBJECT5; i++) {
+	for (int32_t i = PUSHABLE_OBJECT1; i <= PUSHABLE_OBJECT5; i++) {
 		obj = &objects[i];
 		obj->initialise = InitialiseMovingBlock;
 		obj->control = MovableBlock;
@@ -978,7 +978,7 @@ void BaddyObjects() {
 		meshes[obj->mesh_index + 9] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 8];
 		meshes[obj->mesh_index + 15] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 14];
 
-		for (int i = 0; i < 12; i++)
+		for (int32_t i = 0; i < 12; i++)
 			meshes[obj->mesh_index + 2 * i + 23] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 2 * i + 22];
 
 		if (objects[BADDY_2].loaded)
@@ -991,7 +991,7 @@ void BaddyObjects() {
 		meshes[obj->mesh_index + 9] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 8];
 		meshes[obj->mesh_index + 15] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 14];
 
-		for (int i = 0; i < 12; i++)
+		for (int32_t i = 0; i < 12; i++)
 			meshes[obj->mesh_index + 2 * i + 23] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 2 * i + 22];
 	}
 
@@ -1021,7 +1021,7 @@ void BaddyObjects() {
 		meshes[obj->mesh_index + 9] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 8];
 		meshes[obj->mesh_index + 15] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 14];
 
-		for (int i = 0; i < 12; i++)
+		for (int32_t i = 0; i < 12; i++)
 			meshes[obj->mesh_index + 2 * i + 23] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 2 * i + 22];
 	}
 
@@ -1031,7 +1031,7 @@ void BaddyObjects() {
 		meshes[obj->mesh_index + 9] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 8];
 		meshes[obj->mesh_index + 15] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 14];
 
-		for (int i = 0; i < 12; i++)
+		for (int32_t i = 0; i < 12; i++)
 			meshes[obj->mesh_index + 2 * i + 23] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + 2 * i + 22];
 	}
 
@@ -1466,7 +1466,7 @@ void BaddyObjects() {
 		bones[obj->bone_index + 36] |= Y_ROTATION_FLAG;
 	}
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		obj = &objects[BABOON_NORMAL + 2 * i];
 
 		if (obj->loaded) {
@@ -1592,7 +1592,7 @@ void BaddyObjects() {
 		obj->save_anim = 1;
 	}
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		obj = &objects[SAS_DYING + 2 * i];
 
 		if (obj->loaded) {
@@ -1617,7 +1617,7 @@ void BaddyObjects() {
 		obj->save_position = 1;
 	}
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		obj = &objects[GAME_PIECE1 + i];
 
 		if (obj->loaded) {
@@ -1653,7 +1653,7 @@ void BaddyObjects() {
 		bones[obj->bone_index + 12] |= Z_ROTATION_FLAG;
 	}
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		obj = &objects[WRAITH1 + i];
 
 		if (obj->loaded) {
@@ -1711,7 +1711,7 @@ void BuildOutsideTable() {
 	memset(OutsideRoomTable, 0xFF, 0xB640);
 	memset(flipped, 0, 255);
 
-	for (int i = 0; i < number_rooms; i++) {
+	for (int32_t i = 0; i < number_rooms; i++) {
 		r = &room[i];
 
 		if (r->flipped_room != -1)
@@ -1721,20 +1721,20 @@ void BuildOutsideTable() {
 	r = &room[0];
 	printf("X %d, Y %d, Z %d, Xs %d, Ys %d\n", r->x, r->y, r->z, r->x_size, r->y_size);
 
-	for (int y = 0; y < 108; y += 4) {
-		for (int x = 0; x < 108; x += 4) {
-			for (int i = 0; i < number_rooms; i++) {
+	for (int32_t y = 0; y < 108; y += 4) {
+		for (int32_t x = 0; x < 108; x += 4) {
+			for (int32_t i = 0; i < number_rooms; i++) {
 				r = &room[i];
 
 				if (flipped[i])
 					continue;
 
-				roomx = (r->z >> 10) + 1;
-				roomy = (r->x >> 10) + 1;
+				roomx = (r->z >> WALL_SHIFT) + 1;
+				roomy = (r->x >> WALL_SHIFT) + 1;
 				cont = 0;
 
-				for (int ry = 0; ry < 4; ry++) {
-					for (int rx = 0; rx < 4; rx++) {
+				for (int32_t ry = 0; ry < 4; ry++) {
+					for (int32_t rx = 0; rx < 4; rx++) {
 						if (x + rx >= roomx && x + rx < roomx + r->x_size - 2 && y + ry >= roomy && y + ry < roomy + r->y_size - 2) {
 							cont = 1;
 							break;
@@ -1745,7 +1745,7 @@ void BuildOutsideTable() {
 				if (cont) {
 					pTable = (uint8_t*)&OutsideRoomTable[1728 * (y >> 2) + 64 * (x >> 2)];
 
-					for (int j = 0; j < 64; j++) {
+					for (int32_t j = 0; j < 64; j++) {
 						if (pTable[j] == 255) {
 							pTable[j] = i;
 
@@ -1762,8 +1762,8 @@ void BuildOutsideTable() {
 
 	oTable = (uint8_t*)OutsideRoomTable;
 
-	for (int y = 0; y < 27; y++) {
-		for (int x = 0; x < 27; x++) {
+	for (int32_t y = 0; y < 27; y++) {
+		for (int32_t x = 0; x < 27; x++) {
 			z = 0;
 			offset = x + 27 * y;
 			pTable = (uint8_t*)&OutsideRoomTable[1728 * y + 64 * x];
@@ -1813,7 +1813,7 @@ void reset_cutseq_vars() {
 }
 
 void ClearFootPrints() {
-	for (int i = 0; i < 32; i++)
+	for (int32_t i = 0; i < 32; i++)
 		FootPrint[i].Active = 0;
 
 	FootPrintNum = 0;
@@ -1882,7 +1882,7 @@ void InitialiseLara() {
 void InitialiseObjects() {
 	OBJECT_INFO* obj;
 
-	for (int i = 0; i < NUMBER_OBJECTS; i++) {
+	for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 		obj = &objects[i];
 		obj->initialise = 0;
 		obj->collision = 0;
@@ -1918,10 +1918,10 @@ void InitialiseObjects() {
 	InitialiseHair();
 	InitialiseEffects();
 
-	for (int i = 0; i < MAX_USED_SEQUENCES; i++)
+	for (int32_t i = 0; i < MAX_USED_SEQUENCES; i++)
 		SequenceUsed[i] = 0;
 
-	for (int i = 0; i < MAX_LIBRARY_TABS; i++)
+	for (int32_t i = 0; i < MAX_LIBRARY_TABS; i++)
 		LibraryTab[i] = 0;
 
 	NumRPickups = 0;
@@ -1933,7 +1933,7 @@ void InitialiseObjects() {
 	SequenceResults[2][0][1] = 4;
 	SequenceResults[2][1][0] = 5;
 
-	for (int i = 0; i < gfNumMips; i++) {
+	for (int32_t i = 0; i < gfNumMips; i++) {
 		obj = &objects[((gfMips[i] & 0xF) << 1) + ANIMATING1];
 		obj->object_mip = (gfMips[i] & 0xF0) << 6;
 	}
@@ -1946,7 +1946,7 @@ void GetAIPickups() {
 	AIOBJECT* aiObj;
 	int16_t aiObjNum;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 
 		if (objects[item->object_number].intelligent) {
@@ -1971,7 +1971,7 @@ void GetCarriedItems() {
 	ITEM_INFO* pickup;
 	int16_t item_num;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		baddy = &items[i];
 		baddy->carried_item = NO_ITEM;
 
@@ -2006,7 +2006,7 @@ void InitTarget() {
 	nVtx = meshp[4] & 0xFF;
 	meshp += 6;
 
-	for (int i = 0; i < nVtx; i++) {
+	for (int32_t i = 0; i < nVtx; i++) {
 		meshp[0] = int16_t(phd_centerx + 80 * meshp[0] / 96);
 		meshp[1] = int16_t(phd_centery + 60 * meshp[1] / 224);
 		meshp += 4;

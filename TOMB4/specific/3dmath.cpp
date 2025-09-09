@@ -65,7 +65,7 @@ static void mInit() {
 	float* ptr;
 	float ang;
 
-	for (int i = 0; i < 65536; i++) {
+	for (int32_t i = 0; i < 65536; i++) {
 		ptr = &fcossin_tbl[i];
 		ang = i * float(M_PI * 2.0F / 65536.0F);
 		*ptr = sin(ang);
@@ -196,31 +196,37 @@ static void mRotYXZpack(int32_t angles) {
 	angle = (angles >> 10) & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
+	if (angle) {
 		mRotY(angle);
+	}
 
 	angle = (angles >> 20) & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
+	if (angle) {
 		mRotX(angle);
+	}
 
 	angle = angles & 0x3FF;
 	angle <<= 6;
 
-	if (angle)
+	if (angle) {
 		mRotZ(angle);
+	}
 }
 
 static void mRotYXZ(int16_t y, int16_t x, int16_t z) {
-	if (y)
+	if (y) {
 		mRotY(y);
+	}
 
-	if (x)
+	if (x) {
 		mRotX(x);
+	}
 
-	if (z)
+	if (z) {
 		mRotZ(z);
+	}
 }
 
 static void mTranslateAbs(int32_t x, int32_t y, int32_t z) {
@@ -270,8 +276,9 @@ static void mGenerateW2V(PHD_3DPOS* viewPos) {
 	if (lara.dpoisoned != lara.poisoned) {
 		lara.poisoned += (lara.dpoisoned - lara.poisoned) >> 4;
 
-		if (abs(lara.dpoisoned - lara.poisoned) < 16)
+		if (abs(lara.dpoisoned - lara.poisoned) < 16) {
 			lara.poisoned = lara.dpoisoned;
+		}
 	}
 
 	if (lara.poisoned >= 256) {
@@ -650,8 +657,9 @@ uint32_t mGetAngle(int32_t x, int32_t z, int32_t x1, int32_t z1) {
 	dx = x1 - x;
 	dz = z1 - z;
 
-	if (!dx && !dz)
+	if (!dx && !dz) {
 		return 0;
+	}
 
 	octant = 0;
 
@@ -679,8 +687,9 @@ uint32_t mGetAngle(int32_t x, int32_t z, int32_t x1, int32_t z1) {
 
 	angle = phdtan2[octant] + phdtantab[(dz << 11) / dx];
 
-	if (angle < 0)
+	if (angle < 0) {
 		angle = -angle;
+	}
 
 	return -angle & 0xFFFF;
 }
@@ -736,8 +745,9 @@ int32_t phd_atan(int32_t x, int32_t y) {
 
 		result = phdtan2[octant] + phdtantab[(y << 11) / x];
 
-		if (result < 0)
+		if (result < 0) {
 			result = -result;
+		}
 	}
 
 	return result;
@@ -754,9 +764,9 @@ uint32_t phd_sqrt(uint32_t num) {
 		result += base;
 		tmp >>= 1;
 
-		if (result > num)
+		if (result > num) {
 			result = tmp;
-		else {
+		} else {
 			num -= result;
 			result = base | tmp;
 		}
@@ -863,8 +873,9 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 	if (lara.dpoisoned != lara.poisoned) {
 		lara.poisoned += (lara.dpoisoned - lara.poisoned) >> 4;
 
-		if (abs(lara.dpoisoned - lara.poisoned) < 16)
+		if (abs(lara.dpoisoned - lara.poisoned) < 16) {
 			lara.poisoned = lara.dpoisoned;
+		}
 	}
 
 	if (lara.poisoned >= 256) {

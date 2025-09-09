@@ -23,6 +23,7 @@
 
 #include "../tomb4/mod_config.h"
 #include "../specific/file.h"
+#include "../tomb4/tomb4plus/t4plus_items.h"
 
 static int16_t MovingBlockBounds[] = {
 	0,
@@ -46,39 +47,59 @@ static void ClearMovableBlockSplitters(int32_t x, int32_t y, int32_t z, int16_t 
 	int16_t room_num, height;
 
 	floor = GetFloor(x, y, z, &room_number);
-	boxes[floor->box].overlap_index = ~0x4000;
+	boxes[floor->box].overlap_index &= ~BLOCKED; // T4Plus - fix mask.
 	height = boxes[floor->box].height;
 	room_num = room_number;
 	floor = GetFloor(x + BLOCK_SIZE, y, z, &room_number);
 
 	if (floor->box != 0x7FF) {
-		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & 0x8000 && boxes[floor->box].overlap_index & 0x4000)
+		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & BLOCKABLE && boxes[floor->box].overlap_index & BLOCKED) {
 			ClearMovableBlockSplitters(x + BLOCK_SIZE, y, z, room_number);
+		}
 	}
 
 	room_number = room_num;
 	floor = GetFloor(x - BLOCK_SIZE, y, z, &room_number);
 
 	if (floor->box != 0x7FF) {
-		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & 0x8000 && boxes[floor->box].overlap_index & 0x4000)
+		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & BLOCKABLE && boxes[floor->box].overlap_index & BLOCKED) {
 			ClearMovableBlockSplitters(x - BLOCK_SIZE, y, z, room_number);
+		}
 	}
 
 	room_number = room_num;
 	floor = GetFloor(x, y, z + BLOCK_SIZE, &room_number);
 
 	if (floor->box != 0x7FF) {
-		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & 0x8000 && boxes[floor->box].overlap_index & 0x4000)
+		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & BLOCKABLE && boxes[floor->box].overlap_index & BLOCKED) {
 			ClearMovableBlockSplitters(x, y, z + BLOCK_SIZE, room_number);
+		}
 	}
 
 	room_number = room_num;
 	floor = GetFloor(x, y, z - BLOCK_SIZE, &room_number);
 
 	if (floor->box != 0x7FF) {
-		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & 0x8000 && boxes[floor->box].overlap_index & 0x4000)
+		if (boxes[floor->box].height == height && boxes[floor->box].overlap_index & BLOCKABLE && boxes[floor->box].overlap_index & BLOCKED) {
 			ClearMovableBlockSplitters(x, y, z - BLOCK_SIZE, room_number);
+		}
 	}
+}
+
+int32_t GetMoveableBlockHeight(int16_t item_number) {
+	MOD_GLOBAL_INFO* global_info = get_game_mod_global_info();
+	MOD_LEVEL_MISC_INFO* misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
+
+	ITEM_INFO *item = T4PlusGetItemInfoForID(item_number);
+
+	int32_t climbable_block_height = 0;
+	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
+		climbable_block_height = item->trigger_flags & 0xf;
+	} else if (misc_info->enable_standing_pushables) {
+		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
+	}
+
+	return climbable_block_height;
 }
 
 void InitialiseMovingBlock(int16_t item_number) {
@@ -89,14 +110,9 @@ void InitialiseMovingBlock(int16_t item_number) {
 
 	MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
 	MOD_LEVEL_MISC_INFO *misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
+
 	// TRNG
-	int climbable_block_height = 0;
-	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
-		climbable_block_height = item->trigger_flags & 0xf;
-		// TREP
-	} else if (misc_info->enable_standing_pushables) {
-		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
-	}
+	int32_t climbable_block_height = GetMoveableBlockHeight(item_number);
 
 	if (climbable_block_height) {
 		if (item->status == ITEM_INACTIVE) {
@@ -158,8 +174,8 @@ static int32_t TestBlockPush(ITEM_INFO* item, int32_t height, uint16_t quadrant,
 	room_number = item->room_number;
 	floor = GetFloor(x, y - CLICK_SIZE, z, &room_number);
 	r = &room[room_number];
-	rx = (x - r->x) >> 10;
-	rz = (z - r->z) >> 10;
+	rx = (x - r->x) >> WALL_SHIFT;
+	rz = (z - r->z) >> WALL_SHIFT;
 
 	if (r->floor[rx * r->x_size + rz].stopper)
 		return 0;
@@ -192,7 +208,7 @@ static int32_t TestBlockPush(ITEM_INFO* item, int32_t height, uint16_t quadrant,
 	item->pos.z_pos = rz;
 
 	if (itemlist[0]) {
-		for (int i = 0; itemlist[0] != 0; i++, itemlist++) {
+		for (int32_t i = 0; itemlist[0] != 0; i++, itemlist++) {
 			collided = itemlist[0];
 
 			if (collided->object_number == TWOBLOCK_PLATFORM || collided->object_number == HAMMER)
@@ -260,8 +276,8 @@ static int32_t TestBlockPull(ITEM_INFO* item, int32_t height, uint16_t quadrant)
 	room_number = item->room_number;
 	floor = GetFloor(x, y - CLICK_SIZE, z, &room_number);
 	r = &room[room_number];
-	rx = (x - r->x) >> 10;
-	rz = (z - r->z) >> 10;
+	rx = (x - r->x) >> WALL_SHIFT;
+	rz = (z - r->z) >> WALL_SHIFT;
 
 	if (r->floor[rx * r->x_size + rz].stopper)
 		return 0;
@@ -285,7 +301,7 @@ static int32_t TestBlockPull(ITEM_INFO* item, int32_t height, uint16_t quadrant)
 	if (itemlist[0]) {
 		ignore = 0;
 
-		for (int i = 0; itemlist[0] != 0; i++, itemlist++) {
+		for (int32_t i = 0; itemlist[0] != 0; i++, itemlist++) {
 			collided = itemlist[0];
 
 			if (collided->object_number == TWOBLOCK_PLATFORM || collided->object_number == HAMMER) {
@@ -317,8 +333,8 @@ static int32_t TestBlockPull(ITEM_INFO* item, int32_t height, uint16_t quadrant)
 	room_number = lara_item->room_number;
 	GetFloor(x, y, z, &room_number);
 	r = &room[room_number];
-	rx = (x - r->x) >> 10;
-	rz = (z - r->z) >> 10;
+	rx = (x - r->x) >> WALL_SHIFT;
+	rz = (z - r->z) >> WALL_SHIFT;
 
 	if (r->floor[rx * r->x_size + rz].stopper)
 		return 0;
@@ -332,7 +348,7 @@ static int32_t TestBlockPull(ITEM_INFO* item, int32_t height, uint16_t quadrant)
 	lara_item->pos.z_pos = rz;
 
 	if (itemlist[0]) {
-		for (int i = 0; itemlist[0] != 0; i++, itemlist++) {
+		for (int32_t i = 0; itemlist[0] != 0; i++, itemlist++) {
 			collided = itemlist[0];
 
 			if (collided == item || collided->object_number == TWOBLOCK_PLATFORM || collided->object_number == HAMMER)
@@ -358,19 +374,13 @@ void MovableBlock(int16_t item_number) {
 	MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
 	MOD_LEVEL_MISC_INFO *misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
 	// TRNG
-	int climbable_block_height = 0;
-	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
-		climbable_block_height = item->trigger_flags & 0xf;
-		// TREP
-	} else if (misc_info->enable_standing_pushables) {
-		climbable_block_height = (item->trigger_flags & 0xf00) >> 8;
-	}
+	int32_t climbable_block_height = GetMoveableBlockHeight(item_number);
 
 	// TRNG
 	if (global_info->trng_pushables_have_gravity) {
 		int16_t room_number = item->room_number;
 		FLOOR_INFO *floor_info = GetFloor(item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos, &room_number);
-		int height = GetHeight(floor_info, item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos);
+		int32_t height = GetHeight(floor_info, item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos);
 
 		if (item->pos.y_pos < height) {
 			item->gravity_status = 1;
@@ -386,7 +396,7 @@ void MovableBlock(int16_t item_number) {
 			SoundEffect(SFX_BOULDER_FALL, &item->pos, SFX_DEFAULT);
 
 			// If the object has landed and Lara is not performing animations, complete the sequence.
-			if (lara_item->anim_number != ANIM_PULL && lara_item->anim_number != ANIM_PUSH && lara_item->anim_number != 417 && lara_item->anim_number != 418) {
+			if (lara_item->anim_number != LARA_ANIM_PULL && lara_item->anim_number != LARA_ANIM_PUSH && lara_item->anim_number != 417 && lara_item->anim_number != 418) {
 				floor_info = GetFloor(item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos, &room_number);
 				height = GetHeight(floor_info, item->pos.x_pos, item->pos.y_pos - 128, item->pos.z_pos);
 
@@ -410,9 +420,9 @@ void MovableBlock(int16_t item_number) {
 	quadrant = uint16_t(lara_item->pos.y_rot + 0x2000) / 0x4000;
 
 	switch (lara_item->anim_number) {
-		case ANIM_PUSH:
+		case LARA_ANIM_PUSH:
 			frame = lara_item->frame_number;
-			base = anims[ANIM_PUSH].frame_base;
+			base = anims[LARA_ANIM_PUSH].frame_base;
 
 			if ((frame < base + 30 || frame > base + 67) && (frame < base + 78 || frame > base + 125) && (frame < base + 140 || frame > base + 160)) {
 				if (sfx) {
@@ -484,9 +494,9 @@ void MovableBlock(int16_t item_number) {
 
 			break;
 
-		case ANIM_PULL:
+		case LARA_ANIM_PULL:
 			frame = lara_item->frame_number;
-			base = anims[ANIM_PULL].frame_base;
+			base = anims[LARA_ANIM_PULL].frame_base;
 
 			if ((frame < base + 40 || frame > base + 122) && (frame < base + 130 || frame > base + 170)) {
 				if (sfx) {
@@ -591,7 +601,7 @@ void MovableBlockCollision(int16_t item_number, ITEM_INFO* laraitem, COLL_INFO* 
 	MOD_LEVEL_MISC_INFO* misc_info = get_game_mod_level_misc_info(gfCurrentLevel);
 
 	// TRNG
-	int climbable_block_height = 0;
+	int32_t climbable_block_height = 0;
 	if (global_info->trng_pushable_extended_ocb && item->trigger_flags & 0x40) {
 		climbable_block_height = item->trigger_flags & 0xf;
 		// TREP
@@ -612,7 +622,7 @@ void MovableBlockCollision(int16_t item_number, ITEM_INFO* laraitem, COLL_INFO* 
 	if (item->room_number != room_number)
 		ItemNewRoom(item_number, room_number);
 
-	if (input & IN_ACTION && laraitem->current_anim_state == AS_STOP && laraitem->anim_number == ANIM_BREATH && !laraitem->gravity_status &&
+	if (input & IN_ACTION && laraitem->current_anim_state == AS_STOP && laraitem->anim_number == LARA_ANIM_BREATH && !laraitem->gravity_status &&
 	        lara.gun_status == LG_NO_ARMS && item->status == ITEM_INACTIVE && item->trigger_flags >= 0 || (lara.IsMoving && lara.GeneralPtr == item_number)) {
 		room_number = laraitem->room_number;
 		GetFloor(item->pos.x_pos, item->pos.y_pos - CLICK_SIZE, item->pos.z_pos, &room_number);
@@ -659,8 +669,8 @@ void MovableBlockCollision(int16_t item_number, ITEM_INFO* laraitem, COLL_INFO* 
 					MovingBlockPos.z = bounds[0] - 105;
 
 				if (MoveLaraPosition(&MovingBlockPos, item, laraitem)) {
-					laraitem->anim_number = ANIM_PPREADY;
-					laraitem->frame_number = anims[ANIM_PPREADY].frame_base;
+					laraitem->anim_number = LARA_ANIM_PPREADY;
+					laraitem->frame_number = anims[LARA_ANIM_PPREADY].frame_base;
 					laraitem->current_anim_state = AS_PPREADY;
 					laraitem->goal_anim_state = AS_PPREADY;
 					lara.IsMoving = 0;
@@ -683,7 +693,7 @@ void MovableBlockCollision(int16_t item_number, ITEM_INFO* laraitem, COLL_INFO* 
 
 			item->pos.y_rot = yrot;
 		}
-	} else if (laraitem->current_anim_state == AS_PPREADY && laraitem->frame_number == anims[ANIM_PPREADY].frame_base + 19 && lara.CornerX == item) {
+	} else if (laraitem->current_anim_state == AS_PPREADY && laraitem->frame_number == anims[LARA_ANIM_PPREADY].frame_base + 19 && lara.CornerX == item) {
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;
@@ -749,7 +759,7 @@ void InitialisePlanetEffect(int16_t item_number) {
 	item = &items[item_number];
 	item->mesh_bits = 0;
 
-	for (int i = 0; i < level_items; i++) { //get the pushable we are linked to
+	for (int32_t i = 0; i < level_items; i++) { //get the pushable we are linked to
 		item2 = &items[i];
 
 		if (item2->object_number >= PUSHABLE_OBJECT1 && item2->object_number <= PUSHABLE_OBJECT5 && item2->trigger_flags == item->trigger_flags) {
@@ -759,7 +769,7 @@ void InitialisePlanetEffect(int16_t item_number) {
 	}
 
 	if (item->trigger_flags == 1) { //get other planet effects
-		for (int i = 0, j = 0; i < level_items; i++) {
+		for (int32_t i = 0, j = 0; i < level_items; i++) {
 			item2 = &items[i];
 
 			if (item2->object_number == PLANET_EFFECT && item_number != i)
@@ -768,8 +778,8 @@ void InitialisePlanetEffect(int16_t item_number) {
 
 		pifl = (char*)&item->item_flags[2];
 
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int32_t i = 0; i < 4; i++) {
+			for (int32_t j = 0; j < 4; j++) {
 				item2 = &items[others[j]];
 
 				if (item2->trigger_flags == i + 2) {
@@ -828,7 +838,7 @@ void ControlPlanetEffect(int16_t item_number) {
 
 			pifl = (char*)&item->item_flags[2];
 
-			for (int i = 0; i < 4; i++) {
+			for (int32_t i = 0; i < 4; i++) {
 				pos2.x = 0;
 				pos2.y = 0;
 				pos2.z = 0;
@@ -880,7 +890,7 @@ void DrawPlanetEffect(ITEM_INFO* item) {
 	phd_PutPolygons(*meshpp, -1);
 	meshpp += 2;
 
-	for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
+	for (int32_t i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
 		poppush = bone[0];
 
 		//These look inverted..

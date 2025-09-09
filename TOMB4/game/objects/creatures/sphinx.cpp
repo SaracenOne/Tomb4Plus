@@ -53,11 +53,11 @@ void SphinxControl(int16_t item_number) {
 	if (item->current_anim_state == 5 && floor->stopper) {
 		r = &room[item->room_number];
 
-		for (int i = 0; i < r->num_meshes; i++) {
+		for (int32_t i = 0; i < r->num_meshes; i++) {
 			mesh = &r->mesh[i];
 
 			MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];
-			if (mesh->z >> 10 == z >> 10 && mesh->x >> 10 == x >> 10 && static_info->creatures_can_shatter) {
+			if (mesh->z >> WALL_SHIFT == z >> WALL_SHIFT && mesh->x >> WALL_SHIFT == x >> WALL_SHIFT && static_info->creatures_can_shatter) {
 				ShatterObject(0, mesh, -64, item->room_number, 0);
 				if (static_info->shatter_sound_id >= 0) {
 					SoundEffect(static_info->shatter_sound_id, &item->pos, SFX_DEFAULT);

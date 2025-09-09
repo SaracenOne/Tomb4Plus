@@ -40,3 +40,42 @@ extern BOX_INFO* boxes;
 extern uint16_t* overlap;
 extern int16_t* ground_zone[5][2];
 extern int32_t num_boxes;
+
+#define BOX_CLIP_LEFT   1
+#define BOX_CLIP_RIGHT  2
+#define BOX_CLIP_TOP    4
+#define BOX_CLIP_BOTTOM 8
+#define BOX_CLIP_ALL (BOX_CLIP_LEFT | BOX_CLIP_RIGHT | BOX_CLIP_TOP | BOX_CLIP_BOTTOM)
+#define BOX_CLIP_SECONDARY 16
+
+#define NO_BOX          0x7ff
+#define BOX_NUMBER      0x7ff
+
+#define BLOCKABLE       0x8000
+#define BLOCKED         0x4000
+#define OVERLAP_INDEX   0x3fff
+
+#define SEARCH_NUMBER   0x7fff
+#define BLOCKED_SEARCH  0x8000
+
+#define JUMP_BIT        0x800
+#define MONKEY_BIT      0x2000
+
+#define BOX_END_BIT     0x8000
+
+#define MAX_EXPANSION   5
+
+#define FRONT_ARC       0x4000
+
+#define NO_FLYING       0
+
+#define CLIP_LEFT   1
+#define CLIP_RIGHT  2
+#define CLIP_TOP    4
+#define CLIP_BOTTOM 8
+#define ALL_CLIP (BOX_CLIP_LEFT | BOX_CLIP_RIGHT | BOX_CLIP_TOP | BOX_CLIP_BOTTOM)
+#define CLIP_SECONDARY 16
+#define SECONDARY_CLIP BOX_CLIP_SECONDARY
+
+#define NAVIGATION_GOAL_RADIUS (HALF_BLOCK_SIZE + HALF_CLICK_SIZE)
+#define NAVIGATION_AVOIDENCE_TURN 0x800

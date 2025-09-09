@@ -106,25 +106,25 @@ bool NGGridFragmentConditionTrigger(int32_t param, uint32_t extra, int32_t grid_
 	}
 
 	if (param >= 0 && param < 16) {
-		int index = param;
+		int32_t index = param;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index / 4, index % 4, FRAGMENT_TYPE_SQUARE_FRAGMENT, inverted);
 	} else if (param >= 32 && param < 36) {
-		int index = param - 32;
+		int32_t index = param - 32;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, 0, index, FRAGMENT_TYPE_HORIZONTAL_STRIP_FRAGMENT, inverted);
 	} else if (param >= 48 && param < 52) {
-		int index = param - 48;
+		int32_t index = param - 48;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index, 0, FRAGMENT_TYPE_VERTICAL_STRIP_FRAGMENT, inverted);
 	} else if (param >= 96 && param < 112) {
-		int index = param - 96;
+		int32_t index = param - 96;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index / 4, index % 4, FRAGMENT_TYPE_TWO_CROSSED_STRIPES, inverted);
 	} else if (param >= 128 && param < 144) {
-		int index = param - 128;
+		int32_t index = param - 128;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index / 4, index % 4, FRAGMENT_TYPE_DIAGONAL_UPPER_RIGHT_LOWER_LEFT_PASSING_LINE, inverted);
 	} else if (param >= 144 && param < 160) {
-		int index = param - 144;
+		int32_t index = param - 144;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index / 4, index % 4, FRAGMENT_TYPE_DIAGONAL_UPPER_LEFT_LOWER_RIGHT_PASSING_LINE, inverted);
 	} else if (param >= 192 && param < 208) {
-		int index = param - 192;
+		int32_t index = param - 192;
 		return NGGridFragmentCondition(lara_sector_displacement_x, lara_sector_displacement_y, grid_size, index / 4, index % 4, FRAGMENT_TYPE_TWO_CROSS_DIAGONALS_PASSING_LINE, inverted);
 	} else {
 		NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGGridFragmentTrigger: param %u unsupported!", param);
@@ -314,7 +314,7 @@ int32_t NGPerformTRNGCondition(uint16_t condition_number, uint16_t main_argument
 					break;
 				case 19: { // Dripping
 					bool is_dripping = false;
-					for (int i = 0; i < WET_COUNT; i++) {
+					for (int32_t i = 0; i < WET_COUNT; i++) {
 						if (lara.wet[i]) {
 							is_dripping = true;
 						}
@@ -353,11 +353,11 @@ int32_t NGPerformTRNGCondition(uint16_t condition_number, uint16_t main_argument
 			// TODO: make more accurate to TRNG
 			*test_restore = true;
 			int16_t* bounds = GetBoundsAccurate(lara_item);
-			int item_top_y = lara_item->pos.y_pos + bounds[2];
-			int item_bottom_y = lara_item->pos.y_pos; // + bounds[3];
+			int32_t item_top_y = lara_item->pos.y_pos + bounds[2];
+			int32_t item_bottom_y = lara_item->pos.y_pos; // + bounds[3];
 
-			int bottom_trigger_bounds = lara_item->floor - (main_argument * 128);
-			int top_trigger_bounds = bottom_trigger_bounds - ((extra + 1) * 128);
+			int32_t bottom_trigger_bounds = lara_item->floor - (main_argument * 128);
+			int32_t top_trigger_bounds = bottom_trigger_bounds - ((extra + 1) * 128);
 
 			if (item_top_y <= bottom_trigger_bounds && item_bottom_y >= top_trigger_bounds) {
 				result = 1;
@@ -368,11 +368,11 @@ int32_t NGPerformTRNGCondition(uint16_t condition_number, uint16_t main_argument
 			// TODO: make more accurate to TRNG
 			*test_restore = true;
 			int16_t* bounds = GetBoundsAccurate(lara_item);
-			int item_top_y = lara_item->pos.y_pos + bounds[2];
-			int item_bottom_y = lara_item->pos.y_pos; // + bounds[3];
+			int32_t item_top_y = lara_item->pos.y_pos + bounds[2];
+			int32_t item_bottom_y = lara_item->pos.y_pos; // + bounds[3];
 
-			int bottom_trigger_bounds = lara_item->floor - (main_argument * 128);
-			int top_trigger_bounds = bottom_trigger_bounds - ((extra + 1) * 128);
+			int32_t bottom_trigger_bounds = lara_item->floor - (main_argument * 128);
+			int32_t top_trigger_bounds = bottom_trigger_bounds - ((extra + 1) * 128);
 
 			if (item_top_y < top_trigger_bounds || item_bottom_y > bottom_trigger_bounds) {
 				result = 1;

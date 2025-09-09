@@ -204,7 +204,7 @@ void BaboonControl(int16_t item_number) {
 					break;
 
 				case 5:
-					baboon->reached_goal = 1;
+					baboon->reached_goal = true;
 					item2 = baboon->enemy;
 
 					if (item2) {
@@ -215,7 +215,7 @@ void BaboonControl(int16_t item_number) {
 								item2->room_number = 255;
 								item2->carried_item = -1;
 
-								for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+								for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 									if (baddie_slots[i].item_num != -1 && baddie_slots[i].item_num != item_number && baddie_slots[i].enemy == baboon->enemy)
 										baddie_slots[i].enemy = 0;
 								}

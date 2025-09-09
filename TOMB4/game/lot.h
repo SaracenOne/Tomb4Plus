@@ -7,7 +7,7 @@
 #define MAXIMUM_BADDIES 5
 #endif
 
-void InitialiseLOTarray(int32_t allocmem);
+void InitialiseLOTarray(bool allocmem);
 void DisableBaddieAI(int16_t item_number);
 void ClearLOT(LOT_INFO* lot);
 void CreateZone(ITEM_INFO* item);

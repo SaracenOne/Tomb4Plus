@@ -134,10 +134,10 @@ void TemplarControl(int16_t item_number) {
 				pos.z = 0;
 				GetJointAbsPosition(item, &pos, 11);
 
-				floor = &r->floor[((pos.z - r->z) >> 10) + r->x_size * ((pos.x - r->x) >> 10)];
+				floor = &r->floor[((pos.z - r->z) >> WALL_SHIFT) + r->x_size * ((pos.x - r->x) >> WALL_SHIFT)];
 
 				if (floor->stopper) {
-					for (int i = 0; i < r->num_meshes; i++) {
+					for (int32_t i = 0; i < r->num_meshes; i++) {
 						mesh = &r->mesh[i];
 
 						MOD_LEVEL_STATIC_INFO* static_info = &get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number];

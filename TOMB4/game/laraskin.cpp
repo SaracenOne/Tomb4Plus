@@ -72,7 +72,7 @@ void CreateSkinningData() {
 	int16_t aboveMeshNum, belowMeshNum, jointMeshNum;
 	uint8_t vertBuf[128];
 
-	for (int i = 0; i < 14; i++) {
+	for (int32_t i = 0; i < 14; i++) {
 		SkinXYZPtr = XYZList;
 		SkinXYZPtr->x = 0;
 		SkinXYZPtr->y = 0;
@@ -89,7 +89,7 @@ void CreateSkinningData() {
 		if (aboveMeshNum) {
 			meshpp++;
 
-			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
+			for (int32_t j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 				if (bone[0] & POP_BONE_FLAG)
 					PopXYZ();
 
@@ -125,7 +125,7 @@ void CreateSkinningData() {
 		if (belowMeshNum) {
 			meshpp++;
 
-			for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
+			for (int32_t j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 				if (bone[0] & POP_BONE_FLAG)
 					PopXYZ();
 
@@ -160,7 +160,7 @@ void CreateSkinningData() {
 		bone = &bones[obj->bone_index];
 		jointMeshNum = i + 1;
 
-		for (int j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
+		for (int32_t j = 1; j < obj->nmeshes; j++, bone += 4, meshpp++) {
 			if (*bone & POP_BONE_FLAG)
 				PopXYZ();
 
@@ -190,14 +190,14 @@ void CreateSkinningData() {
 
 		joint = &jointMesh->nNorms;
 
-		for (int j = 0; j < jointVerts; j++) {
+		for (int32_t j = 0; j < jointVerts; j++) {
 			jointX = JointMeshXYZ.x + joint[0];
 			jointY = JointMeshXYZ.y + joint[1];
 			jointZ = JointMeshXYZ.z + joint[2];
 			joint += 3;
 			LaraMesh = &aboveMesh->nNorms;
 
-			for (int ii = 0; ii < laraVerts; ii++) {
+			for (int32_t ii = 0; ii < laraVerts; ii++) {
 				laraX = AboveMeshXYZ.x + LaraMesh[0];
 				laraY = AboveMeshXYZ.y + LaraMesh[1];
 				laraZ = AboveMeshXYZ.z + LaraMesh[2];
@@ -219,14 +219,14 @@ void CreateSkinningData() {
 		laraVerts = belowMesh->nVerts & 0xFF;
 		joint = &jointMesh->nNorms;
 
-		for (int j = 0; j < jointVerts; j++) {
+		for (int32_t j = 0; j < jointVerts; j++) {
 			jointX = JointMeshXYZ.x + joint[0];
 			jointY = JointMeshXYZ.y + joint[1];
 			jointZ = JointMeshXYZ.z + joint[2];
 			joint += 3;
 			LaraMesh = &belowMesh->nNorms;
 
-			for (int ii = 0; ii < laraVerts; ii++) {
+			for (int32_t ii = 0; ii < laraVerts; ii++) {
 				laraY = BelowMeshXYZ.y + LaraMesh[1];
 				laraX = BelowMeshXYZ.x + LaraMesh[0];
 				laraZ = BelowMeshXYZ.z + LaraMesh[2];
@@ -249,7 +249,7 @@ void CreateSkinningData() {
 		if (vertCount == jointVerts)
 			jointMesh->nVerts <<= 8;
 		else {
-			for (int j = 0; j < jointVerts; j++) {
+			for (int32_t j = 0; j < jointVerts; j++) {
 				if (!vertBuf[j]) {
 					PointsToCalc[jointMeshNum - 1][calcPointsCounter] = j;
 					calcPointsCounter++;
@@ -260,7 +260,7 @@ void CreateSkinningData() {
 		PointsToCalc[jointMeshNum - 1][calcPointsCounter] = 0xFF;
 	}
 
-	for (int i = 0; ; i++) {
+	for (int32_t i = 0; ; i++) {
 		if (gfLevelFlags & GF_YOUNGLARA) {
 			SkinVertNums[28][i] = HairSkinVertNums[1][i];
 			SkinVertNums[34][i] = HairSkinVertNums[2][i];
@@ -280,8 +280,8 @@ void CreateSkinningData() {
 			break;
 	}
 
-	for (int i = 0; i < 4; i += 2) {
-		for (int j = 0; ; j++) {
+	for (int32_t i = 0; i < 4; i += 2) {
+		for (int32_t j = 0; ; j++) {
 			SkinVertNums[i + 30][j] = HairSkinVertNums[4][j];
 			SkinVertNums[i + 31][j] = HairSkinVertNums[3][j];
 			ScratchVertNums[i + 30][j] = HairScratchVertNums[2][j];
@@ -299,7 +299,7 @@ void CreateSkinningData() {
 	obj = &objects[T4PlusGetLaraHairSlotID()];
 	meshpp = &meshes[obj->mesh_index];
 
-	for (int i = 0; i < 3; i++, meshpp += 2) {
+	for (int32_t i = 0; i < 3; i++, meshpp += 2) {
 		hairMesh = (MESH_DATA*)*meshpp;
 		hairMesh->nVerts <<= 8;
 	}

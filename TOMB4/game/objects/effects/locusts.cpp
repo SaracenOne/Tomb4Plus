@@ -24,7 +24,7 @@ int32_t GetFreeLocust() {
 
 	fx = &Locusts[next_locust];
 
-	for (int free = next_locust, i = 0; i < MAX_LOCUSTS; i++) {
+	for (int32_t free = next_locust, i = 0; i < MAX_LOCUSTS; i++) {
 		if (fx->On) {
 			if (free == 63) {
 				fx = Locusts;
@@ -120,7 +120,7 @@ void DrawLocusts() {
 	LOCUST_STRUCT* fx;
 	int16_t** meshpp;
 
-	for (int i = 0; i < MAX_LOCUSTS; i++) {
+	for (int32_t i = 0; i < MAX_LOCUSTS; i++) {
 		fx = &Locusts[i];
 
 		if (fx->On) {
@@ -154,7 +154,7 @@ void UpdateLocusts() {
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = get_game_mod_level_object_customization_for_slot(gfCurrentLevel, FISH);
 
-	for (int i = 0; i < MAX_LOCUSTS; i++) {
+	for (int32_t i = 0; i < MAX_LOCUSTS; i++) {
 		fx = &Locusts[i];
 
 		if (fx->On) {

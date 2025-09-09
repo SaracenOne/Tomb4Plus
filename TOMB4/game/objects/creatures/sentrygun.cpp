@@ -25,7 +25,7 @@ void TriggerAutogunFlamethrower(ITEM_INFO* item) {
 	PHD_VECTOR vel;
 	int32_t v;
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
 		sptr->sR = (GetRandomControl() & 0x1F) + 48;
@@ -115,7 +115,7 @@ void AutogunControl(int16_t item_number) {
 		untrigger_item_in_room(item->room_number, SMOKE_EMITTER_BLACK);
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos - (HALF_BLOCK_SIZE + CLICK_SIZE), item->pos.z_pos, 3, -2, 0, item->room_number);
 
-		for (int i = 0; i < 2; i++)
+		for (int32_t i = 0; i < 2; i++)
 			TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos - (HALF_BLOCK_SIZE + CLICK_SIZE), item->pos.z_pos, 3, -1, 0, item->room_number);
 
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0x1800000 | SFX_SETPITCH);
@@ -141,7 +141,7 @@ void AutogunControl(int16_t item_number) {
 			item->pos.y_pos += HALF_BLOCK_SIZE;
 			ahead = info.angle - autogun->joint_rotation[0];
 
-			if (ahead > -0x4000 && ahead < 0x4000)
+			if (ahead > -FRONT_ARC && ahead < FRONT_ARC)
 				info.ahead = 1;
 			else
 				info.ahead = 0;

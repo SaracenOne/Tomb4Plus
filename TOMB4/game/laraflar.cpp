@@ -32,7 +32,7 @@ void DrawFlareInAir(ITEM_INFO* item) {
 	phd_PutPolygons_train(meshes[objects[FLARE_ITEM].mesh_index], 0);
 	phd_PopMatrix();
 
-	for (int i = 0; i < t4p_mirror_count; i++) {
+	for (int32_t i = 0; i < t4p_mirror_count; i++) {
 		if (item->room_number == t4p_mirror_info[i].mirror_room) {
 			phd_PushMatrix();
 			PHD_3DPOS mirrored_pos = T4PMirrorUnrotated3DPosOnPlane(&t4p_mirror_info[i], item->pos);
@@ -169,7 +169,7 @@ void DoFlareInHand(int32_t flare_age) {
 	GetLaraJointPos(&pos, LMX_HAND_L);
 	lara.left_arm.flash_gun = (int16_t)DoFlareLight(&pos, flare_age);
 
-	for (int i = 0; i < t4p_mirror_count; i++) {
+	for (int32_t i = 0; i < t4p_mirror_count; i++) {
 		if (lara_item->room_number == t4p_mirror_info[i].mirror_room) {
 			PHD_VECTOR mirrored_vector = pos;
 			mirrored_vector = T4PMirrorVectorOnPlane(&t4p_mirror_info[i], mirrored_vector);
@@ -338,17 +338,17 @@ void undraw_flare() {
 	lara.flare_control_left = 1;
 
 	if (lara_item->goal_anim_state == AS_STOP && lara.vehicle == NO_ITEM) {
-		if (lara_item->anim_number == ANIM_BREATH) {
-			lara_item->anim_number = ANIM_THROWFLARE;
-			ani2 = ani + anims[ANIM_THROWFLARE].frame_base;
+		if (lara_item->anim_number == LARA_ANIM_BREATH) {
+			lara_item->anim_number = LARA_ANIM_THROWFLARE;
+			ani2 = ani + anims[LARA_ANIM_THROWFLARE].frame_base;
 			lara.flare_frame = ani2;
 			lara_item->frame_number = ani2;
 		}
 
-		if (lara_item->anim_number == ANIM_THROWFLARE) {
+		if (lara_item->anim_number == LARA_ANIM_THROWFLARE) {
 			lara.flare_control_left = 0;
 
-			if (ani2 >= anims[ANIM_THROWFLARE].frame_base + 31) {
+			if (ani2 >= anims[LARA_ANIM_THROWFLARE].frame_base + 31) {
 				lara.request_gun_type = lara.last_gun_type;
 				lara.gun_type = lara.last_gun_type;
 				lara.gun_status = LG_NO_ARMS;
@@ -356,11 +356,11 @@ void undraw_flare() {
 				lara.target = 0;
 				lara.right_arm.lock = 0;
 				lara.left_arm.lock = 0;
-				lara_item->anim_number = ANIM_STOP;
-				lara_item->frame_number = anims[ANIM_STOP].frame_base;
+				lara_item->anim_number = LARA_ANIM_STOP;
+				lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 				lara_item->current_anim_state = AS_STOP;
 				lara_item->goal_anim_state = AS_STOP;
-				lara.flare_frame = anims[ANIM_STOP].frame_base;
+				lara.flare_frame = anims[LARA_ANIM_STOP].frame_base;
 				return;
 			}
 
@@ -368,8 +368,8 @@ void undraw_flare() {
 			lara.flare_frame = ani2;
 		}
 	} else if (lara_item->current_anim_state == AS_STOP && lara.vehicle == NO_ITEM) {
-		lara_item->anim_number = ANIM_STOP;
-		lara_item->frame_number = anims[ANIM_STOP].frame_base;
+		lara_item->anim_number = LARA_ANIM_STOP;
+		lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 	}
 
 	if (ani >= 33 && ani < 72)
@@ -463,7 +463,7 @@ void FlareControl(int16_t item_number) {
 		flare_age++;
 
 	if (DoFlareLight((PHD_VECTOR*)&flare->pos, flare_age)) {
-		for (int i = 0; i < t4p_mirror_count; i++) {
+		for (int32_t i = 0; i < t4p_mirror_count; i++) {
 			if (flare->room_number == t4p_mirror_info[i].mirror_room) {
 				flare->pos = T4PMirrorUnrotated3DPosOnPlane(&t4p_mirror_info[i], flare->pos);
 				DoFlareLight((PHD_VECTOR*)&flare->pos, flare_age);

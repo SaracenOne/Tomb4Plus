@@ -21,7 +21,7 @@ void InitialiseItemArray(int16_t num) {
 	next_item_free = (int16_t)level_items;
 	next_item_active = NO_ITEM;
 
-	for (int i = level_items + 1; i < num; i++) {
+	for (int32_t i = level_items + 1; i < num; i++) {
 		item->next_item = i;
 		item->active = 0;
 		item++;
@@ -167,7 +167,7 @@ void InitialiseItem(int16_t item_num) {
 	r = &room[item->room_number];
 	item->next_item = r->item_number;
 	r->item_number = item_num;
-	floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+	floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 	item->floor = floor->floor << 8;
 	item->box_number = floor->box;
 
@@ -294,17 +294,18 @@ void ItemNewRoom(int16_t item_num, int16_t room_num) {
 	room[room_num].item_number = item_num;
 }
 
-void InitialiseFXArray(int32_t allocmem) {
+void InitialiseFXArray(bool allocmem) {
 	FX_INFO* fx;
 
-	if (allocmem)
+	if (allocmem) {
 		effects = (FX_INFO*)game_malloc(sizeof(FX_INFO) * 24);
+	}
 
 	next_fx_active = NO_ITEM;
 	next_fx_free = 0;
 	fx = effects;
 
-	for (int i = 1; i < 24; i++) {
+	for (int32_t i = 1; i < 24; i++) {
 		fx->next_fx = i;
 		fx++;
 	}
@@ -347,9 +348,9 @@ void KillEffect(int16_t fx_num) {
 	DetatchSpark(fx_num, 64);
 	fx = &effects[fx_num];
 
-	if (next_fx_active == fx_num)
+	if (next_fx_active == fx_num) {
 		next_fx_active = fx->next_active;
-	else {
+	} else {
 		for (linknum = next_fx_active; linknum != NO_ITEM; linknum = effects[linknum].next_active) {
 			if (effects[linknum].next_active == fx_num) {
 				effects[linknum].next_active = fx->next_active;
@@ -360,9 +361,9 @@ void KillEffect(int16_t fx_num) {
 
 	linknum = room[fx->room_number].fx_number;
 
-	if (linknum == fx_num)
+	if (linknum == fx_num) {
 		room[fx->room_number].fx_number = fx->next_fx;
-	else {
+	} else {
 		for (; linknum != NO_ITEM; linknum = effects[linknum].next_fx) {
 			if (effects[linknum].next_fx == fx_num) {
 				effects[linknum].next_fx = fx->next_fx;
@@ -390,9 +391,9 @@ void EffectNewRoom(int16_t fx_num, int16_t room_num) {
 	fx = &effects[fx_num];
 	r = &room[fx->room_number];
 
-	if (r->fx_number == fx_num)
+	if (r->fx_number == fx_num) {
 		r->fx_number = fx->next_fx;
-	else {
+	} else {
 		for (linknum = r->fx_number; linknum != NO_ITEM; linknum = effects[linknum].next_fx) {
 			if (effects[linknum].next_fx == fx_num) {
 				effects[linknum].next_fx = fx->next_fx;

@@ -4,7 +4,7 @@
 extern THREAD MainThread;
 
 void GameClose();
-int GameMain(void* ptr);
+int32_t GameMain(void* ptr);
 uint16_t GetRandom(WATERTAB* wt, int32_t lp);
 void init_water_table();
 bool GameInitialise();

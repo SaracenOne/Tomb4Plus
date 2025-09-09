@@ -33,3 +33,4 @@ extern uint32_t NGNumericOperation32(NGNumericOperationType number_operation, ui
 extern void NGNumericOperation(NGNumericOperationType number_operation, uint32_t variable, uint32_t value);
 extern int32_t NGNumericGetVariable(uint32_t variable);
 extern int32_t NGNumericGetSavegameValue(uint32_t variable);
+extern void NGNumericSetSavegameValue(uint32_t variable, int32_t value);

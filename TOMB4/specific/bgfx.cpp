@@ -185,7 +185,7 @@ void InitializeBGFX() {
 	bgfx::setViewMode(0, bgfx::ViewMode::Sequential);
 
 	SetupOutputBucketVertexLayout();
-	for (int i = 0; i < MAX_BUCKETS; i++) {
+	for (int32_t i = 0; i < MAX_BUCKETS; i++) {
 		TEXTUREBUCKET *bucket = &Bucket[i];
 		bucket->handle = bgfx::createDynamicVertexBuffer(BUCKET_VERT_COUNT, ms_outputBucketVertexLayout);
 	}
@@ -193,7 +193,7 @@ void InitializeBGFX() {
 	sort_draw_commands = (BGFXSortDrawCommand *)SYSTEM_MALLOC(MAX_SORT_DRAW_COMMANDS * sizeof(BGFXSortDrawCommand));
 	sort_buffer_vertex_buffer = (GFXTLBUMPVERTEX*) SYSTEM_MALLOC(SORT_BUFFER_VERT_COUNT * MAX_SORT_BUFFERS * sizeof(GFXTLBUMPVERTEX));
 
-	for (int i = 0; i < MAX_SORT_BUFFERS; i++) {
+	for (int32_t i = 0; i < MAX_SORT_BUFFERS; i++) {
 		sort_buffer_vertex_handle[i] = bgfx::createDynamicVertexBuffer(SORT_BUFFER_VERT_COUNT, ms_outputBucketVertexLayout);
 	}
 
@@ -441,7 +441,7 @@ void StartBGFXFrame() {
 
 	ClearBGFXDrawCommand();
 
-	for (int i = 0; i < MAX_SORT_BUFFERS; i++) {
+	for (int32_t i = 0; i < MAX_SORT_BUFFERS; i++) {
 		sort_buffer_vertex_buffers_ref[i] = bgfx::makeRef((i * SORT_BUFFER_VERT_COUNT) + sort_buffer_vertex_buffer, SORT_BUFFER_VERT_COUNT * sizeof(GFXTLBUMPVERTEX));
 	}
 }
@@ -569,7 +569,7 @@ void AddBGFXSortList(bool clear_depth_buffer) {
 						total_sort_verts_in_current_buffer = 0;
 					}
 
-					for (int i = 0; i < pSort->nVtx; i++, vtx++, bVtx++) {
+					for (int32_t i = 0; i < pSort->nVtx; i++, vtx++, bVtx++) {
 						bVtx->sx = vtx->sx;
 						bVtx->sy = vtx->sy;
 						bVtx->sz = vtx->sz;
@@ -639,7 +639,7 @@ void AddBGFXSortList(bool clear_depth_buffer) {
 						total_sort_verts_in_current_buffer = 0;
 					}
 
-					for (int i = 0; i < pSort->nVtx; i++, vtx++, bVtx++) {
+					for (int32_t i = 0; i < pSort->nVtx; i++, vtx++, bVtx++) {
 						bVtx->sx = vtx->sx;
 						bVtx->sy = vtx->sy;
 						bVtx->sz = vtx->sz;

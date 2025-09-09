@@ -746,14 +746,20 @@ void lara_hands_free(ITEM_INFO* item) {
 
 	// T4Plus: Bug fix for weapons getting stuck in perpetual animation loop.
 	if (get_game_mod_global_info()->fix_lara_hands_free_flipeffect_bugs) {
-		lara.gun_type = WEAPON_NONE;
-		lara.request_gun_type = WEAPON_NONE;
+		if (lara.gun_type != WEAPON_FLARE) {
+			lara.gun_type = WEAPON_NONE;
+		}
+		if (lara.request_gun_type != WEAPON_FLARE) {
+			lara.request_gun_type = WEAPON_NONE;
+		}
 
 		lara.left_arm.frame_number = 0;
 		lara.right_arm.frame_number = 0;
 
-		lara.mesh_ptrs[LM_LHAND] = meshes[objects[0].mesh_index + 2 * LM_LHAND];
-		lara.mesh_ptrs[LM_RHAND] = meshes[objects[0].mesh_index + 2 * LM_RHAND];
+		if (lara.gun_type != WEAPON_FLARE) {
+			lara.mesh_ptrs[LM_LHAND] = meshes[objects[0].mesh_index + 2 * LM_LHAND];
+			lara.mesh_ptrs[LM_RHAND] = meshes[objects[0].mesh_index + 2 * LM_RHAND];
+		}
 		lara.left_arm.frame_number = 0;
 		lara.right_arm.frame_number = 0;
 		lara.target = 0;
@@ -809,7 +815,7 @@ void swap_meshes_with_meshswap1(ITEM_INFO* item) {
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++) {
+	for (int32_t i = 0; i < obj->nmeshes; i++) {
 		// Changed this to only use single index offsets.
 		// Seems to be more compatible with TRLE, but may
 		// require more extensive testing.
@@ -829,7 +835,7 @@ void swap_meshes_with_meshswap2(ITEM_INFO* item) {
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++) {
+	for (int32_t i = 0; i < obj->nmeshes; i++) {
 		// Changed this to only use single index offsets.
 		// Seems to be more compatible with TRLE, but may
 		// require more extensive testing.
@@ -849,7 +855,7 @@ void swap_meshes_with_meshswap3(ITEM_INFO* item) {
 
 	obj = &objects[item->object_number];
 
-	for (int i = 0; i < obj->nmeshes; i++) {
+	for (int32_t i = 0; i < obj->nmeshes; i++) {
 		tmp = meshes[obj->mesh_index + i * 2];
 		meshes[obj->mesh_index + i] = meshes[objects[T4PlusGetMeshSwap3SlotID()].mesh_index + i * 2];
 
@@ -1031,7 +1037,7 @@ void SoundEffects() {
 	OBJECT_VECTOR* sfx;
 	SoundSlot* slot;
 
-	for (int i = 0; i < number_sound_effects; i++) {
+	for (int32_t i = 0; i < number_sound_effects; i++) {
 		sfx = &sound_effects[i];
 
 		if (flip_status) {
@@ -1051,7 +1057,7 @@ void SoundEffects() {
 	if (!sound_active)
 		return;
 
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		slot = &LaSlot[i];
 
 		if (slot->nSampleInfo < 0)
@@ -1105,16 +1111,16 @@ void LaraBreath(ITEM_INFO* item) {
 		return;
 
 	if (lara_item->current_anim_state == AS_STOP) {
-		if (lara_item->frame_number < anims[ANIM_BREATH].frame_base + 30)
+		if (lara_item->frame_number < anims[LARA_ANIM_BREATH].frame_base + 30)
 			return;
 	} else if (lara_item->current_anim_state == AS_SURFSWIM) {
-		if (lara_item->frame_number < anims[ANIM_SURF].frame_base + 21)
+		if (lara_item->frame_number < anims[LARA_ANIM_SURF].frame_base + 21)
 			return;
 	} else if (lara_item->current_anim_state == AS_DUCK) {
-		if (lara_item->frame_number < anims[ANIM_DUCKBREATHE].frame_base + 32)
+		if (lara_item->frame_number < anims[LARA_ANIM_DUCKBREATHE].frame_base + 32)
 			return;
 	} else if (lara_item->current_anim_state == AS_ALL4S) {
-		if (lara_item->frame_number < anims[ANIM_ALL4S].frame_base + 28)
+		if (lara_item->frame_number < anims[LARA_ANIM_ALL4S].frame_base + 28)
 			return;
 	} else if (wibble < 80 || wibble > 192)
 		return;

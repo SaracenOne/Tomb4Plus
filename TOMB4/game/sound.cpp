@@ -67,7 +67,7 @@ void StopSoundEffect(int32_t sfx) {
 	if (sound_active) {
 		lut = sample_lut[sfx];
 
-		for (int i = 0; i < MAX_VOICES; i++) {
+		for (int32_t i = 0; i < MAX_VOICES; i++) {
 			if (LaSlot[i].nSampleInfo >= lut && LaSlot[i].nSampleInfo < (lut + ((sample_infos[lut].flags >> 2) & 0xF))) {
 				S_SoundStopSample(i);
 				LaSlot[i].nSampleInfo = -1;
@@ -79,7 +79,7 @@ void StopSoundEffect(int32_t sfx) {
 void SOUND_Init() {
 	//empty func call here
 
-	for (int i = 0; i < MAX_VOICES; i++)
+	for (int32_t i = 0; i < MAX_VOICES; i++)
 		LaSlot[i].nSampleInfo = -1;
 
 	sound_active = true;
@@ -89,7 +89,7 @@ void SOUND_Stop() {
 	if (sound_active) {
 		S_SoundStopAllSamples();
 
-		for (int i = 0; i < MAX_VOICES; i++)
+		for (int32_t i = 0; i < MAX_VOICES; i++)
 			LaSlot[i].nSampleInfo = -1;
 	}
 }
@@ -210,7 +210,7 @@ int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags) {
 	switch (flag) {
 		case 1:
 
-			for (int i = 0; i < MAX_VOICES; i++) {
+			for (int32_t i = 0; i < MAX_VOICES; i++) {
 				if (LaSlot[i].nSampleInfo == lut) {
 					if (S_SoundSampleIsPlayingOnChannel(i))
 						return 0;
@@ -223,7 +223,7 @@ int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags) {
 
 		case 2:
 
-			for (int i = 0; i < MAX_VOICES; i++) {
+			for (int32_t i = 0; i < MAX_VOICES; i++) {
 				if (LaSlot[i].nSampleInfo == lut) {
 					S_SoundStopSample(i);
 					LaSlot[i].nSampleInfo = -1;
@@ -235,7 +235,7 @@ int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags) {
 
 		case 3:
 
-			for (int i = 0; i < MAX_VOICES; i++) {
+			for (int32_t i = 0; i < MAX_VOICES; i++) {
 				if (LaSlot[i].nSampleInfo == lut) {
 					if (volume > LaSlot[i].nVolume) {
 						LaSlot[i].OrigVolume = OrigVolume;
@@ -278,7 +278,7 @@ int32_t SoundEffect(int32_t sfx, PHD_3DPOS* pos, int32_t flags) {
 		vol = 0x8000000;
 		slot = -1;
 
-		for (int i = 1; i < MAX_VOICES; i++) {
+		for (int32_t i = 1; i < MAX_VOICES; i++) {
 			if ((LaSlot[i].nSampleInfo >= 0) && (LaSlot[i].nVolume <= vol)) {
 				vol = LaSlot[i].nVolume;
 				slot = i;

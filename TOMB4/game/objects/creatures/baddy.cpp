@@ -117,7 +117,7 @@ void BaddyControl(int16_t item_number) {
 	torso_y = 0;
 
 	if (item->trigger_flags % 1000) {
-		baddy->LOT.is_jumping = 1;
+		baddy->LOT.is_jumping = true;
 		baddy->maximum_turn = 0;
 
 		if (item->trigger_flags % 1000 > 100) {
@@ -188,7 +188,7 @@ void BaddyControl(int16_t item_number) {
 
 	if (item->hit_points <= 0) {
 		item->hit_points = 0;
-		baddy->LOT.is_jumping = 0;
+		baddy->LOT.is_jumping = false;
 		room_number = item->room_number;
 		floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
 		item->floor = GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
@@ -205,7 +205,7 @@ void BaddyControl(int16_t item_number) {
 
 			case BADDY_STATE_DEATH:
 				item->gravity_status = 1;
-				baddy->LOT.is_jumping = 1;
+				baddy->LOT.is_jumping = true;
 
 				if (item->pos.y_pos >= item->floor) {
 					item->pos.y_pos = item->floor;
@@ -237,7 +237,7 @@ void BaddyControl(int16_t item_number) {
 				item->anim_number = objects[obj_num].anim_index + BADDY_STAND_DEATH_ANIMATION;
 				item->frame_number = anims[item->anim_number].frame_base;
 				item->current_anim_state = BADDY_STATE_DEATH;
-				baddy->LOT.is_jumping = 1;
+				baddy->LOT.is_jumping = true;
 
 				if (item->trigger_flags > 999) {
 					for (target_num = room[2].item_number; target_num != NO_ITEM; target_num = target->next_item) {
@@ -275,7 +275,7 @@ void BaddyControl(int16_t item_number) {
 			dz = lara_item->pos.z_pos - item->pos.z_pos;
 			larainfo.angle = int16_t(phd_atan(dz, dx) - item->pos.y_rot);
 
-			if (larainfo.angle > -0x4000 && larainfo.angle < 0x4000)
+			if (larainfo.angle > -FRONT_ARC && larainfo.angle < FRONT_ARC)
 				larainfo.ahead = 1;
 			else
 				larainfo.ahead = 0;
@@ -293,7 +293,7 @@ void BaddyControl(int16_t item_number) {
 		enemy = baddy->enemy;
 
 		if (item->hit_status || (larainfo.distance < 0x100000 || TargetVisible(item, &larainfo)) && abs(lara_item->pos.y_pos - item->pos.y_pos) < BLOCK_SIZE)
-			baddy->alerted = 1;
+			baddy->alerted = true;
 
 		baddy->enemy = enemy;
 
@@ -311,9 +311,9 @@ void BaddyControl(int16_t item_number) {
 			h2 = GetHeight(floor, x, y, z);
 
 			if (abs(h2 - y) > CLICK_SIZE || h1 + HALF_BLOCK_SIZE >= y)
-				can_jump = 0;
+				can_jump = false;
 			else
-				can_jump = 1;
+				can_jump = true;
 
 			room_number = item->room_number;
 			x = item->pos.x_pos + (942 * phd_sin(item->pos.y_rot - 0x2000) >> W2V_SHIFT);
@@ -328,18 +328,18 @@ void BaddyControl(int16_t item_number) {
 			h2 = GetHeight(floor, x, y, z);
 
 			if (abs(h2 - y) > CLICK_SIZE || h1 + HALF_BLOCK_SIZE >= y)
-				can_roll = 0;
+				can_roll = false;
 			else
-				can_roll = 1;
+				can_roll = true;
 		} else {
-			can_roll = 0;
-			can_jump = 0;
+			can_roll = false;
+			can_jump = false;
 		}
 
 		switch (item->current_anim_state) {
 			case BADDY_STATE_IDLE:
-				baddy->LOT.is_jumping = 0;
-				baddy->LOT.is_monkeying = 0;
+				baddy->LOT.is_jumping = false;
+				baddy->LOT.is_monkeying = false;
 				baddy->flags = 0;
 				baddy->maximum_turn = 0;
 				head = info.angle >> 1;
@@ -377,7 +377,7 @@ void BaddyControl(int16_t item_number) {
 					else
 						item->goal_anim_state = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 
-					baddy->LOT.is_jumping = 1;
+					baddy->LOT.is_jumping = true;
 				} else if (enemy && (enemy->object_number == SMALLMEDI_ITEM || enemy->object_number == UZI_AMMO_ITEM) && info.distance < 0x40000) {
 					item->goal_anim_state = BADDY_STATE_STAND_TO_CROUCH;
 					item->required_anim_state = BADDY_STATE_CROUCH_PICKUP;
@@ -420,8 +420,8 @@ void BaddyControl(int16_t item_number) {
 
 				break;
 			case BADDY_STATE_WALK:
-				baddy->LOT.is_jumping = 0;
-				baddy->LOT.is_monkeying = 0;
+				baddy->LOT.is_jumping = false;
+				baddy->LOT.is_monkeying = false;
 				baddy->maximum_turn = DEGREES_TO_ROTATION(7);
 				baddy->flags = 0;
 
@@ -578,8 +578,8 @@ void BaddyControl(int16_t item_number) {
 
 					if (c == h - 1536) {
 						item->goal_anim_state = BADDY_STATE_MONKEY_FALL_LAND;
-						baddy->LOT.is_jumping = 0;
-						baddy->LOT.is_monkeying = 0;
+						baddy->LOT.is_jumping = false;
+						baddy->LOT.is_monkeying = false;
 					} else {
 						item->goal_anim_state = BADDY_STATE_MONKEY_FORWARD;
 					}
@@ -591,8 +591,8 @@ void BaddyControl(int16_t item_number) {
 			case BADDY_STATE_MONKEY_FORWARD:
 				torso_x = 0;
 				torso_y = 0;
-				baddy->LOT.is_jumping = 1;
-				baddy->LOT.is_monkeying = 1;
+				baddy->LOT.is_jumping = true;
+				baddy->LOT.is_monkeying = true;
 				baddy->flags = 0;
 				baddy->maximum_turn = DEGREES_TO_ROTATION(7);
 
@@ -617,8 +617,8 @@ void BaddyControl(int16_t item_number) {
 				baddy->maximum_turn = DEGREES_TO_ROTATION(7);
 
 				if (!baddy->flags && item->touch_bits) {
-					lara_item->anim_number = ANIM_STOPHANG;
-					lara_item->frame_number = anims[ANIM_STOPHANG].frame_base + 9;
+					lara_item->anim_number = LARA_ANIM_STOPHANG;
+					lara_item->frame_number = anims[LARA_ANIM_STOPHANG].frame_base + 9;
 					lara_item->current_anim_state = AS_UPJUMP;
 					lara_item->goal_anim_state = AS_UPJUMP;
 					lara_item->gravity_status = 1;
@@ -672,7 +672,7 @@ void BaddyControl(int16_t item_number) {
 
 					KillItem(int16_t(baddy->enemy - items));
 
-					for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+					for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 						if (baddie_slots[i].item_num != -1 && baddie_slots[i].item_num != item_number && baddie_slots[i].enemy == baddy->enemy)
 							baddie_slots[i].enemy = 0;
 					}
@@ -685,7 +685,7 @@ void BaddyControl(int16_t item_number) {
 				if (item->anim_number == objects[obj_num].anim_index + BADDY_SOMERSAULT_END_ANIMATION)
 					CreatureYRot(&item->pos, info.angle, DEGREES_TO_ROTATION(7));
 				else if (item->anim_number == objects[obj_num].anim_index + BADDY_STAND_IDLE_ANIMATION)
-					baddy->LOT.is_jumping = 1;
+					baddy->LOT.is_jumping = true;
 
 				break;
 			case BADDY_STATE_AIM:

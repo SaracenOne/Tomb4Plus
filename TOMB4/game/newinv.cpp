@@ -475,12 +475,12 @@ void init_new_inventry() {
 				setup_objectlist_startposition((int16_t)GLOBAL_lastinvitem);
 			else {
 				if (GLOBAL_lastinvitem >= INV_WATERSKIN1_EMPTY_ITEM && GLOBAL_lastinvitem <= INV_WATERSKIN1_3_ITEM) {
-					for (int i = INV_WATERSKIN1_EMPTY_ITEM; i <= INV_WATERSKIN1_3_ITEM; i++) {
+					for (int32_t i = INV_WATERSKIN1_EMPTY_ITEM; i <= INV_WATERSKIN1_3_ITEM; i++) {
 						if (have_i_got_item(i))
 							setup_objectlist_startposition(i);
 					}
 				} else if (GLOBAL_lastinvitem >= INV_WATERSKIN2_EMPTY_ITEM && GLOBAL_lastinvitem <= INV_WATERSKIN2_5_ITEM) {
-					for (int i = INV_WATERSKIN2_EMPTY_ITEM; i <= INV_WATERSKIN2_5_ITEM; i++) {
+					for (int32_t i = INV_WATERSKIN2_EMPTY_ITEM; i <= INV_WATERSKIN2_5_ITEM; i++) {
 						if (have_i_got_item(i))
 							setup_objectlist_startposition(i);
 					}
@@ -644,7 +644,7 @@ void DrawInventoryItemMe(INVDRAWITEM* item, int32_t shade, int32_t overlay, int3
 
 	meshpp += 2;
 
-	for (int i = 0; i < object->nmeshes - 1; i++, meshpp += 2, bone += 4) {
+	for (int32_t i = 0; i < object->nmeshes - 1; i++, meshpp += 2, bone += 4) {
 		poppush = *bone;
 
 		if (poppush & 1)
@@ -790,7 +790,7 @@ void insert_object_into_list_v2(int16_t num) {
 void construct_combine_object_list() {
 	rings[RING_AMMO]->numobjectsinlist = 0;
 
-	for (int i = 0; i < NUM_INVOBJ; i++)
+	for (int32_t i = 0; i < NUM_INVOBJ; i++)
 		rings[RING_AMMO]->current_object_list[i].invitem = NO_ITEM;
 
 	if (!(gfLevelFlags & GF_YOUNGLARA)) {
@@ -818,17 +818,17 @@ void construct_combine_object_list() {
 	if (lara.big_water_skin)
 		insert_object_into_list_v2(lara.big_water_skin + INV_WATERSKIN2_EMPTY_ITEM - 1);
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < 16; i++) {
 		if ((1 << i) & lara.puzzleitemscombo)
 			insert_object_into_list_v2(i + INV_PUZZLE1_COMBO1_ITEM);
 	}
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < 16; i++) {
 		if ((1 << i) & lara.keyitemscombo)
 			insert_object_into_list_v2(i + INV_KEY1_COMBO1_ITEM);
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		if ((1 << i) & lara.pickupitemscombo)
 			insert_object_into_list_v2(i + INV_PICKUP1_COMBO1_ITEM);
 	}
@@ -854,7 +854,7 @@ void insert_object_into_list(int16_t num) {
 void construct_object_list() {
 	rings[RING_INVENTORY]->numobjectsinlist = 0;
 
-	for (int i = 0; i < NUM_INVOBJ; i++)
+	for (int32_t i = 0; i < NUM_INVOBJ; i++)
 		rings[RING_INVENTORY]->current_object_list[i].invitem = NO_ITEM;
 
 	CurrentPistolsAmmoType = 0;
@@ -967,37 +967,37 @@ void construct_object_list() {
 	if (lara.mechanical_scarab & 4)
 		insert_object_into_list(INV_MECHANICAL_SCARAB_ITEM);
 
-	for (int i = 0; i < 12; i++) {
+	for (int32_t i = 0; i < PUZZLE_ITEM_COUNT; i++) {
 		if (lara.puzzleitems[i])
 			insert_object_into_list(i + INV_PUZZLE1_ITEM);
 	}
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < (sizeof(lara.puzzleitemscombo) * CHAR_BIT); i++) {
 		if ((1 << i) & lara.puzzleitemscombo)
 			insert_object_into_list(i + INV_PUZZLE1_COMBO1_ITEM);
 	}
 
-	for (int i = 0; i < 12; i++) {
+	for (int32_t i = 0; i < KEY_ITEM_COUNT; i++) {
 		if ((1 << i) & lara.keyitems)
 			insert_object_into_list(i + INV_KEY1_ITEM);
 	}
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < (sizeof(lara.keyitemscombo) * CHAR_BIT); i++) {
 		if ((1 << i) & lara.keyitemscombo)
 			insert_object_into_list(i + INV_KEY1_COMBO1_ITEM);
 	}
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < PICKUP_ITEM_COUNT; i++) {
 		if ((1 << i) & lara.pickupitems)
 			insert_object_into_list(i + INV_PICKUP1_ITEM);
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < PICKUP_COMBO_ITEM_COUNT; i++) {
 		if ((1 << i) & lara.pickupitemscombo)
 			insert_object_into_list(i + INV_PICKUP1_COMBO1_ITEM);
 	}
 
-	for (int i = 0; i < 6; i++) {
+	for (int32_t i = 0; i < QUEST_ITEM_COUNT; i++) {
 		if ((1 << i) & lara.questitems)
 			insert_object_into_list(i + INV_QUEST1_ITEM);
 	}
@@ -1208,7 +1208,7 @@ void update_laras_weapons_status() {
 }
 
 int32_t have_i_got_item(int16_t obj) {
-	for (int i = 0; i < NUM_INVOBJ; i++) {
+	for (int32_t i = 0; i < NUM_INVOBJ; i++) {
 		if (rings[RING_INVENTORY]->current_object_list[i].invitem == obj)
 			return 1;
 	}
@@ -1393,7 +1393,7 @@ int32_t do_special_waterskin_combine(int32_t flag) {
 }
 
 void setup_objectlist_startposition(int16_t newobj) {
-	for (int i = 0; i < NUM_INVOBJ; i++) {
+	for (int32_t i = 0; i < NUM_INVOBJ; i++) {
 		if (rings[RING_INVENTORY]->current_object_list[i].invitem == newobj) {
 			rings[RING_INVENTORY]->curobjinlist = i;
 			return;
@@ -1402,7 +1402,7 @@ void setup_objectlist_startposition(int16_t newobj) {
 }
 
 void setup_objectlist_startposition2(int16_t newobj) {
-	for (int i = 0; i < NUM_INVOBJ; i++) {
+	for (int32_t i = 0; i < NUM_INVOBJ; i++) {
 		if (inventry_objects_list[rings[RING_INVENTORY]->current_object_list[i].invitem].object_number == newobj) {
 			rings[RING_INVENTORY]->curobjinlist = i;
 			return;
@@ -1457,7 +1457,7 @@ void remove_inventory_item(int16_t object_number) {
 }
 
 int32_t convert_obj_to_invobj(int16_t obj) {
-	for (int i = 0; i < NUM_INVOBJ; i++) {
+	for (int32_t i = 0; i < NUM_INVOBJ; i++) {
 		if (inventry_objects_list[i].object_number == obj)
 			return i;
 	}
@@ -1528,22 +1528,22 @@ void dels_give_lara_items_cheat() {
 	if (objects[CLOCKWORK_BEETLE].loaded)
 		lara.mechanical_scarab = 1;
 
-	for (int i = 0; i < ((PUZZLE_ITEM12 - PUZZLE_ITEM1) + 1); i++) {
+	for (int32_t i = 0; i < ((PUZZLE_ITEM12 - PUZZLE_ITEM1) + 1); i++) {
 		if (objects[PUZZLE_ITEM1 + i].loaded)
 			lara.puzzleitems[i] = 1;
 	}
 
-	for (int i = 0; i < ((KEY_ITEM12 - KEY_ITEM1) + 1); i++) {
+	for (int32_t i = 0; i < ((KEY_ITEM12 - KEY_ITEM1) + 1); i++) {
 		if (objects[KEY_ITEM1 + i].loaded)
 			lara.keyitems |= 1 << i;
 	}
 
-	for (int i = 0; i < ((PICKUP_ITEM4 - PICKUP_ITEM1) + 1); i++) {
+	for (int32_t i = 0; i < ((PICKUP_ITEM4 - PICKUP_ITEM1) + 1); i++) {
 		if (objects[PICKUP_ITEM1 + i].loaded)
 			lara.pickupitems |= 1 << i;
 	}
 
-	for (int i = 0; i < ((QUEST_ITEM6 - QUEST_ITEM1) + 1); i++) {
+	for (int32_t i = 0; i < ((QUEST_ITEM6 - QUEST_ITEM1) + 1); i++) {
 		if (objects[QUEST_ITEM1 + i].loaded)
 			lara.questitems |= 1 << i;
 	}
@@ -1642,7 +1642,7 @@ void use_current_item() {
 		} else
 			SayNo();
 	} else if (invobject == INV_BINOCULARS_ITEM) {
-		if ((lara_item->current_anim_state == AS_STOP && lara_item->anim_number == ANIM_BREATH || lara.IsDucked && !(input & IN_DUCK))) {
+		if ((lara_item->current_anim_state == AS_STOP && lara_item->anim_number == LARA_ANIM_BREATH || lara.IsDucked && !(input & IN_DUCK))) {
 			oldLaraBusy = 1;
 			BinocularRange = 128;
 
@@ -1894,7 +1894,7 @@ void DEL_picked_up_object(int16_t objnum) {	//notice fallthroughs
 
 int32_t is_item_currently_combinable(int16_t obj) {
 	if (obj < INV_WATERSKIN1_EMPTY_ITEM || obj > INV_WATERSKIN2_5_ITEM) {
-		for (int i = 0; i < 23; i++) {
+		for (int32_t i = 0; i < 23; i++) {
 			if (dels_handy_combine_table[i].item1 == obj && have_i_got_item(dels_handy_combine_table[i].item2))
 				return 1;
 
@@ -1902,12 +1902,12 @@ int32_t is_item_currently_combinable(int16_t obj) {
 				return 1;
 		}
 	} else if (obj > INV_WATERSKIN1_3_ITEM) {
-		for (int i = 0; i < 4; i++) {
+		for (int32_t i = 0; i < 4; i++) {
 			if (have_i_got_item(i + INV_WATERSKIN1_EMPTY_ITEM))
 				return 1;
 		}
 	} else {
-		for (int i = 0; i < 6; i++) {
+		for (int32_t i = 0; i < 6; i++) {
 			if (have_i_got_item(i + INV_WATERSKIN2_EMPTY_ITEM))
 				return 1;
 		}
@@ -1917,7 +1917,7 @@ int32_t is_item_currently_combinable(int16_t obj) {
 }
 
 int32_t do_these_objects_combine(int32_t obj1, int32_t obj2) {
-	for (int i = 0; i < 23; i++) {
+	for (int32_t i = 0; i < 23; i++) {
 		if (dels_handy_combine_table[i].item1 == obj1 && dels_handy_combine_table[i].item2 == obj2)
 			return 1;
 
@@ -1976,7 +1976,7 @@ void draw_ammo_selector() {
 	else if (num_ammo_slots == 3)
 		xpos -= OBJLIST_SPACING;
 
-	for (int i = 0; i < num_ammo_slots; i++) {
+	for (int32_t i = 0; i < num_ammo_slots; i++) {
 		objme = &inventry_objects_list[ammo_object_list[i].invitem];
 
 		if (i == *current_ammo_type) {
@@ -2057,7 +2057,7 @@ void handle_inventry_menu() {
 
 	inv_item = rings[RING_INVENTORY]->current_object_list[rings[RING_INVENTORY]->curobjinlist].invitem;
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		current_options[i].type = 0;
 		current_options[i].text = 0;
 	}
@@ -2145,7 +2145,7 @@ void handle_inventry_menu() {
 	else if (num == 2)
 		ypos += font_height >> 1;
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		if (i == current_selected_option)
 			PrintString(phd_centerx, ypos, 1, current_options[i].text, FF_CENTER);
 		else
@@ -2379,7 +2379,7 @@ void draw_current_object_list(int32_t ringnum) {
 	if (rings[ringnum]->objlistmovement < 0)
 		maxobj++;
 
-	for (int i = minobj; i <= maxobj; i++) {
+	for (int32_t i = minobj; i <= maxobj; i++) {
 		if (minobj == i) {
 			if (rings[ringnum]->objlistmovement < 0)
 				shade = 0;
@@ -2620,7 +2620,7 @@ int32_t S_CallInventory2() {
 			compass_settle_thang -= (QUARTER_CLICK_SIZE / 2);
 
 		S_InitialisePolyList();
-		SetDebounce = 1;
+		SetDebounce = true;
 		S_UpdateInput();
 		input = inputBusy;
 		UpdatePulseColour();
@@ -2661,7 +2661,7 @@ int32_t S_CallInventory2() {
 			while (1) {
 				flag = 0;
 				S_InitialisePolyList();
-				SetDebounce = 1;
+				SetDebounce = true;
 				S_UpdateInput();
 				input = inputBusy;
 				UpdatePulseColour();

@@ -23,7 +23,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll) {
 	ITEM_INFO* pitem;
 	int32_t Dist;
 
-	int item_num = lara.GeneralPtr;
+	int32_t item_num = lara.GeneralPtr;
 	pitem = &items[item_num];
 
 	item->gravity_status = 1;
@@ -42,8 +42,8 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll) {
 		item->pos.x_pos += 700 * phd_sin(item->pos.y_rot) >> W2V_SHIFT;
 		item->pos.y_pos -= 361;
 		item->pos.z_pos += 700 * phd_cos(item->pos.y_rot) >> W2V_SHIFT;
-		item->anim_number = ANIM_GRABLOOP;
-		item->frame_number = anims[ANIM_GRABLOOP].frame_base;
+		item->anim_number = LARA_ANIM_GRABLOOP;
+		item->frame_number = anims[LARA_ANIM_GRABLOOP].frame_base;
 		item->goal_anim_state = AS_REACH;
 		item->current_anim_state = AS_REACH;
 	}
@@ -62,7 +62,7 @@ void ParallelBarsCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_num];
 
-	if (!(input & IN_ACTION) || l->current_anim_state != AS_REACH || l->anim_number != ANIM_GRABLOOP) {
+	if (!(input & IN_ACTION) || l->current_anim_state != AS_REACH || l->anim_number != LARA_ANIM_GRABLOOP) {
 		if (l->current_anim_state != AS_PBSPIN)
 			ObjectCollision(item_num, l, coll);
 
@@ -83,8 +83,8 @@ void ParallelBarsCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 	}
 
 	l->current_anim_state = AS_CONTROLLED;
-	l->anim_number = ANIM_PB_GRAB;
-	l->frame_number = anims[ANIM_PB_GRAB].frame_base;
+	l->anim_number = LARA_ANIM_PB_GRAB;
+	l->frame_number = anims[LARA_ANIM_PB_GRAB].frame_base;
 	l->fallspeed = 0;
 	l->gravity_status = 0;
 	lara.head_x_rot = 0;

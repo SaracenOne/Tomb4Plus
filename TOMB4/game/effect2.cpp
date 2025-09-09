@@ -61,20 +61,23 @@ void ControlSmokeEmitter(int16_t item_number) {
 				pos.y_pos = item->pos.y_pos - (GetRandomControl() & 0x1F) - 16;
 				pos.z_pos = (GetRandomControl() & 0x3F) + item->pos.z_pos - 32;
 
-				if (item->trigger_flags == 1)
+				if (item->trigger_flags == 1) {
 					CreateBubble(&pos, item->room_number, 15, 15);
-				else
+				} else {
 					CreateBubble(&pos, item->room_number, 8, 7);
+				}
 
 				if (item->item_flags[0]) {
 					item->item_flags[0]--;
 
-					if (!item->item_flags[0])
+					if (!item->item_flags[0]) {
 						item->item_flags[1] = 0;
+					}
 				}
 			}
-		} else if (!(GetRandomControl() & 0x1F))
+		} else if (!(GetRandomControl() & 0x1F)) {
 			item->item_flags[0] = (GetRandomControl() & 3) + 4;
+		}
 
 		return;
 	}
@@ -83,22 +86,26 @@ void ControlSmokeEmitter(int16_t item_number) {
 		if (item->item_flags[0]) {
 			item->item_flags[0]--;
 
-			if (!item->item_flags[0])
+			if (!item->item_flags[0]) {
 				item->item_flags[1] = (GetRandomControl() & 0x3F) + 30;
+			}
 
 			normal = 1;
 
-			if (item->item_flags[2])
+			if (item->item_flags[2]) {
 				item->item_flags[2] -= 256;
-		} else if (item->item_flags[2] < 4096)
+			}
+		} else if (item->item_flags[2] < 4096) {
 			item->item_flags[2] += 256;
+		}
 
 		if (item->item_flags[2]) {
 			dx = lara_item->pos.x_pos - item->pos.x_pos;
 			dz = lara_item->pos.z_pos - item->pos.z_pos;
 
-			if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+			if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 				return;
+			}
 
 			sptr = &spark[GetFreeSpark()];
 			sptr->On = 1;
@@ -118,8 +125,9 @@ void ControlSmokeEmitter(int16_t item_number) {
 			sptr->z = (GetRandomControl() & 0x3F) + item->pos.z_pos - 32;
 			size = item->item_flags[2];
 
-			if (item->item_flags[2] == 0x1000)
+			if (item->item_flags[2] == 0x1000) {
 				size = (GetRandomControl() & 0x7FF) + (BLOCK_SIZE * 2);
+			}
 
 			sptr->Xvel = (int16_t)((size * phd_sin(item->pos.y_rot - 0x8000)) >> W2V_SHIFT);
 			sptr->Yvel = -16 - (GetRandomControl() & 0xF);
@@ -127,15 +135,17 @@ void ControlSmokeEmitter(int16_t item_number) {
 			sptr->Friction = 4;
 			sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 
-			if (!(GlobalCounter & 3))
+			if (!(GlobalCounter & 3)) {
 				sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2 | SF_DAMAGE;
+			}
 
 			sptr->RotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (GetRandomControl() & 1) {
 				sptr->RotAdd = -8 - (GetRandomControl() & 7);
-			else
+			} else {
 				sptr->RotAdd = (GetRandomControl() & 7) + 8;
+			}
 
 			sptr->Scalar = 2;
 			sptr->Gravity = -8 - (GetRandomControl() & 0xF);
@@ -145,22 +155,25 @@ void ControlSmokeEmitter(int16_t item_number) {
 			sptr->sSize = sptr->dSize >> 1;
 			sptr->Size = sptr->sSize;
 
-			if (item->item_flags[1])
+			if (item->item_flags[1]) {
 				item->item_flags[1]--;
-			else
+			} else {
 				item->item_flags[0] = item->trigger_flags >> 4;
+			}
 		}
 
-		if (!normal)
+		if (!normal) {
 			return;
+		}
 	}
 
 	if (!(wibble & 0xF) && (item->object_number != STEAM_EMITTER || !(wibble & 0x1F))) {
 		dx = lara_item->pos.x_pos - item->pos.x_pos;
 		dz = lara_item->pos.z_pos - item->pos.z_pos;
 
-		if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+		if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 			return;
+		}
 
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
@@ -183,10 +196,11 @@ void ControlSmokeEmitter(int16_t item_number) {
 		sptr->Life = (GetRandomControl() & 7) + 28;
 		sptr->sLife = sptr->Life;
 
-		if (item->object_number == SMOKE_EMITTER_BLACK)
+		if (item->object_number == SMOKE_EMITTER_BLACK) {
 			sptr->TransType = 3;
-		else
+		} else {
 			sptr->TransType = 2;
+		}
 
 		sptr->x = (GetRandomControl() & 0x3F) + item->pos.x_pos - 32;
 		sptr->y = (GetRandomControl() & 0x3F) + item->pos.y_pos - 32;
@@ -197,15 +211,17 @@ void ControlSmokeEmitter(int16_t item_number) {
 		sptr->Friction = 3;
 		sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 
-		if (room[item->room_number].flags & ROOM_OUTSIDE)
+		if (room[item->room_number].flags & ROOM_OUTSIDE) {
 			sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2 | SF_OUTSIDE;
+		}
 
 		sptr->RotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (GetRandomControl() & 1) {
 			sptr->RotAdd = -8 - (GetRandomControl() & 7);
-		else
+		} else {
 			sptr->RotAdd = (GetRandomControl() & 7) + 8;
+		}
 
 		sptr->Scalar = 2;
 		sptr->Gravity = -8 - (GetRandomControl() & 0xF);
@@ -235,8 +251,9 @@ void TriggerExplosionSmokeEnd(int32_t x, int32_t y, int32_t z, int32_t uw) {
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -262,10 +279,11 @@ void TriggerExplosionSmokeEnd(int32_t x, int32_t y, int32_t z, int32_t uw) {
 	sptr->Life = (GetRandomControl() & 0x1F) + 96;
 	sptr->sLife = sptr->Life;
 
-	if (uw)
+	if (uw) {
 		sptr->TransType = 2;
-	else
+	} else {
 		sptr->TransType = 3;
+	}
 
 	sptr->x = (GetRandomControl() & 0x1F) + x - (QUARTER_CLICK_SIZE / 4);
 	sptr->y = (GetRandomControl() & 0x1F) + y - (QUARTER_CLICK_SIZE / 4);
@@ -278,16 +296,18 @@ void TriggerExplosionSmokeEnd(int32_t x, int32_t y, int32_t z, int32_t uw) {
 		sptr->Friction = 20;
 		sptr->Yvel >>= 4;
 		sptr->y += (QUARTER_CLICK_SIZE / 2);
-	} else
+	} else {
 		sptr->Friction = 6;
+	}
 
 	sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 	sptr->RotAng = GetRandomControl() & 0xFFF;
 
-	if (GetRandomControl() & 1)
+	if (GetRandomControl() & 1) {
 		sptr->RotAdd = -16 - (GetRandomControl() & 0xF);
-	else
+	} else {
 		sptr->RotAdd = (GetRandomControl() & 0xF) + 16;
+	}
 
 	sptr->Scalar = 3;
 
@@ -311,8 +331,9 @@ void TriggerExplosionSmoke(int32_t x, int32_t y, int32_t z, int32_t uw) {
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -345,10 +366,11 @@ void TriggerExplosionSmoke(int32_t x, int32_t y, int32_t z, int32_t uw) {
 	sptr->Yvel = (GetRandomControl() & 0xFF) - HALF_CLICK_SIZE;
 	sptr->Zvel = ((GetRandomControl() & 0xFFF) - (BLOCK_SIZE * 2)) >> 2;
 
-	if (uw)
+	if (uw) {
 		sptr->Friction = 2;
-	else
+	} else {
 		sptr->Friction = 6;
+	}
 
 	sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 	sptr->RotAng = GetRandomControl() & 0xFFF;
@@ -370,8 +392,9 @@ void TriggerFlareSparks(int32_t x, int32_t y, int32_t z, int32_t xvel, int32_t y
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	rnd = GetRandomDraw();
 	sptr = &spark[GetFreeSpark()];
@@ -429,12 +452,14 @@ void TriggerFlareSparks(int32_t x, int32_t y, int32_t z, int32_t xvel, int32_t y
 			smokeSpark->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 			smokeSpark->RotAng = int16_t(rnd >> 3);
 
-			if (rnd & 2)
+			if (rnd & 2) {
 				smokeSpark->RotAdd = -16 - (rnd & 0xF);
-			else
+			} else {
 				smokeSpark->RotAdd = (rnd & 0xF) + 16;
-		} else
+			}
+		} else {
 			smokeSpark->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
+		}
 
 		smokeSpark->Gravity = -8 - ((rnd >> 3) & 3);
 		smokeSpark->Scalar = 2;
@@ -475,8 +500,9 @@ void TriggerDynamic(int32_t x, int32_t y, int32_t z, int32_t falloff, int32_t r,
 void ClearDynamics() {
 	number_dynamics = 0;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++)
+	for (int32_t i = 0; i < MAX_DYNAMICS; i++) {
 		dynamics[i].on = 0;
+	}
 }
 
 void ControlEnemyMissile(int16_t fx_number) {
@@ -493,8 +519,9 @@ void ControlEnemyMissile(int16_t fx_number) {
 		max_turn = HALF_BLOCK_SIZE;
 		max_speed = CLICK_SIZE;
 	} else if (fx->flag1 == 6) {
-		if (fx->counter)
+		if (fx->counter) {
 			fx->counter--;
+		}
 
 		max_turn = HALF_BLOCK_SIZE + CLICK_SIZE;
 		max_speed = HALF_CLICK_SIZE + QUARTER_CLICK_SIZE;
@@ -504,44 +531,51 @@ void ControlEnemyMissile(int16_t fx_number) {
 	}
 
 	if (fx->speed < max_speed) {
-		if (fx->flag1 == 6)
+		if (fx->flag1 == 6) {
 			fx->speed++;
-		else
+		} else {
 			fx->speed += 3;
+		}
 
 		oy = (uint16_t)angles[0] - (uint16_t)fx->pos.y_rot;
 
-		if (abs(oy) > 0x8000)
+		if (abs(oy) > 0x8000) {
 			oy = (uint16_t)fx->pos.y_rot - (uint16_t)angles[0];
+		}
 
 		ox = (uint16_t)angles[1] - (uint16_t)fx->pos.x_rot;
 
-		if (abs(ox) > 0x8000)
+		if (abs(ox) > 0x8000) {
 			ox = (uint16_t)fx->pos.x_rot - (uint16_t)angles[1];
+		}
 
 		oy >>= 3;
 		ox >>= 3;
 
-		if (oy > max_turn)
+		if (oy > max_turn) {
 			oy = max_turn;
-		else if (oy < -max_turn)
+		} else if (oy < -max_turn) {
 			oy = -max_turn;
+		}
 
-		if (ox > max_turn)
+		if (ox > max_turn) {
 			ox = max_turn;
-		else if (ox < -max_turn)
+		} else if (ox < -max_turn) {
 			ox = -max_turn;
+		}
 
 		fx->pos.x_rot += (int16_t)ox;
 
-		if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
+		if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter)) {
 			fx->pos.y_rot += (int16_t)oy;
+		}
 	}
 
 	fx->pos.z_rot += fx->speed << 4;
 
-	if (fx->flag1 == 6)
+	if (fx->flag1 == 6) {
 		fx->pos.z_rot += fx->speed << 4;
+	}
 
 	ox = fx->pos.x_pos;
 	oy = fx->pos.y_pos;
@@ -560,21 +594,22 @@ void ControlEnemyMissile(int16_t fx_number) {
 		fx->pos.y_pos = oy;
 		fx->pos.z_pos = oz;
 
-		if (fx->flag1 != 6)
+		if (fx->flag1 != 6) {
 			ExplodeFX(fx, 0, -32);
+		}
 
 		if (fx->flag1 == 1) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x18008040, (((~room[fx->room_number].flags & 0xFF) >> 4) & 2) << 16);	//decipher me
 			TriggerExplosionSparks(ox, oy, oz, 3, -2, 2, fx->room_number);
-		} else if (fx->flag1 == 0)
+		} else if (fx->flag1 == 0) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10008040, 0);
-		else if (fx->flag1 == 3 || fx->flag1 == 4)
+		} else if (fx->flag1 == 3 || fx->flag1 == 4) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10004080, 0);
-		else if (fx->flag1 == 5)
+		} else if (fx->flag1 == 5) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10806000, 0);
-		else if (fx->flag1 == 2)
+		} else if (fx->flag1 == 2) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10808000, 0);
-		else if (fx->flag1 == 6) {
+		} else if (fx->flag1 == 6) {
 			TriggerExplosionSparks(ox, oy, oz, 3, -2, 0, fx->room_number);
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xF00030, 64, 0x18806000, 0x20000);
 			fx->pos.y_pos -= HALF_CLICK_SIZE;
@@ -590,8 +625,9 @@ void ControlEnemyMissile(int16_t fx_number) {
 	if (ItemNearLara(&fx->pos, 200)) {
 		lara_item->hit_status = 1;
 
-		if (fx->flag1 != 6)
+		if (fx->flag1 != 6) {
 			ExplodeFX(fx, 0, -32);
+		}
 
 		KillEffect(fx_number);
 
@@ -600,15 +636,15 @@ void ControlEnemyMissile(int16_t fx_number) {
 			TriggerExplosionSparks(ox, oy, oz, 3, -2, 2, fx->room_number);
 			LaraBurn();
 			lara.BurnGreen = 1;
-		} else if (fx->flag1 == 0)
+		} else if (fx->flag1 == 0) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0x580018, 48, 0x10008040, (((~room[fx->room_number].flags & 0xFF) >> 4) & 2) << 16);
-		else if (fx->flag1 == 3 || fx->flag1 == 4)
+		} else if (fx->flag1 == 3 || fx->flag1 == 4) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10004080, 0x10000);
-		else if (fx->flag1 == 5)
+		} else if (fx->flag1 == 5) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10806000, 0x20000);
-		else if (fx->flag1 == 2)
+		} else if (fx->flag1 == 2) {
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xA00020, 64, 0x10808000, 0x20000);
-		else if (fx->flag1 == 6) {
+		} else if (fx->flag1 == 6) {
 			TriggerExplosionSparks(ox, oy, oz, 3, -2, 0, fx->room_number);
 			TriggerShockwave((PHD_VECTOR*)&fx->pos, 0xF00030, 64, 0x18806000, 0);
 			fx->pos.y_pos -= HALF_CLICK_SIZE;
@@ -618,24 +654,26 @@ void ControlEnemyMissile(int16_t fx_number) {
 			LaraBurn();
 		}
 	} else {
-		if (room_number != fx->room_number)
+		if (room_number != fx->room_number) {
 			EffectNewRoom(fx_number, room_number);
+		}
 
 		ox -= fx->pos.x_pos;
 		oy -= fx->pos.y_pos;
 		oz -= fx->pos.z_pos;
 
 		if (wibble & 4 || fx->flag1 == 1 || fx->flag1 == 5 || fx->flag1 == 2) {
-			if (fx->flag1 == 0)
+			if (fx->flag1 == 0) {
 				TriggerSethMissileFlame(fx_number, ox << 4, oy << 4, oz << 4);
-			else if (fx->flag1 == 1)
+			} else if (fx->flag1 == 1) {
 				TriggerSethMissileFlame(fx_number, ox << 5, oy << 5, oz << 5);
-			else if (fx->flag1 == 3 || fx->flag1 == 4 || fx->flag1 == 5)
+			} else if (fx->flag1 == 3 || fx->flag1 == 4 || fx->flag1 == 5) {
 				TriggerDemigodMissileFlame(fx_number, ox << 4, oy << 4, oz << 4);
-			else if (fx->flag1 == 2)
+			} else if (fx->flag1 == 2) {
 				TriggerHarpyMissileFlame(fx_number, ox << 4, oy << 4, oz << 4);
-			else if (fx->flag1 == 6)
+			} else if (fx->flag1 == 6) {
 				TriggerCrocgodMissileFlame(fx_number, ox << 4, oy << 4, oz << 4);
+			}
 		}
 	}
 }
@@ -649,8 +687,9 @@ void SetupRipple(int32_t x, int32_t y, int32_t z, int32_t size, int32_t flags) {
 	while (ripples[num].flags & 1) {
 		num++;
 
-		if (num >= MAX_RIPPLES)
+		if (num >= MAX_RIPPLES) {
 			return;
+		}
 	}
 
 	ripple = &ripples[num];
@@ -679,8 +718,9 @@ void TriggerUnderwaterBlood(int32_t x, int32_t y, int32_t z, int32_t size) {
 		ripple++;
 		n++;
 
-		if (n >= MAX_RIPPLES)
+		if (n >= MAX_RIPPLES) {
 			return;
+		}
 	}
 
 	ripple->flags = 49;
@@ -708,7 +748,7 @@ void TriggerWaterfallMist(int32_t x, int32_t y, int32_t z, int32_t ang) {
 	vs = rcossin_tbl[ang << 2];
 	vc = rcossin_tbl[(ang << 2) + 1];
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
 		sptr->sR = 128;
@@ -734,12 +774,14 @@ void TriggerWaterfallMist(int32_t x, int32_t y, int32_t z, int32_t ang) {
 			sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 			sptr->RotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (GetRandomControl() & 1) {
 				sptr->RotAdd = -16 - (GetRandomControl() & 0xF);
-			else
+			} else {
 				sptr->RotAdd = (GetRandomControl() & 0xF) + 16;
-		} else
+			}
+		} else {
 			sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
+		}
 
 		sptr->Scalar = 6;
 		sptr->Gravity = 0;
@@ -757,8 +799,9 @@ void TriggerDartSmoke(int32_t x, int32_t y, int32_t z, int32_t xv, int32_t zv, i
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -782,17 +825,19 @@ void TriggerDartSmoke(int32_t x, int32_t y, int32_t z, int32_t xv, int32_t zv, i
 		sptr->Yvel = -4 - (GetRandomControl() & 3);
 		sptr->Zvel = int16_t((GetRandomControl() & 0xFF) - zv - 128);
 	} else {
-		if (xv)
+		if (xv) {
 			sptr->Xvel = (int16_t)-xv;
-		else
+		} else {
 			sptr->Xvel = (GetRandomControl() & 0xFF) - 128;
+		}
 
 		sptr->Yvel = -4 - (GetRandomControl() & 3);
 
-		if (zv)
+		if (zv) {
 			sptr->Zvel = (int16_t)-zv;
-		else
+		} else {
 			sptr->Zvel = (GetRandomControl() & 0xFF) - 128;
+		}
 	}
 
 	sptr->Friction = 3;
@@ -801,12 +846,14 @@ void TriggerDartSmoke(int32_t x, int32_t y, int32_t z, int32_t xv, int32_t zv, i
 		sptr->Flags = SF_ROTATE | SF_DEF | SF_SCALE | SF_UNUSED2;
 		sptr->RotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (GetRandomControl() & 1) {
 			sptr->RotAdd = -16 - (GetRandomControl() & 0xF);
-		else
+		} else {
 			sptr->RotAdd = (GetRandomControl() & 0xF) + 16;
-	} else
+		}
+	} else {
 		sptr->Flags = SF_DEF | SF_SCALE | SF_UNUSED2;
+	}
 
 	sptr->Scalar = 1;
 	rand = (GetRandomControl() & 0x3F) + 72;
@@ -843,8 +890,9 @@ void TriggerExplosionBubble(int32_t x, int32_t y, int32_t z, int16_t room_number
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -876,7 +924,7 @@ void TriggerExplosionBubble(int32_t x, int32_t y, int32_t z, int16_t room_number
 	sptr->sSize = size >> 1;
 	sptr->dSize = size << 1;
 
-	for (int i = 0; i < 7; i++) {
+	for (int32_t i = 0; i < 7; i++) {
 		pos.x_pos = (GetRandomControl() & 0x1FF) + x - CLICK_SIZE;
 		pos.y_pos = (GetRandomControl() & 0x7F) + y - QUARTER_CLICK_SIZE;
 		pos.z_pos = (GetRandomControl() & 0x1FF) + z - CLICK_SIZE;
@@ -908,7 +956,7 @@ void DetatchSpark(int32_t num, int32_t type) {
 	FX_INFO* fx;
 	ITEM_INFO* item;
 
-	for (int i = 0; i < get_game_mod_global_info()->max_particles; i++) {
+	for (int32_t i = 0; i < get_game_mod_global_info()->max_particles; i++) {
 		sptr = &spark[i];
 
 		if (sptr->On && (sptr->Flags & type) && sptr->FxObj == num) {
@@ -936,9 +984,9 @@ int32_t GetFreeSpark() {
 	free = next_spark;
 	sptr = &spark[next_spark];
 
-	int max_sparks = get_game_mod_global_info()->max_particles;
+	int32_t max_sparks = get_game_mod_global_info()->max_particles;
 
-	for (int i = 0; i < max_sparks; i++) {
+	for (int32_t i = 0; i < max_sparks; i++) {
 		if (sptr->On) {
 			if (free == max_sparks - 1) {
 				sptr = &spark[0];
@@ -959,7 +1007,7 @@ int32_t GetFreeSpark() {
 	free = 0;
 	min_life = 4095;
 
-	for (int i = 0; i < max_sparks; i++) {
+	for (int32_t i = 0; i < max_sparks; i++) {
 		sptr = &spark[i];
 
 		if (sptr->Life < min_life && sptr->Dynamic == -1 && !(sptr->Flags & SF_NOKILL)) {
@@ -989,19 +1037,21 @@ void UpdateSparks() {
 	DeadlyBounds[4] = lara_item->pos.z_pos + bounds[4];
 	DeadlyBounds[5] = lara_item->pos.z_pos + bounds[5];
 
-	int max_sparks = get_game_mod_global_info()->max_particles;
+	int32_t max_sparks = get_game_mod_global_info()->max_particles;
 
-	for (int i = 0; i < max_sparks; i++) {
+	for (int32_t i = 0; i < max_sparks; i++) {
 		sptr = &spark[i];
 
-		if (!sptr->On)
+		if (!sptr->On) {
 			continue;
+		}
 
 		sptr->Life--;
 
 		if (!sptr->Life) {
-			if (sptr->Dynamic != -1)
+			if (sptr->Dynamic != -1) {
 				spark_dynamics[sptr->Dynamic].On = 0;
+			}
 
 			sptr->On = 0;
 			continue;
@@ -1028,28 +1078,32 @@ void UpdateSparks() {
 			sptr->B = sptr->dB;
 		}
 
-		if (sptr->Life == sptr->FadeToBlack && sptr->Flags & SF_UNWATER)
+		if (sptr->Life == sptr->FadeToBlack && sptr->Flags & SF_UNWATER) {
 			sptr->dSize >>= 2;
+		}
 
-		if (sptr->Flags & SF_ROTATE)
+		if (sptr->Flags & SF_ROTATE) {
 			sptr->RotAng = (sptr->RotAng + sptr->RotAdd) & 0xFFF;
+		}
 
 		if (sptr->sLife - sptr->Life == sptr->extras >> 3 && sptr->extras & 7) {
-			if (sptr->Flags & SF_UNWATER)
+			if (sptr->Flags & SF_UNWATER) {
 				uw = 1;
-			else if (sptr->Flags & SF_GREEN)
+			} else if (sptr->Flags & SF_GREEN) {
 				uw = 2;
-			else
+			} else {
 				uw = 0;
+			}
 
-			for (int j = 0; j < (sptr->extras & 7); j++) {
+			for (int32_t j = 0; j < (sptr->extras & 7); j++) {
 				TriggerExplosionSparks(sptr->x, sptr->y, sptr->z, (sptr->extras & 7) - 1, sptr->Dynamic, uw, sptr->RoomNumber);
 				sptr->Dynamic = -1;
 			}
 
 			// TODO: TR5 behaviour on triggers bubble if uw == 1
-			if (sptr->Flags & SF_UNWATER)
+			if (sptr->Flags & SF_UNWATER) {
 				TriggerExplosionBubble(sptr->x, sptr->y, sptr->z, sptr->RoomNumber);
+			}
 
 			sptr->extras = 0;
 		}
@@ -1087,19 +1141,21 @@ void UpdateSparks() {
 			if (sptr->x + rad > DeadlyBounds[0] && sptr->x - rad < DeadlyBounds[1] &&
 			        sptr->y + rad > DeadlyBounds[2] && sptr->y - rad < DeadlyBounds[3] &&
 			        sptr->z + rad > DeadlyBounds[4] && sptr->z - rad < DeadlyBounds[5]) {
-				if (sptr->Flags & SF_FIRE)
+				if (sptr->Flags & SF_FIRE) {
 					LaraBurn();
-				else
+				} else {
 					lara_item->hit_points -= 2;
+				}
 			}
 		}
 	}
 
-	for (int i = 0; i < max_sparks; i++) {
+	for (int32_t i = 0; i < max_sparks; i++) {
 		sptr = &spark[i];
 
-		if (!sptr->On || sptr->Dynamic == -1)
+		if (!sptr->On || sptr->Dynamic == -1) {
 			continue;
+		}
 
 		dynamic = &spark_dynamics[sptr->Dynamic];
 
@@ -1111,35 +1167,40 @@ void UpdateSparks() {
 			falloff = sptr->sLife - sptr->Life - 1;
 
 			if (falloff < 2) {
-				if (dynamic->Falloff < 28)
+				if (dynamic->Falloff < 28) {
 					dynamic->Falloff += 6;
+				}
 
 				r = 255 - (falloff << 3) - (rnd & 0x1F);
 				g = 255 - (falloff << 4) - (rnd & 0x1F);
 				b = 255 - (falloff << 6) - (rnd & 0x1F);
 			} else if (falloff < 4) {
-				if (dynamic->Falloff < 28)
+				if (dynamic->Falloff < 28) {
 					dynamic->Falloff += 6;
+				}
 
 				r = 255 - (falloff << 3) - (rnd & 0x1F);
 				g = 128 - (falloff << 3);
 				b = 128 - (falloff << 5);
 
-				if (b < 0)
+				if (b < 0) {
 					b = 0;
+				}
 			} else {
-				if (dynamic->Falloff > 0)
+				if (dynamic->Falloff > 0) {
 					dynamic->Falloff--;
+				}
 
 				r = 224 + (rnd & 0x1F);
 				g = 128 + ((rnd >> 4) & 0x1F);
 				b = (rnd >> 8) & 0x3F;
 			}
 
-			if (sptr->Flags & SF_GREEN)
+			if (sptr->Flags & SF_GREEN) {
 				TriggerDynamic(x, y, z, dynamic->Falloff > 31 ? 31 : dynamic->Falloff, b, r, g);
-			else
+			} else {
 				TriggerDynamic(x, y, z, dynamic->Falloff > 31 ? 31 : dynamic->Falloff, r, g, b);
+			}
 		}
 	}
 }
@@ -1149,7 +1210,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, int32_t ang, int32_t num, int32_t sm
 	int32_t rnd;
 
 	if (!smoke_only) {
-		for (int i = 0; i < num; i++) {
+		for (int32_t i = 0; i < num; i++) {
 			sptr = &spark[GetFreeSpark()];
 			rnd = GetRandomControl();
 			sptr->On = 1;
@@ -1200,10 +1261,11 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, int32_t ang, int32_t num, int32_t sm
 		sptr->Flags = SF_ROTATE | SF_DEF | SF_SCALE;
 		sptr->RotAng = (rnd >> 2) & 0xFFF;
 
-		if (rnd & 1)
+		if (rnd & 1) {
 			sptr->RotAdd = -64 - ((rnd >> 1) & 0x3F);
-		else
+		} else {
 			sptr->RotAdd = ((rnd >> 1) & 0x3F) + 64;
+		}
 
 		sptr->Scalar = 3;
 		sptr->Def = objects[T4PlusGetDefaultSpritesSlotID()].mesh_index + 12;
@@ -1214,7 +1276,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, int32_t ang, int32_t num, int32_t sm
 		sptr->Gravity = 0;
 	}
 
-	for (int i = 0; i < 1 - smoke_only; i++) {
+	for (int32_t i = 0; i < 1 - smoke_only; i++) {
 		rnd = GetRandomControl();
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
@@ -1251,10 +1313,11 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, int32_t ang, int32_t num, int32_t sm
 		sptr->Flags = SF_ROTATE | SF_DEF | SF_SCALE;
 		sptr->RotAng = int16_t(rnd >> 3);
 
-		if (rnd & 1)
+		if (rnd & 1) {
 			sptr->RotAdd = -16 - (rnd & 0xF);
-		else
+		} else {
 			sptr->RotAdd = (rnd & 0xF) + 16;
+		}
 
 		sptr->Scalar = 2;
 		sptr->Gravity = -4 - ((rnd >> 9) & 3);
@@ -1281,16 +1344,18 @@ void TriggerExplosionSparks(int32_t x, int32_t y, int32_t z, int32_t extras, int
 	scalar = 0;
 	mirror = 0;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	if (room_number < 0) {
 		room_number = -room_number;
 		scalar = 1;
 	}
 
-	if (room_number == gfMirrorRoom && gfLevelFlags & GF_MIRROR)
+	if (room_number == gfMirrorRoom && gfLevelFlags & GF_MIRROR) {
 		mirror = 1;
+	}
 
 	do {
 		sptr = &spark[GetFreeSpark()];
@@ -1333,10 +1398,11 @@ void TriggerExplosionSparks(int32_t x, int32_t y, int32_t z, int32_t extras, int
 					pDL->On = 1;
 					pDL->Falloff = 4;
 
-					if (uw == 1)
+					if (uw == 1) {
 						pDL->Flags = 2;
-					else
+					} else {
 						pDL->Flags = 1;
+					}
 
 					sptr->Dynamic = (int8_t)i;
 					break;
@@ -1364,10 +1430,11 @@ void TriggerExplosionSparks(int32_t x, int32_t y, int32_t z, int32_t extras, int
 			sptr->z = (GetRandomControl() & 0x1FF) + z - CLICK_SIZE;
 		}
 
-		if (uw == 1)
+		if (uw == 1) {
 			sptr->Friction = 17;
-		else
+		} else {
 			sptr->Friction = 51;
+		}
 
 		if (GetRandomControl() & 1) {
 			if (uw == 1)
@@ -1379,10 +1446,11 @@ void TriggerExplosionSparks(int32_t x, int32_t y, int32_t z, int32_t extras, int
 			sptr->RotAdd = (GetRandomControl() & 0xFF) + HALF_CLICK_SIZE;
 		}
 
-		else if (uw == 1)
+		else if (uw == 1) {
 			sptr->Flags = SF_UNWATER | SF_UNUSED2 | SF_DEF | SF_SCALE;
-		else
+		} else {
 			sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
+		}
 
 		sptr->Scalar = 3;
 		sptr->Gravity = 0;
@@ -1409,10 +1477,11 @@ void TriggerExplosionSparks(int32_t x, int32_t y, int32_t z, int32_t extras, int
 			sptr->dB = g;
 
 			sptr->Flags |= SF_GREEN;
-		} else if (extras)
+		} else if (extras) {
 			TriggerExplosionSmoke(x, y, z, uw);
-		else
+		} else {
 			TriggerExplosionSmokeEnd(x, y, z, uw);
+		}
 
 		z = 2 * gfMirrorZPlane - z;
 		mirror--;
@@ -1426,8 +1495,9 @@ void TriggerFireFlame(int32_t x, int32_t y, int32_t z, int32_t body_part, int32_
 	dx = lara_item->pos.x_pos - x;
 	dz = lara_item->pos.z_pos - z;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -1500,10 +1570,11 @@ void TriggerFireFlame(int32_t x, int32_t y, int32_t z, int32_t body_part, int32_
 		sptr->Yvel = -(QUARTER_CLICK_SIZE / 4) - (GetRandomControl() & 0xF);
 		sptr->Zvel = (GetRandomControl() & 0xFF) - HALF_CLICK_SIZE;
 
-		if (type == 1)
+		if (type == 1) {
 			sptr->Friction = 51;
-		else
+		} else {
 			sptr->Friction = 5;
+		}
 	}
 
 	if (GetRandomControl() & 1) {
@@ -1520,10 +1591,11 @@ void TriggerFireFlame(int32_t x, int32_t y, int32_t z, int32_t body_part, int32_
 
 		sptr->RotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (GetRandomControl() & 1) {
 			sptr->RotAdd = -16 - (GetRandomControl() & 0xF);
-		else
+		} else {
 			sptr->RotAdd = (GetRandomControl() & 0xF) + 16;
+		}
 	} else {
 		if (body_part == -1) {
 			sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
@@ -1539,23 +1611,24 @@ void TriggerFireFlame(int32_t x, int32_t y, int32_t z, int32_t body_part, int32_
 
 	sptr->Scalar = 2;
 
-	if (!type)
+	if (!type) {
 		size = (GetRandomControl() & 0x1F) + HALF_CLICK_SIZE;
-	else if (type == 1)
+	} else if (type == 1) {
 		size = (GetRandomControl() & 0x1F) + QUARTER_CLICK_SIZE;
-	else if (type < 254) {
+	} else if (type < 254) {
 		sptr->MaxYvel = 0;
 		sptr->Gravity = 0;
 		size = (GetRandomControl() & 0x1F) + (QUARTER_CLICK_SIZE / 2);
-	} else
+	} else {
 		size = (GetRandomControl() & 0xF) + 48;
+	}
 
 	sptr->Size = (uint8_t)size;
 	sptr->sSize = sptr->Size;
 
-	if (type == 2)
+	if (type == 2) {
 		sptr->dSize = sptr->Size >> 2;
-	else {
+	} else {
 		sptr->dSize = sptr->Size >> 4;
 
 		if (type == 7) {
@@ -1574,13 +1647,15 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int32_t yvel, int32_t deadly) {
 	dx = lara_item->pos.x_pos - item->pos.x_pos;
 	dz = lara_item->pos.z_pos - item->pos.z_pos;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000) {
 		return;
+	}
 
 	dy = (GetRandomControl() & 0x1FF) - yvel;
 
-	if (dy < HALF_BLOCK_SIZE)
+	if (dy < HALF_BLOCK_SIZE) {
 		dy = HALF_BLOCK_SIZE;
+	}
 
 	sptr = &spark[GetFreeSpark()];
 	sptr->On = 1;
@@ -1601,10 +1676,11 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int32_t yvel, int32_t deadly) {
 	sptr->Friction = 51;
 	sptr->MaxYvel = 0;
 
-	if (deadly)
+	if (deadly) {
 		sptr->Flags = SF_FIRE | SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
-	else
+	} else {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
+	}
 
 	sptr->Scalar = 2;
 	sptr->dSize = uint8_t((GetRandomControl() & 0xF) + (dy >> 6) + 16);
@@ -1627,14 +1703,15 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int32_t yvel, int32_t deadly) {
 	sptr->Zvel = (GetRandomControl() & 0xFF) - 128;
 	dy -= dy >> 2;
 
-	if (!item->pos.y_rot)
+	if (!item->pos.y_rot) {
 		sptr->Zvel = (int16_t)-dy;
-	else if (item->pos.y_rot == 0x4000)
+	} else if (item->pos.y_rot == 0x4000) {
 		sptr->Xvel = (int16_t)-dy;
-	else if (item->pos.y_rot == -0x8000)
+	} else if (item->pos.y_rot == -0x8000) {
 		sptr->Zvel = (int16_t)dy;
-	else
+	} else {
 		sptr->Xvel = (int16_t)dy;
+	}
 }
 
 void TriggerRocketSmoke(int32_t x, int32_t y, int32_t z, int32_t col) {
@@ -1665,12 +1742,14 @@ void TriggerRocketSmoke(int32_t x, int32_t y, int32_t z, int32_t col) {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_ROTATE | SF_UNUSED2;
 		sptr->RotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (GetRandomControl() & 1) {
 			sptr->RotAdd = -16 - (GetRandomControl() & 0xF);
-		else
+		} else {
 			sptr->RotAdd = (GetRandomControl() & 0xF) + 16;
-	} else
+		}
+	} else {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
+	}
 
 	sptr->Scalar = 3;
 	sptr->Gravity = -4 - (GetRandomControl() & 3);
@@ -1722,7 +1801,7 @@ void UpdateSplashes() {	//(and ripples)
 	SPLASH_STRUCT* splash;
 	RIPPLE_STRUCT* ripple;
 
-	for (int i = 0; i < MAX_SPLASHES; i++) {
+	for (int32_t i = 0; i < MAX_SPLASHES; i++) {
 		splash = &splashes[i];
 
 		if (!(splash->flags & 1))
@@ -1740,19 +1819,22 @@ void UpdateSplashes() {	//(and ripples)
 		splash->InnerY += splash->InnerYVel >> 4;
 		splash->InnerYVel += 0x400;
 
-		if (splash->InnerYVel > 0x4000)
+		if (splash->InnerYVel > 0x4000) {
 			splash->InnerYVel = 0x4000;
+		}
 
 		if (splash->InnerY < 0) {
-			if (splash->InnerY < -0x7000)
+			if (splash->InnerY < -0x7000) {
 				splash->InnerY = -0x7000;
+			}
 		} else {
 			splash->InnerY = 0;
 			splash->flags |= 4;
 			splash->life -= 2;
 
-			if (!splash->life)
+			if (!splash->life) {
 				splash->flags = 0;
+			}
 		}
 
 		splash->MiddleY += splash->MiddleYVel >> 4;
@@ -1762,42 +1844,47 @@ void UpdateSplashes() {	//(and ripples)
 			splash->MiddleYVel = 0x4000;
 
 		if (splash->MiddleY < 0) {
-			if (splash->MiddleY < -0x7000)
+			if (splash->MiddleY < -0x7000) {
 				splash->MiddleY = -0x7000;
+			}
 		} else {
 			splash->MiddleY = 0;
 			splash->flags |= 8;
 		}
 	}
 
-	for (int i = 0; i < MAX_RIPPLES; i++) {
+	for (int32_t i = 0; i < MAX_RIPPLES; i++) {
 		ripple = &ripples[i];
 
 		if (!(ripple->flags & 1))
 			continue;
 
 		if (ripple->size < 252) {
-			if (ripple->flags & 2)
+			if (ripple->flags & 2) {
 				ripple->size += 2;
-			else
+			} else {
 				ripple->size += 4;
+			}
 		}
 
 		if (ripple->init) {
 			if (ripple->init < ripple->life) {
-				if (ripple->flags & 2)
+				if (ripple->flags & 2) {
 					ripple->init += 8;
-				else
+				} else {
 					ripple->init += 4;
+				}
 
-				if (ripple->init >= ripple->life)
+				if (ripple->init >= ripple->life) {
 					ripple->init = 0;
+				}
 			}
 		} else {
 			ripple->life -= 3;
 
-			if (ripple->life > 250)
+			if (ripple->life > 250) {
 				ripple->flags = 0;
+			}
 		}
 	}
 }
@@ -1830,10 +1917,11 @@ void TriggerBreath(int32_t x, int32_t y, int32_t z, int32_t xv, int32_t yv, int3
 	sptr->Yvel = (int16_t)yv;
 	sptr->Zvel = (int16_t)zv;
 
-	if (room[lara_item->room_number].flags & ROOM_NOT_INSIDE)
+	if (room[lara_item->room_number].flags & ROOM_NOT_INSIDE) {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_OUTSIDE | SF_UNUSED2;
-	else
+	} else {
 		sptr->Flags = SF_SCALE | SF_DEF | SF_UNUSED2;
+	}
 
 	sptr->Scalar = 3;
 	sptr->Def = (uint8_t)objects[T4PlusGetDefaultSpritesSlotID()].mesh_index;

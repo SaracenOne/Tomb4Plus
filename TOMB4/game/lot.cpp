@@ -11,18 +11,20 @@ CREATURE_INFO* baddie_slots;
 
 static int32_t slots_used = 0;
 
-void InitialiseLOTarray(int32_t allocmem) {
+void InitialiseLOTarray(bool allocmem) {
 	CREATURE_INFO* creature;
 
-	if (allocmem)
+	if (allocmem) {
 		baddie_slots = (CREATURE_INFO*)game_malloc(MAXIMUM_BADDIES * sizeof(CREATURE_INFO));
+	}
 
-	for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+	for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 		creature = &baddie_slots[i];
 		creature->item_num = NO_ITEM;
 
-		if (allocmem)
+		if (allocmem) {
 			creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * num_boxes);
+		}
 	}
 
 	slots_used = 0;
@@ -45,16 +47,16 @@ void DisableBaddieAI(int16_t item_number) {
 void ClearLOT(LOT_INFO* lot) {
 	BOX_NODE* node;
 
-	lot->tail = 2047;
-	lot->head = 2047;
+	lot->tail = NO_BOX;
+	lot->head = NO_BOX;
 	lot->search_number = 0;
-	lot->target_box = 2047;
-	lot->required_box = 2047;
+	lot->target_box = NO_BOX;
+	lot->required_box = NO_BOX;
 	node = lot->node;
 
-	for (int i = 0; i < num_boxes; i++) {
-		node->next_expansion = 2047;
-		node->exit_box = 2047;
+	for (int32_t i = 0; i < num_boxes; i++) {
+		node->next_expansion = NO_BOX;
+		node->exit_box = NO_BOX;
 		node->search_number = 0;
 		node++;
 	}
@@ -70,13 +72,13 @@ void CreateZone(ITEM_INFO* item) {
 
 	creature = (CREATURE_INFO*)item->data;
 	r = &room[item->room_number];
-	item->box_number = r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)].box;
+	item->box_number = r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)].box;
 
 	if (creature->LOT.fly) {
 		creature->LOT.zone_count = 0;
 		node = creature->LOT.node;
 
-		for (int i = 0; i < num_boxes; i++) {
+		for (int32_t i = 0; i < num_boxes; i++) {
 			node->box_number = i;
 			node++;
 			creature->LOT.zone_count++;
@@ -89,7 +91,7 @@ void CreateZone(ITEM_INFO* item) {
 		creature->LOT.zone_count = 0;
 		node = creature->LOT.node;
 
-		for (int i = 0; i < num_boxes; i++) {
+		for (int32_t i = 0; i < num_boxes; i++) {
 			if (*zone == zone_number || *flip == flip_number) {
 				node->box_number = i;
 				node++;
@@ -115,24 +117,24 @@ void InitialiseSlot(int16_t item_number, int32_t slot) {
 	creature->joint_rotation[1] = 0;
 	creature->joint_rotation[2] = 0;
 	creature->joint_rotation[3] = 0;
-	creature->alerted = 0;
-	creature->head_left = 0;
-	creature->head_right = 0;
-	creature->reached_goal = 0;
-	creature->hurt_by_lara = 0;
-	creature->patrol2 = 0;
-	creature->jump_ahead = 0;
-	creature->monkey_ahead = 0;
-	creature->LOT.can_jump = 0;
-	creature->LOT.can_monkey = 0;
-	creature->LOT.is_jumping = 0;
-	creature->LOT.is_monkeying = 0;
+	creature->alerted = false;
+	creature->head_left = false;
+	creature->head_right = false;
+	creature->reached_goal = false;
+	creature->hurt_by_lara = false;
+	creature->patrol2 = false;
+	creature->jump_ahead = false;
+	creature->monkey_ahead = false;
+	creature->LOT.can_jump = false;
+	creature->LOT.can_monkey = false;
+	creature->LOT.is_jumping = false;
+	creature->LOT.is_monkeying = false;
 	creature->maximum_turn = DEGREES_TO_ROTATION(1);
 	creature->flags = 0;
-	creature->enemy = 0;
+	creature->enemy = NULL;
 	creature->LOT.step = CLICK_SIZE;
 	creature->LOT.drop = -HALF_BLOCK_SIZE;
-	creature->LOT.block_mask = 0x4000;
+	creature->LOT.block_mask = BLOCKED;
 	creature->LOT.fly = 0;
 	creature->LOT.zone = BASIC_ZONE;
 
@@ -143,8 +145,8 @@ void InitialiseSlot(int16_t item_number, int32_t slot) {
 		case BADDY_2:
 			creature->LOT.step = BLOCK_SIZE;
 			creature->LOT.drop = -BLOCK_SIZE;
-			creature->LOT.can_jump = 1;
-			creature->LOT.can_monkey = 1;
+			creature->LOT.can_jump = true;
+			creature->LOT.can_monkey = true;
 			creature->LOT.zone = HUMAN_ZONE;
 			break;
 
@@ -170,7 +172,7 @@ void InitialiseSlot(int16_t item_number, int32_t slot) {
 		case SETHA:
 			creature->LOT.step = CLICK_SIZE;
 			creature->LOT.drop = -HALF_BLOCK_SIZE;
-			creature->LOT.can_jump = 1;
+			creature->LOT.can_jump = true;
 			creature->LOT.zone = SKELLY_ZONE;
 			break;
 

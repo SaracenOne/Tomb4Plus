@@ -66,7 +66,7 @@ void CLPath(char* cmd) {
 void InitDSDevice(HWND dlg, HWND hwnd) {
 	SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
 
-	for (int i = 0; i < App.DXInfo.nDSInfo; i++) {
+	for (int32_t i = 0; i < App.DXInfo.nDSInfo; i++) {
 #ifdef UNICODE
 		wchar_t wide_string[80];
 		MultiByteToWideChar(CP_UTF8, 0, App.DXInfo.DSInfo[i].About, -1, wide_string, sizeof(wide_string) / sizeof(wchar_t));
@@ -124,7 +124,7 @@ void InitResolution(HWND dlg, HWND hwnd, bool resetvms) {
 	if (resetvms) {
 		SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
 
-		int display_mode_count = SDL_GetNumDisplayModes(0);
+		int32_t display_mode_count = SDL_GetNumDisplayModes(0);
 		if (display_mode_count < 1) {
 			platform_fatal_error("SDL_GetNumDisplayModes failed: %s", SDL_GetError());
 			return;
@@ -271,15 +271,15 @@ char* MapASCIIToANSI(char* s, char* d) {
 	l = strlen(s);
 	p = d;
 
-	for (int i = 0; i < l; i++) {
+	for (int32_t i = 0; i < l; i++) {
 		c = *s++;
 
 		if (c >= 0x80) {
 			found = 0;
 
-			for (int i = 0; i < 7; i++) {
-				if (c == ASCIIToANSITable[i][0]) {
-					c = ASCIIToANSITable[i][1];
+			for (int32_t j = 0; j < 7; j++) {
+				if (c == ASCIIToANSITable[j][0]) {
+					c = ASCIIToANSITable[j][1];
 					found = 1;
 					break;
 				}

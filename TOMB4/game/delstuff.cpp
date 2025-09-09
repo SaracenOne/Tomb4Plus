@@ -155,10 +155,11 @@ void DrawLara(ITEM_INFO* item, bool mirror) {
 		}
 	}
 
-	if (!mirror)
+	if (!mirror) {
 		CalculateObjectLightingLara();
+	}
 
-	for (int i = 0; i < 15; i++) { //skin
+	for (int32_t i = 0; i < 15; i++) { //skin
 		mMXPtr[M00] = lara_matrices[i * 12 + M00];
 		mMXPtr[M01] = lara_matrices[i * 12 + M01];
 		mMXPtr[M02] = lara_matrices[i * 12 + M02];
@@ -172,14 +173,15 @@ void DrawLara(ITEM_INFO* item, bool mirror) {
 		mMXPtr[M22] = lara_matrices[i * 12 + M22];
 		mMXPtr[M23] = lara_matrices[i * 12 + M23];
 
-		if (LaraNodeUnderwater[i])
+		if (LaraNodeUnderwater[i]) {
 			bLaraUnderWater = i;
-		else
+		} else {
 			bLaraUnderWater = -1;
+		}
 
 		phd_PutPolygons(lara.mesh_ptrs[lara_mesh_sweetness_table[i]], -1);	//no meshbits checks?
 
-		for (int j = 0; j < 4; j++) {
+		for (int32_t j = 0; j < 4; j++) {
 			stash = (uint8_t)NodesToStashFromScratch[i][j];
 
 			if (stash == 255)
@@ -198,7 +200,7 @@ void DrawLara(ITEM_INFO* item, bool mirror) {
 	meshpp = &meshes[obj->mesh_index];
 	meshpp += 2;
 
-	for (int i = 0; i < 14; i++) { //joints
+	for (int32_t i = 0; i < 14; i++) { //joints
 		SkinVerticesToScratch(NodesToStashToScratch[i][0]);
 		SkinVerticesToScratch(NodesToStashToScratch[i][1]);
 
@@ -349,7 +351,7 @@ void SetLaraUnderwaterNodes() {
 	bLaraInWater = room[room_num].flags & ROOM_UNDERWATER ? 1 : 0;
 	bit = 0;
 
-	for (int i = 14; i >= 0; i--) {
+	for (int32_t i = 14; i >= 0; i--) {
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;
@@ -1055,13 +1057,13 @@ void CalcLaraMatrices(int32_t flag) {
 		frame = *frmptr;
 	else {
 		if (!lara.hit_direction)
-			spaz = lara.IsDucked ? ANIM_SPAZ_DUCKF : ANIM_SPAZ_FORWARD;
+			spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKF : LARA_ANIM_SPAZ_FORWARD;
 		else if (lara.hit_direction == 1)
-			spaz = lara.IsDucked ? ANIM_SPAZ_DUCKR : ANIM_SPAZ_RIGHT;
+			spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKR : LARA_ANIM_SPAZ_RIGHT;
 		else if (lara.hit_direction == 2)
-			spaz = lara.IsDucked ? ANIM_SPAZ_DUCKB : ANIM_SPAZ_BACK;
+			spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKB : LARA_ANIM_SPAZ_BACK;
 		else
-			spaz = lara.IsDucked ? ANIM_SPAZ_DUCKL : ANIM_SPAZ_LEFT;
+			spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKL : LARA_ANIM_SPAZ_LEFT;
 
 		frame = &anims[spaz].frame_ptr[lara.hit_frame * (anims[spaz].interpolation >> 8)];
 	}

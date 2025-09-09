@@ -24,7 +24,7 @@ void InitialiseWraith(int16_t item_number) {
 	item->hit_points = 0;
 	item->speed = WraithSpeed;
 
-	for (int i = 0; i < MAX_WRAITH_DATA; i++) {
+	for (int32_t i = 0; i < MAX_WRAITH_DATA; i++) {
 		data->pos.x = item->pos.x_pos;
 		data->pos.y = item->pos.y_pos;
 		data->pos.z = item->pos.z_pos;
@@ -123,7 +123,7 @@ void TriggerWraithEffect(int32_t x, int32_t y, int32_t z, int16_t vel, int32_t o
 	scol = (sb << 24) | (sg << 16) | (sr << 8) | 1;			//sptr->On = 1; sptr->sR = sr; sptr->sG = sg; sptr->sB = sb;
 	dcol = (0xFF << 24) | (db << 16) | (dg << 8) | dr;		//sptr->dR = dr; sptr->dG = dg; sptr->dB = sb; sptr->R = 0xFF;
 
-	for (int i = 0; i < 15; i++) {
+	for (int32_t i = 0; i < 15; i++) {
 		sptr = &spark[GetFreeSpark()];
 		*(uint32_t*)&sptr->On = scol;	//just.. why
 		*(uint32_t*)&sptr->dR = dcol;
@@ -244,7 +244,7 @@ void WraithControl(int16_t item_number) {
 	if (item->room_number != IsRoomOutsideNo && IsRoomOutsideNo != 255) {
 		ItemNewRoom(item_number, IsRoomOutsideNo);
 
-		for (int i = room[item->room_number].item_number; i != NO_ITEM; i = item2->next_item) {
+		for (int32_t i = room[item->room_number].item_number; i != NO_ITEM; i = item2->next_item) {
 			item2 = &items[i];
 
 			if (item2->active) {
@@ -347,7 +347,7 @@ void WraithControl(int16_t item_number) {
 	wraith = (WRAITH_STRUCT*)item->data;
 	wraith += (MAX_WRAITH_DATA - 1);
 
-	for (int i = 0; i < (MAX_WRAITH_DATA - 1); i++) {
+	for (int32_t i = 0; i < (MAX_WRAITH_DATA - 1); i++) {
 		wraith[-1].pos.x += wraith[-1].xv >> 4;
 		wraith[-1].pos.y += wraith[-1].yv >> 4;
 		wraith[-1].pos.z += wraith[-1].zv >> 4;

@@ -19,8 +19,8 @@ LARA_TIGHTROPE_EXTRASTATE lara_tightrope_extrastate;
 
 static void GetTighRopeFallOff(int32_t chance) {
 	if (lara_item->hit_points <= 0 || lara_item->hit_status) {
-		lara_item->anim_number = ANIM_TROPEFALLOFF_L;
-		lara_item->frame_number = anims[ANIM_TROPEFALLOFF_L].frame_base;
+		lara_item->anim_number = LARA_ANIM_TROPEFALLOFF_L;
+		lara_item->frame_number = anims[LARA_ANIM_TROPEFALLOFF_L].frame_base;
 		lara_item->current_anim_state = AS_TROPEFALL_L;
 		lara_item->goal_anim_state = AS_TROPEFALL_L;
 	}
@@ -54,10 +54,10 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll) {
 	} else if (input & IN_FORWARD)
 		item->goal_anim_state = AS_TROPEWALK;
 	else if (input & IN_ROLL || input & IN_BACK) {
-		if (item->anim_number == ANIM_TRPOSE) {
+		if (item->anim_number == LARA_ANIM_TRPOSE) {
 			item->current_anim_state = AS_TROPETURN;
-			item->anim_number = ANIM_TROPETURN;
-			item->frame_number = anims[ANIM_TROPETURN].frame_base;
+			item->anim_number = LARA_ANIM_TROPETURN;
+			item->frame_number = anims[LARA_ANIM_TROPETURN].frame_base;
 			GetTighRopeFallOff(1);
 		}
 	}
@@ -107,7 +107,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 	PHD_VECTOR pos;
 	int32_t UndoInput, WrongInput, UndoAnim, UndoFrame;
 
-	if (item->anim_number == ANIM_TROPEFALLOFF_L || item->anim_number == ANIM_TROPEFALLOFF_R) {
+	if (item->anim_number == LARA_ANIM_TROPEFALLOFF_L || item->anim_number == LARA_ANIM_TROPEFALLOFF_R) {
 		if (item->frame_number == anims[item->anim_number].frame_end) {
 			pos.x = 0;
 			pos.y = 0;
@@ -118,8 +118,8 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 			item->pos.z_pos = pos.z;
 			item->goal_anim_state = AS_FASTFALL;
 			item->current_anim_state = AS_FASTFALL;
-			item->anim_number = ANIM_FASTFALL;
-			item->frame_number = anims[ANIM_FASTFALL].frame_base;
+			item->anim_number = LARA_ANIM_FASTFALL;
+			item->frame_number = anims[LARA_ANIM_FASTFALL].frame_base;
 			item->fallspeed = 81;
 			lara.gun_status = LG_NO_ARMS;
 		}
@@ -130,14 +130,14 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll) {
 	if (lara_tightrope_extrastate.TightRopeOnCount)
 		lara_tightrope_extrastate.TightRopeOnCount--;
 
-	if (item->anim_number == ANIM_TROPEFALL_L) {
+	if (item->anim_number == LARA_ANIM_TROPEFALL_L) {
 		UndoInput = IN_RIGHT;
 		WrongInput = IN_LEFT;
-		UndoAnim = ANIM_TROPEUNDO_L;
-	} else if (item->anim_number == ANIM_TROPEFALL_R) {
+		UndoAnim = LARA_ANIM_TROPEUNDO_L;
+	} else if (item->anim_number == LARA_ANIM_TROPEFALL_R) {
 		UndoInput = IN_LEFT;
 		WrongInput = IN_RIGHT;
-		UndoAnim = ANIM_TROPEUNDO_R;
+		UndoAnim = LARA_ANIM_TROPEUNDO_R;
 	} else
 		return;
 
@@ -176,15 +176,15 @@ void TightRopeCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_num];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status &&
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && !l->gravity_status &&
 	        lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_num) {
 		item->pos.y_rot += 0x8000;
 
 		if (TestLaraPosition(TightRopeBounds, item, l)) {
 			if (MoveLaraPosition(&TightRopePos, item, l)) {
 				l->current_anim_state = AS_TROPEGETON;
-				l->anim_number = ANIM_TROPEGETON;
-				l->frame_number = anims[ANIM_TROPEGETON].frame_base;
+				l->anim_number = LARA_ANIM_TROPEGETON;
+				l->frame_number = anims[LARA_ANIM_TROPEGETON].frame_base;
 				lara.IsMoving = 0;
 				lara.head_x_rot = 0;
 				lara.head_y_rot = 0;

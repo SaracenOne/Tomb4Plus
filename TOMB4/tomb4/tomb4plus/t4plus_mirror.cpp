@@ -2,14 +2,14 @@
 
 #include "t4plus_mirror.h"
 
-int t4p_mirror_count = 0;
+int32_t t4p_mirror_count = 0;
 T4PlusMirrorInfo t4p_mirror_info[MAX_MIRRORS];
 
 void T4PResetMirrors() {
 	t4p_mirror_count = 0;
 }
 
-void T4PInsertMirror(int mirror_room, int pivot_point, T4PlusMirrorDirection direction) {
+void T4PInsertMirror(int32_t mirror_room, int32_t pivot_point, T4PlusMirrorDirection direction) {
 	if (t4p_mirror_count >= MAX_MIRRORS) {
 		platform_fatal_error("MAX_MIRRORS overflow.");
 		return;

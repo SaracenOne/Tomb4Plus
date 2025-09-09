@@ -9,7 +9,7 @@
 DXPTR* G_dxptr;
 DXINFO* G_dxinfo;
 
-int keymap_count = 0;
+int32_t keymap_count = 0;
 const Uint8 *keymap;
 SDL_GameController *controller = nullptr;
 const char* controller_name = nullptr;

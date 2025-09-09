@@ -436,7 +436,7 @@ void LaraTorch(PHD_VECTOR* Soffset, PHD_VECTOR* Eoffset, int16_t yrot, int32_t b
 	offs[3] = 0x4000;
 	offs[4] = 0x4001;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++) {
+	for (int32_t i = 0; i < MAX_DYNAMICS; i++) {
 		if (counter) {
 			counter--;
 
@@ -617,17 +617,17 @@ void ChaseCamera(ITEM_INFO* item) {
 	}
 
 	if (tr5_camera_behaviour) {
-		for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
+		for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
 			ideals[i].y = camera.target.y + (camera.target_distance * phd_sin(camera.actual_elevation) >> W2V_SHIFT);
 	} else {
-		for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
+		for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
 			ideals[i].y = (camera.target_distance * phd_sin(camera.target_elevation) >> W2V_SHIFT) + camera.target.y;
 	}
 
 	farthest = 0x7FFFFFFF;
 	farthestnum = 0;
 
-	for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++) {
+	for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++) {
 		if (i) {
 			angle = (i - 1) << W2V_SHIFT;
 		} else {
@@ -809,17 +809,17 @@ void CombatCamera(ITEM_INFO* item) {
 	}
 
 	if (tr5_camera_behaviour) {
-		for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
+		for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
 			ideals[i].y = camera.target.y + (camera.target_distance * phd_sin(camera.actual_elevation) >> W2V_SHIFT);
 	} else {
-		for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
+		for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++)
 			ideals[i].y = (camera.target_distance * phd_sin(camera.target_elevation) >> W2V_SHIFT) + camera.target.y;
 	}
 
 	farthest = 0x7FFFFFFF;
 	farthestnum = 0;
 
-	for (int i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++) {
+	for (int32_t i = 0; i < MAX_CAMERA_CHASE_IDEALS; i++) {
 		if (i) {
 			angle = (i - 1) << W2V_SHIFT;
 		} else {

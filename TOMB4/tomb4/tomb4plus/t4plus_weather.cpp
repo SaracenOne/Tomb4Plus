@@ -50,7 +50,7 @@ void InitWeatherFX() {
 }
 
 void ClearWeatherFX() {
-	for (int i = 0; i < PERCIPITATION_ARRAY_SIZE; i++) {
+	for (int32_t i = 0; i < PERCIPITATION_ARRAY_SIZE; i++) {
 		Rain[i].x = 0;
 		Snow[i].x = 0;
 	}
@@ -69,7 +69,7 @@ void DoRain() {
 
 	num_alive = 0;
 
-	for (int i = 0; i < rain_count; i++) {
+	for (int32_t i = 0; i < rain_count; i++) {
 		rptr = &Rain[i];
 
 		if (rain_outside && !rptr->x && num_alive < max_rain) {
@@ -181,7 +181,7 @@ void DoRain() {
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
-	for (int i = 0; i < rain_count; i++) {
+	for (int32_t i = 0; i < rain_count; i++) {
 		rptr = &Rain[i];
 
 		if (rptr->x) {
@@ -290,7 +290,7 @@ void DoSnow() {
 
 	num_alive = 0;
 
-	for (int i = 0; i < snow_count; i++) {
+	for (int32_t i = 0; i < snow_count; i++) {
 		snow = &Snow[i];
 
 		if (!snow->x) {
@@ -412,7 +412,7 @@ void DoSnow() {
 	clipflags[2] = 0;
 	clipflags[3] = 0;
 
-	for (int i = 0; i < snow_count; i++) {
+	for (int32_t i = 0; i < snow_count; i++) {
 		snow = &Snow[i];
 
 		if (!snow->x)
@@ -442,7 +442,7 @@ void DoSnow() {
 
 		zv = f_mpersp / zv;
 
-		for (int j = 0; j < 4; j++) {
+		for (int32_t j = 0; j < 4; j++) {
 			xSize = pSize[0] * zv;
 			ySize = pSize[1] * zv;
 			pSize += 2;

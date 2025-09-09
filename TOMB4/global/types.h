@@ -74,6 +74,8 @@
 #define HALF_BLOCK_SIZE						(CLICK_SIZE * 2)
 #define BLOCK_SIZE							(HALF_BLOCK_SIZE * 2)
 
+#define WALL_SHIFT							10
+
 #define DEFAULT_FOV							80
 #define ONE_DEGREE							182
 #define HALF_DEGREE							91
@@ -708,6 +710,11 @@ struct LARA_ARM {
 
 #define LARA_MESH_PTR_COUNT 15
 #define WET_COUNT 15
+#define PUZZLE_ITEM_COUNT 12
+#define KEY_ITEM_COUNT 12
+#define PICKUP_ITEM_COUNT 4
+#define PICKUP_COMBO_ITEM_COUNT 8
+#define QUEST_ITEM_COUNT 6
 
 struct LARA_INFO {
 	int16_t item_number;
@@ -808,7 +815,7 @@ struct LARA_INFO {
 	int8_t examine1;
 	int8_t examine2;
 	int8_t examine3;
-	int8_t puzzleitems[12];
+	int8_t puzzleitems[PUZZLE_ITEM_COUNT];
 	uint16_t puzzleitemscombo;
 	uint16_t keyitems;
 	uint16_t keyitemscombo;

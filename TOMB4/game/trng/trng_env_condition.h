@@ -89,9 +89,9 @@ enum NGEnvironmentType {
 
 struct TestEnvConditionTripletResult {
 	bool is_valid = false;
-	int seek_item = -1;
-	int test_position_id = -1;
+	int32_t seek_item = -1;
+	int32_t test_position_id = -1;
 };
 
 TestEnvConditionTripletResult TestEnvConditionTriplet(NG_MULTI_ENV_TRIPLET* triplet, bool set_alignment_variables, int32_t item_index);
-bool TestMultiEnvCondition(int multi_env_condition_id, bool evaluate_as_or, int32_t item_index);
+bool TestMultiEnvCondition(int32_t multi_env_condition_id, bool evaluate_as_or, int32_t item_index);

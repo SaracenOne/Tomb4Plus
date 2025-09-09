@@ -15,10 +15,10 @@ extern std::string screenshots_dir_path;
 #define PATH_SEPARATOR "/"
 #endif
 
-int platform_strcicmp(char const* a, char const* b);
+int32_t platform_strcicmp(char const* a, char const* b);
 FILE *platform_fopen(const char* filename, const char* mode);
 void platform_find_file_with_substring(const char* dir_path, const char* substring, char* found_filename);
-int platform_string_ends_with(const char* str, const char* suffix);
+int32_t platform_string_ends_with(const char* str, const char* suffix);
 void platform_fatal_error(const char* s, ...);
 void platform_message_box(const char* s, ...);
 bool platform_create_directory(const char* path);

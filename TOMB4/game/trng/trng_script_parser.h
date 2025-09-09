@@ -13,7 +13,7 @@
 	CLASS_NAME record; \
 };
 
-#define NG_DEFINE_RECORD_DATA_ENTRY(CLASS_NAME, VAR_NAME) int VAR_NAME##_count = 0; \
+#define NG_DEFINE_RECORD_DATA_ENTRY(CLASS_NAME, VAR_NAME) int32_t VAR_NAME##_count = 0; \
 	CLASS_NAME##_RECORD* VAR_NAME##_table = NULL; \
 
 struct NG_PLUGIN {

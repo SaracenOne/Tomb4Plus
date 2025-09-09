@@ -49,6 +49,9 @@ void BigScorpionControl(int16_t item_number) {
 		return;
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = get_game_mod_level_object_customization_for_slot(gfCurrentLevel, SCORPION);
+	if (!mod_object_customization) {
+		return;
+	}
 
 	angle = 0;
 	item = &items[item_number];
@@ -148,7 +151,7 @@ void BigScorpionControl(int16_t item_number) {
 				scorpion->enemy = 0;
 				bestdist = 0x7FFFFFFF;
 
-				for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+				for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 					target_num = baddie_slots[i].item_num;
 
 					if (target_num != NO_ITEM && target_num != item_number) {
@@ -239,7 +242,7 @@ void BigScorpionControl(int16_t item_number) {
 					scorpion->flags = 1;
 					CreatureEffectT(item, &stinger, 10, item->pos.y_rot + 0x8000, DoBloodSplat);
 				} else if (!scorpion->flags && item->touch_bits & 0x1B00100) {
-					lara_item->hit_points -= mod_object_customization->damage_1;
+					lara_item->hit_points -= mod_object_customization ? mod_object_customization->damage_1 : 120;
 					lara_item->hit_status = 1;
 
 					if (item->current_anim_state == 5) {

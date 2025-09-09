@@ -26,7 +26,7 @@ void InitialiseHair() {
 	HAIR_STRUCT* hptr;
 	int32_t* bone;
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		obj = &objects[T4PlusGetLaraHairSlotID()];
 		bone = &bones[obj->bone_index];
 		bone += 4;
@@ -35,7 +35,7 @@ void InitialiseHair() {
 		hptr->pos.x_rot = -0x4000;
 		first_hair[i] = 1;
 
-		for (int j = 1; j < 7; j++, bone += 4) {
+		for (int32_t j = 1; j < 7; j++, bone += 4) {
 			hptr->pos.x_pos = bone[3];
 			hptr->pos.y_pos = bone[2];
 			hptr->pos.z_pos = bone[1];
@@ -76,13 +76,13 @@ void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int
 			frac = GetFrames(lara_item, frm, &rate); // Interpolate the frames if necessary
 		} else {
 			if (!lara.hit_direction)
-				spaz = lara.IsDucked ? ANIM_SPAZ_DUCKF : ANIM_SPAZ_FORWARD;
+				spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKF : LARA_ANIM_SPAZ_FORWARD;
 			else if (lara.hit_direction == 1)
-				spaz = lara.IsDucked ? ANIM_SPAZ_DUCKR : ANIM_SPAZ_RIGHT;
+				spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKR : LARA_ANIM_SPAZ_RIGHT;
 			else if (lara.hit_direction == 2)
-				spaz = lara.IsDucked ? ANIM_SPAZ_DUCKB : ANIM_SPAZ_BACK;
+				spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKB : LARA_ANIM_SPAZ_BACK;
 			else
-				spaz = lara.IsDucked ? ANIM_SPAZ_DUCKL : ANIM_SPAZ_LEFT;
+				spaz = lara.IsDucked ? LARA_ANIM_SPAZ_DUCKL : LARA_ANIM_SPAZ_LEFT;
 
 			frame = anims[spaz].frame_ptr;
 			size = anims[spaz].interpolation >> 8;
@@ -124,15 +124,16 @@ void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int
 
 		phd_PushMatrix_I();
 		objptr = lara.mesh_ptrs[LM_TORSO];
-		phd_TranslateRel_I(*objptr - 9, objptr[1], objptr[2] + 25);//repositioned to avoid floaty hair
+		phd_TranslateRel_I(*objptr - 9, objptr[1], objptr[2] + 25); //repositioned to avoid floaty hair
 		mInterpolateMatrix();
 		sphere[1].x = (int32_t)mMXPtr[M03];
 		sphere[1].y = (int32_t)mMXPtr[M13];
 		sphere[1].z = (int32_t)mMXPtr[M23];
 		sphere[1].r = objptr[3];
 
-		if (pigtail_update)
+		if (pigtail_update) {
 			sphere[1].r -= (sphere[1].r >> 2) + (sphere[1].r >> 3);
+		}
 
 		phd_PopMatrix_I();
 
@@ -311,7 +312,7 @@ void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int
 		hair->pos.y_pos = pos.y;
 		hair->pos.z_pos = pos.z;
 
-		for (int i = 0; i < 6; i++, bone += 4) {
+		for (int32_t i = 0; i < 6; i++, bone += 4) {
 			phd_PushUnitMatrix();
 			phd_SetTrans(hair->pos.x_pos, hair->pos.y_pos, hair->pos.z_pos);
 			phd_RotYXZ(hair->pos.y_rot, hair->pos.x_rot, 0);
@@ -362,7 +363,7 @@ void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int
 		SmokeWindZ = (hair_wind * rcossin_tbl[hair_wind_angle + 1]) >> 12;
 		hair++;
 
-		for (int i = 1; i < 7; i++, bone += 4) {
+		for (int32_t i = 1; i < 7; i++, bone += 4) {
 			pos.x = hair->pos.x_pos;
 			pos.y = hair->pos.y_pos;
 			pos.z = hair->pos.z_pos;
@@ -399,7 +400,7 @@ void HairControl(bool in_cutscene, LaraHairUpdateType lara_hair_update_type, int
 				hair->pos.z_pos = pos.z;
 			}
 
-			for (int j = 0; j < 6; j++) {	//6 instead of 5 for new sphere
+			for (int32_t j = 0; j < 6; j++) {	//6 instead of 5 for new sphere
 				x = hair->pos.x_pos - sphere[j].x;
 				y = hair->pos.y_pos - sphere[j].y;
 				z = hair->pos.z_pos - sphere[j].z;
@@ -464,14 +465,14 @@ void GetCorrectStashPoints(int32_t pigtail, int32_t hair_node, int32_t skin_node
 		num++;
 	}
 
-	for (int i = 0; i < 5; i++)
+	for (int32_t i = 0; i < 5; i++)
 		ScratchVertNums[skin_node][i] = HairRotScratchVertNums[num][i];
 }
 
 void DrawHair() {
 	HAIR_STRUCT* hair;
 	int16_t** meshpp;
-	int ii;
+	int32_t ii;
 
 	size_t hair_count = 0;
 	switch (get_game_mod_level_lara_info(gfCurrentLevel)->hair_type) {
@@ -496,14 +497,14 @@ void DrawHair() {
 		}
 	}
 
-	for (int i = 0; i < hair_count; i++) {
+	for (int32_t i = 0; i < hair_count; i++) {
 		ii = i * 6;
 		meshpp = &meshes[objects[T4PlusGetLaraHairSlotID()].mesh_index];
 		meshpp += 2;
 
 		hair = &hairs[i][1];
 
-		for (int j = 1; j < 6; j += 2, meshpp += 4, hair += 2) {
+		for (int32_t j = 1; j < 6; j += 2, meshpp += 4, hair += 2) {
 			phd_PushMatrix();
 			phd_TranslateAbs(hair->pos.x_pos, hair->pos.y_pos, hair->pos.z_pos);
 			phd_RotY(hair->pos.y_rot);
@@ -522,7 +523,7 @@ void DrawHair() {
 
 		meshpp = &meshes[objects[T4PlusGetLaraHairSlotID()].mesh_index];
 
-		for (int j = 0; j < 6; j += 2, meshpp += 4) {
+		for (int32_t j = 0; j < 6; j += 2, meshpp += 4) {
 			SkinVerticesToScratch(28 + ii + j);
 			GetCorrectStashPoints(i, j, 29 + ii + j);
 			SkinVerticesToScratch(29 + ii + j);

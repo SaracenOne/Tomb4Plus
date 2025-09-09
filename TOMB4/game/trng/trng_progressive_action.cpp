@@ -106,7 +106,7 @@ void NGExecuteProgressiveAction(NGProgressiveAction* progressive_action) {
 }
 
 void NGExecuteProgressiveActions() {
-	for (int i = 0; i < progressive_action_count; i++) {
+	for (int32_t i = 0; i < progressive_action_count; i++) {
 		if (progressive_actions[i].type != AZ_NONE) {
 			NGExecuteProgressiveAction(&progressive_actions[i]);
 		}

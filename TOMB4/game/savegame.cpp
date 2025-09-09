@@ -32,6 +32,7 @@
 #include "../tomb4/tomb4plus/t4plus_objects.h"
 #include "trng/trng_savegame.h"
 #include "../specific/audio.h"
+#include "moveblok.h"
 
 LEGACY_SAVEGAME_INFO savegame;
 
@@ -43,14 +44,14 @@ int32_t CheckSumValid(char* buffer) {
 
 	checksum = 0;
 
-	for (int i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++)
+	for (int32_t i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++)
 		checksum += *buffer++;
 
 	return !checksum;
 }
 
 void sgInitialiseHub(int32_t dont_save_lara) {
-	for (int i = 0; i < MAX_HUB_LEVELS; i++) {
+	for (int32_t i = 0; i < MAX_HUB_LEVELS; i++) {
 		savegame.HubLevels[i] = 0;
 		savegame.HubOffsets[i] = 0;
 		savegame.HubSizes[i] = 0;
@@ -109,7 +110,7 @@ void SaveLaraData() {
 	savegame.Lara.dpoisoned = lara.dpoisoned;
 	savegame.Lara.electric = lara.electric;
 
-	for (int i = 0; i < WET_COUNT; i++) {
+	for (int32_t i = 0; i < WET_COUNT; i++) {
 		savegame.Lara.wet[i] = lara.wet[i];
 	}
 
@@ -136,7 +137,7 @@ void SaveLaraData() {
 	savegame.Lara.spaz_effect = 0; // Pointer
 	savegame.Lara.mesh_effects = lara.mesh_effects;
 
-	for (int i = 0; i < LARA_MESH_PTR_COUNT; i++) {
+	for (int32_t i = 0; i < LARA_MESH_PTR_COUNT; i++) {
 		size_t base = (size_t)mesh_base;
 		size_t offset = ((size_t)lara.mesh_ptrs[i]) - base;
 
@@ -150,7 +151,7 @@ void SaveLaraData() {
 
 	savegame.Lara.target = 0; // Pointer
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		savegame.Lara.target_angles[i] = lara.target_angles[i];
 	}
 
@@ -223,7 +224,7 @@ void SaveLaraData() {
 	savegame.Lara.examine2 = lara.examine2;
 	savegame.Lara.examine3 = lara.examine3;
 
-	for (int i = 0; i < 12; i++) {
+	for (int32_t i = 0; i < 12; i++) {
 		savegame.Lara.puzzleitems[i] = lara.puzzleitems[i];
 	}
 
@@ -324,7 +325,7 @@ void RestoreLaraData(bool full_save) {
 	lara.dpoisoned = savegame.Lara.dpoisoned;
 	lara.electric = savegame.Lara.electric;
 
-	for (int i = 0; i < WET_COUNT; i++) {
+	for (int32_t i = 0; i < WET_COUNT; i++) {
 		lara.wet[i] = savegame.Lara.wet[i];
 	}
 
@@ -352,7 +353,7 @@ void RestoreLaraData(bool full_save) {
 	lara.mesh_effects = savegame.Lara.mesh_effects;
 
 	if (!savegame.HubSavedLara) {
-		for (int i = 0; i < LARA_MESH_PTR_COUNT; i++) {
+		for (int32_t i = 0; i < LARA_MESH_PTR_COUNT; i++) {
 			size_t base = (size_t)mesh_base;
 			size_t offset = (size_t)(savegame.Lara.mesh_ptrs[i]);
 
@@ -369,7 +370,7 @@ void RestoreLaraData(bool full_save) {
 
 	lara.target = nullptr; // Pointer
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		lara.target_angles[i] = savegame.Lara.target_angles[i];
 	}
 
@@ -442,7 +443,7 @@ void RestoreLaraData(bool full_save) {
 	lara.examine2 = savegame.Lara.examine2;
 	lara.examine3 = savegame.Lara.examine3;
 
-	for (int i = 0; i < 12; i++) {
+	for (int32_t i = 0; i < 12; i++) {
 		lara.puzzleitems[i] = savegame.Lara.puzzleitems[i];
 	}
 
@@ -543,7 +544,7 @@ void sgRestoreLevel() {
 	InitialiseLaraAnims(lara_item);
 
 	if (savegame.Lara.vehicle != NO_ITEM) {
-		for (int i = 0; i < level_items; i++) {
+		for (int32_t i = 0; i < level_items; i++) {
 			item = &items[i];
 
 			if (item->object_number == T4PlusGetMotorbikeSlotID() || item->object_number == T4PlusGetJeepSlotID()) {
@@ -578,7 +579,7 @@ void CreateCheckSum() {
 	ptr = (char*)&savegame;
 	checksum = 0;
 
-	for (int i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++)
+	for (int32_t i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++)
 		checksum += *ptr++;
 
 	savegame.Checksum = -checksum;
@@ -728,10 +729,10 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 	word = 0;
 	int32_t shatter_bit_idx = 0;
 
-	for (int i = 0; i < number_rooms; i++) {
+	for (int32_t i = 0; i < number_rooms; i++) {
 		r = &room[i];
 
-		for (int j = 0; j < r->num_meshes; j++) {
+		for (int32_t j = 0; j < r->num_meshes; j++) {
 			mesh = &r->mesh[j];
 
 			if (get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number].record_shatter_state_in_savegames) {
@@ -752,26 +753,26 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 
 	byte = 0;
 
-	for (int i = 0; i < MAX_LIBRARY_TABS; i++)
+	for (int32_t i = 0; i < MAX_LIBRARY_TABS; i++)
 		byte |= LibraryTab[i] << i;
 
 	WriteSG(&byte, sizeof(uint8_t));
 	WriteSG(&CurrentSequence, sizeof(uint8_t));
 	byte = 0;
 
-	for (int i = 0; i < MAX_USED_SEQUENCES; i++)
+	for (int32_t i = 0; i < MAX_USED_SEQUENCES; i++)
 		byte |= SequenceUsed[i] << i;
 
 	WriteSG(&byte, sizeof(uint8_t));
 	WriteSG(Sequences, MAX_SEQUENCES);
 
-	for (int i = 0; i < number_cameras; i++)
+	for (int32_t i = 0; i < number_cameras; i++)
 		WriteSG(&camera.fixed[i].flags, sizeof(int16_t));
 
-	for (int i = 0; i < number_spotcams; i++)
+	for (int32_t i = 0; i < number_spotcams; i++)
 		WriteSG(&SpotCam[i].flags, sizeof(int16_t));
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 		obj = &objects[item->object_number];
 		packed = 0;
@@ -922,7 +923,7 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 						WriteSG(item->data, 18);
 						int32_t enemy_ptr = -1;
 						if (creature->enemy) {
-							for (int j = 0; j < VANILLA_ITEM_COUNT; j++) {
+							for (int32_t j = 0; j < VANILLA_ITEM_COUNT; j++) {
 								if (creature->enemy == &items[j]) {
 									enemy_ptr = int32_t((vanilla_item_malloc_offset + (j * TR4_VANILLA_ITEM_STRUCT_SIZE)) & 0xffffffff);
 									break;
@@ -976,7 +977,7 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		byte = 0;
 		item = &items[level_items];
 
-		for (int i = level_items; i < VANILLA_ITEM_COUNT; i++) {
+		for (int32_t i = level_items; i < VANILLA_ITEM_COUNT; i++) {
 			if (item->active && (item->object_number == FLARE_ITEM || item->object_number == BURNING_TORCH_ITEM))
 				byte++;
 
@@ -986,7 +987,7 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		WriteSG(&byte, sizeof(uint8_t));
 		item = &items[level_items];
 
-		for (int i = level_items; i < VANILLA_ITEM_COUNT; i++) {
+		for (int32_t i = level_items; i < VANILLA_ITEM_COUNT; i++) {
 			if (item->active && (item->object_number == FLARE_ITEM || item->object_number == BURNING_TORCH_ITEM)) {
 				if (item->object_number == FLARE_ITEM)
 					byte = 0;
@@ -1012,14 +1013,14 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		if (objects[LITTLE_BEETLE].loaded) {
 			byte = 0;
 
-			for (int j = 0; j < 128; j++) {
+			for (int32_t j = 0; j < 128; j++) {
 				if (Scarabs[j].On)
 					byte++;
 			}
 
 			WriteSG(&byte, sizeof(uint8_t));
 
-			for (int j = 0; j < 128; j++) {
+			for (int32_t j = 0; j < 128; j++) {
 				if (Scarabs[j].On) {
 					word = Scarabs[j].room_number << 8;
 
@@ -1057,7 +1058,7 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		byte = 0;
 		item = &items[level_items];
 
-		for (int i = level_items; i < 256; i++) {
+		for (int32_t i = level_items; i < 256; i++) {
 			if (item->active && item->object_number == CLOCKWORK_BEETLE) {
 				byte = 1;
 				break;
@@ -1076,7 +1077,7 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		if (gfCurrentLevel == 1) {
 			flags = 0;
 
-			for (int i = 0; i < MAX_VONCROY_FLAGS; i++) {
+			for (int32_t i = 0; i < MAX_VONCROY_FLAGS; i++) {
 				if (VonCroyCutFlags[i])
 					flags |= 1 << (i & 0xF);
 
@@ -1124,7 +1125,7 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 		flipmap_bitcount = 10;
 	}
 
-	for (int i = 0; i < flipmap_bitcount; i++) {
+	for (int32_t i = 0; i < flipmap_bitcount; i++) {
 		if (flipmap_mask & (1 << i))
 			FlipMap(i);
 
@@ -1139,10 +1140,10 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 	ReadSG(&CurrentAtmosphere, sizeof(uint8_t));
 	int32_t shatter_bit_idx = 16;
 
-	for (int i = 0; i < number_rooms; i++) {
+	for (int32_t i = 0; i < number_rooms; i++) {
 		r = &room[i];
 
-		for (int j = 0; j < r->num_meshes; j++) {
+		for (int32_t j = 0; j < r->num_meshes; j++) {
 			mesh = &r->mesh[j];
 
 			if (get_game_mod_level_statics_info(gfCurrentLevel)->static_info[mesh->static_number].record_shatter_state_in_savegames) {
@@ -1169,7 +1170,7 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 
 	ReadSG(&byte, sizeof(int8_t));
 
-	for (int i = 0; i < MAX_LIBRARY_TABS; i++) {
+	for (int32_t i = 0; i < MAX_LIBRARY_TABS; i++) {
 		LibraryTab[i] = byte & 1;
 		byte >>= 1;
 	}
@@ -1177,20 +1178,20 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 	ReadSG(&CurrentSequence, sizeof(uint8_t));
 	ReadSG(&byte, sizeof(int8_t));
 
-	for (int i = 0; i < MAX_USED_SEQUENCES; i++) {
+	for (int32_t i = 0; i < MAX_USED_SEQUENCES; i++) {
 		SequenceUsed[i] = byte & 1;
 		byte >>= 1;
 	}
 
 	ReadSG(Sequences, MAX_SEQUENCES);
 
-	for (int i = 0; i < number_cameras; i++)
+	for (int32_t i = 0; i < number_cameras; i++)
 		ReadSG(&camera.fixed[i].flags, sizeof(int16_t));
 
-	for (int i = 0; i < number_spotcams; i++)
+	for (int32_t i = 0; i < number_spotcams; i++)
 		ReadSG(&SpotCam[i].flags, sizeof(int16_t));
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
 		obj = &objects[item->object_number];
 		ReadSG(&packed, sizeof(uint16_t));
@@ -1200,6 +1201,9 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 			item->status = ITEM_DEACTIVATED;
 			item->flags |= IFL_INVISIBLE;
 		} else if (packed & 0x8000) {
+			PHD_3DPOS original_pos = item->pos;
+			item_status original_status = (item_status)item->status;
+
 			if (obj->save_position) {
 				uroom_number = 0;
 
@@ -1352,15 +1356,39 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 				}
 			}
 
-			if (item->object_number >= SMASH_OBJECT1 && item->object_number <= SMASH_OBJECT8 && item->flags & IFL_INVISIBLE)
+			if (item->object_number >= SMASH_OBJECT1 && item->object_number <= SMASH_OBJECT8 && item->flags & IFL_INVISIBLE) {
 				item->mesh_bits = 0x100;
+			}
 
 			if (item->object_number == RAISING_BLOCK1 && item->item_flags[1] ||
-			        item->object_number == EXPANDING_PLATFORM && item->item_flags[2])
+				item->object_number == EXPANDING_PLATFORM && item->item_flags[2]) {
 				AlterFloorHeight(item, -BLOCK_SIZE);
+			}
 
-			if (item->object_number == RAISING_BLOCK2 && item->item_flags[1])
+			if (item->object_number == RAISING_BLOCK2 && item->item_flags[1]) {
 				AlterFloorHeight(item, -(BLOCK_SIZE * 2));
+			}
+
+			// Revert MoveableBlock standing collision
+			int32_t climbable_block_height = GetMoveableBlockHeight(i);
+
+			if (item->object_number >= PUSHABLE_OBJECT1 && item->object_number <= PUSHABLE_OBJECT5) {
+				if (climbable_block_height) {
+					if (original_status == ITEM_INACTIVE) {
+						// Clear the original floor modification.
+						PHD_3DPOS new_pos = item->pos;
+						item->pos = original_pos;
+						AlterFloorHeight(item, climbable_block_height * CLICK_SIZE);
+
+						item->pos = new_pos;
+					}
+
+					if (item->status == ITEM_INACTIVE) {
+						// Apply the new floor modification.
+						AlterFloorHeight(item, -climbable_block_height* CLICK_SIZE);
+					}
+				}
+			}
 		}
 	}
 
@@ -1377,7 +1405,7 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 	if (full_save) {
 		ReadSG(&numberof, sizeof(uint8_t));
 
-		for (int i = 0; i < numberof; i++) {
+		for (int32_t i = 0; i < numberof; i++) {
 			item_number = CreateItem();
 			item = &items[item_number];
 			ReadSG(&byte, sizeof(int8_t));
@@ -1409,7 +1437,7 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 		if (objects[LITTLE_BEETLE].loaded) {
 			ReadSG(&byte, sizeof(int8_t));
 
-			for (int i = 0; i < byte; i++) {
+			for (int32_t i = 0; i < byte; i++) {
 				ReadSG(&sword, sizeof(int16_t));
 
 				ReadSG(&uword, sizeof(uint16_t));
@@ -1443,7 +1471,7 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 		}
 
 		if (gfCurrentLevel == 1) {
-			for (int i = 0; i < MAX_VONCROY_FLAGS; i++) {
+			for (int32_t i = 0; i < MAX_VONCROY_FLAGS; i++) {
 				if (!(i & 0xF))
 					ReadSG(&uword, sizeof(uint16_t));
 

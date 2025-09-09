@@ -112,7 +112,7 @@ void CrocControl(int16_t item_number) {
 
 		if (item->hit_status || info.distance < 0x240000 || (TargetVisible(item, &info) && info.distance < 0x1900000)) {
 			if (!croc->alerted)
-				croc->alerted = 1;
+				croc->alerted = true;
 
 			AlertAllGuards(item_number);
 		}

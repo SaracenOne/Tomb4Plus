@@ -64,7 +64,7 @@ void GameClose() {
 	ShutdownBGFX();
 }
 
-int GameMain(void* ptr) {
+int32_t GameMain(void* ptr) {
 	Log(2, "GameMain");
 
 	if (GameInitialise()) {
@@ -152,8 +152,8 @@ void init_water_table() {
 		WaterTable[4][i].random = (uint8_t)GetRandom(&WaterTable[4][0], i);
 		WaterTable[4][i].abs = 8;
 
-		for (int j = 0, k = 5; j < 4; j++, k += 4) {
-			for (int m = 0; m < 4; m++) {
+		for (int32_t j = 0, k = 5; j < 4; j++, k += 4) {
+			for (int32_t m = 0; m < 4; m++) {
 				WaterTable[k + m][i].shimmer = -((sSin * water_shimmer[m]) >> 15);
 				WaterTable[k + m][i].choppy = sSin * water_choppy[j] >> 12;
 				WaterTable[k + m][i].random = (uint8_t)GetRandom(&WaterTable[k + m][0], i);
@@ -162,12 +162,12 @@ void init_water_table() {
 		}
 	}
 
-	for (int i = 0; i < WIBBLE_TABLE_SIZE; i++) {
+	for (int32_t i = 0; i < WIBBLE_TABLE_SIZE; i++) {
 		fSin = sinf(float(i * (M_PI / 16.0F)));
 		vert_wibble_table[i] = fSin + fSin;
 	}
 
-	for (int i = 0; i < UNUSED_WIBBLE_TABLE_SIZE; i++) {
+	for (int32_t i = 0; i < UNUSED_WIBBLE_TABLE_SIZE; i++) {
 		angle = 0x10000 * i / 256;
 		lSin = phd_sin(angle);
 		unused_vert_wibble_table[i] = float(lSin >> (W2V_SHIFT - 5));

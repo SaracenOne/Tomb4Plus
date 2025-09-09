@@ -414,7 +414,7 @@ int32_t FireWeapon(int32_t weapon_type, ITEM_INFO* target, ITEM_INFO* src, int16
 	best = -1;
 	bestdist = 0x7FFFFFFF;
 
-	for (int i = 0; i < nSpheres; i++) {
+	for (int32_t i = 0; i < nSpheres; i++) {
 		sptr = &Slist[i];
 		r = sptr->r;
 
@@ -1061,7 +1061,7 @@ void LaraGun() {
 		if (input & IN_DRAW)
 			lara.request_gun_type = lara.last_gun_type;
 		else if (input & IN_FLARE && !(gfLevelFlags & GF_YOUNGLARA)) {
-			if (lara_item->current_anim_state == AS_DUCK && lara_item->anim_number != ANIM_DUCKBREATHE)
+			if (lara_item->current_anim_state == AS_DUCK && lara_item->anim_number != LARA_ANIM_DUCKBREATHE)
 				return;
 
 			if (lara.gun_type == WEAPON_FLARE) {
@@ -1109,8 +1109,9 @@ void LaraGun() {
 		if (input & IN_DRAW || lara.request_gun_type != lara.gun_type || lara.water_status != LW_ABOVE_WATER &&
 		        (lara.water_status != LW_WADE || lara.water_surface_dist < -weapons[lara.gun_type].gun_height))
 			lara.gun_status = LG_UNDRAW_GUNS;
-	} else if (lara.gun_status == LG_HANDS_BUSY && input & IN_FLARE && lara_item->current_anim_state == AS_ALL4S && lara_item->anim_number == ANIM_ALL4S)
+	} else if (lara.gun_status == LG_HANDS_BUSY && input & IN_FLARE && lara_item->current_anim_state == AS_ALL4S && lara_item->anim_number == LARA_ANIM_ALL4S) {
 		lara.request_gun_type = WEAPON_FLARE;
+	}
 
 	switch (lara.gun_status) {
 		case LG_NO_ARMS:

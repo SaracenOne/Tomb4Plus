@@ -37,12 +37,12 @@ void DragSASCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_number];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && lara.gun_status == LG_NO_ARMS &&
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && lara.gun_status == LG_NO_ARMS &&
 	        !l->gravity_status && !(item->flags & IFL_CODEBITS) || lara.IsMoving && lara.GeneralPtr == item_number) {
 		if (TestLaraPosition(DragSASBounds, item, l)) {
 			if (MoveLaraPosition(&DragSASPos, item, l)) {
-				l->anim_number = ANIM_DRAGSAS;
-				l->frame_number = anims[ANIM_DRAGSAS].frame_base;
+				l->anim_number = LARA_ANIM_DRAGSAS;
+				l->frame_number = anims[LARA_ANIM_DRAGSAS].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
 				l->pos.y_rot = item->pos.y_rot;
 				lara.IsMoving = 0;

@@ -328,10 +328,10 @@ void CalculateObjectLightingLara() {
 		pos.y = 0;
 		pos.z = 0;
 
-		if (lara_item->anim_number == ANIM_DUCKBREATHE || lara_item->anim_number == ANIM_ALL4S || lara_item->anim_number == ANIM_BREATH) {
+		if (lara_item->anim_number == LARA_ANIM_DUCKBREATHE || lara_item->anim_number == LARA_ANIM_ALL4S || lara_item->anim_number == LARA_ANIM_BREATH) {
 			pos.x = lara_item->pos.x_pos;
 
-			if (lara_item->anim_number == ANIM_BREATH)
+			if (lara_item->anim_number == LARA_ANIM_BREATH)
 				pos.y = lara_item->pos.y_pos - HALF_BLOCK_SIZE;
 			else
 				pos.y = lara_item->pos.y_pos - HALF_CLICK_SIZE + QUARTER_CLICK_SIZE;
@@ -423,7 +423,7 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 
 			meshpp += 2;
 
-			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
+			for (int32_t i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix_I();
 
@@ -480,7 +480,7 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 
 			meshpp += 2;
 
-			for (int i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
+			for (int32_t i = 0; i < obj->nmeshes - 1; i++, bone += 4, meshpp += 2) {
 				if (bone[0] & POP_BONE_FLAG)
 					phd_PopMatrix();
 
@@ -530,7 +530,7 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-static void DoMirrorStuff(int mirror_id) {
+static void DoMirrorStuff(int32_t mirror_id) {
 	LARA_ARM larm;
 	LARA_ARM rarm;
 	int16_t old_anim, old_frame;
@@ -559,8 +559,8 @@ static void DoMirrorStuff(int mirror_id) {
 			lara.left_arm.frame_base = anims[lara.left_arm.anim_number].frame_ptr;
 			lara.right_arm.frame_base = anims[lara.right_arm.anim_number].frame_ptr;
 		} else {
-			lara_item->anim_number = ANIM_BINOCS;
-			lara_item->frame_number = anims[ANIM_BINOCS].frame_base;
+			lara_item->anim_number = LARA_ANIM_BINOCS;
+			lara_item->frame_number = anims[LARA_ANIM_BINOCS].frame_base;
 			lara.mesh_ptrs[LM_RHAND] = meshes[objects[T4PlusGetMeshSwap2SlotID()].mesh_index + 2 * LM_RHAND];
 		}
 	}
@@ -626,8 +626,9 @@ void DrawRooms(int16_t CurrentRoom) {
 		if (horizon_slot < 0 || !objects[horizon_slot].loaded)
 			outside = -1;
 		else {
-			if (BinocularRange)
+			if (BinocularRange) {
 				AlterFOV(DEGREES_TO_ROTATION(DEFAULT_FOV) - (int16_t)BinocularRange);
+			}
 
 			phd_PushMatrix();
 			phd_TranslateAbs(camera.pos.x, camera.pos.y, camera.pos.z);
@@ -642,11 +643,13 @@ void DrawRooms(int16_t CurrentRoom) {
 				} else {
 					UpdateSkyLightning();
 
-					if (LightningSFXDelay > -1)
+					if (LightningSFXDelay > -1) {
 						LightningSFXDelay--;
+					}
 
-					if (!LightningSFXDelay)
+					if (!LightningSFXDelay) {
 						SoundEffect(SFX_THUNDER_RUMBLE, 0, SFX_DEFAULT);
+					}
 				}
 			}
 
@@ -656,17 +659,20 @@ void DrawRooms(int16_t CurrentRoom) {
 			if (gfLevelFlags & GF_LAYER1) {
 				phd_RotY(32760);
 
-				if (gfLevelFlags & GF_LIGHTNING)
+				if (gfLevelFlags & GF_LIGHTNING) {
 					DrawFlatSky(RGBA(LightningRGB[0], LightningRGB[1], LightningRGB[2], 44), SkyPos, -1536, 4);
-				else
+				} else {
 					DrawFlatSky(*(uint32_t*)&gfLayer1Col, SkyPos, -1536, 4);
+				}
 			}
 
-			if (gfLevelFlags & GF_LAYER2)
+			if (gfLevelFlags & GF_LAYER2) {
 				DrawFlatSky(0xFF000000 | *(uint32_t*)&gfLayer2Col, SkyPos2, -1536, 2);
+			}
 
-			if (gfLevelFlags & GF_LAYER1 || gfLevelFlags & GF_LAYER2)
+			if (gfLevelFlags & GF_LAYER1 || gfLevelFlags & GF_LAYER2) {
 				OutputSky();
+			}
 
 			phd_PopMatrix();
 
@@ -677,8 +683,9 @@ void DrawRooms(int16_t CurrentRoom) {
 
 			phd_PopMatrix();
 
-			if (BinocularRange)
+			if (BinocularRange) {
 				AlterFOV(7 * (2080 - (int16_t)BinocularRange));
+			}
 		}
 	}
 
@@ -726,7 +733,7 @@ void DrawRooms(int16_t CurrentRoom) {
 				DrawGunflashes();
 			}
 
-			for (int i = 0; i < t4p_mirror_count; i++) {
+			for (int32_t i = 0; i < t4p_mirror_count; i++) {
 				if (lara_item->room_number == t4p_mirror_info[i].mirror_room) {
 					DoMirrorStuff(i);
 				}
@@ -736,27 +743,32 @@ void DrawRooms(int16_t CurrentRoom) {
 
 	nPolyType = 0;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++) {
+	for (int32_t i = 0; i < MAX_DYNAMICS; i++) {
 		if (dynamics[i].on) {
-			if (dynamics[i].x < 0)
+			if (dynamics[i].x < 0) {
 				dynamics[i].x = 0;
+			}
 
-			if (dynamics[i].z < 0)
+			if (dynamics[i].z < 0) {
 				dynamics[i].z = 0;
+			}
 		}
 	}
 
-	for (int i = 0; i < number_draw_rooms; i++)
+	for (int32_t i = 0; i < number_draw_rooms; i++) {
 		S_InsertRoom(draw_rooms[i]);
+	}
 
-	if (gfLevelFlags & GF_TRAIN)
+	if (gfLevelFlags & GF_TRAIN) {
 		DrawTrainFloor();
+	}
 
 	DrawGunshells();
 	nPolyType = 3;
 
-	if (GLOBAL_playing_cutseq)
+	if (GLOBAL_playing_cutseq) {
 		DrawCutSeqActors();
+	}
 
 	nPolyType = 6;
 	DrawRopeList();
@@ -789,14 +801,17 @@ void DrawRooms(int16_t CurrentRoom) {
 	lara_item->pos.z_pos = lz;
 	lara_item->room_number = lr;
 
-	if (gfLevelFlags & GF_LENSFLARE)
+	if (gfLevelFlags & GF_LENSFLARE) {
 		SetUpLensFlare(gfLensFlare.x, gfLensFlare.y - 4096, gfLensFlare.z, 0);
+	}
 
-	if (LaserSightActive)
+	if (LaserSightActive) {
 		DrawLaserSightSprite();
+	}
 
-	for (int i = 0; i < number_draw_rooms; i++)
+	for (int32_t i = 0; i < number_draw_rooms; i++) {
 		PrintObjects(draw_rooms[i]);
+	}
 }
 
 void RenderIt(int16_t CurrentRoom) {
@@ -879,13 +894,13 @@ void RenderIt(int16_t CurrentRoom) {
 
 	nPolyType = 0;
 
-	for (int i = 0; i < number_draw_rooms; i++)
+	for (int32_t i = 0; i < number_draw_rooms; i++)
 		S_InsertRoom(draw_rooms[i]);
 
 	if (gfLevelFlags & GF_TRAIN)
 		DrawTrainFloor();
 
-	for (int i = 0; i < number_draw_rooms; i++)
+	for (int32_t i = 0; i < number_draw_rooms; i++)
 		PrintObjects(draw_rooms[i]);
 }
 
@@ -1009,7 +1024,7 @@ void SetRoomBounds(int16_t* door, int32_t rn, ROOM_INFO* actualRoom) {
 	tooNear = 0;
 	tooFar = 0;
 
-	for (int i = 0; i < 4; i++, v++, door += 3) {
+	for (int32_t i = 0; i < 4; i++, v++, door += 3) {
 		v->x = mMXPtr[M00] * door[0] + mMXPtr[M01] * door[1] + mMXPtr[M02] * door[2] + mMXPtr[M03];
 		v->y = mMXPtr[M10] * door[0] + mMXPtr[M11] * door[1] + mMXPtr[M12] * door[2] + mMXPtr[M13];
 		v->z = mMXPtr[M20] * door[0] + mMXPtr[M21] * door[1] + mMXPtr[M22] * door[2] + mMXPtr[M23];
@@ -1061,7 +1076,7 @@ void SetRoomBounds(int16_t* door, int32_t rn, ROOM_INFO* actualRoom) {
 		v = vbuf;
 		lastV = &vbuf[3];
 
-		for (int i = 0; i < 4; i++, lastV = v, v++) {
+		for (int32_t i = 0; i < 4; i++, lastV = v, v++) {
 			if (lastV->z <= 0 == v->z <= 0)
 				continue;
 
@@ -1182,7 +1197,7 @@ void PrintObjects(int16_t room_number) {
 
 	mesh = r->mesh;
 
-	for (int i = r->num_meshes; i > 0; i--, mesh++) {
+	for (int32_t i = r->num_meshes; i > 0; i--, mesh++) {
 		if (mesh->Flags & 1) {
 			phd_PushMatrix();
 			phd_TranslateAbs(mesh->x, mesh->y, mesh->z);
@@ -1308,7 +1323,7 @@ int16_t* GetBoundsAccurate(ITEM_INFO* item) {
 
 	bptr = interpolated_bounds;
 
-	for (int i = 0; i < 6; i++) {
+	for (int32_t i = 0; i < 6; i++) {
 		bptr[i] = int16_t(*frmptr[0] + (*frmptr[1] - *frmptr[0]) * frac / rate);
 		frmptr[0]++;
 		frmptr[1]++;
@@ -1347,7 +1362,7 @@ void UpdateSkyLightning() {
 		}
 	}
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		LightningRGB[i] = LightningRGBs[i] + ((LightningRGBs[i] * LightningRand) >> 8);
 
 		if (LightningRGB[i] > 255)
@@ -1406,7 +1421,7 @@ TR_FORCE_INLINE void mRotBoundingBoxNoPerspExt(int16_t* bounds, int16_t* rotated
 	yMax = -0x7FFF;
 	zMax = -0x7FFF;
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		if (!legacy) {
 			x = (pos[i].x * phd_mxptr[M00] + pos[i].y * phd_mxptr[M01] + pos[i].z * phd_mxptr[M02]) >> W2V_SHIFT;
 			y = (pos[i].x * phd_mxptr[M10] + pos[i].y * phd_mxptr[M11] + pos[i].z * phd_mxptr[M12]) >> W2V_SHIFT;

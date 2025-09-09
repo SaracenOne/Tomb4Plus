@@ -225,7 +225,7 @@ void InitialiseDemigod(int16_t item_number) {
 	item->current_anim_state = 0;
 	item->goal_anim_state = 0;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item2 = &items[i];
 
 		if (item != item2 && item2->object_number == DEMIGOD3 && !item2->item_flags[0])
@@ -271,7 +271,7 @@ void DemigodControl(int16_t item_number) {
 	if (gfCurrentLevel == 24) {	//Chambers of Tulun
 		r = &room[lara_item->room_number];
 		zone = ground_zone[god->LOT.zone][flip_status];
-		lara_item->box_number = r->floor[((lara_item->pos.z_pos - r->z) >> 10) + r->x_size * ((lara_item->pos.x_pos - r->x) >> 10)].box;
+		lara_item->box_number = r->floor[((lara_item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((lara_item->pos.x_pos - r->x) >> WALL_SHIFT)].box;
 
 		if (zone[item->box_number] == zone[lara_item->box_number]) {
 			item->ai_bits = 0;
@@ -560,8 +560,8 @@ void DemigodControl(int16_t item_number) {
 						lara.torso_y_rot = 0;
 						lara.head_x_rot = 0;
 						lara.head_y_rot = 0;
-						lara_item->anim_number = ANIM_FALLDOWN;
-						lara_item->frame_number = anims[ANIM_FALLDOWN].frame_base;
+						lara_item->anim_number = LARA_ANIM_FALLDOWN;
+						lara_item->frame_number = anims[LARA_ANIM_FALLDOWN].frame_base;
 						lara_item->current_anim_state = AS_FORWARDJUMP;
 						lara_item->goal_anim_state = AS_FORWARDJUMP;
 						lara_item->pos.x_pos += -50 * phd_sin(lara_item->pos.y_rot) >> W2V_SHIFT;

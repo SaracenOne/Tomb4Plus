@@ -161,7 +161,7 @@ static void S_PrintCircleShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	x = xDist + (xDist >> 1);
 	z = zDist + (zDist >> 1);
 
-	for (int i = 0; i < CIRCUMFERENCE_POINTS; i++) {
+	for (int32_t i = 0; i < CIRCUMFERENCE_POINTS; i++) {
 		cp[i].x = float(x * phd_sin(65536 * i / CIRCUMFERENCE_POINTS) >> W2V_SHIFT);
 		cp[i].z = float(z * phd_cos(65536 * i / CIRCUMFERENCE_POINTS) >> W2V_SHIFT);
 		cv[i].x = cp[i].x;
@@ -191,7 +191,7 @@ static void S_PrintCircleShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	phd_TranslateRel(pos.x, y, pos.z);
 	phd_RotY(item->pos.y_rot);	//rot the grid to correct Y
 
-	for (int i = 0; i < CIRCUMFERENCE_POINTS; i++) {
+	for (int32_t i = 0; i < CIRCUMFERENCE_POINTS; i++) {
 		fx = cp[i].x;
 		fz = cp[i].z;
 		cp[i].x = fx * mMXPtr[M00] + fz * mMXPtr[M02] + mMXPtr[M03];
@@ -202,7 +202,7 @@ static void S_PrintCircleShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	ccp.z = mMXPtr[M23];
 	phd_PopMatrix();
 
-	for (int i = 0; i < CIRCUMFERENCE_POINTS; i++) {
+	for (int32_t i = 0; i < CIRCUMFERENCE_POINTS; i++) {
 		s = item->room_number;
 		cp[i].y = (float)GetHeight(GetFloor((int32_t)cp[i].x, item->floor, (int32_t)cp[i].z, &s), (int32_t)cp[i].x, item->floor, (int32_t)cp[i].z);
 
@@ -220,7 +220,7 @@ static void S_PrintCircleShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	phd_TranslateAbs(pos.x, y, pos.z);
 	phd_RotY(item->pos.y_rot);
 
-	for (int i = 0; i < CIRCUMFERENCE_POINTS; i++) {
+	for (int32_t i = 0; i < CIRCUMFERENCE_POINTS; i++) {
 		fx = cv[i].x;
 		fy = (cp[i].y - item->floor);
 		fz = cv[i].z;
@@ -235,7 +235,7 @@ static void S_PrintCircleShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	ccv.z = mMXPtr[M21] * fy + mMXPtr[M23];
 	phd_PopMatrix();
 
-	for (int i = 0; i < CIRCUMFERENCE_POINTS; i++) { // Draw the pizza
+	for (int32_t i = 0; i < CIRCUMFERENCE_POINTS; i++) { // Draw the pizza
 		x1 = (int32_t)cv[i].x;
 		y1 = (int32_t)cv[i].y;
 		z1 = (int32_t)cv[i].z;
@@ -314,8 +314,8 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	sXYZ = sxyz;
 	hXZ = hxz;
 
-	for (int i = 0; i < LINE_POINTS; i++, z -= zDist) {
-		for (int j = 0; j < LINE_POINTS; j++, sXYZ += 3, hXZ += 2, x += xDist) {
+	for (int32_t i = 0; i < LINE_POINTS; i++, z -= zDist) {
+		for (int32_t j = 0; j < LINE_POINTS; j++, sXYZ += 3, hXZ += 2, x += xDist) {
 			sXYZ[0] = x;
 			sXYZ[2] = z;
 			hXZ[0] = x;
@@ -349,7 +349,7 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	phd_RotY(item->pos.y_rot);
 	hXZ = hxz;
 
-	for (int i = 0; i < GRID_POINTS; i++, hXZ += 2) {
+	for (int32_t i = 0; i < GRID_POINTS; i++, hXZ += 2) {
 		x = hXZ[0];
 		z = hXZ[1];
 		hXZ[0] = int32_t(x * mMXPtr[M00] + z * mMXPtr[M02] + mMXPtr[M03]);
@@ -361,7 +361,7 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	hXZ = hxz;
 	hY = hy;
 
-	for (int i = 0; i < GRID_POINTS; i++, hXZ += 2, hY++) {
+	for (int32_t i = 0; i < GRID_POINTS; i++, hXZ += 2, hY++) {
 		s = item->room_number;
 		*hY = GetHeight(GetFloor(hXZ[0], item->floor, hXZ[1], &s), hXZ[0], item->floor, hXZ[1]);
 
@@ -375,7 +375,7 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	sXYZ = sxyz;
 	hY = hy;
 
-	for (int i = 0; i < GRID_POINTS; i++, sXYZ += 3, hY++) {
+	for (int32_t i = 0; i < GRID_POINTS; i++, sXYZ += 3, hY++) {
 		x = sXYZ[0];
 		y = *hY - item->floor;
 		z = sXYZ[2];
@@ -392,8 +392,8 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 
 	sXYZ = sxyz;
 
-	for (int i = 0; i < LINE_POINTS - 1; i++) {
-		for (int j = 0; j < LINE_POINTS - 1; j++) {
+	for (int32_t i = 0; i < LINE_POINTS - 1; i++) {
+		for (int32_t j = 0; j < LINE_POINTS - 1; j++) {
 			p = (j * 3) + (i * 12);
 			x1 = sXYZ[p + 0];
 			y1 = sXYZ[p + 1];
@@ -412,7 +412,7 @@ static void S_PrintSpriteShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 
 			setXYZ4(v, x1, y1, z1, x2, y2, z2, x4, y4, z4, x3, y3, z3, clipflags);
 
-			for (int k = 0; k < 4; k++) {
+			for (int32_t k = 0; k < 4; k++) {
 				v[k].color = 0xFF2D2D2D;
 				v[k].specular = 0xFF000000;
 			}
@@ -468,8 +468,8 @@ void S_PrintShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	sXYZ = sxyz;
 	hXZ = hxz;
 
-	for (int i = 0; i < LINE_POINTS; i++, z -= zDist) {
-		for (int j = 0; j < LINE_POINTS; j++, sXYZ += 3, hXZ += 2, x += xDist) {
+	for (int32_t i = 0; i < LINE_POINTS; i++, z -= zDist) {
+		for (int32_t j = 0; j < LINE_POINTS; j++, sXYZ += 3, hXZ += 2, x += xDist) {
 			sXYZ[0] = x;		//fill shadow XYZ array with the points of the grid
 			sXYZ[2] = z;
 			hXZ[0] = x;			//fill height XZ array with the points of the grid
@@ -503,7 +503,7 @@ void S_PrintShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	phd_RotY(item->pos.y_rot);	//rot the grid to correct Y
 	hXZ = hxz;
 
-	for (int i = 0; i < GRID_POINTS; i++, hXZ += 2) {
+	for (int32_t i = 0; i < GRID_POINTS; i++, hXZ += 2) {
 		x = hXZ[0];
 		z = hXZ[1];
 		hXZ[0] = int32_t(x * mMXPtr[M00] + z * mMXPtr[M02] + mMXPtr[M03]);
@@ -515,7 +515,7 @@ void S_PrintShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	hXZ = hxz;
 	hY = hy;
 
-	for (int i = 0; i < GRID_POINTS; i++, hXZ += 2, hY++) {	//Get height on each grid point and store it in hy array
+	for (int32_t i = 0; i < GRID_POINTS; i++, hXZ += 2, hY++) {	//Get height on each grid point and store it in hy array
 		s = item->room_number;
 		*hY = GetHeight(GetFloor(hXZ[0], item->floor, hXZ[1], &s), hXZ[0], item->floor, hXZ[1]);
 
@@ -529,7 +529,7 @@ void S_PrintShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	sXYZ = sxyz;
 	hY = hy;
 
-	for (int i = 0; i < GRID_POINTS; i++, sXYZ += 3, hY++) {
+	for (int32_t i = 0; i < GRID_POINTS; i++, sXYZ += 3, hY++) {
 		x = sXYZ[0];
 		y = *hY - item->floor;
 		z = sXYZ[2];
@@ -541,7 +541,7 @@ void S_PrintShadow(int16_t size, int16_t* box, ITEM_INFO* item) {
 	phd_PopMatrix();
 	sXYZ = sxyz;
 
-	for (int i = 0; i < NUM_TRIS; i++) { //draw triangles
+	for (int32_t i = 0; i < NUM_TRIS; i++) { //draw triangles
 		triA = 3 * ShadowTable[(i * 3) + 0];	//get tri points
 		triB = 3 * ShadowTable[(i * 3) + 1];
 		triC = 3 * ShadowTable[(i * 3) + 2];
@@ -772,7 +772,7 @@ void DrawBikeSpeedo(int32_t ux, int32_t uy, int32_t vel, int32_t maxVel, int32_t
 	rTVel = turboVel >> 1;
 	angle = -0x4000;
 
-	for (int i = 0; i <= rTVel; i += (BLOCK_SIZE * 2)) {
+	for (int32_t i = 0; i <= rTVel; i += (BLOCK_SIZE * 2)) {
 		x0 = ((rSize * (phd_sin(angle + i)) >> (W2V_SHIFT - 1)) - ((rSize * phd_sin(angle + i)) >> (W2V_SHIFT + 1))) * (p + (p / 4.0F));
 		y0 = (-(rSize * phd_cos(angle + i)) >> W2V_SHIFT) * (p * 2);
 		x1 = ((size * (phd_sin(angle + i)) >> (W2V_SHIFT - 1)) - ((size * phd_sin(angle + i)) >> (W2V_SHIFT + 1))) * (p + (p / 4.0F));
@@ -892,7 +892,7 @@ void DrawJeepSpeedo(int32_t ux, int32_t uy, int32_t vel, int32_t maxVel, int32_t
 	rTVel += rTVel >> 1;
 	angle = -0x4000;
 
-	for (int i = 0; i <= rTVel; i += 1536) {
+	for (int32_t i = 0; i <= rTVel; i += 1536) {
 		x0 = ((rSize * (phd_sin(angle + i)) >> (W2V_SHIFT - 1)) - ((rSize * phd_sin(angle + i)) >> (W2V_SHIFT + 1))) * (p + (p / 4.0F));
 		y0 = (-(rSize * phd_cos(angle + i)) >> W2V_SHIFT) * (p * 2);
 		x1 = ((size * (phd_sin(angle + i)) >> (W2V_SHIFT - 1)) - ((size * phd_sin(angle + i)) >> (W2V_SHIFT + 1))) * (p + (p / 4.0F));
@@ -965,7 +965,7 @@ void DrawDebris() {
 	Z = (int32_t*)&tsv_buffer[512];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < 256; i++) {
+	for (int32_t i = 0; i < 256; i++) {
 		dptr = &debris[i];
 
 		if (!dptr->On)
@@ -1313,7 +1313,7 @@ void DrawFlatSky(uint32_t color, int32_t zpos, int32_t ypos, int32_t drawtype) {
 	vec[3].y = 0;
 	vec[3].z = -4864;
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		x = vec[i].x;
 		y = vec[i].y;
 		z = vec[i].z;
@@ -1360,7 +1360,7 @@ void DrawFlatSky(uint32_t color, int32_t zpos, int32_t ypos, int32_t drawtype) {
 	vec[3].y = 0;
 	vec[3].z = -4864;
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		x = vec[i].x;
 		y = vec[i].y;
 		z = vec[i].z;
@@ -2032,7 +2032,7 @@ void SetUpLensFlare(int32_t x, int32_t y, int32_t z, GAME_VECTOR* lfobj) {
 		dy = (pos.y - camera.pos.y) >> 4;
 		dz = (pos.z - camera.pos.z) >> 4;
 
-		for (int i = 0; i < 16; i++) {
+		for (int32_t i = 0; i < 16; i++) {
 			IsRoomOutsideNo = 255;
 			IsRoomOutside(pos.x, pos.y, pos.z);
 			rn = IsRoomOutsideNo;
@@ -2166,7 +2166,7 @@ void InitTarget_2() {
 	targetMeshP = (MESH_DATA*)meshes[obj->mesh_index];
 	v = (GFXTLVERTEX*)targetMeshP->Buffer;
 
-	for (int i = 0; i < targetMeshP->nVerts; i++) {
+	for (int32_t i = 0; i < targetMeshP->nVerts; i++) {
 		v[i].sx = (v[i].sx * 80) / 96;
 		v[i].sy = (v[i].sy * 60) / 224;
 		v[i].sz = 0;
@@ -2188,7 +2188,7 @@ void InitBinoculars() {
 	binocsMeshP = (MESH_DATA*)meshes[obj->mesh_index];
 	v = (GFXTLVERTEX*)binocsMeshP->Buffer;
 
-	for (int i = 0; i < binocsMeshP->nVerts; i++) {
+	for (int32_t i = 0; i < binocsMeshP->nVerts; i++) {
 		v[i].sx = (v[i].sx * 32) / 96;
 		v[i].sy = (v[i].sy * 30) / 224;
 		v[i].sz = 0;
@@ -2220,7 +2220,7 @@ void DrawBinoculars() {
 	v = (GFXTLVERTEX*)mesh->Buffer;
 	clip = clipflags;
 
-	for (int i = 0; i < mesh->nVerts; i++) {
+	for (int32_t i = 0; i < mesh->nVerts; i++) {
 		clipdistance = 0;
 		vtx[i] = v[i];
 		vtx[i].sx = (vtx[i].sx * float(phd_winxmax / 512.0F)) + f_centerx;
@@ -2243,7 +2243,7 @@ void DrawBinoculars() {
 	tri = mesh->gt3;
 
 	if (LaserSight) {
-		for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+		for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 			tex = &textinfo[quad[4] & 0x7FFF];
 			drawbak = tex->drawtype;
 			tex->drawtype = 0;
@@ -2260,7 +2260,7 @@ void DrawBinoculars() {
 			tex->drawtype = drawbak;
 		}
 
-		for (int i = 0, j = 0; i < mesh->ngt3; i++, tri += 5) {
+		for (int32_t i = 0, j = 0; i < mesh->ngt3; i++, tri += 5) {
 			tex = &textinfo[tri[3] & 0x7FFF];
 			drawbak = tex->drawtype;
 			tex->drawtype = 0;
@@ -2277,7 +2277,7 @@ void DrawBinoculars() {
 			tex->drawtype = drawbak;
 		}
 	} else {
-		for (int i = 0; i < mesh->ngt4; i++, quad += 6) {
+		for (int32_t i = 0; i < mesh->ngt4; i++, quad += 6) {
 			tex = &textinfo[quad[4] & 0x7FFF];
 			drawbak = tex->drawtype;
 			tex->drawtype = 0;
@@ -2294,7 +2294,7 @@ void DrawBinoculars() {
 			tex->drawtype = drawbak;
 		}
 
-		for (int i = 0; i < mesh->ngt3; i++, tri += 5) {
+		for (int32_t i = 0; i < mesh->ngt3; i++, tri += 5) {
 			tex = &textinfo[tri[3] & 0x7FFF];
 			drawbak = tex->drawtype;
 			tex->drawtype = 0;
@@ -2328,7 +2328,7 @@ void DrawWraithTrail(ITEM_INFO* item) {
 	phd_PushMatrix();
 	phd_TranslateAbs(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 
-	for (int i = 0; i < 5; i++) {
+	for (int32_t i = 0; i < 5; i++) {
 		if (!i)
 			phd_RotY(-DEGREES_TO_ROTATION(6));
 		else if (i == 2)
@@ -2343,7 +2343,7 @@ void DrawWraithTrail(ITEM_INFO* item) {
 		offsets = (int32_t*)&tsv_buffer[1024];
 		wraith = (WRAITH_STRUCT*)item->data;
 
-		for (int j = 0; j < 8; j++, XY += 2, Z += 2, wraith++) {
+		for (int32_t j = 0; j < 8; j++, XY += 2, Z += 2, wraith++) {
 			offsets[0] = wraith->pos.x - item->pos.x_pos;
 			offsets[1] = wraith->pos.y - item->pos.y_pos;
 			offsets[2] = wraith->pos.z - item->pos.z_pos;
@@ -2364,7 +2364,7 @@ void DrawWraithTrail(ITEM_INFO* item) {
 		XY = (int32_t*)&tsv_buffer[0];
 		Z = (int32_t*)&tsv_buffer[512];
 
-		for (int j = 0; j < 7; j++, XY += 2, Z += 2) {
+		for (int32_t j = 0; j < 7; j++, XY += 2, Z += 2) {
 			if (Z[0] <= f_mznear || Z[0] >= 20480)
 				continue;
 
@@ -2428,7 +2428,7 @@ void DrawDrips() {
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
-	for (int i = 0; i < 32; i++) {
+	for (int32_t i = 0; i < 32; i++) {
 		drip = &Drips[i];
 
 		if (!drip->On)
@@ -2536,7 +2536,7 @@ void DrawBubbles() {
 	Z = (int32_t*)&tsv_buffer[512];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < 40; i++) {
+	for (int32_t i = 0; i < 40; i++) {
 		if (!bubble->size) {
 			bubble++;
 			continue;
@@ -2641,7 +2641,7 @@ void DrawShockwaves() {
 	sprite = &spriteinfo[objects[T4PlusGetDefaultSpritesSlotID()].mesh_index + 8];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < 16; i++) {
 		wave = &ShockWaves[i];
 
 		if (!wave->life)
@@ -2657,7 +2657,7 @@ void DrawShockwaves() {
 		offsets[9] = 0;
 		rad = wave->OuterRad;
 
-		for (int j = 0; j < 2; j++) {
+		for (int32_t j = 0; j < 2; j++) {
 			offsets[0] = (rad * phd_sin(0)) >> W2V_SHIFT;
 			offsets[2] = (rad * phd_cos(0)) >> W2V_SHIFT;
 			offsets[4] = (rad * phd_sin(0x1000)) >> W2V_SHIFT;
@@ -2665,7 +2665,7 @@ void DrawShockwaves() {
 			offsets[8] = (rad * phd_sin(0x2000)) >> W2V_SHIFT;
 			offsets[10] = (rad * phd_cos(0x2000)) >> W2V_SHIFT;
 
-			for (int k = 1; k < 7; k++) {
+			for (int32_t k = 1; k < 7; k++) {
 				v = k * 0x3000;
 
 				p1.x = offsets[0] * mMXPtr[M00] + offsets[1] * mMXPtr[M01] + offsets[2] * mMXPtr[M02] + mMXPtr[M03];
@@ -2710,7 +2710,7 @@ void DrawShockwaves() {
 		XY = (int32_t*)&tsv_buffer[0];
 		Z = (int32_t*)&tsv_buffer[512];
 
-		for (int j = 0; j < 16; j++) {
+		for (int32_t j = 0; j < 16; j++) {
 			x1 = XY[0];
 			y1 = XY[1];
 			x2 = XY[2];
@@ -2790,13 +2790,13 @@ void DrawTrainFloorStrip(int32_t x, int32_t z, TEXTURESTRUCT* tex, int32_t y_and
 	offsets[1].x = x;
 	offsets[2].x = x;
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		XY = (int32_t*)&tsv_buffer[0];
 		Z = (int32_t*)&tsv_buffer[984];
 		XY -= 6;
 		Z -= 3;
 
-		for (int j = 0; j < 41; j++) {
+		for (int32_t j = 0; j < 41; j++) {
 			p1.x = offsets[0].x * mMXPtr[M00] + offsets[0].y * mMXPtr[M01] + offsets[0].z * mMXPtr[M02] + mMXPtr[M03];
 			p1.y = offsets[0].x * mMXPtr[M10] + offsets[0].y * mMXPtr[M11] + offsets[0].z * mMXPtr[M12] + mMXPtr[M13];
 			p1.z = offsets[0].x * mMXPtr[M20] + offsets[0].y * mMXPtr[M21] + offsets[0].z * mMXPtr[M22] + mMXPtr[M23];
@@ -2834,7 +2834,7 @@ void DrawTrainFloorStrip(int32_t x, int32_t z, TEXTURESTRUCT* tex, int32_t y_and
 		XY = (int32_t*)&tsv_buffer[0];
 		Z = (int32_t*)&tsv_buffer[984];
 
-		for (int j = num; j < num + 20; j++, XY += 12, Z += 6) {
+		for (int32_t j = num; j < num + 20; j++, XY += 12, Z += 6) {
 			z1 = Z[0];
 			z2 = Z[2];
 			z3 = Z[6];
@@ -2894,7 +2894,7 @@ void S_DrawSplashes() {	//	(also draws ripples and underwater blood (which is a 
 	v = MyVertexBuffer;
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		splash = &splashes[i];
 
 		if (!(splash->flags & 1))
@@ -2919,8 +2919,8 @@ void S_DrawSplashes() {	//	(also draws ripples and underwater blood (which is a 
 		yVals[4] = 0;
 		yVals[5] = 0;
 
-		for (int j = 0; j < 6; j++) {
-			for (int k = 0; k < 0x10000; k += 0x2000) {
+		for (int32_t j = 0; j < 6; j++) {
+			for (int32_t k = 0; k < 0x10000; k += 0x2000) {
 				offsets[0] = (rads[j] * phd_sin(k)) >> (W2V_SHIFT - 1);
 				offsets[1] = yVals[j] >> 3;
 				offsets[2] = (rads[j] * phd_cos(k)) >> (W2V_SHIFT - 1);
@@ -2935,7 +2935,7 @@ void S_DrawSplashes() {	//	(also draws ripples and underwater blood (which is a 
 		XY = (int32_t*)&tsv_buffer[0];
 		Z = (int32_t*)&tsv_buffer[512];
 
-		for (int j = 0; j < 3; j++) {
+		for (int32_t j = 0; j < 3; j++) {
 			if (j == 2 || (!j && splash->flags & 4) || (j == 1 && splash->flags & 8))
 				sprite = &spriteinfo[objects[T4PlusGetDefaultSpritesSlotID()].mesh_index + 4 + ((wibble >> 4) & 3)];
 			else
@@ -2944,7 +2944,7 @@ void S_DrawSplashes() {	//	(also draws ripples and underwater blood (which is a 
 			links = SplashLinks;
 			linkNum = j << 5;
 
-			for (int k = 0; k < 8; k++) {
+			for (int32_t k = 0; k < 8; k++) {
 				x1 = XY[links[0] + linkNum];
 				y1 = XY[links[0] + linkNum + 1];
 				z1 = Z[links[0] + linkNum];
@@ -3021,7 +3021,7 @@ void S_DrawSplashes() {	//	(also draws ripples and underwater blood (which is a 
 		}
 	}
 
-	for (int i = 0; i < 16; i++) {
+	for (int32_t i = 0; i < 16; i++) {
 		ripple = &ripples[i];
 
 		if (!(ripple->flags & 1))
@@ -3248,7 +3248,7 @@ void S_DrawFireSparks(int32_t size, int32_t life) {
 	Z = (int32_t*)&tsv_buffer[512];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < MAX_FIRE_SPARKS; i++) {
+	for (int32_t i = 0; i < MAX_FIRE_SPARKS; i++) {
 		sptr = &fire_spark[i];
 
 		if (!sptr->On)
@@ -3398,7 +3398,7 @@ void DrawRope(ROPE_STRUCT* rope) {
 	x4 = rope->Coords[0][0] + dx;
 	y4 = rope->Coords[0][1] + dy;
 
-	for (int i = 0; i < 23; i++) {
+	for (int32_t i = 0; i < 23; i++) {
 		dx = rope->Coords[i + 1][0] - rope->Coords[i][0];
 		dy = rope->Coords[i + 1][1] - rope->Coords[i][1];
 		d = SQUARE(dx) + SQUARE(dy);
@@ -3496,7 +3496,7 @@ void DrawBlood() {
 	Z = (int32_t*)&tsv_buffer[512];
 	offsets = (int32_t*)&tsv_buffer[1024];
 
-	for (int i = 0; i < 32; i++) {
+	for (int32_t i = 0; i < 32; i++) {
 		bptr = &blood[i];
 
 		if (!bptr->On)
@@ -3600,7 +3600,7 @@ void S_DrawSmokeSparks() {
 	is_mirror = 0;
 	sptr = &smoke_spark[0];
 
-	for (int i = 0; i < 32; i++) {
+	for (int32_t i = 0; i < 32; i++) {
 		if (!sptr->On) {
 			sptr++;
 			continue;
@@ -3736,7 +3736,7 @@ void DoUwEffect() {
 	v = MyVertexBuffer;
 	num_alive = 0;
 
-	for (int i = 0; i < 256; i++) {
+	for (int32_t i = 0; i < 256; i++) {
 		p = &uwdust[i];
 
 		if (!p->pos.x && num_alive < 16) {
@@ -3790,7 +3790,7 @@ void DoUwEffect() {
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
-	for (int i = 0; i < 256; i++) {
+	for (int32_t i = 0; i < 256; i++) {
 		p = &uwdust[i];
 
 		if (!p->pos.x)
@@ -3884,7 +3884,7 @@ void DrawLightning() {
 	phd_TranslateAbs(lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 	sprite = &spriteinfo[objects[T4PlusGetDefaultSpritesSlotID()].mesh_index + 28];
 
-	for (int i = 0; i < MAX_LIGHTNING; i++) {
+	for (int32_t i = 0; i < MAX_LIGHTNING; i++) {
 		pL = &Lightning[i];
 
 		if (!pL->Life)
@@ -3895,7 +3895,7 @@ void DrawLightning() {
 		memcpy(&vec[1], &pL->Point[0], 4 * sizeof(PHD_VECTOR));
 		memcpy(&vec[5], &pL->Point[3], sizeof(PHD_VECTOR));
 
-		for (int j = 0; j < 6; j++) {
+		for (int32_t j = 0; j < 6; j++) {
 			vec[j].x -= lara_item->pos.x_pos;
 			vec[j].y -= lara_item->pos.y_pos;
 			vec[j].z -= lara_item->pos.z_pos;
@@ -3909,7 +3909,7 @@ void DrawLightning() {
 		if (abs(vec[0].x) > 0x6000 || abs(vec[0].y) > 0x6000 || abs(vec[0].z) > 0x6000)
 			continue;
 
-		for (int j = 0; j < pL->Segments; j++) {
+		for (int32_t j = 0; j < pL->Segments; j++) {
 			p1.x = offsets[0].x * mMXPtr[M00] + offsets[0].y * mMXPtr[M01] + offsets[0].z * mMXPtr[M02] + mMXPtr[M03];
 			p1.y = offsets[0].x * mMXPtr[M10] + offsets[0].y * mMXPtr[M11] + offsets[0].z * mMXPtr[M12] + mMXPtr[M13];
 			p1.z = offsets[0].x * mMXPtr[M20] + offsets[0].y * mMXPtr[M21] + offsets[0].z * mMXPtr[M22] + mMXPtr[M23];
@@ -3942,7 +3942,7 @@ void DrawLightning() {
 		XY = (int32_t*)&tsv_buffer[1024];
 		Z = (int32_t*)&tsv_buffer[2048];
 
-		for (int j = 0; j < 3 * pL->Segments - 1; j++) {
+		for (int32_t j = 0; j < 3 * pL->Segments - 1; j++) {
 			if (pL->Life < 16)
 				c = pL->Life << 2;
 			else

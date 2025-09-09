@@ -94,7 +94,7 @@ static void SasFireGrenade(ITEM_INFO* sas, int16_t xrot, int16_t yrot) {
 	SmokeCountL = 32;
 	SmokeWeapon = WEAPON_GRENADE;
 
-	for (int i = 0; i < 5; i++)
+	for (int32_t i = 0; i < 5; i++)
 		TriggerGunSmoke(oPos.x, oPos.y, oPos.z, pos.x - oPos.x, pos.y - oPos.y, pos.z - oPos.z, 1, 5, 32);
 
 	InitialiseItem(item_number);

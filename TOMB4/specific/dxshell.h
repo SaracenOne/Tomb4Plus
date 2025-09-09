@@ -31,7 +31,7 @@ int32_t DXCreate(int32_t w, int32_t h, int32_t bpp, int32_t Flags, DXPTR* dxptr)
 extern DXPTR* G_dxptr;
 extern DXINFO* G_dxinfo;
 
-extern int keymap_count;
+extern int32_t keymap_count;
 extern const Uint8 *keymap;
 extern SDL_GameController *controller;
 extern const char* controller_name;

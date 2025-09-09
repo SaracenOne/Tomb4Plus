@@ -77,14 +77,14 @@ void ShutThatDoor(DOORPOS_DATA* d) {
 		d->floor->pit_room = -1;
 		d->floor->sky_room = -1;
 
-		if (d->block != 2047) {
-			boxes[d->block].overlap_index |= 0x4000;
+		if (d->block != NO_BOX) {
+			boxes[d->block].overlap_index |= BLOCKED;
 
 			for (int16_t slot = 0; slot < MAXIMUM_BADDIES; slot++) {
 				cinfo = &baddie_slots[slot];
 				// T4Plus: additional check for NULL slots
 				if (cinfo) {
-					cinfo->LOT.target_box = 2047;
+					cinfo->LOT.target_box = NO_BOX;
 				} else {
 					break;
 				}
@@ -99,14 +99,14 @@ void OpenThatDoor(DOORPOS_DATA* d) {
 	if (d->floor) {
 		*d->floor = d->data;
 
-		if (d->block != 2047) {
-			boxes[d->block].overlap_index &= ~0x4000;
+		if (d->block != NO_BOX) {
+			boxes[d->block].overlap_index &= ~BLOCKED;
 
 			for (int16_t slot = 0; slot < MAXIMUM_BADDIES; slot++) {
 				cinfo = &baddie_slots[slot];
 				// T4Plus: additional check for NULL slots
 				if (cinfo) {
-					cinfo->LOT.target_box = 2047;
+					cinfo->LOT.target_box = NO_BOX;
 				} else {
 					break;
 				}
@@ -314,7 +314,7 @@ void DoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 #endif
 
 	if (item->trigger_flags == 2 && item->status != ITEM_ACTIVE && ((input & IN_ACTION || GLOBAL_inventoryitemchosen == CROWBAR_ITEM) &&
-	        l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status && lara.gun_status == LG_NO_ARMS ||
+	        l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && !l->gravity_status && lara.gun_status == LG_NO_ARMS ||
 	        lara.IsMoving && lara.GeneralPtr == item_num)) {
 		item->pos.y_rot ^= 0x8000;
 
@@ -345,8 +345,8 @@ void DoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 			GLOBAL_inventoryitemchosen = NO_ITEM;
 
 			if (MoveLaraPosition(&CrowbarDoorPos, item, l)) {
-				l->anim_number = ANIM_CROWBARDOOR;
-				l->frame_number = anims[ANIM_CROWBARDOOR].frame_base;
+				l->anim_number = LARA_ANIM_CROWBARDOOR;
+				l->frame_number = anims[LARA_ANIM_CROWBARDOOR].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
 				item->pos.y_rot ^= 0x8000;
 				AddActiveItem(item_num);
@@ -403,7 +403,7 @@ void PushPullKickDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) 
 
 	item = &items[item_num];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && item->status != ITEM_ACTIVE &&
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && item->status != ITEM_ACTIVE &&
 	        !l->gravity_status && lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_num) {
 		pull = 0;
 
@@ -417,8 +417,8 @@ void PushPullKickDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) 
 
 			if (pull) {
 				if (MoveLaraPosition(&PullDoorPos, item, l)) {
-					l->anim_number = ANIM_PULLDOOR;
-					l->frame_number = anims[ANIM_PULLDOOR].frame_base;
+					l->anim_number = LARA_ANIM_PULLDOOR;
+					l->frame_number = anims[LARA_ANIM_PULLDOOR].frame_base;
 					item->goal_anim_state = 3;
 					goin = 1;
 				} else
@@ -426,16 +426,16 @@ void PushPullKickDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) 
 			} else {
 				if (item->object_number < KICK_DOOR1) {
 					if (MoveLaraPosition(&PushDoorPos, item, l)) {
-						l->anim_number = ANIM_PUSHDOOR;
-						l->frame_number = anims[ANIM_PUSHDOOR].frame_base;
+						l->anim_number = LARA_ANIM_PUSHDOOR;
+						l->frame_number = anims[LARA_ANIM_PUSHDOOR].frame_base;
 						item->goal_anim_state = 2;
 						goin = 1;
 					} else
 						lara.GeneralPtr = item_num;
 				} else {
 					if (MoveLaraPosition(&KickDoorPos, item, l)) {
-						l->anim_number = ANIM_KICKDOOR;
-						l->frame_number = anims[ANIM_KICKDOOR].frame_base;
+						l->anim_number = LARA_ANIM_KICKDOOR;
+						l->frame_number = anims[LARA_ANIM_KICKDOOR].frame_base;
 						item->goal_anim_state = 2;
 						goin = 1;
 					} else
@@ -467,14 +467,14 @@ void DoubleDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_num];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && item->status != ITEM_ACTIVE &&
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && item->status != ITEM_ACTIVE &&
 	        !l->gravity_status && lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_num) {
 		item->pos.y_rot ^= 0x8000;
 
 		if (TestLaraPosition(PushPullKickDoorBounds, item, l)) {
 			if (MoveLaraPosition(&DoubleDoorPos, item, l)) {
-				l->anim_number = ANIM_TWODOOR;
-				l->frame_number = anims[ANIM_TWODOOR].frame_base;
+				l->anim_number = LARA_ANIM_TWODOOR;
+				l->frame_number = anims[LARA_ANIM_TWODOOR].frame_base;
 				l->current_anim_state = AS_TWODOOR;
 				AddActiveItem(item_num);
 				item->status = ITEM_ACTIVE;
@@ -506,8 +506,8 @@ void UnderwaterDoorCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 		if (TestLaraPosition(UnderwaterDoorBounds, item, l)) {
 			if (MoveLaraPosition(&UnderwaterDoorPos, item, l)) {
-				l->anim_number = ANIM_WATERDOOR;
-				l->frame_number = anims[ANIM_WATERDOOR].frame_base;
+				l->anim_number = LARA_ANIM_WATERDOOR;
+				l->frame_number = anims[LARA_ANIM_WATERDOOR].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
 				l->fallspeed = 0;
 				item->status = ITEM_ACTIVE;

@@ -209,7 +209,7 @@ void DoSethEffects(int16_t item_number) {
 		case 15:
 
 			if (item->item_flags[0] < 78 && (GetRandomControl() & 0x1F) < item->item_flags[0]) {
-				for (int i = 0; i < 2; i++) {
+				for (int32_t i = 0; i < 2; i++) {
 					vec.x = (GetRandomControl() & 0x7FF) + r.x - BLOCK_SIZE;
 					vec.y = (GetRandomControl() & 0x7FF) + r.y - BLOCK_SIZE;
 					zv = (GetRandomControl() & 0x7FF);
@@ -315,7 +315,7 @@ void DoSethEffects(int16_t item_number) {
 		case 13:
 
 			if (item->item_flags[0] > 40 && item->item_flags[0] < 100 && (GetRandomControl() & 7) < item->item_flags[0] - 40) {
-				for (int i = 0; i < 2; i++) {
+				for (int32_t i = 0; i < 2; i++) {
 					vec.x = (GetRandomControl() & 0x7FF) + r.x - BLOCK_SIZE;
 					vec.y = (GetRandomControl() & 0x7FF) + r.y - BLOCK_SIZE;
 					zv = (GetRandomControl() & 0x7FF);
@@ -444,7 +444,7 @@ void SethControl(int16_t item_number) {
 
 		switch (item->current_anim_state) {
 			case 1:
-				seth->LOT.is_jumping = 0;
+				seth->LOT.is_jumping = false;
 				seth->flags = 0;
 
 				if (item->required_anim_state)
@@ -511,7 +511,7 @@ void SethControl(int16_t item_number) {
 
 				if (can_jump) {
 					if (item->anim_number == objects[SETHA].anim_index + 15 && item->frame_number == anims[item->anim_number].frame_base) {
-						seth->LOT.is_jumping = 1;
+						seth->LOT.is_jumping = true;
 						seth->maximum_turn = 0;
 					}
 				}
@@ -535,7 +535,7 @@ void SethControl(int16_t item_number) {
 				break;
 
 			case 5:
-				seth->LOT.is_jumping = 1;
+				seth->LOT.is_jumping = true;
 				seth->maximum_turn = 0;
 				break;
 
@@ -567,7 +567,7 @@ void SethControl(int16_t item_number) {
 				}
 
 				if (hp && lara_item->hit_points <= 0) {	//this hit killed her
-					CreatureKill(item, 14, 9, ANIM_SETHDEATH);
+					CreatureKill(item, 14, 9, LARA_ANIM_SETHDEATH);
 					seth->maximum_turn = 0;
 					return;
 				}

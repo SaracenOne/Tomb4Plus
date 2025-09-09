@@ -3,15 +3,15 @@
 
 #include "builtin_plugins/AkyVMix01/t4plus_plugin_akyvmix_01.h"
 
-int t4plus_active_plugin_count = 0;
+int32_t t4plus_active_plugin_count = 0;
 T4PlusRegisteredPlugin t4plus_registered_plugins[MAX_REGISTERED_PLUGINS];
 
 T4PlusBuiltinPluginTableEntry t4plus_builtin_plugin_table[] = {
 	{"AkyVMix01", T4PlusPluginGetPluginStructure_AkyVMix01}
 };
 
-int T4PlusFindBuiltinPluginIDForBuiltinName(const char *plugin_builtin_name) {
-	for (int i = 0; i < (sizeof(t4plus_builtin_plugin_table) / sizeof(T4PlusBuiltinPluginTableEntry)); i++) {
+int32_t T4PlusFindBuiltinPluginIDForBuiltinName(const char *plugin_builtin_name) {
+	for (int32_t i = 0; i < (sizeof(t4plus_builtin_plugin_table) / sizeof(T4PlusBuiltinPluginTableEntry)); i++) {
 		if (strcmp(plugin_builtin_name, t4plus_builtin_plugin_table[i].plugin_name) == 0) {
 			return i;
 		}
@@ -26,7 +26,7 @@ T4PlusPluginRegistrationResult T4PlusRegisterBuiltinPlugin(const char *plugin_na
 		return T4PLUS_PLUGIN_REGISTRATION_RESULT_FAILED;
 	}
 
-	int builtin_plugin_id = T4PlusFindBuiltinPluginIDForBuiltinName(plugin_builtin_name);
+	int32_t builtin_plugin_id = T4PlusFindBuiltinPluginIDForBuiltinName(plugin_builtin_name);
 	if (builtin_plugin_id >= 0) {
 		t4plus_registered_plugins[t4plus_active_plugin_count].plugin_name = plugin_name;
 		t4plus_registered_plugins[t4plus_active_plugin_count].plugin_type = T4PLUS_PLUGIN_TYPE_BUILTIN;
@@ -43,8 +43,8 @@ T4PlusPluginRegistrationResult T4PlusRegisterBuiltinPlugin(const char *plugin_na
 	return T4PLUS_PLUGIN_REGISTRATION_RESULT_FAILED;
 }
 
-int T4PlusFindRegisteredPluginByName(const char* plugin_name) {
-	for (int i = 0; i < t4plus_active_plugin_count; i++) {
+int32_t T4PlusFindRegisteredPluginByName(const char* plugin_name) {
+	for (int32_t i = 0; i < t4plus_active_plugin_count; i++) {
 		if (strcmp(plugin_name, t4plus_registered_plugins[i].plugin_name) == 0) {
 			return i;
 		}

@@ -66,7 +66,7 @@ int32_t GetSpheres(ITEM_INFO* item, SPHERE* ptr, int32_t WorldSpace) {
 
 	extra_rot = (int16_t*)item->data;
 
-	for (int i = 0; i < obj->nmeshes - 1; i++) {
+	for (int32_t i = 0; i < obj->nmeshes - 1; i++) {
 		poppush = *bone++;
 
 		if (poppush & POP_BONE_FLAG)
@@ -134,7 +134,7 @@ int32_t TestCollision(ITEM_INFO* item, ITEM_INFO* l) {
 			GotLaraSpheres = 1;
 	}
 
-	for (int i = 0; i < nItemSpheres; i++) {
+	for (int32_t i = 0; i < nItemSpheres; i++) {
 		itemSpheres = &Slist[i];
 		ir = itemSpheres->r;
 
@@ -143,7 +143,7 @@ int32_t TestCollision(ITEM_INFO* item, ITEM_INFO* l) {
 			ip.y = itemSpheres->y;
 			ip.z = itemSpheres->z;
 
-			for (int j = 0; j < nLaraSpheres; j++) {
+			for (int32_t j = 0; j < nLaraSpheres; j++) {
 				laraSpheres = &LaraSpheres[j];
 				lr = laraSpheres->r;
 
@@ -195,6 +195,15 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* pos, int32_t joint) {
 	mIMx = mIMptr;
 	iMx = phd_mxptr;
 	obj = &objects[item->object_number];
+
+	// T4Plus: fix joint overflow bug.
+	if (joint >= obj->nmeshes) {
+		pos->x = 0;
+		pos->y = 0;
+		pos->z = 0;
+		return;
+	}
+
 	frac = GetFrames(item, frm, &rate);
 
 	phd_PushUnitMatrix();
@@ -215,7 +224,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* pos, int32_t joint) {
 		phd_TranslateRel_ID(frm[0][6], frm[0][7], frm[0][8], frm[1][6], frm[1][7], frm[1][8]);
 		gar_RotYXZsuperpack_I(&rot, &rot2, 0);
 
-		for (int i = 0; i < joint; i++) {
+		for (int32_t i = 0; i < joint; i++) {
 			poppush = *bone;
 
 			if (poppush & POP_BONE_FLAG)
@@ -248,7 +257,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* pos, int32_t joint) {
 		rot = frm[0] + 9;
 		gar_RotYXZsuperpack(&rot, 0);
 
-		for (int i = 0; i < joint; i++) {
+		for (int32_t i = 0; i < joint; i++) {
 			poppush = *bone;
 
 			if (poppush & POP_BONE_FLAG)

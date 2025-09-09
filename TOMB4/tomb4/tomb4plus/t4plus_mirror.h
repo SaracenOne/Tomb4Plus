@@ -12,15 +12,15 @@ enum T4PlusMirrorDirection {
 
 struct T4PlusMirrorInfo {
 	uint32_t mirror_room;
-	int pivot_point;
+	int32_t pivot_point;
 	T4PlusMirrorDirection direction;
 };
 
-extern int t4p_mirror_count;
+extern int32_t t4p_mirror_count;
 extern T4PlusMirrorInfo t4p_mirror_info[MAX_MIRRORS];
 
 extern void T4PResetMirrors();
-extern void T4PInsertMirror(int mirror_room, int pivot_point, T4PlusMirrorDirection direction);
+extern void T4PInsertMirror(int32_t mirror_room, int32_t pivot_point, T4PlusMirrorDirection direction);
 extern PHD_VECTOR T4PMirrorVectorOnPlane(T4PlusMirrorInfo* mirror_info, PHD_VECTOR vec);
 extern PHD_3DPOS T4PMirrorUnrotated3DPosOnPlane(T4PlusMirrorInfo* mirror_info, PHD_3DPOS pos);
 extern PHD_3DPOS T4PMirrorRotated3DPosOnPlane(T4PlusMirrorInfo* mirror_info, PHD_3DPOS pos);

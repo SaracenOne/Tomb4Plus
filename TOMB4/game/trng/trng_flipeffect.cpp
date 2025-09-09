@@ -1336,6 +1336,50 @@ bool variables_copy_to_x_numeric_variable_the_savegame_memory_value(uint8_t vari
 	return true;
 }
 
+// NGLE - 245
+bool variables_copy_from_x_numeric_variable_the_savegame_memory_value(uint8_t numeric_variable, uint8_t savegame_variable) {
+	NGNumericSetSavegameValue(savegame_variable, NGNumericGetVariable(numeric_variable));
+	return true;
+}
+
+// NGLE - 246
+bool variables_set_in_x_savegame_memory_the_value(uint32_t variable, int32_t value) {
+	NGNumericSetSavegameValue(variable, value);
+	return true;
+}
+
+// NGLE - 247
+bool variables_set_in_x_savegame_memory_the_bit(uint32_t variable, uint8_t bit) {
+	int32_t value = NGNumericGetSavegameValue(variable);
+	value |= (1 << bit);
+	NGNumericSetSavegameValue(variable, value);
+	return true;
+}
+
+// NGLE - 248
+bool variables_clear_in_x_savegame_memory_the_bit(uint32_t variable, uint8_t bit) {
+	int32_t value = NGNumericGetSavegameValue(variable);
+	value &= ~(1 << bit);
+	NGNumericSetSavegameValue(variable, value);
+	return true;
+}
+
+// NGLE - 249
+bool variables_add_to_x_savegame_memory_the_value(uint32_t variable, int32_t value) {
+	int32_t savegame_value = NGNumericGetSavegameValue(variable);
+	savegame_value += value;
+	NGNumericSetSavegameValue(variable, savegame_value);
+	return true;
+}
+
+// NGLE - 250
+bool variables_subtract_to_x_savegame_memory_the_value(uint32_t variable, int32_t value) {
+	int32_t savegame_value = NGNumericGetSavegameValue(variable);
+	savegame_value -= value;
+	NGNumericSetSavegameValue(variable, savegame_value);
+	return true;
+}
+
 // NGLE - 251
 bool variables_multiply_x_variable_by_value(uint8_t variable, uint8_t value) {
 	NGNumericOperation(NG_MULTIPLY, variable, value);
@@ -1357,15 +1401,17 @@ bool variables_divide_x_variable_by_value(uint8_t variable, uint8_t value) {
 // NGLE - 264
 bool variables_start_the_x_trng_timer_in_mode(uint8_t set_global_timer, uint8_t countdown_timer) {
 	if (set_global_timer) {
-		if (countdown_timer)
+		if (countdown_timer) {
 			ng_global_timer_frame_increment = -1;
-		else
+		} else {
 			ng_global_timer_frame_increment = 1;
+		}
 	} else {
-		if (countdown_timer)
+		if (countdown_timer) {
 			ng_local_timer_frame_increment = -1;
-		else
+		} else {
 			ng_local_timer_frame_increment = 1;
+		}
 	}
 
 	return true;
@@ -2471,27 +2517,27 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			break;
 		}
 		case VARIABLES_COPY_FROM_X_NUMERIC_VARIABLE_THE_SAVEGAME_MEMORY_VALUE: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_COPY_FROM_X_NUMERIC_VARIABLE_THE_SAVEGAME_MEMORY_VALUE unimplemented!");
+			variables_copy_from_x_numeric_variable_the_savegame_memory_value(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_SET_IN_X_SAVEGAME_MEMORY_THE_VALUE: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_COPY_FROM_X_NUMERIC_VARIABLE_THE_SAVEGAME_MEMORY_VALUE unimplemented!");
+			variables_set_in_x_savegame_memory_the_value(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_SET_IN_X_SAVEGAME_MEMORY_THE_BIT: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_SET_IN_X_SAVEGAME_MEMORY_THE_BIT unimplemented!");
+			variables_set_in_x_savegame_memory_the_bit(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_CLEAR_IN_X_SAVEGAME_MEMORY_THE_BIT: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_CLEAR_IN_X_SAVEGAME_MEMORY_THE_BIT unimplemented!");
+			variables_clear_in_x_savegame_memory_the_bit(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_ADD_TO_X_SAVEGAME_MEMORY_THE_VALUE: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_ADD_TO_X_SAVEGAME_MEMORY_THE_VALUE unimplemented!");
+			variables_add_to_x_savegame_memory_the_value(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_SUBTRACT_FROM_X_SAVEGAME_MEMORY_THE_VALUE: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARIABLES_SUBTRACT_FROM_X_SAVEGAME_MEMORY_THE_VALUE unimplemented!");
+			variables_subtract_to_x_savegame_memory_the_value(timer, extra_timer);
 			break;
 		}
 		case VARIABLES_MULTIPLY_X_VARIABLE_BY_VALUE: {
@@ -2739,8 +2785,8 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			variables_set_the_x_inventory_item_as_selected_inventory_memory(timer, extra_timer);
 			break;
 		}
-		case VARAIBLES_COPY_FROM_X_NUMERIC_VARIABLE_TO_E_INVENTORY_MEMOY: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARAIBLES_COPY_FROM_X_NUMERIC_VARIABLE_TO_E_INVENTORY_MEMOY unimplemented!");
+		case VARAIBLES_COPY_FROM_X_NUMERIC_VARIABLE_TO_E_INVENTORY_MEMORY: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "VARAIBLES_COPY_FROM_X_NUMERIC_VARIABLE_TO_E_INVENTORY_MEMORY unimplemented!");
 			break;
 		}
 		case VARIABLES_SET_IN_X_INVENTORY_MEMORY_THE_E_VALUE: {

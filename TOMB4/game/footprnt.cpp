@@ -69,7 +69,7 @@ void S_DrawFootPrints() {
 
 	v = MyVertexBuffer;
 
-	for (int i = 0; i < 32; i++) {
+	for (int32_t i = 0; i < 32; i++) {
 		print = &FootPrint[i];
 
 		if (print->Active) {
@@ -96,7 +96,7 @@ void S_DrawFootPrints() {
 			phd_TranslateRel(print->x, print->y, print->z);
 			phd_RotY(print->YRot);
 
-			for (int j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++) {
 				x = int32_t(pos[j].x * mMXPtr[M00] + pos[j].z * mMXPtr[M02] + mMXPtr[M03]);
 				z = int32_t(pos[j].x * mMXPtr[M20] + pos[j].z * mMXPtr[M22] + mMXPtr[M23]);
 				room_number = lara_item->room_number;
@@ -119,7 +119,7 @@ void S_DrawFootPrints() {
 			phd_PopMatrix();
 			setXYZ3(v, x1, y1, z1, x2, y2, z2, x3, y3, z3, clipflags);
 
-			for (int j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++) {
 				v[j].color = RGBA(col, col, col, 0xFF);
 				v[j].specular = 0xFF000000;
 			}

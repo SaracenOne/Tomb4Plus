@@ -56,7 +56,7 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #endif
 #include "input.h"
 
-void SDLProcessCommandLine(int argc, char* argv[]) {
+void SDLProcessCommandLine(int32_t argc, char* argv[]) {
 	COMMANDLINES* command;
 	char* pCommand;
 	char* p;
@@ -69,13 +69,13 @@ void SDLProcessCommandLine(int argc, char* argv[]) {
 
 	num = sizeof(commandlines) / sizeof(commandlines[0]);
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		command = &commandlines[i];
 		command->code((char*)"_INIT");
 	}
 
-	for (int cur_arg = 1; cur_arg < argc; cur_arg++) {
-		for (int i = 0; (uint32_t)i < strlen(argv[cur_arg]); i++) {
+	for (int32_t cur_arg = 1; cur_arg < argc; cur_arg++) {
+		for (int32_t i = 0; (uint32_t)i < strlen(argv[cur_arg]); i++) {
 			if (argv[cur_arg][i] == '=') {
 				break;
 			}
@@ -85,12 +85,12 @@ void SDLProcessCommandLine(int argc, char* argv[]) {
 		}
 	}
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		command = &commandlines[i];
 		memset(parameter, 0, sizeof(parameter));
 
 		pCommand = NULL;
-		for (int cur_arg = 1; cur_arg < argc; cur_arg++) {
+		for (int32_t cur_arg = 1; cur_arg < argc; cur_arg++) {
 			pCommand = strstr(argv[cur_arg], command->command);
 			if (pCommand != NULL) {
 				break;
@@ -102,7 +102,7 @@ void SDLProcessCommandLine(int argc, char* argv[]) {
 				p = 0;
 				l = strlen(pCommand);
 
-				for (int j = 0; (uint32_t)j < l; j++, pCommand++) {
+				for (int32_t j = 0; (uint32_t)j < l; j++, pCommand++) {
 					if (*pCommand != '=')
 						continue;
 
@@ -184,7 +184,7 @@ void* SDLGetNativeWindowHandle(SDL_Window *window) {
 #if ENTRY_CONFIG_USE_WAYLAND
 	wl_egl_window* win_impl = (wl_egl_window*)SDL_GetWindowData(_window, "wl_egl_window");
 	if (!win_impl) {
-		int width, height;
+		int32_t width, height;
 		SDL_GetWindowSize(_window, &width, &height);
 		struct wl_surface* surface = wmi.info.wl.surface;
 		if (!surface)
@@ -391,7 +391,7 @@ void SDLClose() {
 	SDL_Quit();
 }
 
-int main(int argc, char* argv[]) {
+int32_t main(int32_t argc, char* argv[]) {
 	char* buf;
 	size_t size;
 
@@ -449,15 +449,15 @@ int main(int argc, char* argv[]) {
 	App.dx.InScene = 0;
 	App.fmv = 0;
 
-	int window_width;
-	int window_height;
-	int window_bpp;
+	int32_t window_width;
+	int32_t window_height;
+	int32_t window_bpp;
 	window_width = App.VideoWidth;
 	window_height = App.VideoHeight;
 	window_bpp = 32;
 
-	int rendererWidth = 0;
-	int rendererHeight = 0;
+	int32_t rendererWidth = 0;
+	int32_t rendererHeight = 0;
 
 	SDL_SetWindowSize(sdl_window, window_width, window_height);
 	uint32_t window_flags = 0;

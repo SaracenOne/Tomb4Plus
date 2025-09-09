@@ -9,8 +9,8 @@ enum GameFlowGameMode {
 	GF_GAME_MODE_SAVEGAME
 };
 
-char *GetCustomStringForTextID(int id);
-char *GetFixedStringForTextID(int id);
+char *GetCustomStringForTextID(int32_t id);
+char *GetFixedStringForTextID(int32_t id);
 void DoGameflow();
 void DoLevel(uint8_t Name, uint8_t Audio);
 void DoTitle(uint8_t Name, uint8_t Audio);

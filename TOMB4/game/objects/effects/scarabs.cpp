@@ -44,7 +44,7 @@ int32_t GetFreeScarab() {
 }
 
 void ClearScarabs() {
-	for (int i = 0; i < MAX_SCARABS; i++)
+	for (int32_t i = 0; i < MAX_SCARABS; i++)
 		Scarabs[i].On = 0;
 
 	next_scarab = 0;
@@ -98,7 +98,7 @@ void UpdateScarabs() {
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *mod_object_customization = get_game_mod_level_object_customization_for_slot(gfCurrentLevel, LITTLE_BEETLE);
 
-	for (int i = 0; i < MAX_SCARABS; i++) {
+	for (int32_t i = 0; i < MAX_SCARABS; i++) {
 		fx = &Scarabs[i];
 
 		if (fx->On) {
@@ -170,7 +170,7 @@ void DrawScarabs() {
 
 	meshpp = &meshes[objects[LITTLE_BEETLE].mesh_index + (wibble >> 2 & 2)];
 
-	for (int i = 0; i < MAX_SCARABS; i++) {
+	for (int32_t i = 0; i < MAX_SCARABS; i++) {
 		fx = &Scarabs[i];
 
 		if (fx->On) {

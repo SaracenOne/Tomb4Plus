@@ -49,7 +49,7 @@ void HorsemanControl(int16_t item_number) {
 		item = &items[item_number];
 
 		if (item->item_flags[0] == -1) {
-			for (int i = 0; i < level_items; i++) {
+			for (int32_t i = 0; i < level_items; i++) {
 				item2 = &items[i];
 
 				if (item2->object_number == HORSE && item->trigger_flags == item2->trigger_flags) {
@@ -209,7 +209,7 @@ void HorsemanControl(int16_t item_number) {
 					horseman->maximum_turn = HALF_DEGREES_TO_ROTATION(3);
 
 					if (larainfo.distance > 0x1000000 || horseman->reached_goal || horseman->enemy == lara_item) {
-						horseman->reached_goal = 0;
+						horseman->reached_goal = false;
 						horseman->flags = 0;
 						item->goal_anim_state = 1;
 						item2->goal_anim_state = 2;
@@ -323,8 +323,8 @@ void HorsemanControl(int16_t item_number) {
 						item->item_flags[1] = 1;
 						item->ai_bits = 0;
 						item->pos = item2->pos;
-						horseman->reached_goal = 0;
-						horseman->enemy = 0;
+						horseman->reached_goal = false;
+						horseman->enemy = NULL;
 						item->anim_number = objects[HORSEMAN].anim_index + 14;
 						item->frame_number = anims[item->anim_number].frame_base;
 						item->current_anim_state = 5;
@@ -372,7 +372,7 @@ void HorsemanControl(int16_t item_number) {
 					break;
 
 				case 17:
-					horseman->reached_goal = 0;
+					horseman->reached_goal = false;
 					horseman->maximum_turn = DEGREES_TO_ROTATION(3);
 
 					if (!item2->flags && item2->touch_bits & 0xA2000) {
@@ -416,7 +416,7 @@ void HorsemanControl(int16_t item_number) {
 							item2->goal_anim_state = 1;
 						}
 					} else {
-						horseman->reached_goal = 0;
+						horseman->reached_goal = false;
 						horseman->flags = 0;
 						horseman->enemy = lara_item;
 					}
@@ -455,7 +455,7 @@ void TriggerHorsemanRicochets(PHD_VECTOR* pos, int32_t yrot, int32_t num) {
 	SPARKS* sptr;
 	int32_t random, rot;
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		sptr = &spark[GetFreeSpark()];
 		random = GetRandomControl();
 		sptr->On = 1;
@@ -483,7 +483,7 @@ void TriggerHorsemanRicochets(PHD_VECTOR* pos, int32_t yrot, int32_t num) {
 		sptr->MaxYvel = 0;
 	}
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		sptr = &spark[GetFreeSpark()];
 		random = GetRandomControl();
 		sptr->On = 1;

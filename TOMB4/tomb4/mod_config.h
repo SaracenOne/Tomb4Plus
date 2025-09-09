@@ -585,16 +585,16 @@ struct MOD_LEVEL_MISC_INFO {
 	bool fix_vertical_water_warp = false;
 	// TREP
 	bool trep_switch_maker = false;
-	int32_t trep_switch_on_ocb_1_anim = ANIM_HIDDENPICKUP;
-	int32_t trep_switch_off_ocb_1_anim = ANIM_HIDDENPICKUP;
-	int32_t trep_switch_on_ocb_2_anim = ANIM_HIDDENPICKUP;
-	int32_t trep_switch_off_ocb_2_anim = ANIM_HIDDENPICKUP;
-	int32_t trep_switch_on_ocb_3_anim = ANIM_SMALLSWITCH;
-	int32_t trep_switch_off_ocb_3_anim = ANIM_SMALLSWITCH;
-	int32_t trep_switch_on_ocb_4_anim = ANIM_GENERATORSW_ON;
-	int32_t trep_switch_off_ocb_4_anim = ANIM_GENERATORSW_OFF;
-	int32_t trep_switch_on_ocb_5_anim = ANIM_ONEHANDPUSHSW;
-	int32_t trep_switch_off_ocb_5_anim = ANIM_ONEHANDPUSHSW;
+	int32_t trep_switch_on_ocb_1_anim = LARA_ANIM_HIDDENPICKUP;
+	int32_t trep_switch_off_ocb_1_anim = LARA_ANIM_HIDDENPICKUP;
+	int32_t trep_switch_on_ocb_2_anim = LARA_ANIM_HIDDENPICKUP;
+	int32_t trep_switch_off_ocb_2_anim = LARA_ANIM_HIDDENPICKUP;
+	int32_t trep_switch_on_ocb_3_anim = LARA_ANIM_SMALLSWITCH;
+	int32_t trep_switch_off_ocb_3_anim = LARA_ANIM_SMALLSWITCH;
+	int32_t trep_switch_on_ocb_4_anim = LARA_ANIM_GENERATORSW_ON;
+	int32_t trep_switch_off_ocb_4_anim = LARA_ANIM_GENERATORSW_OFF;
+	int32_t trep_switch_on_ocb_5_anim = LARA_ANIM_ONEHANDPUSHSW;
+	int32_t trep_switch_off_ocb_5_anim = LARA_ANIM_ONEHANDPUSHSW;
 	int32_t trep_switch_on_ocb_6_anim = 470;
 	int32_t trep_switch_off_ocb_6_anim = 471;
 
@@ -631,38 +631,38 @@ struct GAME_MOD_CONFIG {
 
 extern GAME_MOD_CONFIG game_mod_config;
 
-extern void setup_custom_slots_for_level(int level, OBJECT_INFO* current_object_info_array);
-extern void assign_slot_for_level(int level, int dest_slot, int src_slot);
+extern void setup_custom_slots_for_level(int32_t level, OBJECT_INFO* current_object_info_array);
+extern void assign_slot_for_level(int32_t level, int32_t dest_slot, int32_t src_slot);
 
-extern void T4PlusSetupObjectsForLevel(int level, OBJECT_INFO* current_object_info_array);
+extern void T4PlusSetupObjectsForLevel(int32_t level, OBJECT_INFO* current_object_info_array);
 
 extern MOD_GLOBAL_INFO *get_game_mod_global_info();
 
-extern MOD_LEVEL_AUDIO_INFO *get_game_mod_level_audio_info(int level);
-extern MOD_LEVEL_BARS_INFO *get_game_mod_level_bars_info(int level);
-extern MOD_LEVEL_ENVIRONMENT_INFO *get_game_mod_level_environment_info(int level);
-extern MOD_LEVEL_FONT_INFO *get_game_mod_level_font_info(int level);
-extern MOD_LEVEL_CAMERA_INFO *get_game_mod_level_camera_info(int level);
-extern MOD_LEVEL_CREATURE_INFO *get_game_mod_level_creature_info(int level);
-extern MOD_LEVEL_GFX_INFO *get_game_mod_level_gfx_info(int level);
-extern MOD_LEVEL_LARA_INFO *get_game_mod_level_lara_info(int level);
-extern MOD_LEVEL_OBJECTS_INFO *get_game_mod_level_objects_info(int level);
-extern MOD_LEVEL_STAT_INFO *get_game_mod_level_stat_info(int level);
-extern MOD_LEVEL_FLARE_INFO *get_game_mod_level_flare_info(int level);
-extern MOD_LEVEL_WEAPON_INFO *get_game_mod_level_weapon_info(int level);
-extern MOD_LEVEL_MISC_INFO *get_game_mod_level_misc_info(int level);
-extern MOD_LEVEL_STATICS_INFO* get_game_mod_level_statics_info(int level);
+extern MOD_LEVEL_AUDIO_INFO *get_game_mod_level_audio_info(int32_t level);
+extern MOD_LEVEL_BARS_INFO *get_game_mod_level_bars_info(int32_t level);
+extern MOD_LEVEL_ENVIRONMENT_INFO *get_game_mod_level_environment_info(int32_t level);
+extern MOD_LEVEL_FONT_INFO *get_game_mod_level_font_info(int32_t level);
+extern MOD_LEVEL_CAMERA_INFO *get_game_mod_level_camera_info(int32_t level);
+extern MOD_LEVEL_CREATURE_INFO *get_game_mod_level_creature_info(int32_t level);
+extern MOD_LEVEL_GFX_INFO *get_game_mod_level_gfx_info(int32_t level);
+extern MOD_LEVEL_LARA_INFO *get_game_mod_level_lara_info(int32_t level);
+extern MOD_LEVEL_OBJECTS_INFO *get_game_mod_level_objects_info(int32_t level);
+extern MOD_LEVEL_STAT_INFO *get_game_mod_level_stat_info(int32_t level);
+extern MOD_LEVEL_FLARE_INFO *get_game_mod_level_flare_info(int32_t level);
+extern MOD_LEVEL_WEAPON_INFO *get_game_mod_level_weapon_info(int32_t level);
+extern MOD_LEVEL_MISC_INFO *get_game_mod_level_misc_info(int32_t level);
+extern MOD_LEVEL_STATICS_INFO* get_game_mod_level_statics_info(int32_t level);
 
 extern MOD_LEVEL_AMMO_INFO *get_game_mod_current_lara_ammo_info(MOD_LEVEL_WEAPON_INFO *weapon_info);
 
-extern MOD_LEVEL_OBJECT_CUSTOMIZATION *get_game_mod_level_object_customization_for_slot(int level, int slot);
+extern MOD_LEVEL_OBJECT_CUSTOMIZATION *get_game_mod_level_object_customization_for_slot(int32_t level, int32_t slot);
 
 extern bool LoadGameModConfigFirstPass();
 extern void LoadGameModConfigSecondPass();
 
 extern void T4PlusLevelReset();
-extern void T4PlusLevelSetup(int current_level);
-extern void T4PlusEnterLevel(int current_level, bool initial_entry);
+extern void T4PlusLevelSetup(int32_t current_level);
+extern void T4PlusEnterLevel(int32_t current_level, bool initial_entry);
 extern void T4PlusInitializeLara();
 extern void T4PlusCleanup();
 extern void T4PlusInit();

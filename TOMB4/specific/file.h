@@ -1,7 +1,7 @@
 #pragma once
 #include "../global/types.h"
 
-int LoadLevel(void* name);
+int32_t LoadLevel(void* name);
 int32_t S_LoadLevelFile(int32_t num);
 void FreeLevel();
 FILE* T4PFileOpen(const char* name);

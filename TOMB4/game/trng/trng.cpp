@@ -114,7 +114,7 @@ void NGPreloadAllLevelInfo(uint32_t valid_level_count) {
 			strcpy(name, &gfFilenameWad[gfFilenameOffset[level_filename_id]]);
 			strcat(name, ".TR4");
 
-			for (int i = 0; i < strlen(name); i++) {
+			for (int32_t i = 0; i < strlen(name); i++) {
 				if (name[i] == '\\') {
 					name[i] = '/';
 				} else {

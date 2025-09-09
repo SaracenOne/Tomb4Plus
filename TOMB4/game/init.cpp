@@ -34,7 +34,7 @@ void InitialiseLightningConductor(int16_t item_number) {
 		pack = 0;
 
 		int16_t lightning_conductor_target = T4PlusGetLightningConductorTargetSlotID();
-		for (int i = 0; i < level_items; i++) {
+		for (int32_t i = 0; i < level_items; i++) {
 			if (items[i].object_number == lightning_conductor_target) {
 				item->item_flags[2] |= i << (pack != 0 ? 8 : 0);
 				pack++;
@@ -68,34 +68,34 @@ void InitialiseDoor(int16_t item_number) {
 		dy = 1;
 
 	r = &room[item->room_number];
-	door->d1.floor = &r->floor[(((item->pos.z_pos - r->z) >> 10) + dx) + (((item->pos.x_pos - r->x) >> 10) + dy) * r->x_size];
+	door->d1.floor = &r->floor[(((item->pos.z_pos - r->z) >> WALL_SHIFT) + dx) + (((item->pos.x_pos - r->x) >> WALL_SHIFT) + dy) * r->x_size];
 	room_number = GetDoor(door->d1.floor);
 
 	if (room_number == 255)
 		box_number = door->d1.floor->box;
 	else {
 		b = &room[room_number];
-		box_number = b->floor[(((item->pos.z_pos - b->z) >> 10) + dx) + (((item->pos.x_pos - b->x) >> 10) + dy) * b->x_size].box;
+		box_number = b->floor[(((item->pos.z_pos - b->z) >> WALL_SHIFT) + dx) + (((item->pos.x_pos - b->x) >> WALL_SHIFT) + dy) * b->x_size].box;
 	}
 
-	door->d1.block = (boxes[box_number].overlap_index & 0x8000) ? box_number : 2047;
+	door->d1.block = (boxes[box_number].overlap_index & BLOCKABLE) ? box_number : NO_BOX;
 	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
 
 	if (r->flipped_room == -1)
 		door->d1flip.floor = 0;
 	else {
 		r = &room[r->flipped_room];
-		door->d1flip.floor = &r->floor[(((item->pos.z_pos - r->z) >> 10) + dx) + (((item->pos.x_pos - r->x) >> 10) + dy) * r->x_size];
+		door->d1flip.floor = &r->floor[(((item->pos.z_pos - r->z) >> WALL_SHIFT) + dx) + (((item->pos.x_pos - r->x) >> WALL_SHIFT) + dy) * r->x_size];
 		room_number = GetDoor(door->d1flip.floor);
 
 		if (room_number == 255)
 			box_number = door->d1flip.floor->box;
 		else {
 			b = &room[room_number];
-			box_number = b->floor[(((item->pos.z_pos - b->z) >> 10) + dx) + (((item->pos.x_pos - b->x) >> 10) + dy) * b->x_size].box;
+			box_number = b->floor[(((item->pos.z_pos - b->z) >> WALL_SHIFT) + dx) + (((item->pos.x_pos - b->x) >> WALL_SHIFT) + dy) * b->x_size].box;
 		}
 
-		door->d1flip.block = (boxes[box_number].overlap_index & 0x8000) ? box_number : 2047;
+		door->d1flip.block = (boxes[box_number].overlap_index & BLOCKABLE) ? box_number : NO_BOX;
 		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
 	}
 
@@ -108,34 +108,34 @@ void InitialiseDoor(int16_t item_number) {
 		door->d2flip.floor = 0;
 	} else {
 		r = &room[two_room];
-		door->d2.floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + ((item->pos.x_pos - r->x) >> 10) * r->x_size];
+		door->d2.floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + ((item->pos.x_pos - r->x) >> WALL_SHIFT) * r->x_size];
 		room_number = GetDoor(door->d2.floor);
 
 		if (room_number == 255)
 			box_number = door->d2.floor->box;
 		else {
 			b = &room[room_number];
-			box_number = b->floor[((item->pos.z_pos - b->z) >> 10) + ((item->pos.x_pos - b->x) >> 10) * b->x_size].box;
+			box_number = b->floor[((item->pos.z_pos - b->z) >> WALL_SHIFT) + ((item->pos.x_pos - b->x) >> WALL_SHIFT) * b->x_size].box;
 		}
 
-		door->d2.block = (boxes[box_number].overlap_index & 0x8000) ? box_number : 2047;
+		door->d2.block = (boxes[box_number].overlap_index & BLOCKABLE) ? box_number : NO_BOX;
 		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
 
 		if (r->flipped_room == -1)
 			door->d2flip.floor = 0;
 		else {
 			r = &room[r->flipped_room];
-			door->d2flip.floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + ((item->pos.x_pos - r->x) >> 10) * r->x_size];
+			door->d2flip.floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + ((item->pos.x_pos - r->x) >> WALL_SHIFT) * r->x_size];
 			room_number = GetDoor(door->d2flip.floor);
 
 			if (room_number == 255)
 				box_number = door->d2flip.floor->box;
 			else {
 				b = &room[room_number];
-				box_number = b->floor[((item->pos.z_pos - b->z) >> 10) + ((item->pos.x_pos - b->x) >> 10) * b->x_size].box;
+				box_number = b->floor[((item->pos.z_pos - b->z) >> WALL_SHIFT) + ((item->pos.x_pos - b->x) >> WALL_SHIFT) * b->x_size].box;
 			}
 
-			door->d2flip.block = (boxes[box_number].overlap_index & 0x8000) ? box_number : 2047;
+			door->d2flip.block = (boxes[box_number].overlap_index & BLOCKABLE) ? box_number : NO_BOX;
 			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
 		}
 
@@ -217,7 +217,7 @@ void InitialiseFlameEmitter3(int16_t item_number) {
 	if (item->trigger_flags < 3)
 		return;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		item2 = &items[i];
 
 		if (item2->object_number == ANIMATING3) {
@@ -302,17 +302,18 @@ void InitialiseRaisingBlock(int16_t item_number) {
 	item = &items[item_number];
 	room_num = item->room_number;
 	floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_num);
-	boxes[floor->box].overlap_index &= 0xBFFF;
+	boxes[floor->box].overlap_index &= (~BLOCKED);
 
 	if (item->object_number == EXPANDING_PLATFORM) {
-		if (!item->pos.y_rot)
+		if (!item->pos.y_rot) {
 			item->pos.z_pos += (HALF_BLOCK_SIZE - 1);
-		else if (item->pos.y_rot == 0x4000)
+		} else if (item->pos.y_rot == 0x4000) {
 			item->pos.x_pos += (HALF_BLOCK_SIZE - 1);
-		else if (item->pos.y_rot == -0x8000)
+		} else if (item->pos.y_rot == -0x8000) {
 			item->pos.z_pos -= (HALF_BLOCK_SIZE - 1);
-		else if (item->pos.y_rot == -0x4000)
+		} else if (item->pos.y_rot == -0x4000) {
 			item->pos.x_pos -= (HALF_BLOCK_SIZE - 1);
+		}
 	}
 
 	if (item->trigger_flags == 2) {
@@ -351,14 +352,16 @@ void InitialiseObelisk(int16_t item_number) {
 	if (item->trigger_flags == 2) {
 		ifl = item->item_flags;
 
-		for (int i = 0; i < level_items; i++) {
+		for (int32_t i = 0; i < level_items; i++) {
 			item2 = &items[i];
 
-			if (item2->object_number == OBELISK && i != item_number)
+			if (item2->object_number == OBELISK && i != item_number) {
 				*ifl++ = i;
+			}
 
-			if (item2->object_number == ANIMATING3)
+			if (item2->object_number == ANIMATING3) {
 				item->item_flags[2] = i;
+			}
 		}
 	}
 }
@@ -381,10 +384,10 @@ void InitialiseSmashObject(int16_t item_number) {
 	item->flags = 0;
 	item->mesh_bits = 1;
 	rinfo = &room[item->room_number];
-	floor = &rinfo->floor[((item->pos.z_pos - rinfo->z) >> 10) + ((item->pos.x_pos - rinfo->x) >> 10) * rinfo->x_size];
+	floor = &rinfo->floor[((item->pos.z_pos - rinfo->z) >> WALL_SHIFT) + ((item->pos.x_pos - rinfo->x) >> WALL_SHIFT) * rinfo->x_size];
 
-	if (boxes[floor->box].overlap_index & 0x8000)
-		boxes[floor->box].overlap_index |= 0x4000;
+	if (boxes[floor->box].overlap_index & BLOCKABLE)
+		boxes[floor->box].overlap_index |= BLOCKED;
 }
 
 void InitialiseStatuePlinth(int16_t item_number) {
@@ -466,7 +469,7 @@ void CreateRope(ROPE_STRUCT* rope, PHD_VECTOR* pos, PHD_VECTOR* dir, int32_t sle
 	dir->z <<= (W2V_SHIFT + 2);
 	Normalise(dir);
 
-	for (int n = 0; n < MAX_ROPE_SEGMENTS; ++n) {
+	for (int32_t n = 0; n < MAX_ROPE_SEGMENTS; ++n) {
 		rope->Segment[n].x = (int64_t)(rope->SegmentLength * n) * dir->x >> (W2V_SHIFT + 2);
 		rope->Segment[n].y = (int64_t)(rope->SegmentLength * n) * dir->y >> (W2V_SHIFT + 2);
 		rope->Segment[n].z = (int64_t)(rope->SegmentLength * n) * dir->z >> (W2V_SHIFT + 2);
@@ -500,8 +503,9 @@ void InitialiseRope(int16_t item_number) {
 }
 
 void init_all_ropes() {
-	for (int i = 0; i < MAXIMUM_ROPES; i++)
+	for (int32_t i = 0; i < MAXIMUM_ROPES; i++) {
 		RopeList[i].Active = 0;
+	}
 
 	nRope = 0;
 }
@@ -520,8 +524,9 @@ void InitialiseEffects() {
 	memset(Drips, 0, sizeof(Drips));
 	memset(ShockWaves, 0, sizeof(ShockWaves));
 
-	for (int i = 0; i < MAX_SPARKS; i++)
+	for (int32_t i = 0; i < MAX_SPARKS; i++) {
 		spark[i].Dynamic = -1;
+	}
 
 	next_fire_spark = 1;
 	next_smoke_spark = 0;
@@ -532,6 +537,7 @@ void InitialiseEffects() {
 	next_blood = 0;
 	ClearScarabs();
 
-	for (int i = 0; i < MAX_LOCUSTS; i++)
+	for (int32_t i = 0; i < MAX_LOCUSTS; i++) {
 		Locusts[i].On = 0;
+	}
 }

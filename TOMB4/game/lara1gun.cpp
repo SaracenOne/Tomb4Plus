@@ -187,7 +187,7 @@ void FireShotgun() {
 	else
 		scatter = 5460;
 
-	for (int i = 0; i < 6; i++) {
+	for (int32_t i = 0; i < 6; i++) {
 		dangles[0] = int16_t(angles[0] + scatter * (GetRandomControl() - 0x4000) / 0x10000);
 		dangles[1] = int16_t(angles[1] + scatter * (GetRandomControl() - 0x4000) / 0x10000);
 
@@ -210,10 +210,10 @@ void FireShotgun() {
 		SmokeWeapon = WEAPON_SHOTGUN;
 
 		if (lara_item->mesh_bits) {
-			for (int i = 0; i < 7; i++)
+			for (int32_t i = 0; i < 7; i++)
 				TriggerGunSmoke(pos.x, pos.y, pos.z, pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, 1, SmokeWeapon, 32);
 
-			//	for (int i = 0; i < 12; i++)
+			//	for (int32_t i = 0; i < 12; i++)
 			//empty func call here
 		}
 
@@ -272,7 +272,7 @@ void FireGrenade() {
 	SmokeCountL = 32;
 	SmokeWeapon = 5;
 
-	for (int i = 0; i < 5; i++)
+	for (int32_t i = 0; i < 5; i++)
 		TriggerGunSmoke(pos.x, pos.y, pos.z, pos2.x - pos.x, pos2.y - pos.y, pos2.z - pos.z, 1, SmokeWeapon, SmokeCountL);
 
 	InitialiseItem(item_number);
@@ -451,7 +451,7 @@ void RifleHandler(int32_t weapon_type) {
 
 			TriggerDynamic(pos.x, pos.y, pos.z, 12, r, g, b);
 
-			for (int i = 0; i < t4p_mirror_count; i++) {
+			for (int32_t i = 0; i < t4p_mirror_count; i++) {
 				if (lara_item->room_number == t4p_mirror_info[i].mirror_room) {
 					PHD_VECTOR mirrored_pos = T4PMirrorVectorOnPlane(&t4p_mirror_info[i], pos);
 
@@ -466,7 +466,7 @@ void RifleHandler(int32_t weapon_type) {
 
 			TriggerDynamic(pos.x, pos.y, pos.z, 12, r, g, b);
 
-			for (int i = 0; i < t4p_mirror_count; i++) {
+			for (int32_t i = 0; i < t4p_mirror_count; i++) {
 				if (lara_item->room_number == t4p_mirror_info[i].mirror_room) {
 					PHD_VECTOR mirrored_pos = T4PMirrorVectorOnPlane(&t4p_mirror_info[i], pos);
 
@@ -495,14 +495,14 @@ void CrossbowHitSwitchType78(ITEM_INFO* item, ITEM_INFO* target, int32_t MustHit
 		cd = 0x7FFFFFFF;
 
 		if (target->object_number == SKELETON) {
-			for (int i = 0; i < 8; i++) {
+			for (int32_t i = 0; i < 8; i++) {
 				speed = item->speed * phd_cos(item->pos.x_rot) >> W2V_SHIFT;
 				item->pos.x_pos += speed * phd_sin(item->pos.y_rot) >> 17;
 				item->pos.y_pos += item->speed * phd_sin(-item->pos.x_rot) >> 17;
 				item->pos.z_pos += speed * phd_cos(item->pos.y_rot) >> 17;
 				ptr1 = Slist;
 
-				for (int j = 0; j < num1; j++) {
+				for (int32_t j = 0; j < num1; j++) {
 					dx = ptr1->x - item->pos.x_pos;
 					dy = ptr1->y - item->pos.y_pos;
 					dz = ptr1->z - item->pos.z_pos;
@@ -522,7 +522,7 @@ void CrossbowHitSwitchType78(ITEM_INFO* item, ITEM_INFO* target, int32_t MustHit
 		} else {
 			ptr1 = Slist;
 
-			for (int i = 0; i < num1; i++) {
+			for (int32_t i = 0; i < num1; i++) {
 				dx = ptr1->x - item->pos.x_pos;
 				dy = ptr1->y - item->pos.y_pos;
 				dz = ptr1->z - item->pos.z_pos;
@@ -553,7 +553,7 @@ void CrossbowHitSwitchType78(ITEM_INFO* item, ITEM_INFO* target, int32_t MustHit
 			} else {
 				NumTrigs = (int16_t)GetSwitchTrigger(target, TriggerItems, 1);
 
-				for (int i = 0; i < NumTrigs; i++) {
+				for (int32_t i = 0; i < NumTrigs; i++) {
 					AddActiveItem(TriggerItems[i]);
 					items[TriggerItems[i]].status = ITEM_ACTIVE;
 					items[TriggerItems[i]].flags |= IFL_CODEBITS;
@@ -586,7 +586,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item, int32_t vehicle) {
 		TriggerExplosionBubble(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, item->room_number);
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 2, -2, 1, item->room_number);
 
-		for (int i = 0; i < 3; i++)
+		for (int32_t i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 2, -1, 1, item->room_number);
 
 		wh = GetWaterHeight(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, item->room_number);
@@ -756,7 +756,7 @@ void ControlCrossbow(int16_t item_number) {
 	else
 		rad = HALF_CLICK_SIZE;
 
-	for (int i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 2; i++) {
 		itemlist = (ITEM_INFO**)&tsv_buffer[0x2000];
 		meshlist = (MESH_INFO**)&tsv_buffer[0x3000];
 		GetCollidedObjects(item, rad, 1, itemlist, meshlist, 1);
@@ -837,7 +837,7 @@ void ControlCrossbow(int16_t item_number) {
 			item->pos.y_pos += 128;
 			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->room_number);
 
-			for (int i = 0; i < 2; i++)
+			for (int32_t i = 0; i < 2; i++)
 				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->room_number);
 		}
 
@@ -1042,7 +1042,7 @@ void ControlGrenade(int16_t item_number) {
 	}
 
 	if (item->item_flags[0] != 3 || !exploded) {
-		for (int i = 0; i < 2; i++) {
+		for (int32_t i = 0; i < 2; i++) {
 			itemlist = (ITEM_INFO**)&tsv_buffer[0x2000];
 			meshlist = (MESH_INFO**)&tsv_buffer[0x3000];
 			GetCollidedObjects(item, rad, 1, itemlist, meshlist, 1);
@@ -1064,7 +1064,7 @@ void ControlGrenade(int16_t item_number) {
 						if (!(target->flags & IFL_CODEBITS) || (target->flags & IFL_CODEBITS) == IFL_CODEBITS) {
 							NumTrigs = (int16_t)GetSwitchTrigger(target, TriggerItems, 1);
 
-							for (int i = 0; i < NumTrigs; i++) {
+							for (int32_t i = 0; i < NumTrigs; i++) {
 								AddActiveItem(TriggerItems[i]);
 								items[TriggerItems[i]].status = ITEM_ACTIVE;
 								items[TriggerItems[i]].flags |= IFL_CODEBITS;
@@ -1150,7 +1150,7 @@ void ControlGrenade(int16_t item_number) {
 			item->pos.y_pos += 128;
 			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->room_number);
 
-			for (int i = 0; i < 2; i++)
+			for (int32_t i = 0; i < 2; i++)
 				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->room_number);
 		}
 

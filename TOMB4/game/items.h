@@ -9,7 +9,7 @@ void RemoveActiveItem(int16_t item_num);
 void RemoveDrawnItem(int16_t item_num);
 void AddActiveItem(int16_t item_num);
 void ItemNewRoom(int16_t item_num, int16_t room_num);
-void InitialiseFXArray(int32_t allocmem);
+void InitialiseFXArray(bool allocmem);
 int16_t CreateEffect(int16_t room_num);
 void KillEffect(int16_t fx_num);
 void EffectNewRoom(int16_t fx_num, int16_t room_num);

@@ -18,8 +18,8 @@ size_t get_virtual_game_malloc_offset();
 #define SYSTEM_REALLOC(ptr, size) realloc(ptr, size)
 #define SYSTEM_FREE(ptr) free(ptr)
 #else
-void* system_malloc(size_t size, const char* filename, int line_number);
-void* system_realloc(void* ptr, size_t size, const char* filename, int line_number);
+void* system_malloc(size_t size, const char* filename, int32_t line_number);
+void* system_realloc(void* ptr, size_t size, const char* filename, int32_t line_number);
 void system_free(void* ptr);
 #define SYSTEM_MALLOC(size) system_malloc(size, __FILE__, __LINE__)
 #define SYSTEM_REALLOC(ptr, size) system_realloc(ptr, size, __FILE__, __LINE__)

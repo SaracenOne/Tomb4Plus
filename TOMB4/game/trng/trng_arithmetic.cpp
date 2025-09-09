@@ -5,6 +5,9 @@
 #include "trng_extra_state.h"
 
 #include "../lara.h"
+#include "../gameflow.h"
+#include "../savegame.h"
+#include "../control.h"
 
 
 // TODO: Investigate whether numeric operations operate as signed or unsigned.
@@ -679,17 +682,132 @@ int32_t NGNumericGetSavegameValue(uint32_t variable) {
 			return lara.climb_status;
 			break;
 		}
-		case 0x0a: {
+		case 0x0A: {
 			return lara.air;
 			break;
 		}
-		case 0x0b: {
+		case 0x0B: {
 			return lara.death_count;
 			break;
 		}
-		case 0x0c: {
-			NGLog(NG_LOG_TYPE_POSSIBLE_INACCURACY, "NGNumericGetSavegameValue: Lara Hands: Remaining time with lighted flare is untested!");
+		case 0x0C: {
 			return lara.flare_age;
+			break;
+		}
+		case 0x0D: {
+			return lara.weapon_item;
+			break;
+		}
+		case 0x0E: {
+			return lara.back_gun;
+			break;
+		}
+		case 0x0F: {
+			return lara.poisoned;
+			break;
+		}
+		case 0x10: {
+			return lara.dpoisoned;
+			break;
+		}
+		case 0x11: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Lara: special status 1 unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x12: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Lara: special status 2 unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x13: {
+			size_t address = (size_t)lara.target - (size_t)items;
+			return 0;
+			break;
+		}
+		case 0x14: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Lara: Torch status in Lara's hand unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x15: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Lara: Flare unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x16: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Auto-aiming unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x17: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Horizontal rope position unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x18: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Lara on rope is unimplemented!");
+			return 0;
+			break;
+		}
+		case 0x19: {
+			return lara.pistols_type_carried;
+			break;
+		}
+		case 0x1A: {
+			return lara.uzis_type_carried;
+			break;
+		}
+		case 0x1B: {
+			return lara.shotgun_type_carried;
+			break;
+		}
+		case 0x1C: {
+			return lara.crossbow_type_carried;
+			break;
+		}
+		case 0x1D: {
+			return lara.grenade_type_carried;
+			break;
+		}
+		case 0x1E: {
+			return lara.sixshooter_type_carried;
+			break;
+		}
+		case 0x1F: {
+			return lara.lasersight;
+			break;
+		}
+		case 0x20: {
+			return lara.binoculars;
+			break;
+		}
+		case 0x21: {
+			return lara.crowbar;
+			break;
+		}
+		case 0x22: {
+			return lara.mechanical_scarab;
+			break;
+		}
+		case 0x23: {
+			return lara.small_water_skin;
+			break;
+		}
+		case 0x24: {
+			return lara.big_water_skin;
+			break;
+		}
+		case 0x25: {
+			return lara.examine1;
+			break;
+		}
+		case 0x26: {
+			return lara.examine2;
+			break;
+		}
+		case 0x27: {
+			return lara.examine3;
 			break;
 		}
 		case 0x28: {
@@ -737,8 +855,95 @@ int32_t NGNumericGetSavegameValue(uint32_t variable) {
 			break;
 		}
 		case 0x33: {
-			return lara.puzzleitems[10];
+			return lara.puzzleitems[11];
 			break;
+		}
+		case 0x34: {
+			return lara.puzzleitemscombo & 0xff;
+		}
+		case 0x35: {
+			return (lara.puzzleitemscombo & 0xff00) >> 8;
+		}
+		case 0x36: {
+			return lara.keyitems & 0xff;
+		}
+		case 0x37: {
+			return (lara.keyitems & 0xff00) >> 8;
+		}
+		case 0x38: {
+			return (lara.pickupitems & 0xff);
+		}
+		case 0x39: {
+			return (lara.questitems & 0xff);
+		}
+		case 0x3A: {
+			return lara.num_small_medipack;
+		}
+		case 0x3B: {
+			return lara.num_large_medipack;
+		}
+		case 0x3C: {
+			return lara.num_flares;
+		}
+		case 0x3D: {
+			return lara.num_pistols_ammo;
+		}
+		case 0x3E: {
+			return lara.num_uzi_ammo;
+		}
+		case 0x3F: {
+			return lara.num_revolver_ammo;
+		}
+		case 0x40: {
+			return lara.num_shotgun_ammo1;
+		}
+		case 0x41: {
+			return lara.num_shotgun_ammo2;
+		}
+		case 0x42: {
+			return lara.num_grenade_ammo1;
+		}
+		case 0x43: {
+			return lara.num_grenade_ammo2;
+		}
+		case 0x44: {
+			return lara.num_grenade_ammo3;
+		}
+		case 0x45: {
+			return lara.num_crossbow_ammo1;
+		}
+		case 0x46: {
+			return lara.num_crossbow_ammo2;
+		}
+		case 0x47: {
+			return lara.num_crossbow_ammo3;
+		}
+		case 0x48: {
+			return lara.beetle_uses;
+		}
+		case 0x49: {
+			return savegame.CurrentLevel;
+		}
+		case 0x4A: {
+			return savegame.Game.Timer;
+		}
+		case 0x4B: {
+			return savegame.Game.Distance;
+		}
+		case 0x4C: {
+			return savegame.Game.AmmoUsed;
+		}
+		case 0x4D: {
+			return savegame.Game.Secrets;
+		}
+		case 0x4E: {
+			return savegame.Game.HealthUsed;
+		}
+		case 0x4F: {
+			return savegame.Level.Timer;
+		}
+		case 0x50: {
+			return savegame.Level.Kills;
 		}
 		default: {
 			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericGetSavegameValue: Unimplemented savegame value: %u", variable);
@@ -747,4 +952,345 @@ int32_t NGNumericGetSavegameValue(uint32_t variable) {
 	}
 
 	return -1;
+}
+
+void NGNumericSetSavegameValue(uint32_t variable, int32_t value) {
+	switch (variable) {
+		case 0x00: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: TRNG Index: Index of last item found with testposition or condition unimplemented");
+			break;
+		}
+		case 0x01: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: TRNG Index: Index of last item performing last AnimCommand unimplemented");
+			break;
+		}
+		case 0x02: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: TRNG Index: Item index for selected item unimplemented");
+			break;
+		}
+		case 0x03: {
+			lara.item_number = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x04: {
+			lara.gun_status = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x05: {
+			lara.gun_type = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x06: {
+			lara.request_gun_type = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x07: {
+			lara.last_gun_type = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x08: {
+			lara.water_status = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x09: {
+			lara.climb_status = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0a: {
+			lara.air = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0b: {
+			lara.death_count = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0c: {
+			lara.flare_age = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0d: {
+			lara.weapon_item = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0e: {
+			lara.back_gun = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x0f: {
+			lara.poisoned = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x10: {
+			lara.dpoisoned = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x11: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: special status 1 unimplemented!");
+			return;
+			break;
+		}
+		case 0x12: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: special status 2 unimplemented!");
+			return;
+			break;
+		}
+		case 0x13: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: item target memory address unimplemented!");
+			return;
+			break;
+		}
+		case 0x14: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Torch status in Lara's hand unimplemented!");
+			return;
+			break;
+		}
+		case 0x15: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Flare unimplemented!");
+			return;
+			break;
+		}
+		case 0x16: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Auto-aiming unimplemented!");
+			return;
+			break;
+		}
+		case 0x17: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Horizontal rope position unimplemented!");
+			return;
+			break;
+		}
+		case 0x18: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara on rope is unimplemented!");
+			return;
+			break;
+		}
+		case 0x19: {
+			lara.pistols_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1A: {
+			lara.uzis_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1B: {
+			lara.shotgun_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1C: {
+			lara.crossbow_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1D: {
+			lara.grenade_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1E: {
+			lara.sixshooter_type_carried = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x1F: {
+			lara.lasersight = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x20: {
+			lara.binoculars = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x21: {
+			lara.crowbar = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x22: {
+			lara.mechanical_scarab = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x23: {
+			lara.small_water_skin = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x24: {
+			lara.big_water_skin = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x25: {
+			lara.examine1 = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x26: {
+			lara.examine2 = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x27: {
+			lara.examine3 = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x28: {
+			lara.puzzleitems[0] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x29: {
+			lara.puzzleitems[1] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2A: {
+			lara.puzzleitems[2] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2B: {
+			lara.puzzleitems[3] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2C: {
+			lara.puzzleitems[4] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2D: {
+			lara.puzzleitems[5] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2E: {
+			lara.puzzleitems[6] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x2F: {
+			lara.puzzleitems[7] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x30: {
+			lara.puzzleitems[8] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x31: {
+			lara.puzzleitems[9] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x32: {
+			lara.puzzleitems[10] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x33: {
+			lara.puzzleitems[11] = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x34: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Combo items  1 - 4 unimplemented!");
+			break;
+		}
+		case 0x35: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Combo items  5 - 8 unimplemented!");
+			break;
+		}
+		case 0x36: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Keys  1 - 4 unimplemented!");
+			break;
+		}
+		case 0x37: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Lara: Keys  5 - 8 unimplemented!");
+			break;
+		}
+		case 0x38: {
+			lara.pickupitems = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x39: {
+			lara.questitems = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x3A: {
+			lara.num_small_medipack = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x3B: {
+			lara.num_large_medipack = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x3C: {
+			lara.num_flares = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x3D: {
+			lara.num_pistols_ammo = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x3E: {
+			lara.num_uzi_ammo = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x3F: {
+			lara.num_revolver_ammo = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x40: {
+			lara.num_shotgun_ammo1 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x41: {
+			lara.num_shotgun_ammo2 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x42: {
+			lara.num_grenade_ammo1 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x43: {
+			lara.num_grenade_ammo2 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x44: {
+			lara.num_grenade_ammo3 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x45: {
+			lara.num_crossbow_ammo1 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x46: {
+			lara.num_crossbow_ammo2 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x47: {
+			lara.num_crossbow_ammo3 = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x48: {
+			lara.beetle_uses = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x49: {
+			savegame.CurrentLevel = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x4A: {
+			savegame.Game.Timer = (int32_t)(value & 0xffffffff);
+			break;
+		}
+		case 0x4B: {
+			savegame.Game.Distance = (int32_t)(value & 0xffffffff);
+			break;
+		}
+		case 0x4C: {
+			savegame.Game.AmmoUsed = (int16_t)(value & 0xffff);
+			break;
+		}
+		case 0x4D: {
+			savegame.Game.Secrets = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x4E: {
+			savegame.Game.HealthUsed = (int8_t)(value & 0xff);
+			break;
+		}
+		case 0x4F: {
+			savegame.Level.Timer = (int32_t)(value & 0xffffffff);
+			break;
+		}
+		case 0x50: {
+			savegame.Level.Kills = (int16_t)(value & 0xffff);
+			break;
+		}
+		default: {
+			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "NGNumericSetSavegameValue: Unimplemented savegame value: %u", variable);
+			break;
+		}
+	}
 }

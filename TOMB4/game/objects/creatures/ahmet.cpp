@@ -49,7 +49,7 @@ void ScalesCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	item = &items[item_number];
 
 	if (TestBoundsCollide(item, l, 100)) {
-		if ((l->anim_number == ANIM_POURWATERSKIN || l->anim_number == ANIM_FILLSCALE) && item->current_anim_state == 1) {
+		if ((l->anim_number == LARA_ANIM_POURWATERSKIN || l->anim_number == LARA_ANIM_FILLSCALE) && item->current_anim_state == 1) {
 			roty = item->pos.y_rot;
 			item->pos.y_rot = (l->pos.y_rot + 0x2000) & 0xC000;
 			ScalesBounds[0] = -(BLOCK_SIZE + CLICK_SIZE + HALF_CLICK_SIZE);
@@ -58,12 +58,12 @@ void ScalesCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 			ScalesBounds[5] = 0;
 
 			if (TestLaraPosition(ScalesBounds, item, l)) {
-				if (l->anim_number == ANIM_POURWATERSKIN) {
-					l->anim_number = ANIM_FILLSCALE;
-					l->frame_number = anims[ANIM_FILLSCALE].frame_base;
-				} else if (l->frame_number == anims[ANIM_FILLSCALE].frame_base + 51)
+				if (l->anim_number == LARA_ANIM_POURWATERSKIN) {
+					l->anim_number = LARA_ANIM_FILLSCALE;
+					l->frame_number = anims[LARA_ANIM_FILLSCALE].frame_base;
+				} else if (l->frame_number == anims[LARA_ANIM_FILLSCALE].frame_base + 51)
 					SoundEffect(SFX_POUR, &l->pos, SFX_DEFAULT);
-				else if (l->frame_number == anims[ANIM_FILLSCALE].frame_base + 74) {
+				else if (l->frame_number == anims[LARA_ANIM_FILLSCALE].frame_base + 74) {
 					AddActiveItem(item_number);
 					item->status = ITEM_ACTIVE;
 
@@ -94,8 +94,8 @@ void ScalesCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 		}
 	}
 
-	if (l->frame_number >= anims[ANIM_POURWATERSKIN].frame_base + 44 && l->frame_number <= anims[ANIM_POURWATERSKIN].frame_base + 72 ||
-	        l->frame_number >= anims[ANIM_FILLSCALE].frame_base + 51 && l->frame_number <= anims[ANIM_FILLSCALE].frame_base + 74) {
+	if (l->frame_number >= anims[LARA_ANIM_POURWATERSKIN].frame_base + 44 && l->frame_number <= anims[LARA_ANIM_POURWATERSKIN].frame_base + 72 ||
+	        l->frame_number >= anims[LARA_ANIM_FILLSCALE].frame_base + 51 && l->frame_number <= anims[LARA_ANIM_FILLSCALE].frame_base + 74) {
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;

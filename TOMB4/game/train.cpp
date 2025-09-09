@@ -65,7 +65,7 @@ void DrawTrainObjects() {
 	phd_PushMatrix();
 	phd_TranslateAbs(lara_item->pos.x_pos - lara_item->pos.x_pos % 6144, CLICK_SIZE, 47168);
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		phd_PutPolygons_train(meshes[static_objects[obj[0]].mesh_number], x);
 		obj++;
 		x += 6144;
@@ -85,7 +85,7 @@ void DrawTrainObjects() {
 	phd_RotY(DEGREES_TO_ROTATION(180));
 	x2 = x + 0xC000;
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		phd_PutPolygons_train(meshes[static_objects[obj[0]].mesh_number], -x);
 		obj++;
 		x += 6144;
@@ -103,7 +103,7 @@ void DrawTrainObjects() {
 	x = trainmappos % 6144 - 24576;
 	phd_PushMatrix();
 
-	for (int i = 0; i < 8; i++) {
+	for (int32_t i = 0; i < 8; i++) {
 		if (p->type != NO_ITEM) {
 			phd_TranslateAbs(lara_item->pos.x_pos - lara_item->pos.x_pos % 6144, CLICK_SIZE, p->zoff + 52224);
 			phd_PutPolygons_train(meshes[static_objects[p->type].mesh_number], x);
@@ -140,7 +140,7 @@ void InitialiseTrainJeep(int16_t item_number) {
 	item = &items[item_number];
 	item->item_flags[0] = -80;
 
-	for (int i = 0; i < level_items; i++) {	//find your baddy
+	for (int32_t i = 0; i < level_items; i++) {	//find your baddy
 		item2 = &items[i];
 
 		if (item != item2 && item2->trigger_flags == item->trigger_flags) {

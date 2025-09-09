@@ -73,7 +73,7 @@ static int32_t GetOnJeep(int16_t item_number, COLL_INFO* coll) {
 
 	if (input & IN_ACTION || GLOBAL_inventoryitemchosen == jeep_key_slot) {
 		if (!(item->flags & IFL_INVISIBLE) && lara.gun_status == LG_NO_ARMS && lara_item->current_anim_state == AS_STOP &&
-		        lara_item->anim_number == ANIM_BREATH && !lara_item->gravity_status) {
+		        lara_item->anim_number == LARA_ANIM_BREATH && !lara_item->gravity_status) {
 			if (abs(item->pos.y_pos - lara_item->pos.y_pos) < CLICK_SIZE && TestBoundsCollide(item, lara_item, 100)) {
 				room_number = item->room_number;
 				floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
@@ -187,7 +187,7 @@ void JeepExplode(ITEM_INFO* item) {
 	else {
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -2, 0, item->room_number);
 
-		for (int i = 0; i < 3; i++)
+		for (int32_t i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -1, 0, item->room_number);
 	}
 
@@ -204,8 +204,8 @@ static int32_t JeepCheckGetOut() {
 		MOD_LEVEL_AUDIO_INFO *mod_audio_info = get_game_mod_level_audio_info(gfCurrentLevel);
 
 		lara_item->pos.y_rot += 0x4000;
-		lara_item->anim_number = ANIM_STOP;
-		lara_item->frame_number = anims[ANIM_STOP].frame_base;
+		lara_item->anim_number = LARA_ANIM_STOP;
+		lara_item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 		lara_item->current_anim_state = AS_STOP;
 		lara_item->goal_anim_state = AS_STOP;
 		lara_item->pos.x_pos -= HALF_BLOCK_SIZE * phd_sin(lara_item->pos.y_rot) >> W2V_SHIFT;
@@ -391,10 +391,10 @@ int32_t DoShift(ITEM_INFO* item, PHD_VECTOR* newPos, PHD_VECTOR* oldPos) {
 	int32_t x, z, nX, nZ, oX, oZ, sX, sZ, h;
 	int16_t room_number;
 
-	nX = newPos->x >> 10;
-	nZ = newPos->z >> 10;
-	oX = oldPos->x >> 10;
-	oZ = oldPos->z >> 10;
+	nX = newPos->x >> WALL_SHIFT;
+	nZ = newPos->z >> WALL_SHIFT;
+	oX = oldPos->x >> WALL_SHIFT;
+	oZ = oldPos->z >> WALL_SHIFT;
 	sX = newPos->x & 0x3FF;
 	sZ = newPos->z & 0x3FF;
 
@@ -938,7 +938,7 @@ void JeepBaddieCollision(ITEM_INFO* item) {
 	jroomies[0] = item->room_number;
 	doors = room[item->room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16) {
+	for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 		for (j = 0; j < room_count; j++) {
 			if (jroomies[j] == *doors)
 				break;
@@ -950,7 +950,7 @@ void JeepBaddieCollision(ITEM_INFO* item) {
 		}
 	}
 
-	for (int i = 0; i < room_count; i++) {
+	for (int32_t i = 0; i < room_count; i++) {
 		for (item_number = room[jroomies[i]].item_number; item_number != NO_ITEM; item_number = collided->next_item) {
 			collided = &items[item_number];
 			obj = &objects[collided->object_number];
@@ -1019,7 +1019,7 @@ void JeepCollideStaticObjects(int32_t x, int32_t y, int32_t z, int16_t room_numb
 	jroomies[0] = room_number;
 	doors = room[room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16) {
+	for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 		for (j = 0; j < room_count; j++) {
 			if (jroomies[j] == *doors)
 				break;
@@ -1031,7 +1031,7 @@ void JeepCollideStaticObjects(int32_t x, int32_t y, int32_t z, int16_t room_numb
 		}
 	}
 
-	for (int i = 0; i < room_count; i++) {
+	for (int32_t i = 0; i < room_count; i++) {
 		rn = jroomies[i];
 		r = &room[rn];
 		mesh = r->mesh;

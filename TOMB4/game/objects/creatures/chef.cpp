@@ -62,7 +62,7 @@ void ChefControl(int16_t item_number) {
 		dx = lara_item->pos.x_pos - item->pos.x_pos;
 		dz = lara_item->pos.z_pos - item->pos.z_pos;
 		larainfo.angle = int16_t(phd_atan(dz, dx) - item->pos.y_rot);
-		larainfo.ahead = larainfo.angle > -0x4000 && larainfo.angle < 0x4000;
+		larainfo.ahead = larainfo.angle > -FRONT_ARC && larainfo.angle < FRONT_ARC;
 		larainfo.distance = SQUARE(dz) + SQUARE(dx);
 	}
 
@@ -84,7 +84,7 @@ void ChefControl(int16_t item_number) {
 			if (abs(lara_item->pos.y_pos - item->pos.y_pos) < 1024 && info.distance < 0x240000 &&
 			        (item->touch_bits || lara_item->speed > 15 || item->hit_status || TargetVisible(item, &larainfo))) {
 				item->goal_anim_state = 2;
-				chef->alerted = 1;
+				chef->alerted = true;
 				item->ai_bits = 0;
 			}
 

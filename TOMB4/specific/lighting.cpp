@@ -42,7 +42,7 @@ void InitItemDynamicLighting(ITEM_INFO* item) {
 	if (!item)
 		return;
 
-	for (int i = 0; i < MAX_DYNAMICS; i++) {
+	for (int32_t i = 0; i < MAX_DYNAMICS; i++) {
 		dptr = &dynamics[i];
 
 		if (dptr->on)
@@ -255,7 +255,7 @@ void CreateLightList(ITEM_INFO* item) {
 		item->il.room_number = item->room_number;
 		prev_lights = (PCLIGHT*)item->il.pPrevLights;
 
-		for (int i = 0; i < item->il.nPrevLights; i++) {
+		for (int32_t i = 0; i < item->il.nPrevLights; i++) {
 			if (prev_lights[i].Active) {
 				if (prev_lights[i].Type == LIGHT_SHADOW)
 					prev_lights[i].iny = -prev_lights[i].shadow >> 3;
@@ -276,7 +276,7 @@ void CreateLightList(ITEM_INFO* item) {
 		current_lights = (PCLIGHT*)item->il.pCurrentLights;
 		room_light = r->pclight;
 
-		for (int i = 0; i < r->num_lights; i++) {
+		for (int32_t i = 0; i < r->num_lights; i++) {
 			current_lights->r = room_light->r;
 			current_lights->g = room_light->g;
 			current_lights->b = room_light->b;
@@ -315,7 +315,7 @@ void CreateLightList(ITEM_INFO* item) {
 	current_lights = (PCLIGHT*)item->il.pCurrentLights;
 	prev_lights = (PCLIGHT*)item->il.pPrevLights;
 
-	for (int i = 0; i < item->il.nCurrentLights; i++) {
+	for (int32_t i = 0; i < item->il.nCurrentLights; i++) {
 		in_range = 1;
 		dx = current_lights[i].ix - item->il.item_pos.x;
 		dy = current_lights[i].iy - item->il.item_pos.y;
@@ -386,7 +386,7 @@ void CreateLightList(ITEM_INFO* item) {
 }
 
 void FadeLightList(PCLIGHT* lights, int32_t nLights) {
-	for (int i = 0; i < nLights; i++) {
+	for (int32_t i = 0; i < nLights; i++) {
 		if (lights[i].Active && lights[i].fcnt) {
 			if (lights[i].Type == LIGHT_SHADOW)
 				lights[i].shadow += lights[i].iny;
@@ -426,14 +426,14 @@ void InitObjectLighting(ITEM_INFO* item) {
 	node_ambient = item->il.ambient;
 	light = (PCLIGHT*)item->il.pCurrentLights;
 
-	for (int i = 0; i < item->il.nCurrentLights; i++) {
+	for (int32_t i = 0; i < item->il.nCurrentLights; i++) {
 		if (light[i].Active)
 			SetupLight(&light[i], item, point_lights_affect_ambience, use_alt_attenuation_calculation, &node_ambient);
 	}
 
 	light = (PCLIGHT*)item->il.pPrevLights;
 
-	for (int i = 0; i < item->il.nPrevLights; i++) {
+	for (int32_t i = 0; i < item->il.nPrevLights; i++) {
 		if (light[i].Active)
 			SetupLight(&light[i], item, point_lights_affect_ambience, use_alt_attenuation_calculation, &node_ambient);
 	}

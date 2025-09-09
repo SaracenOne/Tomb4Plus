@@ -125,7 +125,7 @@ void InitialiseSpotCam(int16_t Sequence) {
 	current_sequence = Sequence;
 	current_spline_camera = 0;
 
-	for (int i = 0; i < SpotRemap[Sequence]; i++)
+	for (int32_t i = 0; i < SpotRemap[Sequence]; i++)
 		current_spline_camera += CameraCnt[i];
 
 	current_camera_cnt = CameraCnt[SpotRemap[Sequence]];
@@ -149,7 +149,7 @@ void InitialiseSpotCam(int16_t Sequence) {
 		num++;
 		next_spline_camera = first_camera;
 
-		for (int i = 0; i < current_camera_cnt; i++) {
+		for (int32_t i = 0; i < current_camera_cnt; i++) {
 			SetSplineData(num, next_spline_camera);	//INLINED
 			num++;
 			next_spline_camera++;
@@ -220,7 +220,7 @@ void InitSpotCamSequences() {
 		s = SpotCam[0].sequence;
 		cc = 1;
 
-		for (int i = 1; i < number_spotcams; i++) {
+		for (int32_t i = 1; i < number_spotcams; i++) {
 			if (SpotCam[i].sequence == s)
 				cc++;
 			else {
@@ -301,10 +301,10 @@ void CalculateSpotCams() {
 		ly = lara_item->pos.y_pos;
 		lz = lara_item->pos.z_pos;
 
-		for (int i = 0; i < 8; i++) {
+		for (int32_t i = 0; i < 8; i++) {
 			tlen = 0x10000;
 
-			for (int j = 0; j < 8; j++) {
+			for (int32_t j = 0; j < 8; j++) {
 				cx = Spline(sp, camera_xposition, spline_cnt) - lx;
 				cy = Spline(sp, camera_yposition, spline_cnt) - ly;
 				cz = Spline(sp, camera_zposition, spline_cnt) - lz;

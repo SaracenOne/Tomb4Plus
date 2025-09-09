@@ -91,12 +91,12 @@ void LaraCheatyBits() {
 		if (lara.vehicle != NO_ITEM)
 			return;
 
-		lara_item->pos.y_pos -= 128;
+		lara_item->pos.y_pos -= HALF_CLICK_SIZE;
 
 		if (lara.water_status != LW_FLYCHEAT) {
 			lara.water_status = LW_FLYCHEAT;
-			lara_item->frame_number = anims[ANIM_SWIMCHEAT].frame_base;
-			lara_item->anim_number = ANIM_SWIMCHEAT;
+			lara_item->frame_number = anims[LARA_ANIM_SWIMCHEAT].frame_base;
+			lara_item->anim_number = LARA_ANIM_SWIMCHEAT;
 			lara_item->current_anim_state = AS_SWIM;
 			lara_item->goal_anim_state = AS_SWIM;
 			lara_item->gravity_status = 0;
@@ -152,8 +152,8 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) {
 
 	if (input & IN_WALK && !(input & IN_LOOK)) {
 		lara.water_status = LW_ABOVE_WATER;
-		item->frame_number = anims[ANIM_STOP].frame_base;
-		item->anim_number = ANIM_STOP;
+		item->frame_number = anims[LARA_ANIM_STOP].frame_base;
+		item->anim_number = LARA_ANIM_STOP;
 		item->pos.z_rot = 0;
 		item->pos.x_rot = 0;
 		lara.torso_y_rot = 0;
@@ -173,15 +173,15 @@ void InitialiseLaraLoad(int16_t item_number) {
 
 void InitialiseLaraAnims(ITEM_INFO* item) {
 	if (room[item->room_number].flags & ROOM_UNDERWATER) {
-		item->anim_number = ANIM_TREAD;
-		item->frame_number = anims[ANIM_TREAD].frame_base;
+		item->anim_number = LARA_ANIM_TREAD;
+		item->frame_number = anims[LARA_ANIM_TREAD].frame_base;
 		item->current_anim_state = AS_TREAD;
 		item->goal_anim_state = AS_TREAD;
 		lara.water_status = LW_UNDERWATER;
 		item->fallspeed = 0;
 	} else {
-		item->anim_number = ANIM_STOP;
-		item->frame_number = anims[ANIM_STOP].frame_base;
+		item->anim_number = LARA_ANIM_STOP;
+		item->frame_number = anims[LARA_ANIM_STOP].frame_base;
 		item->current_anim_state = AS_STOP;
 		item->goal_anim_state = AS_STOP;
 		lara.water_status = LW_ABOVE_WATER;
@@ -189,7 +189,7 @@ void InitialiseLaraAnims(ITEM_INFO* item) {
 }
 
 void LaraInitialiseMeshes() {
-	for (int i = 0; i < LARA_MESH_PTR_COUNT; i++) {
+	for (int32_t i = 0; i < LARA_MESH_PTR_COUNT; i++) {
 		meshes[objects[T4PlusGetLaraSlotID()].mesh_index + i * 2] = meshes[objects[T4PlusGetLaraSkinSlotID()].mesh_index + i * 2];
 		lara.mesh_ptrs[i] = meshes[objects[T4PlusGetLaraSlotID()].mesh_index + i * 2];
 	}
@@ -229,7 +229,7 @@ void AnimateLara(ITEM_INFO* item) {
 		if (anim->number_commands > 0) {
 			cmd = &commands[anim->command_index];
 
-			for (int i = anim->number_commands; i > 0; i--) {
+			for (int32_t i = anim->number_commands; i > 0; i--) {
 				switch (*cmd++) {
 					case ACMD_SETPOS:
 						// TRNG
@@ -242,7 +242,7 @@ void AnimateLara(ITEM_INFO* item) {
 						}
 
 						TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-						UpdateLaraRoom(item, -381);
+						UpdateLaraRoom(item, -(LARA_STANDARD_HEIGHT / 2));
 						cmd += 3;
 						break;
 
@@ -287,10 +287,10 @@ void AnimateLara(ITEM_INFO* item) {
 	if (anim->number_commands > 0) {
 		cmd = &commands[anim->command_index];
 
-		for (int i = anim->number_commands; i > 0; i--) {
+		for (int32_t i = anim->number_commands; i > 0; i--) {
 			switch (*cmd++) {
 				case ACMD_SETPOS: {
-					int offset_frame = item->frame_number - anim->frame_base;
+					int32_t offset_frame = item->frame_number - anim->frame_base;
 
 					// TRNG
 					if (NGIsUsingNGAnimCommands()) {
@@ -407,7 +407,7 @@ void LaraControl(int16_t item_number) {
 	oldy = l->pos.y_pos;
 	oldz = l->pos.z_pos;
 
-	if (lara.gun_status == LG_HANDS_BUSY && l->current_anim_state == AS_STOP && l->goal_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status)
+	if (lara.gun_status == LG_HANDS_BUSY && l->current_anim_state == AS_STOP && l->goal_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && !l->gravity_status)
 		lara.gun_status = LG_NO_ARMS;
 
 	if (l->current_anim_state != AS_DASH && DashTimer < 120)
@@ -445,8 +445,8 @@ void LaraControl(int16_t item_number) {
 								if (lara_item->current_anim_state == AS_SWANDIVE || lara_item->current_anim_state == AS_FASTDIVE)
 									lara_item->pos.y_pos = wh + 1000;
 
-								lara_item->anim_number = ANIM_WADE;
-								lara_item->frame_number = anims[ANIM_WADE].frame_base;
+								lara_item->anim_number = LARA_ANIM_WADE;
+								lara_item->frame_number = anims[LARA_ANIM_WADE].frame_base;
 								lara_item->current_anim_state = AS_WADE;
 								lara_item->goal_anim_state = AS_WADE;
 							}
@@ -565,13 +565,13 @@ void LaraControl(int16_t item_number) {
 						lara.torso_y_rot = 0;
 						lara.head_x_rot = 0;
 						lara.head_y_rot = 0;
-						UpdateLaraRoom(l, -381);
+						UpdateLaraRoom(l, -(LARA_STANDARD_HEIGHT / 2));
 						if (!get_game_mod_level_lara_info(gfCurrentLevel)->disable_hardcoded_breath_sound)
 							SoundEffect(SFX_LARA_BREATH, &l->pos, SFX_ALWAYS);
 					} else {
 						lara.water_status = LW_ABOVE_WATER;
-						l->anim_number = ANIM_FALLDOWN;
-						l->frame_number = anims[ANIM_FALLDOWN].frame_base;
+						l->anim_number = LARA_ANIM_FALLDOWN;
+						l->frame_number = anims[LARA_ANIM_FALLDOWN].frame_base;
 						l->current_anim_state = AS_FORWARDJUMP;
 						l->goal_anim_state = AS_FORWARDJUMP;
 						l->speed = l->fallspeed / 4;
@@ -593,16 +593,16 @@ void LaraControl(int16_t item_number) {
 				if (!room_water_state) {
 					if (hfw <= CLICK_SIZE) {
 						lara.water_status = LW_ABOVE_WATER;
-						l->anim_number = ANIM_FALLDOWN;
-						l->frame_number = anims[ANIM_FALLDOWN].frame_base;
+						l->anim_number = LARA_ANIM_FALLDOWN;
+						l->frame_number = anims[LARA_ANIM_FALLDOWN].frame_base;
 						l->goal_anim_state = AS_FORWARDJUMP;
 						l->current_anim_state = AS_FORWARDJUMP;
 						l->speed = l->fallspeed / 4;
 						l->gravity_status = 1;
 					} else {
 						lara.water_status = LW_WADE;
-						l->anim_number = ANIM_BREATH;
-						l->frame_number = anims[ANIM_BREATH].frame_base;
+						l->anim_number = LARA_ANIM_BREATH;
+						l->frame_number = anims[LARA_ANIM_BREATH].frame_base;
 						l->current_anim_state = AS_STOP;
 						l->goal_anim_state = AS_WADE;
 						AnimateItem(l);

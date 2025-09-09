@@ -97,7 +97,7 @@ void T4PlusSetValidLaraGunType() {
 
 // TODO: there may be some missing types still needing support
 
-int T4PlusGetInventoryCount(int16_t object_number) {
+int32_t T4PlusGetInventoryCount(int16_t object_number) {
 	if (object_number >= PUZZLE_ITEM1_COMBO1 && object_number <= PUZZLE_ITEM8_COMBO2)
 		return (lara.puzzleitemscombo >> (object_number - PUZZLE_ITEM1_COMBO1)) & 1;
 	else if (object_number >= PUZZLE_ITEM1 && object_number <= PUZZLE_ITEM12)
@@ -190,7 +190,7 @@ int T4PlusGetInventoryCount(int16_t object_number) {
 	return 0;
 }
 
-void T4PlusSetInventoryCount(int16_t object_number, int count, bool update_weapon_state) {
+void T4PlusSetInventoryCount(int16_t object_number, int32_t count, bool update_weapon_state) {
 	if (object_number >= PUZZLE_ITEM1_COMBO1 && object_number <= PUZZLE_ITEM8_COMBO2) {
 		if (count)
 			lara.puzzleitemscombo |= (1 << (object_number - PUZZLE_ITEM1_COMBO1));
@@ -303,8 +303,8 @@ void T4PlusSetInventoryCount(int16_t object_number, int count, bool update_weapo
 		T4PlusSetValidLaraGunType();
 }
 
-void T4ShowObjectPickup(int object_number, int16_t displayable_lifetime) {
-	for (int i = 0; i < MAX_PICKUP_DISPLAYABLE_COUNT; i++) {
+void T4ShowObjectPickup(int32_t object_number, int16_t displayable_lifetime) {
+	for (int32_t i = 0; i < MAX_PICKUP_DISPLAYABLE_COUNT; i++) {
 		DISPLAYPU *pu = &pickups[i];
 
 		if (pu->life < 0) {

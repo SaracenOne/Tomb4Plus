@@ -85,7 +85,7 @@ void ControlMapper(int16_t item_number) {
 		floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
 		h = GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 
-		for (int i = 0; i < 2; i++) {
+		for (int32_t i = 0; i < 2; i++) {
 			sptr = &spark[GetFreeSpark()];
 			sptr->On = 1;
 			sptr->sR = (GetRandomControl() & 0x7F) + 64;
@@ -277,7 +277,7 @@ void StatuePlinthCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_number];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status &&
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && !l->gravity_status &&
 	        lara.gun_status == LG_NO_ARMS && !item->trigger_flags && !item->item_flags[0]) {
 		if (!item->item_flags[1]) {
 			bounds = GetBoundsAccurate(item);
@@ -300,8 +300,8 @@ void StatuePlinthCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 		}
 
 		if (GLOBAL_inventoryitemchosen == PUZZLE_ITEM5) {
-			l->anim_number = ANIM_PLINTHHI;
-			l->frame_number = anims[ANIM_PLINTHHI].frame_base;
+			l->anim_number = LARA_ANIM_PLINTHHI;
+			l->frame_number = anims[LARA_ANIM_PLINTHHI].frame_base;
 			l->current_anim_state = AS_CONTROLLED;
 			lara.gun_status = LG_HANDS_BUSY;
 			GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -309,8 +309,8 @@ void StatuePlinthCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 		}
 	} else if (item->item_flags[1]) {
 		if (GLOBAL_inventoryitemchosen == PUZZLE_ITEM5) {
-			l->anim_number = ANIM_PLINTHHI;
-			l->frame_number = anims[ANIM_PLINTHHI].frame_base;
+			l->anim_number = LARA_ANIM_PLINTHHI;
+			l->frame_number = anims[LARA_ANIM_PLINTHHI].frame_base;
 			l->current_anim_state = AS_CONTROLLED;
 			lara.gun_status = LG_HANDS_BUSY;
 			GLOBAL_inventoryitemchosen = NO_ITEM;
@@ -318,7 +318,7 @@ void StatuePlinthCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 		}
 	}
 
-	if (l->anim_number == ANIM_PLINTHHI && l->frame_number == anims[ANIM_PLINTHHI].frame_base + 45) {
+	if (l->anim_number == LARA_ANIM_PLINTHHI && l->frame_number == anims[LARA_ANIM_PLINTHHI].frame_base + 45) {
 		room_number = item->room_number;
 		floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
 		GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
@@ -400,7 +400,7 @@ void ControlBurningRope(int16_t item_number) {
 		GetSpheres(item, Slist, 1);
 		sphere = &Slist[item->item_flags[0] >> 1];
 
-		for (int i = item->item_flags[0]; i < item->item_flags[1]; i++) {
+		for (int32_t i = item->item_flags[0]; i < item->item_flags[1]; i++) {
 			if (item->mesh_bits & (1 << (i >> 1))) {
 				if (i & 1 && GlobalCounter & 4) {
 					pos.x = (sphere->x + sphere[1].x) >> 1;
@@ -488,7 +488,7 @@ void BurningRopeCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	pos.z = CLICK_SIZE;
 	GetLaraJointPos(&pos, LMX_HAND_L);
 
-	for (int i = 0; i < nSpheres; i++) {
+	for (int32_t i = 0; i < nSpheres; i++) {
 		sphere = &Slist[i];
 		dx = abs(sphere->x - pos.x);
 		dy = abs(sphere->y - pos.y);
@@ -540,7 +540,7 @@ void AnimateWaterfalls() {
 	vOff &= 0x3F;
 	off = (float)vOff * float(1.0F / 256.0F);
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		obj = &objects[WATERFALL1 + i];
 
 		if (obj->loaded) {
@@ -604,15 +604,15 @@ void PoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_num];
 
-	if (input & IN_ACTION && lara.gun_status == LG_NO_ARMS && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH ||
+	if (input & IN_ACTION && lara.gun_status == LG_NO_ARMS && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH ||
 	        lara.IsMoving && lara.GeneralPtr == item_num) {
 		roty = item->pos.y_rot;
 		item->pos.y_rot = l->pos.y_rot;
 
 		if (TestLaraPosition(PoleBounds, item, l)) {
 			if (MoveLaraPosition(&PolePos, item, l)) {
-				l->anim_number = ANIM_STAT2POLE;
-				l->frame_number = anims[ANIM_STAT2POLE].frame_base;
+				l->anim_number = LARA_ANIM_STAT2POLE;
+				l->frame_number = anims[LARA_ANIM_STAT2POLE].frame_base;
 				l->current_anim_state = AS_POLESTAT;
 				lara.IsMoving = 0;
 				lara.gun_status = LG_HANDS_BUSY;
@@ -634,12 +634,12 @@ void PoleCollision(int16_t item_num, ITEM_INFO* l, COLL_INFO* coll) {
 
 			if (l->current_anim_state == AS_REACH) {
 				PolePosR.y = l->pos.y_pos - item->pos.y_pos + 10;
-				l->anim_number = ANIM_REACH2POLE;
-				l->frame_number = anims[ANIM_REACH2POLE].frame_base;
+				l->anim_number = LARA_ANIM_REACH2POLE;
+				l->frame_number = anims[LARA_ANIM_REACH2POLE].frame_base;
 			} else {
 				PolePosR.y = l->pos.y_pos - item->pos.y_pos + 66;
-				l->anim_number = ANIM_JUMP2POLE;
-				l->frame_number = anims[ANIM_JUMP2POLE].frame_base;
+				l->anim_number = LARA_ANIM_JUMP2POLE;
+				l->frame_number = anims[LARA_ANIM_JUMP2POLE].frame_base;
 			}
 
 			AlignLaraPosition(&PolePosR, item, l);
@@ -713,11 +713,12 @@ void SmashObject(int16_t item_number) {
 
 	item = &items[item_number];
 	r = &room[item->room_number];
-	sector = ((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10);
+	sector = ((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT);
 	box = &boxes[r->floor[sector].box];
 
-	if (box->overlap_index & 0x8000)
-		box->overlap_index &= ~0x4000;
+	if (box->overlap_index & BLOCKABLE) {
+		box->overlap_index &= ~BLOCKED;
+	}
 
 	SoundEffect(SFX_EXPLOSION1, &item->pos, SFX_DEFAULT);
 	SoundEffect(SFX_EXPLOSION2, &item->pos, SFX_DEFAULT);
@@ -726,8 +727,9 @@ void SmashObject(int16_t item_number) {
 	ExplodingDeath2(item_number, -1, 0x100);
 	item->flags |= IFL_INVISIBLE;
 
-	if (item->status == ITEM_ACTIVE)
+	if (item->status == ITEM_ACTIVE) {
 		RemoveActiveItem(item_number);
+	}
 
 	item->status = ITEM_DEACTIVATED;
 }

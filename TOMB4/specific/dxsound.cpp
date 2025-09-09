@@ -31,7 +31,7 @@ char* samples_buffer;
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
 ma_engine ma_samples_engine;
 static ma_sound ma_voices[MAX_VOICES];
-static int ma_voice_active[MAX_VOICES];
+static int32_t ma_voice_active[MAX_VOICES];
 static ma_audio_buffer ma_voice_buffers[MAX_VOICES];
 static ma_audio_buffer *ma_sample_buffers[MAX_SAMPLE_BUFFERS];
 #else
@@ -39,7 +39,7 @@ static LPDIRECTSOUNDBUFFER DSPrimary;
 static IXAudio2MasteringVoice* XAMaster;
 static IUnknown* XAEffect;
 static IXAudio2SourceVoice* XA_Voices[MAX_VOICES];
-static int XA_Voice_Active[MAX_VOICES];
+static int32_t XA_Voice_Active[MAX_VOICES];
 static float current_voice_samples_per_second = 0.0F;
 static XAUDIO2_BUFFER XA_Buffers[MAX_SAMPLE_BUFFERS];
 static float XA_SPS[MAX_SAMPLE_BUFFERS];
@@ -222,13 +222,13 @@ bool DXDSCreate() {
 		return false;
 	}
 
-	for (int i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
+	for (int32_t i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
 		if (ma_sample_buffers[i]) {
 			ma_sample_buffers[i] = nullptr;
 		}
 	}
 
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		ma_voice_active[i] = -1;
 	}
 
@@ -257,13 +257,13 @@ bool DXDSCreate() {
 	chain.pEffectDescriptors = &chaind;
 	DXAttempt(App.dx.lpXA->CreateMasteringVoice(&XAMaster, 2, 44100, 0, 0, &chain, AudioCategory_GameEffects));
 
-	for (int i = 0; i < MAX_VOICES; i++)
+	for (int32_t i = 0; i < MAX_VOICES; i++)
 		DXAttempt(App.dx.lpXA->CreateSourceVoice(&XA_Voices[i], &pcm_format, 0, XAUDIO2_MAX_FREQ_RATIO, 0, 0, 0));
 
-	for (int i = 0; i < 4; i++)
+	for (int32_t i = 0; i < 4; i++)
 		ReverbConvertI3DL2ToNative(&reverb_preset[i], &reverb_type[i], FALSE);
 
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		XA_Voice_Active[i] = -1;
 	}
 
@@ -320,7 +320,7 @@ bool FreeSampleDecompress() {
 	return 1;
 }
 
-bool DXCreateSample(char* data, int32_t size, int samples_per_second, int32_t num) {
+bool DXCreateSample(char* data, int32_t size, int32_t samples_per_second, int32_t num) {
 	Log(8, "DXCreateSample - %u", num);
 
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
@@ -460,7 +460,7 @@ bool DSIsChannelPlaying(int32_t channel) {
 }
 
 int32_t DSGetFreeChannel() {
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (!DSIsChannelPlaying(i))
 			return i;
 	}
@@ -470,13 +470,13 @@ int32_t DSGetFreeChannel() {
 
 bool DSIsSamplePlaying(int32_t sample_id) {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (ma_voice_active[sample_id] == sample_id) {
 			return true;
 		}
 	}
 #elif _WIN32
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (DSIsChannelPlaying(i)) {
 			if (XA_Voice_Active[i] == sample_id) {
 				return true;
@@ -597,7 +597,7 @@ int32_t CalcVolume(int32_t volume) {
 }
 
 void S_SoundStopAllSamples() {
-	for (int i = 0; i < MAX_VOICES; i++)
+	for (int32_t i = 0; i < MAX_VOICES; i++)
 		DXStopSample(i);
 }
 
@@ -621,14 +621,14 @@ void DXFreeSounds() {
 	S_SoundStopAllSamples();
 
 #ifdef MA_AUDIO_SAMPLES
-	for (int i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
+	for (int32_t i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
 		if (ma_sample_buffers[i]) {
 			ma_audio_buffer_uninit_and_free(ma_sample_buffers[i]);
 			ma_sample_buffers[i] = nullptr;
 		}
 	}
 #elif _WIN32
-	for (int i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
+	for (int32_t i = 0; i < MAX_SAMPLE_BUFFERS; i++) {
 		if (XA_Buffers[i].pAudioData) {
 			SYSTEM_FREE((void*)XA_Buffers[i].pAudioData);
 			XA_Buffers[i].pAudioData = 0;
@@ -686,7 +686,7 @@ void S_SetReverbType(int32_t reverb) {
 
 void S_SoundPauseSamples() {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (ma_voice_active[i] >= 0) {
 			ma_sound_stop(&ma_voices[i]);
 		}
@@ -696,7 +696,7 @@ void S_SoundPauseSamples() {
 
 void S_SoundUnpauseSamples() {
 #if defined(MA_AUDIO_SAMPLES) && defined(MA_AUDIO_ENGINE)
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (ma_voice_active[i] >= 0) {
 			ma_sound_start(&ma_voices[i]);
 		}
@@ -712,7 +712,7 @@ void DXDSClose() {
 	if (App.SoundDisabled)
 		return;
 
-	for (int i = 0; i < MAX_VOICES; i++) {
+	for (int32_t i = 0; i < MAX_VOICES; i++) {
 		if (XA_Voices[i]) {
 			XA_Voices[i]->DestroyVoice();
 			XA_Voices[i] = 0;

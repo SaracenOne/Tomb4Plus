@@ -67,7 +67,7 @@ void BatControl(int16_t item_number) {
 		else {
 			max_dist = 0x7FFFFFFF;
 
-			for (int i = 0; i < MAXIMUM_BADDIES; i++) {
+			for (int32_t i = 0; i < MAXIMUM_BADDIES; i++) {
 				baddie = &baddie_slots[i];
 
 				if (baddie->item_num != NO_ITEM && baddie->item_num != item_number) {

@@ -15,7 +15,7 @@ void CreateFXBulbs();
 void ClearFXFogBulbs();
 void TriggerFXFogBulb(int32_t x, int32_t y, int32_t z, int32_t FXRad, int32_t density, int32_t r, int32_t g, int32_t b, int32_t room_number);
 bool IsVolumetric();
-int DistCompare(const void* a, const void* b);
+int32_t DistCompare(const void* a, const void* b);
 void InitialiseFogBulbs();
 void OmniEffect(GFXTLVERTEX* v);
 void OmniFog(GFXTLVERTEX* v, bool multi_colour_fog);

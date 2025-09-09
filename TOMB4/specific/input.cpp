@@ -19,7 +19,7 @@
 
 #include "function_stubs.h"
 
-int convert_sdl_scancode_to_tomb_keycode(int scancode) {
+int32_t convert_sdl_scancode_to_tomb_keycode(int32_t scancode) {
 	switch (scancode) {
 		case SDL_SCANCODE_UNKNOWN:
 			return 0x00; //
@@ -217,7 +217,7 @@ int convert_sdl_scancode_to_tomb_keycode(int scancode) {
 	}
 };
 
-int convert_tomb_keycode_to_sdl_scancode(int tomb_keycode) {
+int32_t convert_tomb_keycode_to_sdl_scancode(int32_t tomb_keycode) {
 	switch (tomb_keycode) {
 		case T4P_KEY_A:
 			return SDL_SCANCODE_A;
@@ -449,8 +449,8 @@ void UpdateGamepad() {
 	}
 
 	if (!controller) {
-		int controller_count = SDL_NumJoysticks();
-		for (int i = 0; i < controller_count; i++) {
+		int32_t controller_count = SDL_NumJoysticks();
+		for (int32_t i = 0; i < controller_count; i++) {
 			controller_name = SDL_GameControllerNameForIndex(i);
 			controller_type = SDL_GameControllerTypeForIndex(i);
 			if (SDL_IsGameController(i)) {
@@ -554,8 +554,8 @@ int32_t inputBusy;
 int16_t ammo_change_timer = 0;
 char ammo_change_buf[12];
 
-bool IsKeyPressed(int t4p_key) {
-	int sdl_scancode = convert_tomb_keycode_to_sdl_scancode(t4p_key);
+bool IsKeyPressed(int32_t t4p_key) {
+	int32_t sdl_scancode = convert_tomb_keycode_to_sdl_scancode(t4p_key);
 	if (sdl_scancode < keymap_count) {
 		return keymap[sdl_scancode];
 	}
@@ -710,7 +710,7 @@ enum GamepadBindingType {
 
 struct GamepadButtonBinding {
 	GamepadBindingType binding_type;
-	int value;
+	int32_t value;
 };
 
 #define MAX_GAMEPAD_BINDINGS_PER_GROUP 2
@@ -756,7 +756,7 @@ bool IsGamepadActionPressed(InputAction current_action) {
 
 	GamepadButtonGroup* binding_group = &default_controller_binding[current_action];
 
-	for (int i = 0; i < MAX_GAMEPAD_BINDINGS_PER_GROUP; i++) {
+	for (int32_t i = 0; i < MAX_GAMEPAD_BINDINGS_PER_GROUP; i++) {
 		GamepadButtonBinding* binding = &binding_group->bindings[i];
 
 		if (binding->binding_type == TYPE_BUTTON) {

@@ -22,7 +22,7 @@ std::string savegame_dir_path;
 std::string screenshots_dir_path;
 
 size_t count_matching_characters(const char* s1, const char* s2) {
-	int count = 0;
+	int32_t count = 0;
 	while (*s1 && *s2) {
 		// If the first byte is 110xxxxx or 1110xxxx or 11110xxx, it's a multi-byte character
 		size_t len = (*s1 & 0xE0) == 0xC0 ? 2 : (*s1 & 0xF0) == 0xE0 ? 3 : (*s1 & 0xF8) == 0xF0 ? 4 : 1;
@@ -38,9 +38,9 @@ size_t count_matching_characters(const char* s1, const char* s2) {
 	return count;
 }
 
-int platform_strcicmp(const char* a, const char* b) {
+int32_t platform_strcicmp(const char* a, const char* b) {
 	for (;; a++, b++) {
-		int d = tolower((uint8_t)*a) - tolower((uint8_t)*b);
+		int32_t d = tolower((uint8_t)*a) - tolower((uint8_t)*b);
 		if (d != 0 || !*a)
 			return d;
 	}
@@ -48,7 +48,7 @@ int platform_strcicmp(const char* a, const char* b) {
 
 FILE *platform_fopen(const char *filename, const char *mode) {
 #if defined(_WIN32) && defined(UNICODE)
-	int len = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	int32_t len = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
 	wchar_t* wpath = (wchar_t*)SYSTEM_MALLOC(len * sizeof(wchar_t));
 	MultiByteToWideChar(CP_UTF8, 0, filename, -1, wpath, len);
 
@@ -137,7 +137,7 @@ void platform_find_file_with_substring(const char* dir_path, const char* substri
 		size_t str_len = strlen(substring);
 
 		if (cmp_count >= str_len) {
-			int filename_length = strlen(dp->d_name);
+			int32_t filename_length = strlen(dp->d_name);
 
 			if (filename_length < 256) {
 				strcpy(found_filename, dp->d_name);
@@ -154,7 +154,7 @@ void platform_find_file_with_substring(const char* dir_path, const char* substri
 #endif
 }
 
-int platform_string_ends_with(const char* str, const char* suffix) {
+int32_t platform_string_ends_with(const char* str, const char* suffix) {
 	if (!str || !suffix)
 		return 0;
 	size_t len_str = strlen(str);
@@ -214,8 +214,8 @@ bool platform_create_directory(const char* path) {
 			*p = 0;
 			DWORD attr = GetFileAttributes(tmp);
 			if (attr == INVALID_FILE_ATTRIBUTES) {
-				int res = _wmkdir(tmp);
-				int er = errno;
+				int32_t res = _wmkdir(tmp);
+				int32_t er = errno;
 
 				if (res != 0 && er != EEXIST) {
 					return false;
@@ -223,8 +223,8 @@ bool platform_create_directory(const char* path) {
 			}
 
 			if (!(attr & FILE_ATTRIBUTE_DIRECTORY)) {
-				int res = _wmkdir(tmp);
-				int er = errno;
+				int32_t res = _wmkdir(tmp);
+				int32_t er = errno;
 
 				if (res != 0 && er != EEXIST) {
 					return false;
@@ -252,8 +252,8 @@ bool platform_create_directory(const char* path) {
 #ifdef _WIN32
 			DWORD attr = GetFileAttributesA(tmp);
 			if (attr == INVALID_FILE_ATTRIBUTES) {
-				int res = _mkdir(tmp);
-				int er = errno;
+				int32_t res = _mkdir(tmp);
+				int32_t er = errno;
 
 				if (res != 0 && er != EEXIST) {
 					return false;
@@ -261,8 +261,8 @@ bool platform_create_directory(const char* path) {
 			}
 
 			if (!(attr & FILE_ATTRIBUTE_DIRECTORY)) {
-				int res = _mkdir(tmp);
-				int er = errno;
+				int32_t res = _mkdir(tmp);
+				int32_t er = errno;
 
 				if (res != 0 && er != EEXIST) {
 					return false;

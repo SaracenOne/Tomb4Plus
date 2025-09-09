@@ -143,7 +143,7 @@ void CreateFXBulbs() {
 
 	NumFXFogBulbs = 0;
 
-	for (int i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++) {
+	for (int32_t i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++) {
 		FogBulb = &FXFogBulbs[i];
 
 		if (FogBulb->active) {
@@ -155,7 +155,7 @@ void CreateFXBulbs() {
 }
 
 void ClearFXFogBulbs() {
-	for (int i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++)
+	for (int32_t i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++)
 		FXFogBulbs[i].active = 0;
 
 	NumFXFogBulbs = 0;
@@ -204,7 +204,7 @@ bool IsVolumetric() {
 	}
 }
 
-int DistCompare(const void* a, const void* b) {
+int32_t DistCompare(const void* a, const void* b) {
 	FOGBULB_STRUCT* bulbA;
 	FOGBULB_STRUCT* bulbB;
 	FVECTOR dA;
@@ -237,7 +237,7 @@ void InitialiseFogBulbs() {
 	NumFogBulbsInRange = 0;
 	qsort(&FogBulbs, NumLevelFogBulbs, sizeof(FOGBULB_STRUCT), DistCompare);
 
-	for (int i = 0; i < NumLevelFogBulbs; i++) {
+	for (int32_t i = 0; i < NumLevelFogBulbs; i++) {
 		FogBulb = &FogBulbs[i];
 		CreateFogPos(FogBulb);
 
@@ -259,7 +259,7 @@ void OmniEffect(GFXTLVERTEX* v) {
 	float val, val2;
 	int32_t r, g, b, lVal;
 
-	for (int i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++) {
+	for (int32_t i = 0; i < MAXIMUM_ACTIVE_FXBULBS; i++) {
 		FogBulb = &FXFogBulbs[i];
 
 		if (FogBulb->active && FogBulb->inRange) {
@@ -344,7 +344,7 @@ void OmniFog(GFXTLVERTEX* v, bool multi_colour_fog) {
 	OmniEffect(v);
 
 	if (NumFogBulbsInRange && NumActiveFogBulbs) {
-		for (int i = 0; i < NumActiveFogBulbs; i++) {
+		for (int32_t i = 0; i < NumActiveFogBulbs; i++) {
 			FogBulb = ActiveFogBulbs[i];
 
 			if (FogBulb->inRange) {
@@ -593,7 +593,7 @@ void AddTriClippedSorted(GFXTLVERTEX* v, int16_t v0, int16_t v1, int16_t v2, TEX
 		} else {
 			p = XYUVClipperBuffer;
 
-			for (int i = 0; i < 3; i++, p++) {
+			for (int32_t i = 0; i < 3; i++, p++) {
 				p->tu *= p->rhw;
 				p->tv *= p->rhw;
 			}
@@ -907,7 +907,7 @@ void SortPolyList(int32_t count, SORTLIST** list) {
 	if (!count)
 		return;
 
-	for (int i = 0; i < count; i++)
+	for (int32_t i = 0; i < count; i++)
 		list[i]->zVal -= (float)i * 0.1F;
 
 	DoSort(0, count - 1, list);
@@ -930,7 +930,7 @@ void AddClippedPoly(GFXTLBUMPVERTEX* dest, int32_t nPoints, GFXTLBUMPVERTEX* v, 
 
 	p = dest;
 
-	for (int i = 0; i < 3; i++, v++, p++) {
+	for (int32_t i = 0; i < 3; i++, v++, p++) {
 		p->sx = v->sx;
 		p->sy = v->sy;
 		p->sz = f_a - f_boo * v->rhw;
@@ -946,7 +946,7 @@ void AddClippedPoly(GFXTLBUMPVERTEX* dest, int32_t nPoints, GFXTLBUMPVERTEX* v, 
 	nClippedPolys++;
 	v--;
 
-	for (int i = nPoints; i > 0; i--) {
+	for (int32_t i = nPoints; i > 0; i--) {
 		v++;
 		p->sx = dest->sx;
 		p->sy = dest->sy;
@@ -1130,7 +1130,7 @@ void AddTriClippedZBuffer(GFXTLVERTEX* v, int16_t v0, int16_t v1, int16_t v2, TE
 		} else {
 			p = XYUVClipperBuffer;
 
-			for (int i = 0; i < 3; i++, p++) {
+			for (int32_t i = 0; i < 3; i++, p++) {
 				p->tu *= p->rhw;
 				p->tv *= p->rhw;
 			}

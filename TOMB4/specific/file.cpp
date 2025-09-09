@@ -84,7 +84,7 @@ void RGB_Swizzle(uint8_t* r, uint8_t* g, uint8_t* b) {
 	*b = r2;
 }
 
-int LoadLevel(void* name) {
+int32_t LoadLevel(void* name) {
 	OBJECT_INFO* obj;
 	TEXTURESTRUCT* tex;
 	char* pData;
@@ -230,7 +230,7 @@ int LoadLevel(void* name) {
 		SYSTEM_FREE(UncompressedData);
 		S_LoadBar();
 
-		for (int i = 0; i < 3; i++) {
+		for (int32_t i = 0; i < 3; i++) {
 			obj = &objects[WATERFALL1 + i];
 
 			if (obj->loaded) {
@@ -264,7 +264,7 @@ int LoadLevel(void* name) {
 	SDL_DetachThread(MainThread.handle);
 #endif
 
-	return 1;
+	return true;
 }
 
 int32_t S_LoadLevelFile(int32_t num) {
@@ -274,7 +274,7 @@ int32_t S_LoadLevelFile(int32_t num) {
 	strcpy(name, &gfFilenameWad[gfFilenameOffset[num]]);
 	strcat(name, ".TR4");
 
-	for (int i = 0; i < strlen(name); i++) {
+	for (int32_t i = 0; i < strlen(name); i++) {
 		if (name[i] == '\\') {
 			name[i] = '/';
 		} else {
@@ -296,7 +296,7 @@ int32_t S_LoadLevelFile(int32_t num) {
 		platform_fatal_error("Level %s could not be loaded.", name);
 	}
 
-	return 1;
+	return true;
 }
 
 void FreeLevel() {
@@ -306,7 +306,7 @@ void FreeLevel() {
 
 	Log(2, "FreeLevel");
 
-	for (int i = 0; i < num_level_meshes; i++) {
+	for (int32_t i = 0; i < num_level_meshes; i++) {
 		vbuf = &mesh_vtxbuf[i];
 		mesh = *vbuf;
 
@@ -318,7 +318,7 @@ void FreeLevel() {
 	}
 
 	if (room) {
-		for (int i = 0; i < number_rooms; i++) {
+		for (int32_t i = 0; i < number_rooms; i++) {
 			r = &room[i];
 
 			if (r->Buffer) {
@@ -344,7 +344,7 @@ void FreeLevel() {
 }
 
 void to_lowercase(char *str) {
-	for (int i = 0; str[i]; i++) {
+	for (int32_t i = 0; str[i]; i++) {
 		str[i] = tolower((uint8_t)str[i]);
 	}
 }
@@ -480,7 +480,7 @@ size_t T4PLoadFileAtRelativePath(const char* name, char** dest) {
 	file = T4PFileOpen(name);
 
 	if (!file)
-		return 0;
+		return false;
 
 	size = FileSize(file);
 	if (!*dest)
@@ -493,7 +493,7 @@ size_t T4PLoadFileAtRelativePath(const char* name, char** dest) {
 		Log(1, "Error Reading File");
 		FileClose(file);
 		SYSTEM_FREE(*dest);
-		return 0;
+		return false;
 	}
 
 	FileClose(file);
@@ -569,7 +569,7 @@ bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages) {
 	FileData += size;
 	S_LoadBar();
 
-	for (int i = 0; i < RTPages; i++) {
+	for (int32_t i = 0; i < RTPages; i++) {
 		Textures = (TEXTURE*)AddStruct(Textures, nTextures, sizeof(TEXTURE));
 		nTex = nTextures;
 		nTextures++;
@@ -589,7 +589,7 @@ bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages) {
 	FileData += size;
 	S_LoadBar();
 
-	for (int i = 0; i < OTPages; i++) {
+	for (int32_t i = 0; i < OTPages; i++) {
 		Textures = (TEXTURE*)AddStruct(Textures, nTextures, sizeof(TEXTURE));
 		nTex = nTextures;
 		nTextures++;
@@ -611,7 +611,7 @@ bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages) {
 		memcpy(TextureData, FileData, size);
 		FileData += size;
 
-		for (int i = 0; i < BTPages; i++) {
+		for (int32_t i = 0; i < BTPages; i++) {
 			if (i < (BTPages >> 1))
 				tSurf = CreateTexturePage(App.TextureSize, App.TextureSize, 0, (int32_t*)(TextureData + (i * skip * 0x10000)), 0, format);
 			else {
@@ -687,12 +687,12 @@ bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages) {
 		Decompress(pComp, CompressedData + 4, uint32_t((size - 4) & 0xffffffff), *(int32_t*)CompressedData);
 		SYSTEM_FREE(CompressedData);
 
-		for (int i = 0; i < 2; i++) {
+		for (int32_t i = 0; i < 2; i++) {
 			s = pComp + (i * 768);
 			d = (int32_t*)TextureData;
 
-			for (int y = 0; y < 256; y++) {
-				for (int x = 0; x < 256; x++) {
+			for (int32_t y = 0; y < 256; y++) {
+				for (int32_t x = 0; x < 256; x++) {
 					b = *(s + (x * 3) + (y * 0x600));
 					g = *(s + (x * 3) + (y * 0x600) + 1);
 					r = *(s + (x * 3) + (y * 0x600) + 2);
@@ -751,7 +751,7 @@ bool LoadTextures(int32_t RTPages, int32_t OTPages, int32_t BTPages) {
 
 	SYSTEM_FREE(TextureData);
 	SYSTEM_FREE(pData);
-	return 1;
+	return true;
 }
 
 bool LoadRooms() {
@@ -774,10 +774,11 @@ bool LoadRooms() {
 	room = (ROOM_INFO*)game_malloc(number_rooms * sizeof(ROOM_INFO));
 	increment_virtual_game_malloc_offset(number_rooms * 148);
 
-	if (!room)
+	if (!room) {
 		return false;
+	}
 
-	for (int i = 0; i < number_rooms; i++) {
+	for (int32_t i = 0; i < number_rooms; i++) {
 		r = &room[i];
 
 		r->x = *(int32_t*)FileData;
@@ -812,8 +813,9 @@ bool LoadRooms() {
 			r->door[0] = (int16_t)nDoors;
 			memcpy(r->door + 1, FileData, 16 * nDoors * sizeof(int16_t));
 			FileData += 16 * nDoors * sizeof(int16_t);
-		} else
+		} else {
 			r->door = 0;
+		}
 
 		r->x_size = *(int16_t*)FileData;
 		FileData += sizeof(int16_t);
@@ -841,8 +843,9 @@ bool LoadRooms() {
 
 			memcpy(r->light, FileData, size);
 			FileData += size;
-		} else
+		} else {
 			r->light = 0;
+		}
 
 		r->num_meshes = *(int16_t*)FileData;
 		FileData += sizeof(int16_t);
@@ -855,14 +858,17 @@ bool LoadRooms() {
 			FileData += size;
 
 			if (ng_level_info[gfCurrentLevel].is_ngle_level) {
-				for (int j = 0; j < r->num_meshes; j++)
+				for (int32_t j = 0; j < r->num_meshes; j++) {
 					r->mesh[j].Flags |= 1;
+				}
 			} else {
-				for (int j = 0; j < r->num_meshes; j++)
+				for (int32_t j = 0; j < r->num_meshes; j++) {
 					r->mesh[j].Flags = 1;
+				}
 			}
-		} else
+		} else {
 			r->mesh = 0;
+		}
 
 		r->flipped_room = *(int16_t*)FileData;
 		FileData += sizeof(int16_t);
@@ -897,7 +903,7 @@ bool LoadRooms() {
 	memcpy(floor_data, FileData, 2 * size);
 	FileData += sizeof(int16_t) * size;
 	Log(0, "Floor Data Size %d @ %x", size, floor_data);
-	return 1;
+	return true;
 }
 
 bool LoadObjects() {
@@ -935,8 +941,8 @@ bool LoadObjects() {
 
 #if INTPTR_MAX == INT64_MAX
 	{
-		int read_amount = 0;
-		for (int i = 0; i < size; i++) {
+		int32_t read_amount = 0;
+		for (int32_t i = 0; i < size; i++) {
 			meshes[i] = (int16_t *)(*(uint32_t*)FileData);
 			FileData += sizeof(uint32_t);
 
@@ -945,16 +951,17 @@ bool LoadObjects() {
 	}
 #elif INTPTR_MAX == INT32_MAX
 	{
-		int read_amount = size * sizeof(int16_t*);
+		int32_t read_amount = size * sizeof(int16_t*);
 		memcpy(meshes, FileData, read_amount);
 		FileData += read_amount;
 	}
 #else
-#error Unknown pointer size or missing size macros!
+	#error Unknown pointer size or missing size macros!
 #endif
 
-	for (int i=0; i<size; i++)
+	for (int32_t i = 0; i < size; i++) {
 		meshes[i] = mesh_base + (size_t)meshes[i] / 2;
+	}
 
 	num_meshes = size;
 
@@ -965,7 +972,7 @@ bool LoadObjects() {
 #if INTPTR_MAX == INT64_MAX
 	size_t remaining_struct_size = sizeof(ANIM_STRUCT) - sizeof(size_t);
 
-	for (int i = 0; i < num_anims; i++) {
+	for (int32_t i = 0; i < num_anims; i++) {
 		anims[i].frame_ptr = (int16_t *)size_t(*(uint32_t*)FileData);
 		FileData += sizeof(uint32_t);
 
@@ -978,7 +985,7 @@ bool LoadObjects() {
 	memcpy(anims, FileData, sizeof(ANIM_STRUCT) * num_anims);
 	FileData += sizeof(ANIM_STRUCT) * num_anims;
 #else
-#error Unknown pointer size or missing size macros!
+	#error Unknown pointer size or missing size macros!
 #endif
 
 	size = *(int32_t*)FileData;
@@ -1021,13 +1028,14 @@ bool LoadObjects() {
 	memcpy(frames, FileData, sizeof(int16_t) * size);
 	FileData += sizeof(int16_t) * size;
 
-	for (int i = 0; i < num_anims; i++)
+	for (int32_t i = 0; i < num_anims; i++) {
 		anims[i].frame_ptr = (int16_t*)((size_t)anims[i].frame_ptr + (size_t)frames);
+	}
 
 	num = *(int32_t*)FileData;
 	FileData += sizeof(int32_t);
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		slot = *(int32_t*)FileData;
 		FileData += sizeof(int32_t);
 		obj = &objects[slot];
@@ -1052,7 +1060,7 @@ bool LoadObjects() {
 
 	CreateSkinningData();
 
-	for (int i = 0; i < NUMBER_OBJECTS; i++) {
+	for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 		obj = &objects[i];
 		obj->mesh_index *= 2;
 	}
@@ -1061,7 +1069,7 @@ bool LoadObjects() {
 	mesh_size = &meshes[num_meshes];
 	memcpy(mesh_size, mesh, num_meshes * sizeof(int16_t *));
 
-	for (int i = 0; i < num_meshes; i++) {
+	for (int32_t i = 0; i < num_meshes; i++) {
 		*mesh++ = *mesh_size;
 		*mesh++ = *mesh_size;
 		mesh_size++;
@@ -1072,7 +1080,7 @@ bool LoadObjects() {
 	num = *(int32_t*)FileData;	//statics
 	FileData += sizeof(int32_t);
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		slot = *(int32_t*)FileData;
 		FileData += sizeof(int32_t);
 		stat = &static_objects[slot];
@@ -1090,13 +1098,13 @@ bool LoadObjects() {
 		FileData += sizeof(int16_t);
 	}
 
-	for (int i = 0; i < NUMBER_STATIC_OBJECTS; i++) {
+	for (int32_t i = 0; i < NUMBER_STATIC_OBJECTS; i++) {
 		stat = &static_objects[i];
 		stat->mesh_number *= 2;
 	}
 
 	ProcessMeshData(num_meshes * 2);
-	return 1;
+	return true;
 }
 
 bool LoadSprites() {
@@ -1113,7 +1121,7 @@ bool LoadSprites() {
 	spriteinfo = (SPRITESTRUCT*)game_malloc(sizeof(SPRITESTRUCT) * num_sprites);
 	increment_virtual_game_malloc_offset(24 * num_sprites);
 
-	for (int i = 0; i < num_sprites; i++) {
+	for (int32_t i = 0; i < num_sprites; i++) {
 		sptr = &spriteinfo[i];
 		memcpy(&sprite, FileData, sizeof(PHDSPRITESTRUCT));
 		FileData += sizeof(PHDSPRITESTRUCT);
@@ -1135,10 +1143,11 @@ bool LoadSprites() {
 	num_slots = *(int32_t*)FileData;
 	FileData += sizeof(int32_t);
 
-	if (num_slots <= 0)
-		return 1;
+	if (num_slots <= 0) {
+		return true;
+	}
 
-	for (int i = 0; i < num_slots; i++) {
+	for (int32_t i = 0; i < num_slots; i++) {
 		slot = *(int32_t*)FileData;
 		FileData += sizeof(int32_t);
 
@@ -1159,7 +1168,7 @@ bool LoadSprites() {
 		}
 	}
 
-	return 1;
+	return true;
 }
 
 bool LoadCameras() {
@@ -1183,7 +1192,7 @@ bool LoadCameras() {
 		FileData += number_spotcams * sizeof(SPOTCAM);
 	}
 
-	return 1;
+	return true;
 }
 
 bool LoadSoundEffects() {
@@ -1199,7 +1208,7 @@ bool LoadSoundEffects() {
 		FileData += number_sound_effects * sizeof(OBJECT_VECTOR);
 	}
 
-	return 1;
+	return true;
 }
 
 bool LoadBoxes() {
@@ -1224,8 +1233,8 @@ bool LoadBoxes() {
 	memcpy(overlap, FileData, sizeof(uint16_t) * size);
 	FileData += sizeof(uint16_t) * size;
 
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int32_t i = 0; i < 2; i++) {
+		for (int32_t j = 0; j < 4; j++) {
 			ground_zone[j][i] = (int16_t*)game_malloc(sizeof(int16_t) * num_boxes);
 			increment_virtual_game_malloc_offset(sizeof(int16_t) * num_boxes);
 
@@ -1240,16 +1249,17 @@ bool LoadBoxes() {
 		FileData += sizeof(int16_t) * num_boxes;
 	}
 
-	for (int i = 0; i < num_boxes; i++) {
+	for (int32_t i = 0; i < num_boxes; i++) {
 		box = &boxes[i];
 
-		if (box->overlap_index & 0x8000)
-			box->overlap_index |= 0x4000;
-		else if (gfLevelFlags & GF_TRAIN && box->height > -256)
-			box->overlap_index |= 0xC000;
+		if (box->overlap_index & BLOCKABLE) {
+			box->overlap_index |= BLOCKED;
+		} else if (gfLevelFlags & GF_TRAIN && box->height > -CLICK_SIZE) {
+			box->overlap_index |= (BLOCKED|BLOCKABLE);
+		}
 	}
 
-	return 1;
+	return true;
 }
 
 bool LoadAnimatedTextures() {
@@ -1264,7 +1274,7 @@ bool LoadAnimatedTextures() {
 	FileData += num_anim_ranges * sizeof(int16_t);
 	nAnimUVRanges = *(int8_t*)FileData;
 	FileData += sizeof(int8_t);
-	return 1;
+	return true;
 }
 
 bool LoadTextureInfos() {
@@ -1281,7 +1291,7 @@ bool LoadTextureInfos() {
 	textinfo = (TEXTURESTRUCT*)game_malloc(val * sizeof(TEXTURESTRUCT));
 	increment_virtual_game_malloc_offset(val * 38);
 
-	for (int i = 0; i < val; i++) {
+	for (int32_t i = 0; i < val; i++) {
 		t = &textinfo[i];
 		memcpy(&tex, FileData, sizeof(PHDTEXTURESTRUCT));
 		FileData += sizeof(PHDTEXTURESTRUCT);
@@ -1300,7 +1310,7 @@ bool LoadTextureInfos() {
 
 	AdjustUV(val);
 	Log(5, "Created %d Texture Pages", nTextures - 1);
-	return 1;
+	return true;
 }
 
 bool LoadItems() {
@@ -1314,8 +1324,9 @@ bool LoadItems() {
 	num_items = *(int32_t*)FileData;
 	FileData += 4;
 
-	if (!num_items)
-		return 1;
+	if (!num_items) {
+		return true;
+	}
 
 	// TRLE: increased item limit
 	vanilla_item_malloc_offset = get_virtual_game_malloc_offset();
@@ -1325,7 +1336,7 @@ bool LoadItems() {
 	level_items = num_items;
 	InitialiseItemArray(ITEM_COUNT); // TRLE
 
-	for (int i = 0; i < num_items; i++) {
+	for (int32_t i = 0; i < num_items; i++) {
 		item = &items[i];
 
 		item->object_number = *(int16_t*)FileData;
@@ -1356,19 +1367,20 @@ bool LoadItems() {
 		FileData += sizeof(int16_t);
 	}
 
-	for (int i = 0; i < num_items; i++)
+	for (int32_t i = 0; i < num_items; i++) {
 		InitialiseItem(i);
+	}
 
-	for (int i = 0; i < number_rooms; i++) {
-		r = &room[i];
+	for (int32_t room_idx = 0; room_idx < number_rooms; room_idx++) {
+		r = &room[room_idx];
 
-		for (int j = 0; j < r->num_meshes; j++) {
+		for (int32_t j = 0; j < r->num_meshes; j++) {
 			x = (r->mesh[j].x - r->x) >> 10;
 			z = (r->mesh[j].z - r->z) >> 10;
 
 			floor = &(r->floor[x * r->x_size + z]);
 
-			if (!(boxes[floor->box].overlap_index & 0x4000) && (gfCurrentLevel != 4 || i != 19 && i != 23 && i != 16)) {
+			if (!(boxes[floor->box].overlap_index & 0x4000) && (gfCurrentLevel != 4 || room_idx != 19 && room_idx != 23 && room_idx != 16)) {
 				stat = &static_objects[r->mesh[j].static_number];
 				y = floor->floor << 8;
 
@@ -1384,12 +1396,12 @@ bool LoadItems() {
 		}
 	}
 
-	return 1;
+	return true;
 }
 
 bool LoadCinematic() {
 	FileData += sizeof(int16_t);
-	return 1;
+	return true;
 }
 
 bool LoadAIInfo() {
@@ -1407,7 +1419,7 @@ bool LoadAIInfo() {
 		FileData += sizeof(AIOBJECT) * num_ai;
 	}
 
-	return 1;
+	return true;
 }
 
 struct  T4PLUS_RIFF_HEADER {
@@ -1429,7 +1441,7 @@ bool LoadSamples() {
 	int32_t num_samples, uncomp_size, comp_size;
 	static int32_t num_sample_infos;
 
-	int max_samples = MAX_SAMPLES;
+	int32_t max_samples = MAX_SAMPLES;
 	if (ng_level_info[gfCurrentLevel].is_using_global_sound_map) {
 		max_samples = MAX_NGLE_SAMPLES;
 	}
@@ -1446,7 +1458,7 @@ bool LoadSamples() {
 
 	if (!num_sample_infos) {
 		Log(1, "No Sample Infos");
-		return 0;
+		return false;
 	}
 
 	sample_infos = (SAMPLE_INFO*)game_malloc(sizeof(SAMPLE_INFO) * num_sample_infos);
@@ -1459,7 +1471,7 @@ bool LoadSamples() {
 
 	if (!num_samples) {
 		Log(1, "No Samples");
-		return 0;
+		return false;
 	}
 
 	Log(8, "Number Of Samples %d", num_samples);
@@ -1468,7 +1480,7 @@ bool LoadSamples() {
 
 	if (num_samples <= 0) {
 		FreeSampleDecompress();
-		return 1;
+		return true;
 	}
 
 	if (num_samples > MAX_SAMPLE_BUFFERS) {
@@ -1476,7 +1488,7 @@ bool LoadSamples() {
 		Log(1, "Maximum sample buffers overrun!");
 	}
 
-	for (int i = 0; i < num_samples; i++) {
+	for (int32_t i = 0; i < num_samples; i++) {
 		fread(&uncomp_size, sizeof(uint32_t), 1, level_fp);
 		fread(&comp_size, sizeof(uint32_t), 1, level_fp);
 
@@ -1486,18 +1498,18 @@ bool LoadSamples() {
 
 				if (!DXCreateSampleADPCM(samples_buffer, comp_size, uncomp_size, i)) {
 					FreeSampleDecompress();
-					return 0;
+					return false;
 				}
 			} else {
 				platform_fatal_error("Sample buffer overrun!");
-				return 0;
+				return false;
 			}
 		} else {
 			T4PLUS_RIFF_HEADER header;
 			int8_t chunk_1_format[4];
-			int chunk_1_size;
+			int32_t chunk_1_size;
 
-			int read_bytes = 0;
+			int32_t read_bytes = 0;
 
 			fread(&header, sizeof(T4PLUS_RIFF_HEADER), 1, level_fp);
 			read_bytes += sizeof(T4PLUS_RIFF_HEADER);
@@ -1508,7 +1520,7 @@ bool LoadSamples() {
 			read_bytes += sizeof(chunk_1_size);
 
 			T4PLUS_WAV_FORMAT wav_format;
-			int chunk_1_remaining_size = chunk_1_size - sizeof(T4PLUS_WAV_FORMAT);
+			int32_t chunk_1_remaining_size = chunk_1_size - sizeof(T4PLUS_WAV_FORMAT);
 			fread(&wav_format, sizeof(T4PLUS_WAV_FORMAT), 1, level_fp);
 			read_bytes += sizeof(T4PLUS_WAV_FORMAT);
 
@@ -1518,7 +1530,7 @@ bool LoadSamples() {
 			}
 
 			int8_t chunk_2_format[4];
-			int chunk_2_size;
+			int32_t chunk_2_size;
 			fread(&chunk_2_format, sizeof(chunk_2_format), 1, level_fp);
 			read_bytes += sizeof(chunk_2_format);
 			fread(&chunk_2_size, sizeof(chunk_2_size), 1, level_fp);
@@ -1527,7 +1539,7 @@ bool LoadSamples() {
 			if (chunk_2_size > 0 && chunk_2_size < DECOMPRESS_BUFFER_LEN) {
 				memset(samples_buffer, 0x00, DECOMPRESS_BUFFER_LEN);
 
-				int remainder = comp_size - (read_bytes + chunk_2_size);
+				int32_t remainder = comp_size - (read_bytes + chunk_2_size);
 
 				if (remainder < 0) {
 					fread(samples_buffer, chunk_2_size + remainder, 1, level_fp);
@@ -1539,7 +1551,7 @@ bool LoadSamples() {
 
 				if (!DXCreateSample(samples_buffer, chunk_2_size, wav_format.samples_per_second, i)) {
 					FreeSampleDecompress();
-					return 0;
+					return false;
 				}
 			} else {
 				Log(1, "Sample buffer overrun!");
@@ -1548,7 +1560,7 @@ bool LoadSamples() {
 	}
 
 	FreeSampleDecompress();
-	return 1;
+	return true;
 }
 
 void S_GetUVRotateTextures() {
@@ -1557,8 +1569,8 @@ void S_GetUVRotateTextures() {
 
 	pRange = aranges + 1;
 
-	for (int i = 0; i < nAnimUVRanges; i++, pRange++) {
-		for (int j = (int)*(pRange++); j >= 0; j--, pRange++) {
+	for (int32_t i = 0; i < nAnimUVRanges; i++, pRange++) {
+		for (int32_t j = (int32_t)*(pRange++); j >= 0; j--, pRange++) {
 			tex = &textinfo[*pRange];
 			AnimatingTexturesV[i][j][0] = tex->v1;
 		}
@@ -1574,7 +1586,7 @@ void AdjustUV(int32_t num) {
 
 	Log(2, "AdjustUV");
 
-	for (int i = 0; i < num; i++) {
+	for (int32_t i = 0; i < num; i++) {
 		tex = &textinfo[i];
 		Textures[tex->tpage].tpage++;
 		tex->tpage++;
@@ -1706,10 +1718,10 @@ bool Decompress(char* pDest, char* pCompressed, int32_t compressedSize, int32_t 
 
 	if (stream.total_out != size) {
 		Log(1, "Error Decompressing Data");
-		return 0;
+		return false;
 	}
 
 	inflateEnd(&stream);
 	Log(5, "Decompression OK");
-	return 1;
+	return true;
 }

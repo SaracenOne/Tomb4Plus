@@ -72,7 +72,7 @@ void FireCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	item = &items[item_number];
 
 	if (lara.gun_type == WEAPON_TORCH && lara.gun_status == LG_READY && !lara.left_arm.lock && (item->status & 1) != lara.LitTorch &&
-	        item->timer != -1 && input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && !l->gravity_status) {
+	        item->timer != -1 && input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && !l->gravity_status) {
 		rot = item->pos.y_rot;
 
 		if (item->object_number == FLAME_EMITTER) {
@@ -102,10 +102,10 @@ void FireCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 		if (TestLaraPosition(FireBounds, item, l)) {
 			if (item->object_number == SPRINKLER)
-				l->anim_number = ANIM_LIGHT_TORCH4;
+				l->anim_number = LARA_ANIM_LIGHT_TORCH4;
 			else {
 				l->item_flags[3] = 1;
-				l->anim_number = int16_t((abs(l->pos.y_pos - item->pos.y_pos) >> 8) + ANIM_LIGHT_TORCH1);
+				l->anim_number = int16_t((abs(l->pos.y_pos - item->pos.y_pos) >> 8) + LARA_ANIM_LIGHT_TORCH1);
 			}
 
 			l->current_anim_state = AS_CONTROLLED;
@@ -119,7 +119,7 @@ void FireCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	}
 
 	if (lara.GeneralPtr == item_number && item->status != ITEM_ACTIVE && l->current_anim_state == AS_CONTROLLED &&
-	        l->anim_number >= ANIM_LIGHT_TORCH1 && l->anim_number <= ANIM_LIGHT_TORCH5 && l->frame_number - anims[l->anim_number].frame_base == 40) {
+	        l->anim_number >= LARA_ANIM_LIGHT_TORCH1 && l->anim_number <= LARA_ANIM_LIGHT_TORCH5 && l->frame_number - anims[l->anim_number].frame_base == 40) {
 		if (item->object_number == SPRINKLER) {
 			l->item_flags[3] = 0;
 			lara.LitTorch = 0;

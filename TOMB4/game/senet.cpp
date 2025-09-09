@@ -192,7 +192,7 @@ void GameStixControl(int16_t item_number) {
 		if (item->hit_points == 100)
 			SoundEffect(SFX_SPINNING_PUZZLE, &item->pos, SFX_DEFAULT);
 
-		for (int i = 0; i < 4; i++) {
+		for (int32_t i = 0; i < 4; i++) {
 			if (item->hit_points < 120 - (2 * i + 20)) {
 				item->item_flags[i] -= item->hit_points << 7;
 
@@ -208,7 +208,7 @@ void GameStixControl(int16_t item_number) {
 		item->hit_points--;
 
 		if (!item->hit_points) {
-			for (int i = 0; i < SENET_ITEM_MID; i++)
+			for (int32_t i = 0; i < SENET_ITEM_MID; i++)
 				items[senet_item[i]].trigger_flags = 0;
 
 			item->trigger_flags = NO_ITEM;
@@ -275,7 +275,7 @@ void GameStixControl(int16_t item_number) {
 				KillItem(senet_item[piece_moving]);
 
 				if (CheckSenetWinner(num)) {
-					for (int i = 0; i < level_items; i++) {
+					for (int32_t i = 0; i < level_items; i++) {
 						item2 = &items[i];
 
 						if (item2->object_number >= GAME_PIECE1 && item2->object_number <= WHEEL_OF_FORTUNE) {
@@ -287,7 +287,7 @@ void GameStixControl(int16_t item_number) {
 					}
 				}
 			} else {
-				for (int i = 0; i < SENET_ITEM_COUNT; i++) {
+				for (int32_t i = 0; i < SENET_ITEM_COUNT; i++) {
 					if (piece_moving != i) {
 						piece = &items[senet_item[i]];
 
@@ -329,7 +329,7 @@ void GameStixControl(int16_t item_number) {
 	if (last_throw == -1) {
 		ThrowSticks(item);
 
-		for (int i = SENET_ITEM_MID; i < SENET_ITEM_COUNT; i++) {
+		for (int32_t i = SENET_ITEM_MID; i < SENET_ITEM_COUNT; i++) {
 			MakeMove(i, last_throw);
 
 			if (last_throw == -1 || !last_throw)
@@ -344,7 +344,7 @@ void GameStixControl(int16_t item_number) {
 		ThrowSticks(item);
 		change = 0;
 
-		for (int i = 0; i < SENET_ITEM_MID; i++) {
+		for (int32_t i = 0; i < SENET_ITEM_MID; i++) {
 			if (senet_piece[i] != -1 && last_throw && senet_piece[i] + last_throw < 17 && !(senet_board[senet_piece[i] + last_throw] & 1))
 				change = 1;
 		}
@@ -363,14 +363,14 @@ void GameStixCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 	item = &items[item_number];
 
-	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH && lara.gun_status == LG_NO_ARMS && !item->active ||
+	if (input & IN_ACTION && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH && lara.gun_status == LG_NO_ARMS && !item->active ||
 	        lara.IsMoving && lara.GeneralPtr == item_number) {
 		item->pos.y_rot ^= 0x8000;
 
 		if (TestLaraPosition(GameStixBounds, item, l)) {
 			if (MoveLaraPosition(&GameStixPos, item, l)) {
-				l->anim_number = ANIM_THROWSTIX;
-				l->frame_number = anims[ANIM_THROWSTIX].frame_base;
+				l->anim_number = LARA_ANIM_THROWSTIX;
+				l->frame_number = anims[LARA_ANIM_THROWSTIX].frame_base;
 				l->current_anim_state = AS_CONTROLLED;
 				lara.IsMoving = 0;
 				lara.head_x_rot = 0;

@@ -22,7 +22,7 @@
 int8_t furr_oneshot_buffer[LAST_FURR_FLIPEFFECT];
 FURRFlipeffectTable furr_flipeffect_table[LAST_FURR_FLIPEFFECT - FIRST_FURR_FLIPEFFECT];
 
-int furr_get_state_field(ITEM_INFO *item, int item_state_address_offset) {
+int32_t furr_get_state_field(ITEM_INFO *item, int32_t item_state_address_offset) {
 	switch(item_state_address_offset) {
 		case 14: {
 			return item->current_anim_state;
@@ -764,7 +764,7 @@ FURRResult furr_cmd_shake_camera_heavy(FURRParameters params) {
 // Params:
 // DRIP_AMOUNT
 FURRResult furr_cmd_lara_drips(FURRParameters params) {
-	for (int i = 0; i < WET_COUNT; i++) {
+	for (int32_t i = 0; i < WET_COUNT; i++) {
 		lara.wet[i] = (uint8_t)params.first_parameter;
 	}
 	return FURR_RESULT_OK;
@@ -1628,8 +1628,8 @@ FURRDataTable furr_data_table[] = {
 
 //
 
-int furr_get_opcode_for_command_string(const char* command_name) {
-	for (int i = 0; i < (sizeof(furr_name_table) / sizeof(FURRNameTableEntry)); i++) {
+int32_t furr_get_opcode_for_command_string(const char* command_name) {
+	for (int32_t i = 0; i < (sizeof(furr_name_table) / sizeof(FURRNameTableEntry)); i++) {
 		if (strcmp(command_name, furr_name_table[i].opcode_name) == 0) {
 			return furr_name_table[i].opcode_token;
 		}
@@ -1638,7 +1638,7 @@ int furr_get_opcode_for_command_string(const char* command_name) {
 	return -1;
 }
 
-int furr_get_arg_count_for_opcode(const FURROpcode opcode) {
+int32_t furr_get_arg_count_for_opcode(const FURROpcode opcode) {
 	if (opcode < FURR_OPCODE_COUNT) {
 		if (opcode < (sizeof(furr_data_table) / sizeof(FURRDataTable))) {
 			FURRDataTable* data_table = &furr_data_table[opcode];
@@ -1655,7 +1655,7 @@ void furr_clear_oneshot_buffer() {
 	memset(furr_oneshot_buffer, 0, LAST_FURR_FLIPEFFECT);
 }
 
-void furr_execute_furr_flipeffect(int flipeffect_id) {
+void furr_execute_furr_flipeffect(int32_t flipeffect_id) {
 	if (flipeffect_id < FIRST_FURR_FLIPEFFECT) {
 		Log(1, "Invalid FURR flipeffect id %u!\n", flipeffect_id);
 		return;
@@ -1673,14 +1673,14 @@ void furr_execute_furr_flipeffect(int flipeffect_id) {
 
 	FURRFlipeffectTable* curr_flipeffect_table = &furr_flipeffect_table[flipeffect_id];
 
-	int idx = 0;
+	int32_t idx = 0;
 	FURRResult previous_result = FURR_RESULT_OK;
 	while (idx < curr_flipeffect_table->size) {
 		FURROpcode opcode = static_cast<FURROpcode>(curr_flipeffect_table->tokens[idx++]);
 		FURRDataTable* data_table = &furr_data_table[opcode];
 
-		int argument_1 = data_table->arg_count >= 1 ? curr_flipeffect_table->tokens[idx++] : 0;
-		int argument_2 = data_table->arg_count >= 2 ? curr_flipeffect_table->tokens[idx++] : 0;
+		int32_t argument_1 = data_table->arg_count >= 1 ? curr_flipeffect_table->tokens[idx++] : 0;
+		int32_t argument_2 = data_table->arg_count >= 2 ? curr_flipeffect_table->tokens[idx++] : 0;
 
 		FURRParameters params = { previous_result, argument_1, argument_2 };
 
@@ -1714,7 +1714,7 @@ void furr_execute_furr_flipeffect(int flipeffect_id) {
 	}
 }
 
-void furr_allocate_flipeffect_buffer(int flipeffect_id, int size) {
+void furr_allocate_flipeffect_buffer(int32_t flipeffect_id, int32_t size) {
 	if (flipeffect_id < FIRST_FURR_FLIPEFFECT) {
 		Log(1, "Invalid FURR flipeffect id %u!\n", flipeffect_id);
 		return;
@@ -1724,18 +1724,18 @@ void furr_allocate_flipeffect_buffer(int flipeffect_id, int size) {
 		return;
 	}
 
-	int table_index = flipeffect_id - FIRST_FURR_FLIPEFFECT;
+	int32_t table_index = flipeffect_id - FIRST_FURR_FLIPEFFECT;
 
 	if (furr_flipeffect_table[table_index].tokens == nullptr) {
-		furr_flipeffect_table[table_index].tokens = (int*)SYSTEM_MALLOC(size * sizeof(int));
+		furr_flipeffect_table[table_index].tokens = (int32_t*)SYSTEM_MALLOC(size * sizeof(int32_t));
 		if (furr_flipeffect_table[table_index].tokens) {
-			memset(furr_flipeffect_table[table_index].tokens, 0, size * sizeof(int));
+			memset(furr_flipeffect_table[table_index].tokens, 0, size * sizeof(int32_t));
 		}
 	}
 }
 
 void furr_free_all_flipeffect_buffers() {
-	for (int i = 0; i < LAST_FURR_FLIPEFFECT - FIRST_FURR_FLIPEFFECT; i++) {
+	for (int32_t i = 0; i < LAST_FURR_FLIPEFFECT - FIRST_FURR_FLIPEFFECT; i++) {
 		if (furr_flipeffect_table[i].tokens != nullptr) {
 			SYSTEM_FREE(furr_flipeffect_table[i].tokens);
 			furr_flipeffect_table[i].tokens = nullptr;
@@ -1744,13 +1744,13 @@ void furr_free_all_flipeffect_buffers() {
 	}
 }
 
-void furr_add_flipeffect_token(int flipeffect_id, int token) {
+void furr_add_flipeffect_token(int32_t flipeffect_id, int32_t token) {
 	if (flipeffect_id < FIRST_FURR_FLIPEFFECT)
 		return;
 	if (flipeffect_id >= LAST_FURR_FLIPEFFECT)
 		return;
 
-	int table_index = flipeffect_id - FIRST_FURR_FLIPEFFECT;
+	int32_t table_index = flipeffect_id - FIRST_FURR_FLIPEFFECT;
 
 	if (furr_flipeffect_table[table_index].tokens) {
 		furr_flipeffect_table[table_index].tokens[furr_flipeffect_table[table_index].size] = token;

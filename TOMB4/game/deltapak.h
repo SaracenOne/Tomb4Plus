@@ -8,7 +8,7 @@ void DecodeAnim(PACKNODE* node, int32_t num_nodes, int32_t frame, int32_t flags)
 int16_t DecodeTrack(char* packed, RTDECODE* decode);
 int16_t GetTrackWord(int32_t off, char* packed, int32_t packmethod);
 void fix_lara_for_cutseq();
-void updateAnimFrame(PACKNODE* node, int flags, int16_t* frame);
+void updateAnimFrame(PACKNODE* node, int32_t flags, int16_t* frame);
 void* cutseq_malloc(int32_t size);
 void finish_cutseq();
 void DrawCutSeqActors();

@@ -127,7 +127,7 @@ int32_t XYUVGClipper(int32_t n, GFXTLBUMPVERTEX* in) {
 
 	nPoints = 0;
 
-	for (int i = 0; i < n; i++) {
+	for (int32_t i = 0; i < n; i++) {
 		v1 = v2;
 		cr1 = cr2;
 		cg1 = cg2;
@@ -295,7 +295,7 @@ int32_t XYUVGClipper(int32_t n, GFXTLBUMPVERTEX* in) {
 
 	nPoints = 0;
 
-	for (int i = 0; i < n; i++) {
+	for (int32_t i = 0; i < n; i++) {
 		v1 = v2;
 		cr1 = cr2;
 		cg1 = cg2;

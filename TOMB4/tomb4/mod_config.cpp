@@ -164,7 +164,7 @@ bool SetupUserDirectories() {
 
 char *T4PlusAllocateString(char* str) {
 	if (global_string_table_size < MAX_T4PLUS_STRINGS) {
-		for (int i = 0; i < global_string_table_size; i++) {
+		for (int32_t i = 0; i < global_string_table_size; i++) {
 			if (strcmp(str, global_string_table[i]) == 0) {
 				return global_string_table[i];
 			}
@@ -189,7 +189,7 @@ char *T4PlusAllocateString(char* str) {
 }
 
 void T4PlusFreeAllStrings() {
-	for (int i = 0; i < global_string_table_size; i++) {
+	for (int32_t i = 0; i < global_string_table_size; i++) {
 		SYSTEM_FREE(global_string_table[i]);
 	}
 	SYSTEM_FREE(global_string_table);
@@ -200,13 +200,13 @@ bool scorpion_poison_override_found = false;
 
 GAME_MOD_CONFIG game_mod_config;
 
-void setup_custom_slots_for_level(int level, OBJECT_INFO* current_object_info_array) {
+void setup_custom_slots_for_level(int32_t level, OBJECT_INFO* current_object_info_array) {
 	OBJECT_INFO* backup_object_info_array = (OBJECT_INFO* )SYSTEM_MALLOC(sizeof(OBJECT_INFO) * NUMBER_OBJECTS);
 
 	if (backup_object_info_array) {
 		memcpy(backup_object_info_array, current_object_info_array, sizeof(OBJECT_INFO) * NUMBER_OBJECTS);
 
-		for (int i = 0; i < NUMBER_OBJECTS; i++) {
+		for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 			if (game_mod_config.level_info[level].objects_info.slot_override[i] != i) {
 				int16_t original_nmeshes = current_object_info_array[i].nmeshes;
 				int16_t original_mesh_index = current_object_info_array[i].mesh_index;
@@ -227,7 +227,7 @@ void setup_custom_slots_for_level(int level, OBJECT_INFO* current_object_info_ar
 	}
 }
 
-void assign_slot_for_level(int level, int dest_slot, int src_slot) {
+void assign_slot_for_level(int32_t level, int32_t dest_slot, int32_t src_slot) {
 	if (src_slot < NUMBER_OBJECTS && dest_slot < NUMBER_OBJECTS && level < MOD_LEVEL_COUNT) {
 		game_mod_config.level_info[level].objects_info.slot_override[dest_slot] = src_slot;
 	} else {
@@ -235,10 +235,10 @@ void assign_slot_for_level(int level, int dest_slot, int src_slot) {
 	}
 }
 
-void T4PlusSetupObjectsForLevel(int level, OBJECT_INFO* current_object_info_array) {
+void T4PlusSetupObjectsForLevel(int32_t level, OBJECT_INFO* current_object_info_array) {
 	setup_custom_slots_for_level(level, current_object_info_array);
 
-	for (int i = 0; i < NUMBER_OBJECTS; i++) {
+	for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 		if (game_mod_config.level_info[level].objects_info.object_customization[i].override_hit_points) {
 			current_object_info_array[i].hit_points = game_mod_config.level_info[level].objects_info.object_customization[i].hit_points;
 		}
@@ -249,47 +249,47 @@ extern MOD_GLOBAL_INFO *get_game_mod_global_info() {
 	return &game_mod_config.global_info;
 }
 
-MOD_LEVEL_AUDIO_INFO *get_game_mod_level_audio_info(int level) {
+MOD_LEVEL_AUDIO_INFO *get_game_mod_level_audio_info(int32_t level) {
 	return &game_mod_config.level_info[level].audio_info;
 }
 
-MOD_LEVEL_BARS_INFO *get_game_mod_level_bars_info(int level) {
+MOD_LEVEL_BARS_INFO *get_game_mod_level_bars_info(int32_t level) {
 	return &game_mod_config.level_info[level].bars_info;
 }
 
-MOD_LEVEL_ENVIRONMENT_INFO *get_game_mod_level_environment_info(int level) {
+MOD_LEVEL_ENVIRONMENT_INFO *get_game_mod_level_environment_info(int32_t level) {
 	return &game_mod_config.level_info[level].environment_info;
 }
 
-extern MOD_LEVEL_FONT_INFO *get_game_mod_level_font_info(int level) {
+extern MOD_LEVEL_FONT_INFO *get_game_mod_level_font_info(int32_t level) {
 	return &game_mod_config.level_info[level].font_info;
 }
 
-extern MOD_LEVEL_CAMERA_INFO *get_game_mod_level_camera_info(int level) {
+extern MOD_LEVEL_CAMERA_INFO *get_game_mod_level_camera_info(int32_t level) {
 	return &game_mod_config.level_info[level].camera_info;
 }
 
-MOD_LEVEL_CREATURE_INFO *get_game_mod_level_creature_info(int level) {
+MOD_LEVEL_CREATURE_INFO *get_game_mod_level_creature_info(int32_t level) {
 	return &game_mod_config.level_info[level].creature_info;
 }
 
-MOD_LEVEL_GFX_INFO *get_game_mod_level_gfx_info(int level) {
+MOD_LEVEL_GFX_INFO *get_game_mod_level_gfx_info(int32_t level) {
 	return &game_mod_config.level_info[level].gfx_info;
 }
 
-MOD_LEVEL_LARA_INFO *get_game_mod_level_lara_info(int level) {
+MOD_LEVEL_LARA_INFO *get_game_mod_level_lara_info(int32_t level) {
 	return &game_mod_config.level_info[level].lara_info;
 }
 
-MOD_LEVEL_STAT_INFO *get_game_mod_level_stat_info(int level) {
+MOD_LEVEL_STAT_INFO *get_game_mod_level_stat_info(int32_t level) {
 	return &game_mod_config.level_info[level].stat_info;
 }
 
-MOD_LEVEL_FLARE_INFO *get_game_mod_level_flare_info(int level) {
+MOD_LEVEL_FLARE_INFO *get_game_mod_level_flare_info(int32_t level) {
 	return &game_mod_config.level_info[level].flare_info;
 }
 
-MOD_LEVEL_WEAPON_INFO *get_game_mod_level_weapon_info(int level) {
+MOD_LEVEL_WEAPON_INFO *get_game_mod_level_weapon_info(int32_t level) {
 	return &game_mod_config.level_info[level].weapon_info;
 }
 
@@ -325,11 +325,11 @@ MOD_LEVEL_AMMO_INFO *get_game_mod_current_lara_ammo_info(MOD_LEVEL_WEAPON_INFO *
 	}
 }
 
-MOD_LEVEL_OBJECTS_INFO *get_game_mod_level_objects_info(int level) {
+MOD_LEVEL_OBJECTS_INFO *get_game_mod_level_objects_info(int32_t level) {
 	return &game_mod_config.level_info[level].objects_info;
 }
 
-MOD_LEVEL_OBJECT_CUSTOMIZATION *get_game_mod_level_object_customization_for_slot(int level, int slot) {
+MOD_LEVEL_OBJECT_CUSTOMIZATION *get_game_mod_level_object_customization_for_slot(int32_t level, int32_t slot) {
 	if (slot < NUMBER_OBJECTS) {
 		return &get_game_mod_level_objects_info(level)->object_customization[slot];
 	} else {
@@ -337,11 +337,11 @@ MOD_LEVEL_OBJECT_CUSTOMIZATION *get_game_mod_level_object_customization_for_slot
 	}
 }
 
-MOD_LEVEL_MISC_INFO *get_game_mod_level_misc_info(int level) {
+MOD_LEVEL_MISC_INFO *get_game_mod_level_misc_info(int32_t level) {
 	return &game_mod_config.level_info[level].misc_info;
 }
 
-MOD_LEVEL_STATICS_INFO* get_game_mod_level_statics_info(int level) {
+MOD_LEVEL_STATICS_INFO* get_game_mod_level_statics_info(int32_t level) {
 	return &game_mod_config.level_info[level].statics_info;
 }
 
@@ -457,7 +457,7 @@ void LoadGameModLevelFontInfo(const json_t* font, MOD_LEVEL_FONT_INFO* font_info
 	const json_t* char_table = json_getProperty(font, "custom_font_table");
 	if (char_table && JSON_ARRAY == json_getType(char_table)) {
 		json_t const *char_table_entry;
-		int char_table_index = 0;
+		int32_t char_table_index = 0;
 		for (char_table_entry = json_getChild(char_table); char_table_entry != 0; char_table_entry = json_getSibling(char_table_entry)) {
 			if (char_table_index >= CHAR_TABLE_COUNT)
 				break;
@@ -496,12 +496,12 @@ void LoadGameModLevelCameraInfo(const json_t* camera, MOD_LEVEL_CAMERA_INFO* cam
 
 typedef struct {
 	const char* name;
-	int value;
+	int32_t value;
 } StringEnumPair;
 
 // Function to map string to enum
-int MapStringToEnum(const char* str, const StringEnumPair* table, int default_value) {
-	for (int i = 0; table[i].name != NULL; i++) {
+int32_t MapStringToEnum(const char* str, const StringEnumPair* table, int32_t default_value) {
+	for (int32_t i = 0; table[i].name != NULL; i++) {
 		if (strcmp(str, table[i].name) == 0) {
 			return table[i].value;
 		}
@@ -518,7 +518,7 @@ int MapStringToEnum(const char* str, const StringEnumPair* table, int default_va
 }
 
 #define READ_JSON_STRING_TO_ENUM_GENERIC(enum_type, value_name, json, ptr, table, default_value) { \
-    int temp = default_value; \
+    int32_t temp = default_value; \
     READ_JSON_STRING_TO_ENUM(value_name, json, temp, table, default_value) \
     ptr = (enum_type) temp; \
 }
@@ -594,7 +594,7 @@ void LoadGameModLevelGFXInfo(const json_t* gfx, MOD_LEVEL_GFX_INFO *gfx_info) {
 	const json_t* mirror_customization = json_getProperty(gfx, "mirror_customization");
 	if (mirror_customization && JSON_ARRAY == json_getType(mirror_customization)) {
 		json_t const* mirror_customization_json;
-		int mirror_customization_index = 0;
+		int32_t mirror_customization_index = 0;
 		for (mirror_customization_json = json_getChild(mirror_customization); mirror_customization_json != 0; mirror_customization_json = json_getSibling(mirror_customization_json)) {
 			if (mirror_customization_index >= MAX_MIRRORS - 1)
 				break;
@@ -689,7 +689,7 @@ void LoadGameModLevelObjectsInfo(const json_t* objects, MOD_LEVEL_OBJECTS_INFO* 
 	if (object_customization && JSON_ARRAY == json_getType(object_customization)) {
 		json_t const* object_customization_json;
 		for (object_customization_json = json_getChild(object_customization); object_customization_json != 0; object_customization_json = json_getSibling(object_customization_json)) {
-			int object_customization_index = -1;
+			int32_t object_customization_index = -1;
 			const json_t* prop = json_getProperty(object_customization_json, "object_id");
 			if (prop && JSON_INTEGER == json_getType(prop)) {
 				object_customization_index = (int32_t)json_getInteger(prop);
@@ -973,7 +973,7 @@ void SetupDefaultObjectInfoForLevel(MOD_LEVEL_INFO* level_info) {
 
 	MOD_LEVEL_OBJECT_CUSTOMIZATION *level_object_customization = level_info->objects_info.object_customization;
 
-	for (int i = 0; i < NUMBER_OBJECTS; i++) {
+	for (int32_t i = 0; i < NUMBER_OBJECTS; i++) {
 		MOD_LEVEL_OBJECT_CUSTOMIZATION* cust = &level_object_customization[i];
 		cust->hit_points = INFINITE_HEALTH;
 		cust->damage_1 = 0;
@@ -1263,7 +1263,7 @@ void SetupDefaultStatInfoForLevel(MOD_LEVEL_INFO* level_info) {
 }
 
 void SetupLevelDefaults() {
-	for (int i = 0; i < MOD_LEVEL_COUNT; i++) {
+	for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
 		if (i != 1) {
 			game_mod_config.level_info[i].creature_info.use_voncroy_racing_behaviour = true;
 		} else {
@@ -1354,7 +1354,7 @@ bool LoadGameModConfigFirstPass() {
 						const json_t* furr_flipeffects = json_getProperty(furr_data, "furr_flipeffects");
 						if (furr_flipeffects && JSON_ARRAY == json_getType(furr_flipeffects)) {
 							json_t const* furr_flipeffect;
-							int furr_flipeffect_index = 47;
+							int32_t furr_flipeffect_index = 47;
 							for (furr_flipeffect = json_getChild(furr_flipeffects); furr_flipeffect != nullptr; furr_flipeffect = json_getSibling(furr_flipeffect)) {
 								if (furr_flipeffect_index > LAST_FURR_FLIPEFFECT) {
 									Log(1, "LoadGameModConfigFirstPass: FURR flipeffect overflow!");
@@ -1362,25 +1362,25 @@ bool LoadGameModConfigFirstPass() {
 								}
 								if (furr_flipeffect && JSON_ARRAY == json_getType(furr_flipeffect)) {
 									json_t const* furr_flipeffect_block;
-									int furr_flipeffect_block_index = 0;
+									int32_t furr_flipeffect_block_index = 0;
 
 									//
-									int furr_command_count = 0;
-									int furr_command_buffer_size = 0;
+									int32_t furr_command_count = 0;
+									int32_t furr_command_buffer_size = 0;
 
 									// First pass to determine the required size of the bytecode buffer
 									for (furr_flipeffect_block = json_getChild(furr_flipeffect); furr_flipeffect_block != nullptr; furr_flipeffect_block = json_getSibling(furr_flipeffect_block)) {
 										if (furr_flipeffect_block && JSON_ARRAY == json_getType(furr_flipeffect_block)) {
 											json_t const* furr_flipeffect_data;
-											int furr_flipeffect_data_index = 0;
+											int32_t furr_flipeffect_data_index = 0;
 											// Count the data
 											for (furr_flipeffect_data = json_getChild(furr_flipeffect_block); furr_flipeffect_data != nullptr; furr_flipeffect_data = json_getSibling(furr_flipeffect_data)) {
 												if (furr_flipeffect_data_index == 0) {
 													if (furr_flipeffect_data && JSON_TEXT == json_getType(furr_flipeffect_data)) {
 														const char *name = furr_flipeffect_data->u.value;
-														int opcode_id = furr_get_opcode_for_command_string(name);
+														int32_t opcode_id = furr_get_opcode_for_command_string(name);
 														if (opcode_id >= 0) {
-															int furr_command_arg_count = furr_get_arg_count_for_opcode((FURROpcode)opcode_id);
+															int32_t furr_command_arg_count = furr_get_arg_count_for_opcode((FURROpcode)opcode_id);
 
 															furr_command_list[furr_command_count] = (FURROpcode)opcode_id;
 
@@ -1418,15 +1418,15 @@ bool LoadGameModConfigFirstPass() {
 									for (furr_flipeffect_block = json_getChild(furr_flipeffect); furr_flipeffect_block != nullptr; furr_flipeffect_block = json_getSibling(furr_flipeffect_block)) {
 										if (furr_flipeffect_block && JSON_ARRAY == json_getType(furr_flipeffect_block)) {
 											json_t const* furr_flipeffect_data;
-											int furr_flipeffect_data_index = 0;
-											int furr_command_arg_count = 0;
+											int32_t furr_flipeffect_data_index = 0;
+											int32_t furr_command_arg_count = 0;
 
 											// Count the data
 											for (furr_flipeffect_data = json_getChild(furr_flipeffect_block); furr_flipeffect_data != nullptr; furr_flipeffect_data = json_getSibling(furr_flipeffect_data)) {
 												if (furr_flipeffect_data_index != 0) {
 													if (furr_flipeffect_data_index <= furr_command_arg_count) {
 														if (furr_flipeffect_data && JSON_INTEGER == json_getType(furr_flipeffect_data)) {
-															int argument_value = (int)json_getInteger(furr_flipeffect_data);
+															int32_t argument_value = (int32_t)json_getInteger(furr_flipeffect_data);
 															furr_add_flipeffect_token(furr_flipeffect_index, argument_value);
 														} else {
 															furr_add_flipeffect_token(furr_flipeffect_index, 0);
@@ -1499,12 +1499,12 @@ bool LoadGameModConfigFirstPass() {
 	if (level && JSON_OBJ == json_getType(level)) {
 		LoadGameModLevel(level, &global_level_info);
 	}
-	for (int i = 0; i < MOD_LEVEL_COUNT; i++) {
+	for (int32_t i = 0; i < MOD_LEVEL_COUNT; i++) {
 		memcpy(&game_mod_config.level_info[i], &global_level_info, sizeof(MOD_LEVEL_INFO));
 
 		// Reset equipment modifiers.
 		if (i > 0) {
-			for (int j = 0; j < MAX_EQUIPMENT_MODIFIERS; j++) {
+			for (int32_t j = 0; j < MAX_EQUIPMENT_MODIFIERS; j++) {
 				game_mod_config.level_info[i].stat_info.equipment_modifiers[j].object_id = -1;
 				game_mod_config.level_info[i].stat_info.equipment_modifiers[j].amount = 0;
 			}
@@ -1572,6 +1572,7 @@ void LoadGameModConfigSecondPass() {
 					READ_JSON_BOOL(spinning_debris, global, mod_global_info);
 					READ_JSON_BOOL(fix_rope_glitch, global, mod_global_info);
 					READ_JSON_BOOL(fix_lara_small_switch_rotation, global, mod_global_info);
+					READ_JSON_BOOL(fix_lara_hands_free_flipeffect_bugs, global, mod_global_info);
 
 					// Misc
 					READ_JSON_BOOL(show_logo_in_title, global, mod_global_info);
@@ -1582,7 +1583,7 @@ void LoadGameModConfigSecondPass() {
 				const json_t* levels = json_getProperty(root_json, "levels");
 				if (levels && JSON_ARRAY == json_getType(levels)) {
 					json_t const* level;
-					int level_index = 0;
+					int32_t level_index = 0;
 					for (level = json_getChild(levels); level != nullptr; level = json_getSibling(level)) {
 						if (JSON_OBJ == json_getType(level)) {
 							LoadGameModLevel(level, &game_mod_config.level_info[level_index]);
@@ -1607,7 +1608,7 @@ void T4PlusLevelReset() {
 	InitWeatherFX();
 }
 
-void T4PlusLevelSetup(int current_level) {
+void T4PlusLevelSetup(int32_t current_level) {
 	S_Reset(); // Reset audio channels.
 
 	MOD_LEVEL_AUDIO_INFO *audio_info = get_game_mod_level_audio_info(current_level);
@@ -1628,7 +1629,7 @@ void T4PlusLevelSetup(int current_level) {
 		T4PInsertMirror(gfMirrorRoom, gfMirrorZPlane, T4_MIR_PLANE_Z);
 	}
 
-	for (int i = 0; i < MAX_MIRRORS - 1; i++) {
+	for (int32_t i = 0; i < MAX_MIRRORS - 1; i++) {
 		MOD_LEVEL_MIRROR_CUSTOMIZATION* mirror_customization = &get_game_mod_level_gfx_info(current_level)->mirror_customization[i];
 
 		if (mirror_customization->room_number >= 0) {
@@ -1638,7 +1639,7 @@ void T4PlusLevelSetup(int current_level) {
 }
 
 // TODO: check if the equipment commands are valid on hub re-entry.
-void T4PlusEnterLevel(int current_level, bool initial_entry) {
+void T4PlusEnterLevel(int32_t current_level, bool initial_entry) {
 	if (initial_entry) {
 		t4_override_fog_mode = get_game_mod_level_misc_info(current_level)->override_fog_mode;
 		UpdateDistanceFogColor();
@@ -1647,7 +1648,7 @@ void T4PlusEnterLevel(int current_level, bool initial_entry) {
 		t4p_snow_type = get_game_mod_level_misc_info(current_level)->snow_type;
 
 		MOD_EQUIPMENT_MODIFIER *equipment_modifiers = get_game_mod_level_stat_info(current_level)->equipment_modifiers;
-		for (int i = 0; i < MAX_EQUIPMENT_MODIFIERS; i++) {
+		for (int32_t i = 0; i < MAX_EQUIPMENT_MODIFIERS; i++) {
 			if (equipment_modifiers[i].object_id != -1) {
 				T4PlusSetInventoryCount(equipment_modifiers[i].object_id, equipment_modifiers[i].amount, true);
 			} else {
@@ -1659,7 +1660,7 @@ void T4PlusEnterLevel(int current_level, bool initial_entry) {
 
 void T4PlusInitializeLara() {
 	MOD_EQUIPMENT_MODIFIER *equipment_modifiers = get_game_mod_level_stat_info(0)->equipment_modifiers;
-	for (int i = 0; i < MAX_EQUIPMENT_MODIFIERS; i++) {
+	for (int32_t i = 0; i < MAX_EQUIPMENT_MODIFIERS; i++) {
 		if (equipment_modifiers[i].object_id != -1) {
 			T4PlusSetInventoryCount(equipment_modifiers[i].object_id, equipment_modifiers[i].amount, true);
 		} else {

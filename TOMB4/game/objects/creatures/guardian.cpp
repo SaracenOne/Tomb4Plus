@@ -45,7 +45,7 @@ void InitialiseGuardian(int16_t item_number) {
 	item->data = game_malloc(20);
 	aptr = (int16_t*)item->data;
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		if (items[i].object_number == objects_info->laser_head_base_slot) {
 			aptr[0] = i;
 			break;
@@ -55,8 +55,8 @@ void InitialiseGuardian(int16_t item_number) {
 	angle = 0;
 	bptr = &aptr[1];
 
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < level_items; j++) {
+	for (int32_t i = 0; i < 8; i++) {
+		for (int32_t j = 0; j < level_items; j++) {
 			if (items[j].object_number == objects_info->laser_head_tentacle_slot && items[j].pos.y_rot == angle) {
 				bptr[i] = j;
 				break;
@@ -66,7 +66,7 @@ void InitialiseGuardian(int16_t item_number) {
 		angle += 0x2000;
 	}
 
-	for (int i = 0; i < level_items; i++) {
+	for (int32_t i = 0; i < level_items; i++) {
 		if (items[i].object_number == PUZZLE_ITEM4) {
 			aptr[9] = i;
 			items[i].status = ITEM_INVISIBLE;
@@ -85,7 +85,7 @@ void TriggerGuardianSparks(GAME_VECTOR* pos, int32_t size, int32_t rgb, int32_t 
 	SPARKS* sptr;
 	int32_t rnd;
 
-	for (int i = 0; i < size; i++) {
+	for (int32_t i = 0; i < size; i++) {
 		sptr = &spark[GetFreeSpark()];
 		sptr->On = 1;
 		sptr->sR = CLRB(rgb);	//BGR
@@ -138,7 +138,7 @@ void TriggerBaseLightning(ITEM_INFO* item) {
 	d.z = Base[0].z;
 	GetJointAbsPosition(&items[bptr[0]], &d, 0);
 
-	for (int i = 0; i < 4; i++) {
+	for (int32_t i = 0; i < 4; i++) {
 		if (item->item_flags[3] & 15) {
 			lptr = gt.blptr[i];
 
@@ -159,7 +159,7 @@ void TriggerBaseLightning(ITEM_INFO* item) {
 	}
 
 	if (GlobalCounter & 1) {
-		for (int i = 0; i < 2; i++) {
+		for (int32_t i = 0; i < 2; i++) {
 			if (item->mesh_bits & 2 * Eye[i].mesh_num) {
 				s.x = 0;
 				s.y = 0;
@@ -352,7 +352,7 @@ void GuardianControl(int16_t item_number) {
 						a2 = a2 * lptr->Life >> 4;
 					}
 
-					for (int i = 0; i < 2; i++) {
+					for (int32_t i = 0; i < 2; i++) {
 						if (!(item->mesh_bits & 2 * Eye[i].mesh_num)) {
 							if (item->item_flags[3] > 90 && gt.elptr[i]) {
 								gt.elptr[i]->Life = 0;
@@ -491,7 +491,7 @@ void GuardianControl(int16_t item_number) {
 		}
 
 		if (item->current_anim_state > 0) {
-			for (int i = 0; i < 8; i++) {
+			for (int32_t i = 0; i < 8; i++) {
 				arm_item = aptr[i + 1];
 				item2 = &items[arm_item];
 

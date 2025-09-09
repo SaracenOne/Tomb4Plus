@@ -13,22 +13,22 @@ FILE *global_logF = nullptr;
 
 struct allocation_table_entry {
 	int8_t filename[64];
-	int line_number = -1;
+	int32_t line_number = -1;
 	void* buffer = nullptr;
 };
 
 allocation_table_entry allocation_table[MAX_MEMORY_ALLOCATIONS];
 int32_t alloc_count = 0;
 
-void* system_malloc(size_t size, const char* filename, int line_number) {
+void* system_malloc(size_t size, const char* filename, int32_t line_number) {
 	alloc_count++;
 	if (alloc_count >= MAX_MEMORY_ALLOCATIONS) {
 		platform_fatal_error("Exceed maximum memory allocations!");
 		return nullptr;
 	}
 
-	int first_free = -1;
-	for (int i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
+	int32_t first_free = -1;
+	for (int32_t i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
 		if (allocation_table[i].buffer == nullptr) {
 			first_free = i;
 			break;
@@ -53,7 +53,7 @@ void* system_malloc(size_t size, const char* filename, int line_number) {
 	return ptr;
 }
 
-void* system_realloc(void* ptr, size_t size, const char* filename, int line_number) {
+void* system_realloc(void* ptr, size_t size, const char* filename, int32_t line_number) {
 	if (!ptr) {
 		return system_malloc(size, filename, line_number);
 	}
@@ -64,7 +64,7 @@ void* system_realloc(void* ptr, size_t size, const char* filename, int line_numb
 		return nullptr;
 	}
 
-	for (int i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
+	for (int32_t i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
 		if (allocation_table[i].buffer == ptr) {
 			allocation_table[i].buffer = new_ptr;
 			break;
@@ -79,7 +79,7 @@ void system_free(void* ptr) {
 		platform_fatal_error("Attempted to free nullptr!");
 	}
 
-	for (int i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
+	for (int32_t i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
 		if (allocation_table[i].buffer == ptr) {
 			allocation_table[i].buffer = nullptr;
 			break;
@@ -99,7 +99,7 @@ void system_free(void* ptr) {
 void system_report_stray_allocation() {
 #ifdef DEBUG
 	if (alloc_count != 0) {
-		for (int i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
+		for (int32_t i = 0; i < MAX_MEMORY_ALLOCATIONS; i++) {
 			if (allocation_table[i].buffer) {
 				Log(0, "Leaked memory at %s:%i\n", allocation_table[i].filename, allocation_table[i].line_number);
 			}

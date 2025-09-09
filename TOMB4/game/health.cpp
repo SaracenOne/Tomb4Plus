@@ -162,8 +162,9 @@ void DrawAirBar(int32_t flash_state) {
 }
 
 void InitialisePickUpDisplay() {
-	for (int i = 0; i < 8; i++)
+	for (int32_t i = 0; i < 8; i++) {
 		pickups[i].life = -1;
+	}
 
 	PickupX = GetFixedScale(128);
 	FullPickupX = PickupX;

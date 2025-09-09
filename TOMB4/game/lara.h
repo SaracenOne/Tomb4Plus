@@ -7,6 +7,9 @@
 #define LARA_TURN_DECREMENT DEGREES_TO_ROTATION(2)
 #define LARA_TURN_INCREMENT ((DEGREES_TO_ROTATION(1) / 4) + LARA_TURN_DECREMENT)
 
+#define LARA_STANDARD_HEIGHT ((HALF_BLOCK_SIZE + CLICK_SIZE) - 6)
+#define LARA_CROUCH_HEIGHT 400
+
 void lara_void_func(ITEM_INFO* item, COLL_INFO* coll);
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, int16_t rot, int16_t flip);

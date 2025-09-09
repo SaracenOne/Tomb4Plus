@@ -87,7 +87,7 @@ extern int8_t cd_flags[128];
 
 extern uint32_t FmvSceneTriggered;
 extern uint32_t CutSceneTriggered;
-extern int32_t SetDebounce;
+extern bool SetDebounce;
 extern int32_t framecount;
 extern int32_t reset_flag;
 extern int32_t WeaponDelay;

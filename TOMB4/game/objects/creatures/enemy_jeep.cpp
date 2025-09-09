@@ -54,7 +54,7 @@ void JeepFireGrenade(ITEM_INFO* item) {
 		SmokeCountL = 32;
 		SmokeWeapon = 5;
 
-		for (int i = 0; i < 5; i++)
+		for (int32_t i = 0; i < 5; i++)
 			TriggerGunSmoke(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 0, 0, 0, 1, 5, 32);
 
 		if (GetRandomControl() & 3)
@@ -226,19 +226,19 @@ void EnemyJeepControl(int16_t item_number) {
 	}
 
 	if (_h1 > item->floor + HALF_BLOCK_SIZE) {
-		jeep->LOT.is_jumping = 1;
+		jeep->LOT.is_jumping = true;
 
 		if (item->item_flags[1] > 0) {
 			xrot = item->item_flags[1];
 			item->item_flags[1] -= 8;
 
 			if (item->item_flags[1] < 0)
-				jeep->LOT.is_jumping = 0;
+				jeep->LOT.is_jumping = false;
 
 			item->pos.y_pos += item->item_flags[1] >> 6;
 		} else {
 			item->item_flags[1] = xrot << 1;
-			jeep->LOT.is_jumping = 1;
+			jeep->LOT.is_jumping = true;
 		}
 
 		if (jeep->LOT.is_jumping) {
@@ -254,7 +254,7 @@ void EnemyJeepControl(int16_t item_number) {
 	}
 
 	if (info.distance < 0x240000 || item->item_flags[3] == -2)
-		jeep->reached_goal = 1;
+		jeep->reached_goal = true;
 
 	if (jeep->reached_goal) {
 		TestTriggersAtXYZ(jeep->enemy->pos.x_pos, jeep->enemy->pos.y_pos, jeep->enemy->pos.z_pos, jeep->enemy->room_number, 1, 0);
@@ -290,11 +290,11 @@ void EnemyJeepControl(int16_t item_number) {
 		}
 
 		if (lara.location >= item->item_flags[3] || !(jeep->enemy->flags & 4)) {
-			jeep->reached_goal = 0;
+			jeep->reached_goal = false;
 			item->item_flags[3]++;
-			jeep->enemy = 0;
+			jeep->enemy = NULL;
 
-			for (int i = 0; i < nAIObjects; i++) {
+			for (int32_t i = 0; i < nAIObjects; i++) {
 				aiobj = &AIObjects[i];
 
 				if (aiobj->trigger_flags == item->item_flags[3] && aiobj->room_number != 255) {
@@ -348,7 +348,7 @@ void EnemyJeepControl(int16_t item_number) {
 	x = item->item_flags[0] * phd_sin(item->pos.y_rot) >> W2V_SHIFT;
 	z = item->item_flags[0] * phd_cos(item->pos.y_rot) >> W2V_SHIFT;
 
-	for (int i = 0; i < 4; i++)
+	for (int32_t i = 0; i < 4; i++)
 		jeep->joint_rotation[i] -= item->item_flags[0];
 
 	item->pos.x_pos += x >> 6;

@@ -788,7 +788,7 @@ void BoatControl(int16_t item_num, BOAT_TYPE boat_type) {
 		else
 			lara_item->pos.y_rot += 0x4000;
 
-		lara_item->anim_number = 77;
+		lara_item->anim_number = LARA_ANIM_JUMP_FORWARD;
 		lara_item->frame_number = anims[lara_item->anim_number].frame_base;
 		lara_item->current_anim_state = AS_FORWARDJUMP;
 		lara_item->goal_anim_state = AS_FORWARDJUMP;
@@ -852,7 +852,7 @@ void BoatControl(int16_t item_num, BOAT_TYPE boat_type) {
 		h = GetHeight(floor, pos.x, pos.y, pos.z);
 
 		if (pos.y > h && !(room[room_number].flags & ROOM_UNDERWATER)) {
-			for (int i = (GetRandomControl() & 3) + 3; i > 0; i--) {
+			for (int32_t i = (GetRandomControl() & 3) + 3; i > 0; i--) {
 				ang = int16_t(item->pos.y_rot + GetRandomControl() + 0x4000);
 				//TriggerBoatMist(pos.x, pos.y, pos.z, ((GetRandomControl() & 0xF) + 96) << 4, ang, 1);
 			}

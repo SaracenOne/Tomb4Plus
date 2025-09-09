@@ -1,8 +1,8 @@
 #pragma once
 #include "../global/types.h"
 
-const int DEFAULT_GLYPH_SCALE_WIDTH = 512;
-const int DEFAULT_GLYPH_SCALE_HEIGHT = 240;
+const int32_t DEFAULT_GLYPH_SCALE_WIDTH = 512;
+const int32_t DEFAULT_GLYPH_SCALE_HEIGHT = 240;
 
 #define CHAR_TABLE_COUNT 106
 

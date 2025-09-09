@@ -174,20 +174,20 @@ bool Page0(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.shadow_mode = (shadow_mode_enum)((int)tomb4.shadow_mode + 1);
+				tomb4.shadow_mode = (shadow_mode_enum)((int32_t)tomb4.shadow_mode + 1);
 
 				if (tomb4.shadow_mode >= SHADOW_MODE_ENUM_SIZE)
-					tomb4.shadow_mode = (shadow_mode_enum)((int)SHADOW_MODE_NULL + 1);
+					tomb4.shadow_mode = (shadow_mode_enum)((int32_t)SHADOW_MODE_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.shadow_mode = (shadow_mode_enum)((int)tomb4.shadow_mode - 1);
+				tomb4.shadow_mode = (shadow_mode_enum)((int32_t)tomb4.shadow_mode - 1);
 				;
 				if (tomb4.shadow_mode == SHADOW_MODE_NULL)
-					tomb4.shadow_mode = (shadow_mode_enum)((int)SHADOW_MODE_ENUM_SIZE - 1);
+					tomb4.shadow_mode = (shadow_mode_enum)((int32_t)SHADOW_MODE_ENUM_SIZE - 1);
 
 
 				changed = 1;
@@ -239,20 +239,20 @@ bool Page0(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.bar_mode = (bar_mode_enum)((int)tomb4.bar_mode + 1);
+				tomb4.bar_mode = (bar_mode_enum)((int32_t)tomb4.bar_mode + 1);
 
 				if (tomb4.bar_mode >= BAR_MODE_ENUM_SIZE)
-					tomb4.bar_mode = (bar_mode_enum)((int)BAR_MODE_NULL + 1);
+					tomb4.bar_mode = (bar_mode_enum)((int32_t)BAR_MODE_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.bar_mode = (bar_mode_enum)((int)tomb4.bar_mode - 1);
+				tomb4.bar_mode = (bar_mode_enum)((int32_t)tomb4.bar_mode - 1);
 				;
 				if (tomb4.bar_mode == BAR_MODE_NULL)
-					tomb4.bar_mode = (bar_mode_enum)((int)BAR_MODE_ENUM_SIZE - 1);
+					tomb4.bar_mode = (bar_mode_enum)((int32_t)BAR_MODE_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -263,20 +263,20 @@ bool Page0(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.bars_pos = (bars_pos_enum)((int)tomb4.bars_pos + 1);
+				tomb4.bars_pos = (bars_pos_enum)((int32_t)tomb4.bars_pos + 1);
 
 				if (tomb4.bars_pos >= BARS_POS_ENUM_SIZE)
-					tomb4.bars_pos = (bars_pos_enum)((int)BARS_POS_NULL + 1);
+					tomb4.bars_pos = (bars_pos_enum)((int32_t)BARS_POS_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.bars_pos = (bars_pos_enum)((int)tomb4.bars_pos - 1);
+				tomb4.bars_pos = (bars_pos_enum)((int32_t)tomb4.bars_pos - 1);
 				;
 				if (tomb4.bars_pos == BARS_POS_NULL)
-					tomb4.bars_pos = (bars_pos_enum)((int)BARS_POS_ENUM_SIZE - 1);
+					tomb4.bars_pos = (bars_pos_enum)((int32_t)BARS_POS_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -327,20 +327,20 @@ bool Page0(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.inv_bg_mode = (inv_bg_mode_enum)((int)tomb4.inv_bg_mode + 1);
+				tomb4.inv_bg_mode = (inv_bg_mode_enum)((int32_t)tomb4.inv_bg_mode + 1);
 
 				if (tomb4.inv_bg_mode >= INV_BG_MODE_ENUM_SIZE)
-					tomb4.inv_bg_mode = (inv_bg_mode_enum)((int)INV_BG_MODE_NULL + 1);
+					tomb4.inv_bg_mode = (inv_bg_mode_enum)((int32_t)INV_BG_MODE_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.inv_bg_mode = (inv_bg_mode_enum)((int)tomb4.inv_bg_mode - 1);
+				tomb4.inv_bg_mode = (inv_bg_mode_enum)((int32_t)tomb4.inv_bg_mode - 1);
 				;
 				if (tomb4.inv_bg_mode == INV_BG_MODE_NULL)
-					tomb4.inv_bg_mode = (inv_bg_mode_enum)((int)INV_BG_MODE_ENUM_SIZE - 1);
+					tomb4.inv_bg_mode = (inv_bg_mode_enum)((int32_t)INV_BG_MODE_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -472,20 +472,20 @@ bool Page1(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.look_transparency = (look_transparency_enum)((int)tomb4.look_transparency + 1);
+				tomb4.look_transparency = (look_transparency_enum)((int32_t)tomb4.look_transparency + 1);
 
 				if (tomb4.look_transparency >= LOOK_TRANSPARENCY_ENUM_SIZE)
-					tomb4.look_transparency = (look_transparency_enum)((int)LOOK_TRANSPARENCY_NULL + 1);
+					tomb4.look_transparency = (look_transparency_enum)((int32_t)LOOK_TRANSPARENCY_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.look_transparency = (look_transparency_enum)((int)tomb4.look_transparency - 1);
+				tomb4.look_transparency = (look_transparency_enum)((int32_t)tomb4.look_transparency - 1);
 				;
 				if (tomb4.look_transparency == LOOK_TRANSPARENCY_NULL)
-					tomb4.look_transparency = (look_transparency_enum)((int)LOOK_TRANSPARENCY_ENUM_SIZE - 1);
+					tomb4.look_transparency = (look_transparency_enum)((int32_t)LOOK_TRANSPARENCY_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -546,20 +546,20 @@ bool Page1(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.reverb = (reverb_enum)((int)tomb4.reverb + 1);
+				tomb4.reverb = (reverb_enum)((int32_t)tomb4.reverb + 1);
 
 				if (tomb4.reverb >= REVERB_ENUM_SIZE)
-					tomb4.reverb = (reverb_enum)((int)REVERB_NULL + 1);
+					tomb4.reverb = (reverb_enum)((int32_t)REVERB_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.reverb = (reverb_enum)((int)tomb4.reverb - 1);
+				tomb4.reverb = (reverb_enum)((int32_t)tomb4.reverb - 1);
 				;
 				if (tomb4.reverb == REVERB_NULL)
-					tomb4.reverb = (reverb_enum)((int)REVERB_ENUM_SIZE - 1);
+					tomb4.reverb = (reverb_enum)((int32_t)REVERB_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -624,20 +624,20 @@ bool Page1(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.pickup_lighting = (pickup_lighting_enum)((int)tomb4.pickup_lighting + 1);
+				tomb4.pickup_lighting = (pickup_lighting_enum)((int32_t)tomb4.pickup_lighting + 1);
 
 				if (tomb4.pickup_lighting >= PICKUP_LIGHTING_ENUM_SIZE)
-					tomb4.pickup_lighting = (pickup_lighting_enum)((int)PICKUP_LIGHTING_NULL + 1);
+					tomb4.pickup_lighting = (pickup_lighting_enum)((int32_t)PICKUP_LIGHTING_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.pickup_lighting = (pickup_lighting_enum)((int)tomb4.pickup_lighting - 1);
+				tomb4.pickup_lighting = (pickup_lighting_enum)((int32_t)tomb4.pickup_lighting - 1);
 
 				if (tomb4.pickup_lighting == PICKUP_LIGHTING_NULL)
-					tomb4.pickup_lighting = (pickup_lighting_enum)((int)PICKUP_LIGHTING_ENUM_SIZE - 1);
+					tomb4.pickup_lighting = (pickup_lighting_enum)((int32_t)PICKUP_LIGHTING_ENUM_SIZE - 1);
 
 				changed = 1;
 			}
@@ -648,20 +648,20 @@ bool Page1(int32_t& num, int32_t textY, uint32_t selection) {
 
 			if (dbinput & IN_RIGHT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int)tomb4.volumetric_flash_grenades + 1);
+				tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int32_t)tomb4.volumetric_flash_grenades + 1);
 
 				if (tomb4.volumetric_flash_grenades >= VOLUMETRIC_FLASH_GRENADES_ENUM_SIZE)
-					tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int)VOLUMETRIC_FLASH_GRENADES_NULL + 1);
+					tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int32_t)VOLUMETRIC_FLASH_GRENADES_NULL + 1);
 
 				changed = 1;
 			}
 
 			if (dbinput & IN_LEFT) {
 				SoundEffect(SFX_MENU_SELECT, 0, SFX_ALWAYS);
-				tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int)tomb4.volumetric_flash_grenades - 1);
+				tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int32_t)tomb4.volumetric_flash_grenades - 1);
 
 				if (tomb4.volumetric_flash_grenades == VOLUMETRIC_FLASH_GRENADES_NULL)
-					tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int)VOLUMETRIC_FLASH_GRENADES_ENUM_SIZE - 1);
+					tomb4.volumetric_flash_grenades = (volumetric_flash_grenades_enum)((int32_t)VOLUMETRIC_FLASH_GRENADES_ENUM_SIZE - 1);
 
 				changed = 1;
 			}

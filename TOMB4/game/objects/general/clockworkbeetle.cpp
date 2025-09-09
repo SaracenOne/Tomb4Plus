@@ -16,7 +16,7 @@ ITEM_INFO* TriggerClockworkBeetle(int32_t flag) {
 	int32_t dx, dy, dz;
 	int16_t item_number;
 
-	if (flag || lara_item->current_anim_state == AS_STOP && lara_item->anim_number == ANIM_BREATH &&
+	if (flag || lara_item->current_anim_state == AS_STOP && lara_item->anim_number == LARA_ANIM_BREATH &&
 	        !lara_item->gravity_status && lara.gun_status == LG_NO_ARMS) {
 		item_number = CreateItem();
 
@@ -84,9 +84,9 @@ void ControlClockworkBeetle(int16_t item_number) {
 	bounce = 0;
 	item = &items[item_number];
 
-	if (lara_item->anim_number == ANIM_USEBEETLE) {
+	if (lara_item->anim_number == LARA_ANIM_USEBEETLE) {
 		frame = lara_item->frame_number;
-		base = anims[ANIM_USEBEETLE].frame_base;
+		base = anims[LARA_ANIM_USEBEETLE].frame_base;
 
 		if (frame < base + 14) {
 			item->status = ITEM_INVISIBLE;
@@ -190,7 +190,7 @@ void ControlClockworkBeetle(int16_t item_number) {
 						lara.beetle_uses--;
 						item->item_flags[2] = 5;
 
-						for (int i = room[item->room_number].item_number; i != NO_ITEM; i = item2->next_item) {
+						for (int32_t i = room[item->room_number].item_number; i != NO_ITEM; i = item2->next_item) {
 							item2 = &items[i];
 
 							if (item2->object_number == MAPPER) {

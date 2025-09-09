@@ -182,8 +182,8 @@ static int32_t OnTwoBlockPlatform(ITEM_INFO* item, int32_t x, int32_t z) {
 
 	x >>= 10;
 	z >>= 10;
-	tx = item->pos.x_pos >> 10;
-	tz = item->pos.z_pos >> 10;
+	tx = item->pos.x_pos >> WALL_SHIFT;
+	tz = item->pos.z_pos >> WALL_SHIFT;
 
 	if (!item->pos.y_rot && (x == tx || x == tx - 1) && (z == tz || z == tz + 1))
 		return 1;
@@ -427,7 +427,7 @@ void ControlSprinkler(int16_t item_number) {
 	if (item->item_flags[0] <= 600) {
 		SoundEffect(SFX_SANDHAM_IN_THE_HOUSE, &item->pos, SFX_DEFAULT);
 
-		for (int i = 0; i < 3; i++) {
+		for (int32_t i = 0; i < 3; i++) {
 			sptr = &spark[GetFreeSpark()];
 			sptr->On = 1;
 			sptr->sR = 112;
@@ -456,7 +456,7 @@ void ControlSprinkler(int16_t item_number) {
 			sptr->MaxYvel = 0;
 		}
 
-		for (int i = 0; i < 1; i++) {
+		for (int32_t i = 0; i < 1; i++) {
 			smokeptr = &smoke_spark[GetFreeSmokeSpark()];
 			smokeptr->On = 1;
 			smokeptr->sShade = 0;
@@ -517,7 +517,7 @@ void ControlMineHelicopter(int16_t item_number) {
 		if (fade > 255)
 			fade = 0;
 
-		for (int i = 0; i < nSpheres; i++) {
+		for (int32_t i = 0; i < nSpheres; i++) {
 			sphere = &Slist[i];
 
 			if (!i || i > 5)
@@ -530,7 +530,7 @@ void ControlMineHelicopter(int16_t item_number) {
 		SoundEffect(SFX_EXPLOSION2, &item->pos, SFX_DEFAULT);
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0x1800000 | SFX_SETPITCH);
 
-		for (int i = 0; i < nSpheres; i++) {
+		for (int32_t i = 0; i < nSpheres; i++) {
 			sphere = &Slist[i];
 
 			if (i >= 7 && i != 9) {
@@ -540,7 +540,7 @@ void ControlMineHelicopter(int16_t item_number) {
 			}
 		}
 
-		for (int i = 0; i < nSpheres; i++)
+		for (int32_t i = 0; i < nSpheres; i++)
 			ExplodeItemNode(item, i, 0, -128);
 
 		FlashFadeR = 255;
@@ -573,8 +573,8 @@ void MineCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	if (item->trigger_flags || item->item_flags[3])
 		return;
 
-	if (l->anim_number == ANIM_MINEDETECT && l->frame_number >= anims[ANIM_MINEDETECT].frame_base + 57) {
-		for (int i = 0; i < level_items; i++) {
+	if (l->anim_number == LARA_ANIM_MINEDETECT && l->frame_number >= anims[LARA_ANIM_MINEDETECT].frame_base + 57) {
+		for (int32_t i = 0; i < level_items; i++) {
 			mines = &items[i];
 
 			if (mines->object_number != MINE || mines->status == ITEM_INVISIBLE || mines->trigger_flags)
@@ -582,7 +582,7 @@ void MineCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 
 			TriggerExplosionSparks(mines->pos.x_pos, mines->pos.y_pos, mines->pos.z_pos, 3, -2, 0, mines->room_number);
 
-			for (int j = 0; j < 2; j++)
+			for (int32_t j = 0; j < 2; j++)
 				TriggerExplosionSparks(mines->pos.x_pos, mines->pos.y_pos, mines->pos.z_pos, 3, -1, 0, mines->room_number);
 
 			mines->mesh_bits = 1;
@@ -597,14 +597,14 @@ void MineCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	} else if (TestBoundsCollide(item, l, 512)) {
 		TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -2, 0, item->room_number);
 
-		for (int i = 0; i < 2; i++)
+		for (int32_t i = 0; i < 2; i++)
 			TriggerExplosionSparks(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, 3, -1, 0, item->room_number);
 
 		item->mesh_bits = 1;
 		ExplodeItemNode(item, 0, 0, 128);
 		KillItem(item_number);
-		l->anim_number = ANIM_MINEDEATH;
-		l->frame_number = anims[ANIM_MINEDEATH].frame_base;
+		l->anim_number = LARA_ANIM_MINEDEATH;
+		l->frame_number = anims[LARA_ANIM_MINEDEATH].frame_base;
 		l->current_anim_state = AS_DEATH;
 		l->speed = 0;
 		SoundEffect(SFX_MINE_EXP_OVERLAY, &item->pos, SFX_DEFAULT);
@@ -627,12 +627,12 @@ void FallingSquishyBlockCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* 
 			l->hit_points = 0;
 			l->current_anim_state = AS_DEATH;
 			l->goal_anim_state = AS_DEATH;
-			l->anim_number = ANIM_FBLOCK_DEATH;
-			l->frame_number = anims[ANIM_FBLOCK_DEATH].frame_base + 50;
+			l->anim_number = LARA_ANIM_FBLOCK_DEATH;
+			l->frame_number = anims[LARA_ANIM_FBLOCK_DEATH].frame_base + 50;
 			l->fallspeed = 0;
 			l->speed = 0;
 
-			for (int i = 0; i < 12; i++)
+			for (int32_t i = 0; i < 12; i++)
 				TriggerBlood(l->pos.x_pos, l->pos.y_pos - 128, l->pos.z_pos, GetRandomControl() << 1, 3);
 		} else if (l->hit_points > 0)
 			ItemPushLara(item, l, coll, 0, 1);
@@ -1012,7 +1012,7 @@ void ControlBurningFloor(int16_t item_number) {
 				if (!nSpheres) {
 					nSpheres = GetSpheres(item, Slist, 1);
 
-					for (int i = 0; i < nSpheres; i++) {
+					for (int32_t i = 0; i < nSpheres; i++) {
 						sphere = &Slist[i];
 						dx = sphere->x - torch->pos.x_pos;
 						dy = sphere->y - torch->pos.y_pos;
@@ -1034,7 +1034,7 @@ void ControlBurningFloor(int16_t item_number) {
 		}
 	}
 
-	for (int i = 0; i < 15; i++) {
+	for (int32_t i = 0; i < 15; i++) {
 		xoff = floor_fires[(i * 3) + 0];
 		zoff = floor_fires[(i * 3) + 1];
 		size = floor_fires[(i * 3) + 2];
@@ -1045,7 +1045,7 @@ void ControlBurningFloor(int16_t item_number) {
 	}
 
 	if (!lara.burn) {
-		for (int i = 0; i < 3; i++) {
+		for (int32_t i = 0; i < 3; i++) {
 			xoff = deadly_floor_fires[(i * 2) + 0];
 			zoff = deadly_floor_fires[(i * 2) + 1];
 			dx = abs(item->pos.x_pos + xoff - lara_item->pos.x_pos);
@@ -1113,14 +1113,14 @@ void ControlBurningFloor(int16_t item_number) {
 	}
 }
 
-ITEM_INFO *GetPushableForRaisingBlock(ITEM_INFO* item, int check_range) {
+ITEM_INFO *GetPushableForRaisingBlock(ITEM_INFO* item, int32_t check_range) {
 	ITEM_INFO** itemlist = nullptr;
 	itemlist = (ITEM_INFO**)&tsv_buffer[0];
 	ITEM_INFO* collided;
 	GetCollidedObjects(item, check_range, 1, itemlist, 0, 0);
 
 	if (itemlist[0]) {
-		for (int i = 0; itemlist[0] != 0; i++, itemlist++) {
+		for (int32_t i = 0; itemlist[0] != 0; i++, itemlist++) {
 			collided = itemlist[0];
 
 			if (collided->object_number >= PUSHABLE_OBJECT1 && collided->object_number <= PUSHABLE_OBJECT5) {
@@ -1315,8 +1315,8 @@ void ControlScaledSpike(int16_t item_number) {
 				               lara_item->pos.x_pos, lara_item->pos.y_pos, lara_item->pos.z_pos);
 
 				if (item->pos.y_pos >= lara_item->pos.y_pos && (dy - lara_item->pos.y_pos < 50 || misc_info->lara_impales_on_spikes)) {
-					lara_item->anim_number = ANIM_SPIKED;
-					lara_item->frame_number = anims[ANIM_SPIKED].frame_base;
+					lara_item->anim_number = LARA_ANIM_SPIKED;
+					lara_item->frame_number = anims[LARA_ANIM_SPIKED].frame_base;
 					lara_item->current_anim_state = AS_DEATH;
 					lara_item->goal_anim_state = AS_DEATH;
 					lara_item->gravity_status = 0;
@@ -1453,7 +1453,7 @@ void FlameControl(int16_t fx_number) {
 
 	fx = &effects[fx_number];
 
-	for (int i = 14; i > 0; i--) {
+	for (int32_t i = 14; i > 0; i--) {
 		if (!(wibble & 0xC)) {
 			fx->pos.x_pos = 0;
 			fx->pos.y_pos = 0;
@@ -1616,9 +1616,9 @@ int32_t TestBoundsCollideTeethSpikes(ITEM_INFO* item) {
 	return xMin <= x + rad && xMax >= x - rad && zMin <= z + rad && zMax >= z - rad;
 }
 
-const int MAX_ROLLING_BALL_VALID_ROOMS = 22;
+const int32_t MAX_ROLLING_BALL_VALID_ROOMS = 22;
 
-int GetRollingBallRooms(ITEM_INFO* item, int16_t* valid_rooms) {
+int32_t GetRollingBallRooms(ITEM_INFO* item, int16_t* valid_rooms) {
 	int16_t* doors;
 	int32_t j;
 	int16_t room_count;
@@ -1628,7 +1628,7 @@ int GetRollingBallRooms(ITEM_INFO* item, int16_t* valid_rooms) {
 	doors = room[item->room_number].door;
 
 	if (doors) {
-		for (int i = *doors++; i > 0; i--, doors += 16) {
+		for (int32_t i = *doors++; i > 0; i--, doors += 16) {
 			for (j = 0; j < room_count; j++) {
 				if (valid_rooms[j] == *doors)
 					break;
@@ -1644,13 +1644,13 @@ int GetRollingBallRooms(ITEM_INFO* item, int16_t* valid_rooms) {
 	return room_count;
 }
 
-void RollingBallBaddieCollision(ITEM_INFO* rolling_ball, int16_t* valid_rooms, int valid_room_count) {
+void RollingBallBaddieCollision(ITEM_INFO* rolling_ball, int16_t* valid_rooms, int32_t valid_room_count) {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
 	int32_t dx, dy, dz;
 	int16_t item_number;
 
-	for (int i = 0; i < valid_room_count; i++) {
+	for (int32_t i = 0; i < valid_room_count; i++) {
 		for (item_number = room[valid_rooms[i]].item_number; item_number != NO_ITEM; item_number = item->next_item) {
 			item = &items[item_number];
 
@@ -1677,7 +1677,7 @@ void RollingBallBaddieCollision(ITEM_INFO* rolling_ball, int16_t* valid_rooms, i
 	return;
 }
 
-void RollingBallCollideStaticObjects(int32_t x, int32_t y, int32_t z, int32_t height, int16_t *valid_rooms, int valid_room_count) {
+void RollingBallCollideStaticObjects(int32_t x, int32_t y, int32_t z, int32_t height, int16_t *valid_rooms, int32_t valid_room_count) {
 	MESH_INFO* mesh;
 	STATIC_INFO* sinfo;
 	ROOM_INFO* r;
@@ -1696,8 +1696,8 @@ void RollingBallCollideStaticObjects(int32_t x, int32_t y, int32_t z, int32_t he
 	RollingBallBounds[4] = z + CLICK_SIZE;
 	RollingBallBounds[5] = z - CLICK_SIZE;
 
-	int i = 0;
-	for (int i = 0; i < valid_room_count; i++) {
+	int32_t i = 0;
+	for (int32_t i = 0; i < valid_room_count; i++) {
 		r = &room[valid_rooms[i]];
 		mesh = r->mesh;
 
@@ -1941,7 +1941,7 @@ void ControlRollingBall(int16_t item_number) {
 	if (global_info->trng_rollingball_extended_ocb || always_smash_and_kill) {
 		if (item->trigger_flags & 0x02 || item->trigger_flags & 0x10 || always_smash_and_kill) {
 			int16_t valid_rooms[MAX_ROLLING_BALL_VALID_ROOMS];
-			int valid_room_count = GetRollingBallRooms(item, valid_rooms);
+			int32_t valid_room_count = GetRollingBallRooms(item, valid_rooms);
 
 			// Enemy collision
 			if (item->trigger_flags & 0x02 || always_smash_and_kill) {
@@ -1978,7 +1978,7 @@ void RollingBallPush(int16_t item_number, ITEM_INFO* l) {
 	MOD_GLOBAL_INFO *global_info = get_game_mod_global_info();
 	if (global_info->trng_rollingball_extended_ocb) {
 		if (lara.GeneralPtr == item_number) {
-			if (l->anim_number == ANIM_BLOCKSWITCH) {
+			if (l->anim_number == LARA_ANIM_BLOCKSWITCH) {
 				int16_t quadrant = uint16_t(l->pos.y_rot + 0x2000) / 0x4000;
 
 				// FrameOfMoving
@@ -2028,7 +2028,7 @@ void RollingBallPush(int16_t item_number, ITEM_INFO* l) {
 
 		if ((item->trigger_flags & 0x04 && item->status == ITEM_INACTIVE) || item->trigger_flags & 0x08) {
 			if (lara.GeneralPtr != item_number && (input & IN_ACTION && lara.gun_status == LG_NO_ARMS &&
-			                                       l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH)) {
+			                                       l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH)) {
 				static int16_t RollingBallBounds[12] = { -700, 700, -512, 512, -700, 700, -0, 0, -5460, 5460, -0, 0 };
 				{
 					// Save rotation
@@ -2042,7 +2042,7 @@ void RollingBallPush(int16_t item_number, ITEM_INFO* l) {
 						if (1) {
 
 							l->current_anim_state = AS_SWITCHON;
-							l->anim_number = ANIM_BLOCKSWITCH;
+							l->anim_number = LARA_ANIM_BLOCKSWITCH;
 							item->goal_anim_state = 0;
 
 							l->goal_anim_state = AS_STOP;
@@ -2057,8 +2057,8 @@ void RollingBallPush(int16_t item_number, ITEM_INFO* l) {
 
 							T4PlusActivateItem(item_number, false);
 						} else {
-							l->anim_number = ANIM_PPREADY;
-							l->frame_number = anims[ANIM_PPREADY].frame_base;
+							l->anim_number = LARA_ANIM_PPREADY;
+							l->frame_number = anims[LARA_ANIM_PPREADY].frame_base;
 							l->current_anim_state = AS_PPREADY;
 
 							l->goal_anim_state = AS_STOP;
@@ -2097,8 +2097,8 @@ void RollingBallCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 		return;
 
 	if (TriggerActive(item) && (item->item_flags[0] || item->fallspeed)) {
-		lara_item->anim_number = ANIM_RBALL_DEATH;
-		lara_item->frame_number = anims[ANIM_RBALL_DEATH].frame_base;
+		lara_item->anim_number = LARA_ANIM_RBALL_DEATH;
+		lara_item->frame_number = anims[LARA_ANIM_RBALL_DEATH].frame_base;
 		lara_item->current_anim_state = AS_DEATH;
 		lara_item->goal_anim_state = AS_DEATH;
 		lara_item->gravity_status = 0;
@@ -2142,7 +2142,7 @@ void DartsControl(int16_t item_number) {
 		item->floor = GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 
 		if (item->pos.y_pos >= item->floor) {
-			for (int i = 0; i < 4; i++)
+			for (int32_t i = 0; i < 4; i++)
 				TriggerDartSmoke(x, item->pos.y_pos, z, 0, 0, 1);
 
 			KillItem(item_number);
@@ -2202,7 +2202,7 @@ void DartEmitterControl(int16_t item_number) {
 		else
 			zLimit = abs(z << 1) - 1;
 
-		for (int i = 0; i < 5; i++) {
+		for (int32_t i = 0; i < 5; i++) {
 			rand = -GetRandomControl();
 
 			if (z >= 0)
@@ -2380,8 +2380,8 @@ void CeilingTrapDoorCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll
 		lara.gun_status = LG_HANDS_BUSY;
 		l->gravity_status = 0;
 		l->fallspeed = 0;
-		l->anim_number = ANIM_PULLTRAP;
-		l->frame_number = anims[ANIM_PULLTRAP].frame_base;
+		l->anim_number = LARA_ANIM_PULLTRAP;
+		l->frame_number = anims[LARA_ANIM_PULLTRAP].frame_base;
 		l->current_anim_state = AS_PULLTRAP;
 		AddActiveItem(item_number);
 		item->status = ITEM_ACTIVE;
@@ -2401,12 +2401,12 @@ void FloorTrapDoorCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) 
 
 	item = &items[item_number];
 
-	if (input & IN_ACTION && item->status != ITEM_ACTIVE && l->current_anim_state == AS_STOP && l->anim_number == ANIM_BREATH
+	if (input & IN_ACTION && item->status != ITEM_ACTIVE && l->current_anim_state == AS_STOP && l->anim_number == LARA_ANIM_BREATH
 	        && lara.gun_status == LG_NO_ARMS || lara.IsMoving && lara.GeneralPtr == item_number) {
 		if (TestLaraPosition(FloorTrapDoorBounds, item, l)) {
 			if (MoveLaraPosition(&FloorTrapDoorPos, item, l)) {
-				l->anim_number = ANIM_LIFTTRAP;
-				l->frame_number = anims[ANIM_LIFTTRAP].frame_base;
+				l->anim_number = LARA_ANIM_LIFTTRAP;
+				l->frame_number = anims[LARA_ANIM_LIFTTRAP].frame_base;
 				l->current_anim_state = AS_LIFTTRAP;
 				lara.IsMoving = 0;
 				lara.head_x_rot = 0;
@@ -2441,17 +2441,17 @@ void OpenTrapDoor(ITEM_INFO* item) {
 
 	pitsky = item->item_flags[3];
 	r = &room[item->room_number];
-	floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+	floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 
 	if (item->pos.y_pos == r->minfloor) {
 		floor->pit_room = pitsky & 0xFF;
 		r = &room[floor->pit_room];
-		floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+		floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 		floor->sky_room = pitsky >> 8;
 	} else {
 		floor->sky_room = pitsky >> 8;
 		r = &room[floor->sky_room];
-		floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+		floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 		floor->pit_room = pitsky & 0xFF;
 	}
 
@@ -2464,13 +2464,13 @@ void CloseTrapDoor(ITEM_INFO* item) {
 	uint16_t pitsky;
 
 	r = &room[item->room_number];
-	floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+	floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 
 	if (item->pos.y_pos == r->minfloor) {
 		pitsky = floor->pit_room;
 		floor->pit_room = 255;
 		r = &room[pitsky];
-		floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+		floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 		pitsky |= floor->sky_room << 8;
 		floor->sky_room = 255;
 		item->item_flags[2] = 1;
@@ -2479,7 +2479,7 @@ void CloseTrapDoor(ITEM_INFO* item) {
 		pitsky = floor->sky_room;
 		floor->sky_room = 255;
 		r = &room[pitsky];
-		floor = &r->floor[((item->pos.z_pos - r->z) >> 10) + r->x_size * ((item->pos.x_pos - r->x) >> 10)];
+		floor = &r->floor[((item->pos.z_pos - r->z) >> WALL_SHIFT) + r->x_size * ((item->pos.x_pos - r->x) >> WALL_SHIFT)];
 		pitsky <<= 8;
 		pitsky |= floor->pit_room;
 		floor->pit_room = 255;
@@ -2620,7 +2620,7 @@ void ControlObelisk(int16_t item_number) {
 		}
 
 		if (item->trigger_flags == 2) {
-			for (int i = 0; i < level_items; i++) {
+			for (int32_t i = 0; i < level_items; i++) {
 				pulley = &items[i];
 
 				if (pulley->object_number == PULLEY) {

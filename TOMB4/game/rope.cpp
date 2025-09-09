@@ -15,7 +15,7 @@ PENDULUM CurrentPendulum;
 int32_t nRope = 0;
 
 void DrawRopeList() {
-	for (int i = 0; i < nRope; i++) {
+	for (int32_t i = 0; i < nRope; i++) {
 		if (RopeList[i].Active)
 			DrawRope(&RopeList[i]);
 	}
@@ -29,7 +29,7 @@ void ProjectRopePoints(ROPE_STRUCT* Rope) {
 	phd_PushMatrix();
 	phd_TranslateAbs(Rope->Position.x, Rope->Position.y, Rope->Position.z);
 
-	for (int i = 0; i < MAX_ROPE_SEGMENTS; i++) {
+	for (int32_t i = 0; i < MAX_ROPE_SEGMENTS; i++) {
 		t.x = Rope->MeshSegment[i].x >> (W2V_SHIFT + 2);
 		t.y = Rope->MeshSegment[i].y >> (W2V_SHIFT + 2);
 		t.z = Rope->MeshSegment[i].z >> (W2V_SHIFT + 2);
@@ -426,7 +426,7 @@ void CalculateRope(ROPE_STRUCT* Rope) {
 int32_t RopeNodeCollision(ROPE_STRUCT* rope, int32_t x, int32_t y, int32_t z, int32_t rad) {
 	int32_t rx, ry, rz;
 
-	for (int i = 0; i < (MAX_ROPE_SEGMENTS - 2); ++i) {
+	for (int32_t i = 0; i < (MAX_ROPE_SEGMENTS - 2); ++i) {
 		if (y > rope->Position.y + (rope->MeshSegment[i].y >> (W2V_SHIFT + 2)) && y < rope->Position.y + (rope->MeshSegment[i + 1].y >> (W2V_SHIFT + 2))) {
 			rx = x - ((rope->MeshSegment[i + 1].x + rope->MeshSegment[i].x) >> 17) - rope->Position.x;
 			ry = y - ((rope->MeshSegment[i + 1].y + rope->MeshSegment[i].y) >> 17) - rope->Position.y;
@@ -454,7 +454,7 @@ void RopeControl(int16_t item_num) {
 
 void RopeCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 	ROPE_STRUCT* rope;
-	int i;
+	int32_t i;
 	int16_t* bounds;
 	int32_t x, y, z, rad;
 
@@ -472,10 +472,10 @@ void RopeCollision(int16_t item_number, ITEM_INFO* l, COLL_INFO* coll) {
 			if (l->current_anim_state == AS_REACH) {
 				l->anim_number = 379;
 				l->current_anim_state = AS_ROPEFWD;
-				lara.RopeFrame = (anims[ANIM_SWINGFWD].frame_base + 32) << 8;
-				lara.RopeDFrame = (anims[ANIM_SWINGFWD].frame_base + 60) << 8;
+				lara.RopeFrame = (anims[LARA_ANIM_SWINGFWD].frame_base + 32) << 8;
+				lara.RopeDFrame = (anims[LARA_ANIM_SWINGFWD].frame_base + 60) << 8;
 			} else {
-				l->anim_number = ANIM_UPJUMP2ROPE;
+				l->anim_number = LARA_ANIM_UPJUMP2ROPE;
 				l->current_anim_state = AS_ROPE;
 			}
 
