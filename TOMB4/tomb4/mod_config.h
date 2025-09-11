@@ -305,7 +305,7 @@ struct MOD_LEVEL_AUDIO_INFO {
 	int32_t sample_rate = 22050;
 
 	int16_t first_looped_audio_track = 105;
-	int16_t last_looped_audio_track = 111;
+	int16_t last_looped_audio_track = 127;
 
 	int16_t boat_track = 12;
 	int16_t inside_jeep_track = 98;
@@ -313,6 +313,8 @@ struct MOD_LEVEL_AUDIO_INFO {
 	int16_t secret_track = 5;
 
 	// SFX
+	int16_t lara_hit_sfx_id = SFX_UNDERWATER_DOOR;
+	int16_t no_ammo_sfx_id = SFX_SARLID_PALACES;
 	int16_t pour_sfx_id = SFX_POUR;
 	int16_t loop_for_small_fires_sfx_id = SFX_LOOP_FOR_SMALL_FIRES;
 	int16_t flame_emitter_sfx_id = SFX_FLAME_EMITTER;
@@ -575,7 +577,6 @@ struct MOD_LEVEL_MISC_INFO {
 	bool enable_ricochet_sound_effect = false;
 	bool enable_smashing_and_killing_rolling_balls = false;
 	bool enable_standing_pushables = false;
-	bool enemy_gun_hit_underwater_sfx_fix = false;
 	bool darts_poison_fix = false;
 	bool disable_motorbike_headlights = false;
 	bool always_exit_from_statistics_screen = false;

@@ -26,10 +26,8 @@ int16_t GunHit(int32_t x, int32_t y, int32_t z, int16_t speed, int16_t yrot, int
 	pos.z = 0;
 	GetJointAbsPosition(lara_item, &pos, (25 * GetRandomControl()) / 0x7FFF);
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, lara_item->pos.y_rot, lara_item->room_number);
-	if (game_mod_config.level_info[gfCurrentLevel].misc_info.enemy_gun_hit_underwater_sfx_fix) {
-		SoundEffect(SFX_LARA_INJURY, &lara_item->pos, SFX_DEFAULT);
-	} else {
-		SoundEffect(SFX_UNDERWATER_DOOR, &lara_item->pos, SFX_DEFAULT);
+	if (game_mod_config.level_info[gfCurrentLevel].audio_info.lara_hit_sfx_id >= 0) {
+		SoundEffect(game_mod_config.level_info[gfCurrentLevel].audio_info.lara_hit_sfx_id, &lara_item->pos, SFX_DEFAULT);
 	}
 	return GunShot(x, y, z, speed, yrot, room_number);
 }

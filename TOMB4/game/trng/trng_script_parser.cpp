@@ -352,9 +352,9 @@ void NGSetupBugfixCustomization(int32_t current_level, uint16_t bug_fix_flags) {
 	}
 
 	if (bug_fix_flags & BUGF_LAND_WATER_SFX_ENEMIES) {
-		get_game_mod_level_misc_info(current_level)->enemy_gun_hit_underwater_sfx_fix = true;
+		get_game_mod_level_audio_info(current_level)->lara_hit_sfx_id = SFX_LARA_INJURY;
 	} else {
-		get_game_mod_level_misc_info(current_level)->enemy_gun_hit_underwater_sfx_fix = false;
+		get_game_mod_level_audio_info(current_level)->lara_hit_sfx_id = SFX_UNDERWATER_DOOR;
 	}
 }
 

@@ -4115,8 +4115,7 @@ void LookLeftRight() {
 
 		if (input & IN_LEFT) {
 			input -= IN_LEFT;
-
-			if (lara.head_y_rot > -8008) {
+			if (lara.head_y_rot > -DEGREES_TO_ROTATION(44)) {
 				if (BinocularRange)
 					lara.head_y_rot -= int16_t(DEGREES_TO_ROTATION(2) * (1792 - BinocularRange) / 1536);
 				else
@@ -4125,7 +4124,7 @@ void LookLeftRight() {
 		} else if (input & IN_RIGHT) {
 			input -= IN_RIGHT;
 
-			if (lara.head_y_rot < 8008) {
+			if (lara.head_y_rot < DEGREES_TO_ROTATION(44)) {
 				if (BinocularRange)
 					lara.head_y_rot += int16_t(DEGREES_TO_ROTATION(2) * (1792 - BinocularRange) / 1536);
 				else

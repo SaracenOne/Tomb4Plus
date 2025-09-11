@@ -358,6 +358,9 @@ void LoadGameModLevelAudioInfo(const json_t* audio, MOD_LEVEL_AUDIO_INFO* audio_
 	READ_JSON_SINT16(inside_jeep_track, audio, audio_info);
 	READ_JSON_SINT16(outside_jeep_track, audio, audio_info);
 	READ_JSON_SINT16(secret_track, audio, audio_info);
+
+	READ_JSON_SINT16(lara_hit_sfx_id, audio, audio_info);
+	READ_JSON_SINT16(no_ammo_sfx_id, audio, audio_info);
 }
 
 void LoadGameModLevelRectColorInfo(const json_t* rect_color, MOD_LEVEL_RECT_COLOR_INFO *rect_color_info) {
@@ -716,7 +719,6 @@ void LoadGameModLevelMiscInfo(const json_t *misc, MOD_LEVEL_MISC_INFO *misc_info
 	READ_JSON_BOOL(enable_ricochet_sound_effect, misc, misc_info);
 	READ_JSON_BOOL(enable_smashing_and_killing_rolling_balls, misc, misc_info);
 	READ_JSON_BOOL(enable_standing_pushables, misc, misc_info);
-	READ_JSON_BOOL(enemy_gun_hit_underwater_sfx_fix, misc, misc_info);
 	READ_JSON_BOOL(darts_poison_fix, misc, misc_info);
 	READ_JSON_BOOL(disable_motorbike_headlights, misc, misc_info);
 	READ_JSON_BOOL(always_exit_from_statistics_screen, misc, misc_info);
