@@ -221,7 +221,13 @@ void ProcessRoomVertices(ROOM_INFO* r) {
 			rnd = WaterTable[r->MeshEffect][rndoff & 0x3C].random;
 			shimmer = WaterTable[r->MeshEffect][((wibble >> 2) + rnd) & 0x3F].shimmer;
 			abs = WaterTable[r->MeshEffect][((wibble >> 2) + rnd) & 0x3F].abs;
-			col = (shimmer + abs) << 3;
+			col = (shimmer + abs);
+
+			// T4Plus - this may improve visual accuracy to some TRLE levels.
+			if (r->MeshEffect != 1) {
+				col = col << 3;
+			}
+
 			cR += col;
 			cG += col;
 			cB += col;
