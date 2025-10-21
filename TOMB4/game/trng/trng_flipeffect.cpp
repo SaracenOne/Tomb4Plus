@@ -794,16 +794,45 @@ bool sound_set_x_volume_for_audio_track_on_channel(uint8_t volume, uint8_t chann
 
 // NGLE - 134
 bool lara_attract_lara_in_direction_on_ground_with_speed(uint8_t direction, uint8_t speed) {
-	if (lara_item->pos.y_pos >= lara_item->floor)
+	if (lara_item->pos.y_pos >= lara_item->floor) {
 		NGAttractLaraInDirection(direction, speed);
+	}
 
 	return true;
 }
 
 // NGLE - 135
 bool lara_attract_lara_in_direction_in_air_with_speed(uint8_t direction, uint8_t speed) {
-	if (lara_item->pos.y_pos < lara_item->floor)
+	if (lara_item->pos.y_pos < lara_item->floor) {
 		NGAttractLaraInDirection(direction, speed);
+	}
+
+	return true;
+}
+
+// NGLE - 136
+bool lara_attract_lara_up_down(uint8_t type, uint8_t speed) {
+	int32_t y_offset = 0;
+	
+	if (lara_item->fallspeed != 0) {
+		if (type & 0x01) {
+			y_offset = speed;
+			if (type & 0x02 && lara_item->fallspeed < 0) {
+				return true;
+			}
+		} else {
+			y_offset = -speed;
+			if (type & 0x02 && lara_item->fallspeed > 0) {
+				return true;
+			}
+		}
+	}
+
+	if (type & 0x04) {
+		lara_item->fallspeed += y_offset;
+	} else {
+		lara_item->pos.y_pos += y_offset;
+	}
 
 	return true;
 }
@@ -2077,7 +2106,7 @@ int32_t NGPerformTRNGFlipEffect(uint16_t flip_number, int16_t full_timer, uint32
 			break;
 		}
 		case LARA_ATTRACT_LARA_UP_DOWN: {
-			NGLog(NG_LOG_TYPE_UNIMPLEMENTED_FEATURE, "LARA_ATTRACT_LARA_UP_DOWN unimplemented!");
+			lara_attract_lara_up_down(timer, extra_timer);
 			repeat_type = 0;
 			break;
 		}
