@@ -156,6 +156,8 @@ int32_t T4PlusGetInventoryCount(int16_t object_number) {
 		return lara.num_flares;
 	else if (object_number == FLARE_INV_ITEM)
 		return lara.num_flares;
+	else if (object_number == LASERSIGHT_ITEM)
+		return lara.lasersight;
 	else if (object_number == BINOCULARS_ITEM)
 		return lara.binoculars;
 	else if (object_number == WATERSKIN1_EMPTY)
@@ -267,10 +269,12 @@ void T4PlusSetInventoryCount(int16_t object_number, int32_t count, bool update_w
 		lara.num_flares = count;
 	else if (object_number == FLARE_INV_ITEM)
 		lara.num_flares = count;
-	else if (object_number == BINOCULARS_ITEM)
-		lara.binoculars = count;
+	else if (object_number == LASERSIGHT_ITEM) {
+		lara.lasersight = count > 0 ? 1 : 0;
+	} else if (object_number == BINOCULARS_ITEM) {
+		lara.binoculars = count > 0 ? 1 : 0;
 	// TODO: check waterskin behaviour
-	else if (object_number == WATERSKIN1_EMPTY)
+	} else if (object_number == WATERSKIN1_EMPTY)
 		lara.small_water_skin = count;
 	else if (object_number == WATERSKIN1_1)
 		lara.small_water_skin = count;
