@@ -44,8 +44,9 @@ int32_t CheckSumValid(char* buffer) {
 
 	checksum = 0;
 
-	for (int32_t i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++)
+	for (int32_t i = 0; i < sizeof(LEGACY_SAVEGAME_INFO); i++) {
 		checksum += *buffer++;
+	}
 
 	return !checksum;
 }
@@ -57,9 +58,9 @@ void sgInitialiseHub(int32_t dont_save_lara) {
 		savegame.HubSizes[i] = 0;
 	}
 
-	if (dont_save_lara)
+	if (dont_save_lara) {
 		savegame.HubSavedLara = 0;
-	else {
+	} else {
 		SaveLaraData();
 		savegame.HubSavedLara = 1;
 	}
@@ -271,8 +272,9 @@ void WriteSG(void* pointer, int32_t size) {
 
 	SGcount += size;
 
-	for (data = (char*)pointer; size > 0; size--)
+	for (data = (char*)pointer; size > 0; size--) {
 		*SGpoint++ = *data++;
+	}
 }
 
 void ReadSG(void* pointer, int32_t size) {
@@ -280,15 +282,17 @@ void ReadSG(void* pointer, int32_t size) {
 
 	SGcount += size;
 
-	for (data = (char*)pointer; size > 0; size--)
+	for (data = (char*)pointer; size > 0; size--) {
 		*data++ = *SGpoint++;
+	}
 }
 
 void SaveHubData(int32_t index) {
 	savegame.HubSizes[index] = uint16_t(SGcount - savegame.HubOffsets[index]);
 
-	if (index < MAX_HUB_LEVELS)
-		savegame.HubSizes[index - (MAX_HUB_LEVELS-1)] = savegame.HubSizes[index] + savegame.HubOffsets[index];
+	if (index < MAX_HUB_LEVELS) {
+		savegame.HubSizes[index - (MAX_HUB_LEVELS - 1)] = savegame.HubSizes[index] + savegame.HubOffsets[index];
+	}
 }
 
 void RestoreLaraData(bool full_save) {
@@ -537,8 +541,9 @@ void sgRestoreLevel() {
 		lara_item->pos.z_pos = lsp->z;
 		lara_item->pos.y_rot = lsp->y_rot;
 
-		if (lara_item->room_number != lsp->room_number)
+		if (lara_item->room_number != lsp->room_number) {
 			ItemNewRoom(lara.item_number, lsp->room_number);
+		}
 	}
 
 	InitialiseLaraAnims(lara_item);
@@ -553,17 +558,19 @@ void sgRestoreLevel() {
 				item->pos.z_pos = lara_item->pos.z_pos;
 				item->pos.y_rot = lara_item->pos.y_rot;
 
-				if (item->room_number != lara_item->room_number)
+				if (item->room_number != lara_item->room_number) {
 					ItemNewRoom(i, lara_item->room_number);
+				}
 
 				floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &item->room_number);
 				item->floor = GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 				lara.vehicle = i;
 
-				if (item->object_number == T4PlusGetMotorbikeSlotID())
+				if (item->object_number == T4PlusGetMotorbikeSlotID()) {
 					BikeStart(item, lara_item);
-				else if (item->object_number == T4PlusGetJeepSlotID())
+				} else if (item->object_number == T4PlusGetJeepSlotID()) {
 					JeepStart(item, lara_item);
+				}
 
 				break;
 			}
@@ -632,8 +639,9 @@ int32_t OpenSaveGame(uint8_t current_level, int32_t saving) {
 
 	index = 0;
 
-	while (index < MAX_HUB_LEVELS && savegame.HubLevels[index] != current_level)
+	while (index < MAX_HUB_LEVELS && savegame.HubLevels[index] != current_level) {
 		index++;
+	}
 
 	if (saving == 1) {
 		j = index + 1;
@@ -644,8 +652,9 @@ int32_t OpenSaveGame(uint8_t current_level, int32_t saving) {
 				curOffset = &savegame.HubOffsets[i];
 				nexOffset = &savegame.HubOffsets[j];
 
-				if (!savegame.HubLevels[j])
+				if (!savegame.HubLevels[j]) {
 					break;
+				}
 
 				memcpy(&savegame.buffer[curOffset[0]], &savegame.buffer[nexOffset[0]], nexOffset[MAX_HUB_LEVELS]);
 				curOffset[MAX_HUB_LEVELS] = nexOffset[MAX_HUB_LEVELS];
@@ -659,8 +668,9 @@ int32_t OpenSaveGame(uint8_t current_level, int32_t saving) {
 		}
 
 		for (index = 0; index < MAX_HUB_LEVELS; index++) {
-			if (!savegame.HubLevels[index])
+			if (!savegame.HubLevels[index]) {
 				break;
+			}
 		}
 
 		savegame.HubLevels[index] = current_level;
@@ -704,8 +714,9 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 	}
 
 	for (size_t i = 0; i < flipmap_bitcount; i++) {
-		if (flip_stats[i])
+		if (flip_stats[i]) {
 			flipmap_mask |= (1 << i);
+		}
 	}
 
 	if (use_full_flipmask) {
@@ -748,29 +759,34 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		}
 	}
 
-	if (shatter_bit_idx)
+	if (shatter_bit_idx) {
 		WriteSG(&word, sizeof(int16_t));
+	}
 
 	byte = 0;
 
-	for (int32_t i = 0; i < MAX_LIBRARY_TABS; i++)
+	for (int32_t i = 0; i < MAX_LIBRARY_TABS; i++) {
 		byte |= LibraryTab[i] << i;
+	}
 
 	WriteSG(&byte, sizeof(uint8_t));
 	WriteSG(&CurrentSequence, sizeof(uint8_t));
 	byte = 0;
 
-	for (int32_t i = 0; i < MAX_USED_SEQUENCES; i++)
+	for (int32_t i = 0; i < MAX_USED_SEQUENCES; i++) {
 		byte |= SequenceUsed[i] << i;
+	}
 
 	WriteSG(&byte, sizeof(uint8_t));
 	WriteSG(Sequences, MAX_SEQUENCES);
 
-	for (int32_t i = 0; i < number_cameras; i++)
+	for (int32_t i = 0; i < number_cameras; i++) {
 		WriteSG(&camera.fixed[i].flags, sizeof(int16_t));
+	}
 
-	for (int32_t i = 0; i < number_spotcams; i++)
+	for (int32_t i = 0; i < number_spotcams; i++) {
 		WriteSG(&SpotCam[i].flags, sizeof(int16_t));
+	}
 
 	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
@@ -784,47 +800,61 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 			if (item->flags & (IFL_CODEBITS | IFL_INVISIBLE | IFL_TRIGGERED) || item->object_number == T4PlusGetLaraSlotID() && full_save) {
 				packed = 0x8000;
 
-				if (item->pos.x_rot)
+				if (item->pos.x_rot) {
 					packed |= 1;
+				}
 
-				if (item->pos.z_rot)
+				if (item->pos.z_rot) {
 					packed |= 2;
+				}
 
-				if (item->pos.x_pos & 1)
+				if (item->pos.x_pos & 1) {
 					packed |= 4;
+				}
 
-				if (item->pos.y_pos & 1)
+				if (item->pos.y_pos & 1) {
 					packed |= 8;
+				}
 
-				if (item->pos.z_pos & 1)
+				if (item->pos.z_pos & 1) {
 					packed |= 0x10;
+				}
 
-				if (item->speed)
+				if (item->speed) {
 					packed |= 0x20;
+				}
 
-				if (item->fallspeed)
+				if (item->fallspeed) {
 					packed |= 0x40;
+				}
 
-				if (item->item_flags[0])
+				if (item->item_flags[0]) {
 					packed |= 0x80;
+				}
 
-				if (item->item_flags[1])
+				if (item->item_flags[1]) {
 					packed |= 0x100;
+				}
 
-				if (item->item_flags[2])
+				if (item->item_flags[2]) {
 					packed |= 0x200;
+				}
 
-				if (item->item_flags[3])
+				if (item->item_flags[3]) {
 					packed |= 0x400;
+				}
 
-				if (item->timer)
+				if (item->timer) {
 					packed |= 0x800;
+				}
 
-				if (item->trigger_flags)
+				if (item->trigger_flags) {
 					packed |= 0x1000;
+				}
 
-				if (obj->save_hitpoints && item->hit_points != obj->hit_points)
+				if (obj->save_hitpoints && item->hit_points != obj->hit_points) {
 					packed |= 0x4000;
+				}
 
 				WriteSG(&packed, sizeof(uint16_t));
 
@@ -843,17 +873,21 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 
 					WriteSG(&item->pos.y_rot, sizeof(int16_t));
 
-					if (packed & 1)
+					if (packed & 1) {
 						WriteSG(&item->pos.x_rot, sizeof(int16_t));
+					}
 
-					if (packed & 2)
+					if (packed & 2) {
 						WriteSG(&item->pos.z_rot, sizeof(int16_t));
+					}
 
-					if (packed & 0x20)
+					if (packed & 0x20) {
 						WriteSG(&item->speed, sizeof(int16_t));
+					}
 
-					if (packed & 0x40)
+					if (packed & 0x40) {
 						WriteSG(&item->fallspeed, sizeof(int16_t));
+					}
 				}
 
 				if (obj->save_anim) {
@@ -869,17 +903,19 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 					if (item->object_number != T4PlusGetLaraSlotID()) {
 						byte = item->anim_number - obj->anim_index;
 						WriteSG(&byte, sizeof(uint8_t));
-					} else
+					} else {
 						WriteSG(&item->anim_number, sizeof(int16_t));
+					}
 
 					WriteSG(&item->frame_number, sizeof(int16_t));
 				}
 
-				if (packed & 0x4000)
+				if (packed & 0x4000) {
 					WriteSG(&item->hit_points, sizeof(int16_t));
+				}
 
 				if (obj->save_flags) {
-					flags = item->flags;
+					flags = (uint16_t)item->flags;
 					flags |= item->active << 16;
 					flags |= item->status << 17;
 					flags |= item->gravity_status << 19;
@@ -891,31 +927,39 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 					flags |= item->ai_bits << 25;
 					flags |= item->really_active << 30;
 
-					if (obj->intelligent && item->data)
+					if (obj->intelligent && item->data) {
 						flags |= 0x80000000;
+					}
 
 					WriteSG(&flags, sizeof(uint32_t));
 
-					if (packed & 0x80)
+					if (packed & 0x80) {
 						WriteSG(&item->item_flags[0], sizeof(int16_t));
+					}
 
-					if (packed & 0x100)
+					if (packed & 0x100) {
 						WriteSG(&item->item_flags[1], sizeof(int16_t));
+					}
 
-					if (packed & 0x200)
+					if (packed & 0x200) {
 						WriteSG(&item->item_flags[2], sizeof(int16_t));
+					}
 
-					if (packed & 0x400)
+					if (packed & 0x400) {
 						WriteSG(&item->item_flags[3], sizeof(int16_t));
+					}
 
-					if (packed & 0x800)
+					if (packed & 0x800) {
 						WriteSG(&item->timer, sizeof(int16_t));
+					}
 
-					if (packed & 0x1000)
+					if (packed & 0x1000) {
 						WriteSG(&item->trigger_flags, sizeof(int16_t));
+					}
 
-					if (obj->intelligent)
+					if (obj->intelligent) {
 						WriteSG(&item->carried_item, sizeof(int16_t));
+					}
 
 					if (flags & 0x80000000) {
 						creature = (CREATURE_INFO*)item->data;
@@ -954,12 +998,14 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 					WriteSG(&item->meshswap_meshbits, sizeof(uint32_t));
 				}
 
-				if (item->object_number == T4PlusGetMotorbikeSlotID())
+				if (item->object_number == T4PlusGetMotorbikeSlotID()) {
 					WriteSG(item->data, sizeof(BIKEINFO));
-				else if (item->object_number == T4PlusGetJeepSlotID())
+				} else if (item->object_number == T4PlusGetJeepSlotID()) {
 					WriteSG(item->data, sizeof(JEEPINFO));
-			} else
+				}
+			} else {
 				WriteSG(&packed, sizeof(uint16_t));
+			}
 		}
 	}
 
@@ -978,8 +1024,9 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 		item = &items[level_items];
 
 		for (int32_t i = level_items; i < VANILLA_ITEM_COUNT; i++) {
-			if (item->active && (item->object_number == FLARE_ITEM || item->object_number == BURNING_TORCH_ITEM))
+			if (item->active && (item->object_number == FLARE_ITEM || item->object_number == BURNING_TORCH_ITEM)) {
 				byte++;
+			}
 
 			item++;
 		}
@@ -989,10 +1036,11 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 
 		for (int32_t i = level_items; i < VANILLA_ITEM_COUNT; i++) {
 			if (item->active && (item->object_number == FLARE_ITEM || item->object_number == BURNING_TORCH_ITEM)) {
-				if (item->object_number == FLARE_ITEM)
+				if (item->object_number == FLARE_ITEM) {
 					byte = 0;
-				else if (item->object_number == BURNING_TORCH_ITEM)
+				} else if (item->object_number == BURNING_TORCH_ITEM) {
 					byte = 1;
+				}
 
 				WriteSG(&byte, sizeof(int8_t));
 				WriteSG(&item->pos, sizeof(PHD_3DPOS));
@@ -1024,17 +1072,21 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 				if (Scarabs[j].On) {
 					word = Scarabs[j].room_number << 8;
 
-					if (Scarabs[j].pos.x_pos & 1)
+					if (Scarabs[j].pos.x_pos & 1) {
 						word |= 1;
+					}
 
-					if (Scarabs[j].pos.y_pos & 1)
+					if (Scarabs[j].pos.y_pos & 1) {
 						word |= 2;
+					}
 
-					if (Scarabs[j].pos.z_pos & 1)
+					if (Scarabs[j].pos.z_pos & 1) {
 						word |= 4;
+					}
 
-					if (Scarabs[j].pos.x_rot)
+					if (Scarabs[j].pos.x_rot) {
 						word |= 8;
+					}
 
 					WriteSG(&word, sizeof(int16_t));
 
@@ -1049,8 +1101,9 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 
 					WriteSG(&Scarabs[j].pos.y_rot, sizeof(int16_t));
 
-					if (word & 8)
+					if (word & 8) {
 						WriteSG(&Scarabs[j].pos.x_rot, sizeof(int16_t));
+					}
 				}
 			}
 		}
@@ -1078,8 +1131,9 @@ void SaveLevelData(bool full_save, bool use_full_flipmask) {
 			flags = 0;
 
 			for (int32_t i = 0; i < MAX_VONCROY_FLAGS; i++) {
-				if (VonCroyCutFlags[i])
+				if (VonCroyCutFlags[i]) {
 					flags |= 1 << (i & 0xF);
+				}
 
 				if ((i & 0xF) == 0xF) {
 					WriteSG(&flags, 2);
@@ -1126,8 +1180,9 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 	}
 
 	for (int32_t i = 0; i < flipmap_bitcount; i++) {
-		if (flipmap_mask & (1 << i))
+		if (flipmap_mask & (1 << i)) {
 			FlipMap(i);
+		}
 
 		ReadSG(&uword, sizeof(uint16_t));
 		flipmap[i] = uword << 8;
@@ -1185,11 +1240,15 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 
 	ReadSG(Sequences, MAX_SEQUENCES);
 
-	for (int32_t i = 0; i < number_cameras; i++)
+	for (int32_t i = 0; i < number_cameras; i++) {
 		ReadSG(&camera.fixed[i].flags, sizeof(int16_t));
+	}
 
-	for (int32_t i = 0; i < number_spotcams; i++)
+	for (int32_t i = 0; i < number_spotcams; i++) {
 		ReadSG(&SpotCam[i].flags, sizeof(int16_t));
+	}
+
+	MOD_LEVEL_OBJECTS_INFO* object_info = get_game_mod_level_objects_info(gfCurrentLevel);
 
 	for (int32_t i = 0; i < level_items; i++) {
 		item = &items[i];
@@ -1219,20 +1278,25 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 				ReadSG(&uroom_number, sizeof(uint8_t));
 				ReadSG(&item->pos.y_rot, sizeof(int16_t));
 
-				if (packed & 1)
+				if (packed & 1) {
 					ReadSG(&item->pos.x_rot, sizeof(int16_t));
+				}
 
-				if (packed & 2)
+				if (packed & 2) {
 					ReadSG(&item->pos.z_rot, sizeof(int16_t));
+				}
 
-				if (packed & 0x20)
+				if (packed & 0x20) {
 					ReadSG(&item->speed, sizeof(int16_t));
+				}
 
-				if (packed & 0x40)
+				if (packed & 0x40) {
 					ReadSG(&item->fallspeed, sizeof(int16_t));
+				}
 
-				if (item->room_number != uroom_number)
+				if (item->room_number != uroom_number) {
 					ItemNewRoom(i, uroom_number);
+				}
 
 				if (obj->shadow_size) {
 					floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, (int16_t*)&uroom_number);
@@ -1254,42 +1318,52 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 				if (item->object_number != T4PlusGetLaraSlotID()) {
 					ReadSG(&anim, sizeof(int8_t));
 					item->anim_number = obj->anim_index + anim;
-				} else
+				} else {
 					ReadSG(&item->anim_number, sizeof(int16_t));
+				}
 
 				ReadSG(&item->frame_number, sizeof(int16_t));
 			}
 
-			if (packed & 0x4000)
+			if (packed & 0x4000) {
 				ReadSG(&item->hit_points, sizeof(int16_t));
+			}
 
 			if (obj->save_flags) {
 				ReadSG(&flags, sizeof(uint32_t));
 				item->flags = (int16_t)flags;
 
-				if (packed & 0x80)
+				if (packed & 0x80) {
 					ReadSG(&item->item_flags[0], sizeof(int16_t));
+				}
 
-				if (packed & 0x100)
+				if (packed & 0x100) {
 					ReadSG(&item->item_flags[1], sizeof(int16_t));
+				}
 
-				if (packed & 0x200)
+				if (packed & 0x200) {
 					ReadSG(&item->item_flags[2], sizeof(int16_t));
+				}
 
-				if (packed & 0x400)
+				if (packed & 0x400) {
 					ReadSG(&item->item_flags[3], sizeof(int16_t));
+				}
 
-				if (packed & 0x800)
+				if (packed & 0x800) {
 					ReadSG(&item->timer, sizeof(int16_t));
+				}
 
-				if (packed & 0x1000)
+				if (packed & 0x1000) {
 					ReadSG(&item->trigger_flags, sizeof(int16_t));
+				}
 
-				if (obj->intelligent)
+				if (obj->intelligent) {
 					ReadSG(&item->carried_item, sizeof(int16_t));
+				}
 
-				if (flags & 0x10000 && !item->active)
+				if (flags & 0x10000 && !item->active) {
 					AddActiveItem(i);
+				}
 
 				item->active = (flags >> 16) & 1;
 				item->status = (flags >> 17) & 3;
@@ -1344,10 +1418,11 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 				ReadSG(&item->meshswap_meshbits, sizeof(uint32_t));
 			}
 
-			if (item->object_number == T4PlusGetMotorbikeSlotID())
+			if (item->object_number == T4PlusGetMotorbikeSlotID()) {
 				ReadSG(item->data, sizeof(BIKEINFO));
-			else if (item->object_number == T4PlusGetJeepSlotID())
+			} else if (item->object_number == T4PlusGetJeepSlotID()) {
 				ReadSG(item->data, sizeof(JEEPINFO));
+			}
 
 			if (obj->collision == PuzzleHoleCollision) {
 				if (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE) {
@@ -1360,13 +1435,16 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 				item->mesh_bits = 0x100;
 			}
 
-			if (item->object_number == RAISING_BLOCK1 && item->item_flags[1] ||
-				item->object_number == EXPANDING_PLATFORM && item->item_flags[2]) {
+			if (item->object_number == EXPANDING_PLATFORM && item->item_flags[2]) {
 				AlterFloorHeight(item, -BLOCK_SIZE);
 			}
 
+			if (item->object_number == RAISING_BLOCK1 && item->item_flags[1]) {
+				AlterFloorHeight(item, -object_info->raising_block_1_height);
+			}
+
 			if (item->object_number == RAISING_BLOCK2 && item->item_flags[1]) {
-				AlterFloorHeight(item, -(BLOCK_SIZE * 2));
+				AlterFloorHeight(item, -object_info->raising_block_2_height);
 			}
 
 			// Revert MoveableBlock standing collision
@@ -1410,10 +1488,11 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 			item = &items[item_number];
 			ReadSG(&byte, sizeof(int8_t));
 
-			if (!byte)
+			if (!byte) {
 				item->object_number = FLARE_ITEM;
-			else
+			} else {
 				item->object_number = BURNING_TORCH_ITEM;
+			}
 
 			ReadSG(&item->pos, sizeof(PHD_3DPOS));
 			ReadSG(&item->room_number, sizeof(int16_t));
@@ -1454,8 +1533,9 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 
 				ReadSG(&Scarabs[i].pos.y_rot, sizeof(int16_t));
 
-				if (sword & 8)
+				if (sword & 8) {
 					ReadSG(&Scarabs[i].pos.x_rot, sizeof(int16_t));
+				}
 
 				Scarabs[i].On = 1;
 				Scarabs[i].room_number = (sword >> 8) & 0xFF;
@@ -1472,11 +1552,13 @@ void RestoreLevelData(bool full_save, bool use_full_flipmask) {
 
 		if (gfCurrentLevel == 1) {
 			for (int32_t i = 0; i < MAX_VONCROY_FLAGS; i++) {
-				if (!(i & 0xF))
+				if (!(i & 0xF)) {
 					ReadSG(&uword, sizeof(uint16_t));
+				}
 
-				if (uword & 1 << (i & 0xF))
+				if (uword & 1 << (i & 0xF)) {
 					VonCroyCutFlags[i] = 1;
+				}
 			}
 		}
 

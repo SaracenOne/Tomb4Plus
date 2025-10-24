@@ -686,6 +686,9 @@ void LoadGameModLevelObjectsInfo(const json_t* objects, MOD_LEVEL_OBJECTS_INFO* 
 	READ_JSON_SINT16(falling_block_timer, objects, objects_info);
 	READ_JSON_SINT16(falling_block_tremble, objects, objects_info);
 
+	READ_JSON_UINT32(raising_block_1_height, objects, objects_info);
+	READ_JSON_UINT32(raising_block_2_height, objects, objects_info);
+
 	READ_JSON_SINT16(whitelight_teleport_ocb, objects, objects_info);
 
 	const json_t *object_customization = json_getProperty(objects, "object_customization");

@@ -238,6 +238,9 @@ struct MOD_LEVEL_OBJECTS_INFO {
 	int16_t falling_block_timer = 60;
 	int16_t falling_block_tremble = 1023;
 
+	uint32_t raising_block_1_height = BLOCK_SIZE;
+	uint32_t raising_block_2_height = BLOCK_SIZE * 2;
+
 	int16_t whitelight_teleport_ocb = -1;
 
 	int16_t slot_override[NUMBER_OBJECTS];
@@ -451,7 +454,7 @@ struct MOD_GLOBAL_INFO {
 	bool trng_pushable_extended_ocb = false; // TRNG (climable pushables)
 	bool trng_switch_extended_ocb = false; // TRNG (custom switch animations)
 	bool trng_hack_allow_meshes_with_exactly_256_vertices = false; // TRNG seems to have a special hack which allows meshes of 256 verticies
-	bool trng_advanced_block_raising_behaviour = false;
+	bool trng_advanced_block_raising_behaviour = true;
 	bool trng_pushables_have_gravity = false;
 	bool trng_legacy_ng_trigger_behaviour = false;
 

@@ -1142,12 +1142,15 @@ void ControlRaisingBlock(int16_t item_number) {
 
 	item = &items[item_number];
 
+	MOD_LEVEL_OBJECTS_INFO* object_info = get_game_mod_level_objects_info(gfCurrentLevel);
+
 	if (TriggerActive(item)) {
 		if (!item->item_flags[2]) {
-			if (item->object_number == RAISING_BLOCK2)
-				AlterFloorHeight(item, -(BLOCK_SIZE * 2));
-			else
-				AlterFloorHeight(item, -BLOCK_SIZE);
+			if (item->object_number == RAISING_BLOCK2) {
+				AlterFloorHeight(item, -object_info->raising_block_2_height);
+			} else {
+				AlterFloorHeight(item, -object_info->raising_block_1_height);
+			}
 
 			item->item_flags[2] = 1;
 		}
@@ -1159,9 +1162,9 @@ void ControlRaisingBlock(int16_t item_number) {
 			// TRNG
 			if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour) {
 				// TRNG
-				ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? (BLOCK_SIZE * 2) : BLOCK_SIZE);
+				ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? object_info->raising_block_2_height : object_info->raising_block_1_height);
 				if (pushable_item) {
-					int32_t height_different = item->object_number == RAISING_BLOCK2 ? -32 : -16;
+					int32_t height_different = item->object_number == RAISING_BLOCK2 ? -(object_info->raising_block_2_height / 64) : -(object_info->raising_block_1_height / 64);
 					pushable_item->pos.y_pos += height_different;
 
 					int16_t pushable_room_number = pushable_item->room_number;
@@ -1174,10 +1177,11 @@ void ControlRaisingBlock(int16_t item_number) {
 
 			if (item->trigger_flags && abs(item->pos.x_pos - lara_item->pos.x_pos) < (BLOCK_SIZE * 10) &&
 			        abs(item->pos.y_pos - lara_item->pos.y_pos) < (BLOCK_SIZE * 10) && abs(item->pos.z_pos - lara_item->pos.z_pos) < (BLOCK_SIZE * 10)) {
-				if (item->item_flags[1] == 64 || item->item_flags[1] == 4096)
+				if (item->item_flags[1] == 64 || item->item_flags[1] == 4096) {
 					camera.bounce = -32;
-				else
+				} else {
 					camera.bounce = -16;
+				}
 			}
 		}
 	} else if (item->item_flags[1] > 0) {
@@ -1185,19 +1189,20 @@ void ControlRaisingBlock(int16_t item_number) {
 
 		if (item->trigger_flags && abs(item->pos.x_pos - lara_item->pos.x_pos) < (BLOCK_SIZE * 10) &&
 		        abs(item->pos.y_pos - lara_item->pos.y_pos) < (BLOCK_SIZE * 10) && abs(item->pos.z_pos - lara_item->pos.z_pos) < (BLOCK_SIZE * 10)) {
-			if (item->item_flags[1] == 64 || item->item_flags[1] == 4096)
+			if (item->item_flags[1] == 64 || item->item_flags[1] == 4096) {
 				camera.bounce = -32;
-			else
+			} else {
 				camera.bounce = -16;
+			}
 		}
 
 		item->item_flags[1] -= 64;
 
 		// TRNG
 		if (get_game_mod_global_info()->trng_advanced_block_raising_behaviour) {
-			ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? 2048 : 1024);
+			ITEM_INFO* pushable_item = GetPushableForRaisingBlock(item, item->object_number == RAISING_BLOCK2 ? object_info->raising_block_2_height : object_info->raising_block_1_height);
 			if (pushable_item) {
-				int32_t height_different = item->object_number == RAISING_BLOCK2 ? 32 : 16;
+				int32_t height_different = item->object_number == RAISING_BLOCK2 ? -(object_info->raising_block_2_height / 64) : -(object_info->raising_block_1_height / 64);
 				pushable_item->pos.y_pos += height_different;
 				int16_t pushable_room_number = pushable_item->room_number;
 				FLOOR_INFO* floor_info = GetFloor(pushable_item->pos.x_pos, pushable_item->pos.y_pos + height_different, pushable_item->pos.z_pos, &pushable_room_number);
@@ -1207,10 +1212,11 @@ void ControlRaisingBlock(int16_t item_number) {
 			}
 		}
 	} else if (item->item_flags[2]) {
-		if (item->object_number == RAISING_BLOCK2)
-			AlterFloorHeight(item, (BLOCK_SIZE * 2));
-		else
-			AlterFloorHeight(item, BLOCK_SIZE);
+		if (item->object_number == RAISING_BLOCK2) {
+			AlterFloorHeight(item, object_info->raising_block_2_height);
+		} else {
+			AlterFloorHeight(item, object_info->raising_block_1_height);
+		}
 
 		item->item_flags[2] = 0;
 	}
